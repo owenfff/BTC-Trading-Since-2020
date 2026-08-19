@@ -320,7 +320,10 @@ def reconcile_execution_prices(normalized_events: Iterable[dict[str, Any]], regi
 
 
 def _build_candidate_diagnostics(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    mismatch_rows = [row for row in rows if row["lastPx_expected_execCost_raw"] != row["execCost"]]
+    mismatch_rows = [
+        row for row in rows
+        if _decimal(row["lastPx_expected_execCost_raw"]) != _decimal(row["execCost"])
+    ]
     candidates = {
         "lastPx": ("observed_last_px", "public Execution price; may have display precision loss"),
         "avgPx": ("observed_avg_px", "execution-average field; not assumed to equal a single Trade price"),
