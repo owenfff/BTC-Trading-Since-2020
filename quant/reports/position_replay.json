@@ -1,13 +1,13 @@
 {
   "audit_version": "M0-02A.1/1.0",
-  "generated_at_utc": "2026-08-19T05:22:28.536409Z",
+  "generated_at_utc": "2026-08-19T05:23:29.363075Z",
   "source": {
     "repository": "owenfff/BTC-Trading-Since-2020",
     "data_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
-    "analysis_commit": "6227b3b0a74d88d201c25438e59e6f27bb70a857"
+    "analysis_commit": "1e62097400fc72e4c5ba9715feff3a9818c26a6b"
   },
   "analysis": {
-    "commit": "6227b3b0a74d88d201c25438e59e6f27bb70a857",
+    "commit": "1e62097400fc72e4c5ba9715feff3a9818c26a6b",
     "branch": "quant/m0-02a-position-replay"
   },
   "protected_files": {
