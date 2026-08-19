@@ -1,6 +1,6 @@
 # M0-02A 合约张数仓位回放报告
 
-分析 commit：`9c30012a0c151dffcc0af3094e7fc3e9aa926bf2`；分支：`quant/m0-02a-position-replay`
+分析 commit：`e62b1c298d1802ff6406827c08787ef3c64630ae`；分支：`quant/m0-02a-position-replay`
 数据源 commit：`f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6`
 
 ## 执行摘要
