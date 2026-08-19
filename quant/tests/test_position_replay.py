@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import sys
 from pathlib import Path
 
@@ -13,10 +14,13 @@ if str(SRC) not in sys.path:
 
 from bitmex_replay.execution_normalizer import (  # noqa: E402
     assert_unique_exec_ids,
+    build_instrument_temporal_audit,
+    load_settlement_evidence,
     load_instruments,
     normalize_executions,
 )
 from bitmex_replay.io_utils import hash_files  # noqa: E402
+from bitmex_replay.instrument_metadata import classify_instrument_typ  # noqa: E402
 from bitmex_replay.order_dimension import build_order_dimension  # noqa: E402
 from bitmex_replay.position_replayer import classify_action, replay_positions  # noqa: E402
 from bitmex_replay.reconciliation import reconcile_snapshot  # noqa: E402
@@ -82,7 +86,7 @@ def make_inputs(tmp_path: Path, execution_rows: list[list[object]], order_rows: 
     instrument_path = tmp_path / "instrument.csv"
     write_csv(execution_path, EXEC_HEADERS, execution_rows)
     write_csv(order_path, ORDER_HEADERS, order_rows or [["2020-01-01T00:00:00Z", "order-1", "Filled", "XBTUSD", "Buy", 10]])
-    write_csv(instrument_path, ["symbol", "expiry", "settle", "settlCurrency"], [["XBTUSD", "", "", "XBt"]])
+    write_csv(instrument_path, ["symbol", "typ", "listing", "expiry", "settle", "settlCurrency", "state"], [["XBTUSD", "FFWCSX", "2019-01-01T00:00:00Z", "", "", "XBt", "Open"]])
     return execution_path, order_path, instrument_path
 
 
@@ -136,18 +140,25 @@ def test_funding_is_retained_as_cashflow_only(tmp_path: Path) -> None:
 
 def test_settlement_applies_only_when_instrument_is_expiring(tmp_path: Path) -> None:
     settlement = execution_row("settle-1", exec_type="Settlement", side="Sell", last_qty=25, order_id="")
-    execution_path, order_path, instrument_path = make_inputs(tmp_path, [settlement])
-    write_csv(instrument_path, ["symbol", "expiry", "settle", "settlCurrency"], [["XBTUSD", "2020-03-27T08:00:00Z", "XBT", "XBt"]])
-    event = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))["events"][0]
+    trade = execution_row("trade-1", last_qty=25)
+    execution_path, order_path, instrument_path = make_inputs(tmp_path, [trade, settlement])
+    write_csv(instrument_path, ["symbol", "typ", "listing", "expiry", "settle", "settlCurrency", "state"], [["XBTUSD", "FFWCSX", "2019-01-01T00:00:00Z", "2020-03-27T08:00:00Z", "XBT", "XBt", "Settled"]])
+    normalized = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))
+    replay_positions(normalized["events"])
+    event = next(event for event in normalized["events"] if event["execType"] == "Settlement")
     assert event["settlement_status"] == "APPLIED_POSITION_DELTA"
     assert event["position_effect"] == "POSITION_DELTA"
     assert event["signed_qty"] == -25
+    assert event["position_before"] == 25
+    assert event["position_after"] == 0
 
 
 def test_settlement_without_expiry_is_unresolved(tmp_path: Path) -> None:
     settlement = execution_row("settle-1", exec_type="Settlement", side="Sell", last_qty=25, order_id="")
-    execution_path, order_path, instrument_path = make_inputs(tmp_path, [settlement])
-    event = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))["events"][0]
+    execution_path, order_path, instrument_path = make_inputs(tmp_path, [execution_row("trade-1", last_qty=25), settlement])
+    normalized = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))
+    replay_positions(normalized["events"])
+    event = next(event for event in normalized["events"] if event["execType"] == "Settlement")
     assert event["settlement_status"] == "UNRESOLVED"
     assert event["normalization_status"] == "UNRESOLVED"
     assert event["signed_qty"] == 0
@@ -213,3 +224,96 @@ def test_protected_hash_is_stable(tmp_path: Path) -> None:
     before = hash_files(tmp_path, ["protected.csv"])
     after = hash_files(tmp_path, ["protected.csv"])
     assert before == after
+
+
+def test_instrument_typ_classifies_spot() -> None:
+    assert classify_instrument_typ("IFXXXP") == "SPOT"
+    assert classify_instrument_typ("FFWCSX") == "DERIVATIVE"
+    assert classify_instrument_typ("MRBXXX") == "REFERENCE_INDEX"
+    assert classify_instrument_typ("not-known") == "UNKNOWN"
+
+
+def test_spot_trade_is_retained_but_does_not_change_derivative_position(tmp_path: Path) -> None:
+    execution_path, order_path, instrument_path = make_inputs(tmp_path, [execution_row("spot-1", symbol="BMEX_USDT")])
+    write_csv(instrument_path, ["symbol", "typ", "listing", "expiry", "settle", "settlCurrency", "state"], [["BMEX_USDT", "IFXXXP", "2022-01-01T00:00:00Z", "", "", "", "Open"]])
+    normalized = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))
+    replay = replay_positions(normalized["events"])
+    event = normalized["events"][0]
+    assert len(normalized["events"]) == 1
+    assert event["instrument_class"] == "SPOT"
+    assert event["position_effect"] == "SPOT_BALANCE_DELTA"
+    assert event["normalization_status"] == "OK_SPOT_TRADE"
+    assert event["signed_contract_qty"] == 0
+    assert replay["position_events"][0]["action"] == "NO_POSITION_CHANGE"
+    assert replay["terminal_derivative_positions"] == []
+    assert replay["spot_execution_summary"][0]["trade_count"] == 1
+
+
+def test_unknown_trade_is_not_defaulted_to_derivative(tmp_path: Path) -> None:
+    execution_path, order_path, instrument_path = make_inputs(tmp_path, [execution_row("unknown-1", symbol="UNKNOWN")])
+    normalized = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))
+    event = normalized["events"][0]
+    assert event["instrument_class"] == "UNKNOWN"
+    assert event["normalization_status"] == "ERROR"
+    assert event["signed_contract_qty"] == 0
+
+
+def test_historical_settlement_evidence_closes_aave_position(tmp_path: Path) -> None:
+    evidence_path = tmp_path / "historical_settlement_evidence.json"
+    evidence_path.write_text(json.dumps({"settlements": [{
+        "symbol": "AAVEUSDT",
+        "execID": "aave-settle",
+        "announced_settlement_time": "2021-11-02T12:00:00Z",
+        "resolution": "OFFICIAL_EARLY_SETTLEMENT",
+        "source_title": "Early settlement",
+        "source_url": "https://example.test/aave",
+    }]}), encoding="utf-8")
+    evidence = load_settlement_evidence(evidence_path)
+    settlement = execution_row("aave-settle", exec_type="Settlement", symbol="AAVEUSDT", side="Sell", last_qty=7439, order_id="", timestamp="2021-11-02T11:59:59.999Z")
+    trade = execution_row("aave-trade", symbol="AAVEUSDT", side="Buy", last_qty=7439, timestamp="2021-11-02T11:00:00Z")
+    execution_path, order_path, instrument_path = make_inputs(tmp_path, [trade, settlement])
+    write_csv(instrument_path, ["symbol", "typ", "listing", "expiry", "settle", "settlCurrency", "state"], [["AAVEUSDT", "FFWCSX", "2024-09-04T12:00:00Z", "", "", "USDt", "Open"]])
+    normalized = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path), evidence)
+    replay = replay_positions(normalized["events"])
+    event = next(event for event in normalized["events"] if event["execType"] == "Settlement")
+    assert event["instrument_temporal_status"] == "SYMBOL_REUSE_SUSPECTED"
+    assert event["settlement_status"] == "APPLIED_POSITION_DELTA"
+    assert event["position_before"] == 7439
+    assert event["signed_contract_qty"] == -7439
+    assert event["position_after"] == 0
+    assert event["settlement_resolution_method"] == "OFFICIAL_EARLY_SETTLEMENT_AND_POSITION_CLOSE_INVARIANT"
+    assert next(row for row in replay["terminal_positions"] if row["symbol"] == "AAVEUSDT")["reconstructed_position"] == 0
+
+
+@pytest.mark.parametrize(
+    ("side", "qty"),
+    [("Sell", 5), ("Buy", 15)],
+)
+def test_settlement_that_does_not_fully_close_is_error(tmp_path: Path, side: str, qty: int) -> None:
+    execution_path, order_path, instrument_path = make_inputs(tmp_path, [execution_row("trade-1", last_qty=10), execution_row("settle-1", exec_type="Settlement", side=side, last_qty=qty, order_id="")])
+    write_csv(instrument_path, ["symbol", "typ", "listing", "expiry", "settle", "settlCurrency", "state"], [["XBTUSD", "FFWCSX", "2019-01-01T00:00:00Z", "2020-03-27T08:00:00Z", "XBT", "XBt", "Settled"]])
+    normalized = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))
+    replay_positions(normalized["events"])
+    event = next(event for event in normalized["events"] if event["execType"] == "Settlement")
+    assert event["settlement_status"] == "ERROR"
+    assert event["normalization_status"] == "ERROR"
+    assert event["position_after"] == 10
+
+
+def test_instrument_temporal_audit_marks_execution_before_listing(tmp_path: Path) -> None:
+    execution_path, order_path, instrument_path = make_inputs(tmp_path, [execution_row("early-1", timestamp="2020-01-01T00:00:00Z")])
+    write_csv(instrument_path, ["symbol", "typ", "listing", "expiry", "settle", "settlCurrency", "state"], [["XBTUSD", "FFWCSX", "2021-01-01T00:00:00Z", "", "", "XBt", "Open"]])
+    normalized = normalize_executions(execution_path, build_order_dimension(order_path), load_instruments(instrument_path))
+    audit = build_instrument_temporal_audit(normalized["events"], load_instruments(instrument_path))
+    assert audit[0]["metadata_temporal_status"] == "EXECUTION_BEFORE_CURRENT_LISTING"
+    assert audit[0]["requires_historical_spec"] is True
+
+
+def test_instrument_metadata_records_are_not_silently_overwritten(tmp_path: Path) -> None:
+    path = tmp_path / "instrument.csv"
+    write_csv(path, ["symbol", "typ", "listing", "expiry", "settle", "settlCurrency", "state"], [
+        ["REUSED", "FFWCSX", "2020-01-01T00:00:00Z", "", "", "XBt", "Settled"],
+        ["REUSED", "FFWCSX", "2024-01-01T00:00:00Z", "", "", "USDt", "Open"],
+    ])
+    records = load_instruments(path)
+    assert len(records["REUSED"]) == 2

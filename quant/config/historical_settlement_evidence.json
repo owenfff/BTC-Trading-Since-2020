@@ -1,0 +1,14 @@
+{
+  "schema_version": "M0-02A.1/1.0",
+  "settlements": [
+    {
+      "symbol": "AAVEUSDT",
+      "execID": "0d881570-ba4c-bc12-7efb-56ae7220d7eb",
+      "announced_settlement_time": "2021-11-02T12:00:00Z",
+      "resolution": "OFFICIAL_EARLY_SETTLEMENT",
+      "source_title": "AXS, EOS, LINK, SOL, AAVE, MATIC, SRM, SUSHI, TRX, UNI, VET, and XLM Quanto Perpetuals: New Listing and Early Settlement of Contracts Due to Naming Conventions",
+      "source_url": "https://www.bitmex.com/blog/axs-eos-link-sol-aave-matic-srm-sushi-trx-uni-vet-and-xlm-quanto-perpetuals-new-listing-and-early-settlement-of-contracts-due-to-naming-conventions",
+      "evidence_note": "BitMEX announced that the AAVEUSDT perpetual swap would be settled at 2021-11-02 12:00 UTC. Replay still requires the position-close invariant before applying this evidence."
+    }
+  ]
+}
