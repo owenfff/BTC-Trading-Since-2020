@@ -1,0 +1,1 @@
+event_time,source_row_number,execID,symbol,side,signed_contract_qty,observed_last_px,cost_implied_price,configured_tick_size,price_delta,delta_in_ticks,lastPx_expected_execCost_raw,execCost,reconciliation_reason
