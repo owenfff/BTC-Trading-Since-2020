@@ -37,6 +37,10 @@ from bitmex_replay.execution_value_validator import (  # noqa: E402
     validate_configured_multiplier,
     validate_partial_evidence_specs,
 )
+from bitmex_replay.execution_price_reconciler import (  # noqa: E402
+    write_execution_price_reports,
+    reconcile_execution_prices,
+)
 from bitmex_replay.io_utils import hash_files  # noqa: E402
 from bitmex_replay.order_dimension import build_order_dimension  # noqa: E402
 from bitmex_replay.reconciliation import write_csv, write_parquet  # noqa: E402
@@ -66,14 +70,19 @@ MULTIPLIER_REPORT_FIELDS = [
     "configured_multiplier_major", "configured_multiplier_raw",
     "declared_evidence_confidence", "effective_evidence_confidence",
     "derivative_trade_count", "eligible_validation_count", "exact_match_count",
-    "mismatch_count", "match_ratio", "max_abs_error_raw", "configured_multiplier",
+    "mismatch_count", "raw_lastPx_exact_match_count", "raw_lastPx_mismatch_count",
+    "execution_price_recovered_count", "execution_price_unresolved_count",
+    "multiplier_conflict_count", "match_ratio", "max_abs_error_raw", "configured_multiplier",
     "implied_multiplier_mode", "implied_multiplier_min", "implied_multiplier_max",
+    "raw_lastPx_implied_multiplier_min", "raw_lastPx_implied_multiplier_max",
     "sign_validation_status", "rounding_policy", "multiplier_validation_status",
+    "multiplier_validation_resolution",
     "blocking_reason",
 ]
 MULTIPLIER_MISMATCH_FIELDS = [
     "event_time", "source_row_number", "execID", "symbol", "side",
-    "signed_contract_qty", "lastPx", "configured_multiplier_raw",
+    "signed_contract_qty", "lastPx", "canonical_execution_price", "execution_price_status", "price_resolution_method",
+    "configured_multiplier_raw", "raw_expected_execCost_raw", "raw_difference_raw",
     "expected_execCost_raw", "actual_execCost_raw", "difference_raw", "spec_id",
 ]
 
@@ -189,14 +198,16 @@ def write_multiplier_reports(report: dict[str, Any], reports_dir: Path) -> None:
         "",
         "Validation uses Decimal only and the fixed raw-unit rule:",
         "",
-        "`expected_execCost_raw = signed_contract_qty × configured_multiplier_raw × lastPx`",
+        "`expected_execCost_raw = signed_contract_qty × configured_multiplier_raw × canonical_execution_price`",
         "",
-        "Buy is positive and Sell is negative through `signed_contract_qty`. No absolute value and no best-of-several rounding policy are used. Actual and expected raw XBt values are also normalized with the frozen wallet asset `scale` for audit display.",
+        "Buy is positive and Sell is negative through `signed_contract_qty`. The original `lastPx` remains in the report for comparison; canonical prices come from the exact Decimal execution-price reconciliation. No tolerance or best-of-several rounding policy is used. Actual and expected raw XBt values are also normalized with the frozen wallet asset `scale` for audit display.",
         "",
         f"- Historical specs diagnosed: `{report['spec_count']}`",
         f"- Eligible validation rows: `{report['eligible_validation_count']}`",
         f"- Exact matches: `{report['exact_match_count']}`",
-        f"- Mismatches: `{report['mismatch_count']}`",
+        f"- Raw lastPx mismatches: `{report.get('raw_lastPx_mismatch_count', 0)}`",
+        f"- Canonical multiplier conflicts: `{report.get('multiplier_conflict_count', report['mismatch_count'])}`",
+        f"- Execution-price unresolved rows: `{report.get('execution_price_unresolved_count', 0)}`",
         f"- Overall match ratio: `{report['match_ratio']}`",
         "",
         "## Per-spec validation",
@@ -239,6 +250,8 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
         f"- `MISSING_SPEC`: `{coverage['missing_spec_count']}`; `OVERLAPPING_SPECS`: `{coverage['overlapping_spec_count']}`.",
         f"- Settlement mapping: `{coverage['settlement_mapped_count']}/{coverage['settlement_count']}`; settlement currency conflicts: `{coverage['settlement_currency_conflict_count']}`; payout-model conflicts: `{coverage['payout_model_conflict_count']}`.",
         f"- Multiplier validation: `{report['multiplier_validation']['exact_match_count']}/{report['multiplier_validation']['eligible_validation_count']}` exact; mismatches: `{report['multiplier_validation']['mismatch_count']}`.",
+        f"- Execution-price precision: `{report['execution_price_precision']['summary']['exact_count']}` EXACT + `{report['execution_price_precision']['summary']['recovered_count']}` RECOVERED + `{report['execution_price_precision']['summary']['unresolved_count']}` UNRESOLVED; raw lastPx mismatches: `{report['execution_price_precision']['summary']['raw_lastPx_mismatch_count']}`.",
+        f"- Canonical multiplier conflicts after price reconciliation: `{report['multiplier_validation']['multiplier_conflict_count']}`.",
         f"- Spot executions excluded from denominator: `{report['execution']['spot_trade_count']}` Spot Trade rows.",
         "",
         "This report only resolves instrument specifications. It does not calculate average cost, realised/unrealised PnL, equity, leverage, margin, candles or trading signals.",
@@ -303,7 +316,7 @@ def write_markdown_report(report: dict[str, Any], path: Path) -> None:
         lines.append("- No coverage, interval, settlement-currency or core payout/multiplier blocker was found.")
     lines.extend([
         "",
-        f"Cost/PnL replay gate: **{readiness['m0_02b_spec_readiness']}**. Core-field blockers are evaluated over specification versions actually used by the frozen derivative execution mapping. Unused current-snapshot rows with unavailable derivations remain listed in `spec_evidence_matrix.csv`; they are not silently filled and do not block this historical dataset gate.",
+        f"Execution valuation gate: **{readiness['m0_02b_spec_readiness']}**. Core-field blockers are evaluated over specification versions actually used by the frozen derivative execution mapping. Unused current-snapshot rows with unavailable derivations remain listed in `spec_evidence_matrix.csv`; they are not silently filled and do not block this historical dataset gate.",
         "",
         "## Raw-data protection",
         "",
@@ -330,19 +343,45 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     registry = load_historical_specs(root / "quant" / "config" / "historical_instrument_specs.json", root / "api-v1-instrument.all.csv", source_commit())
     interval_errors = validate_spec_intervals(registry)
     mapping_rows = resolve_specs_for_events(normalized["events"], registry)
+    execution_price_reconciliation = reconcile_execution_prices(normalized["events"], registry, mapping_rows)
+    execution_price_report_paths = write_execution_price_reports(
+        execution_price_reconciliation,
+        reports,
+        source={
+            "analysis_commit": git_value(["rev-parse", "HEAD"]),
+            "branch": git_value(["rev-parse", "--abbrev-ref", "HEAD"]),
+            "raw_execution_file": "api-v1-execution-tradeHistory.csv",
+        },
+    )
     wallet_assets = load_wallet_asset_scales(root / "api-v1-wallet-assets.csv")
-    multiplier_validation = validate_configured_multiplier(normalized["events"], registry, mapping_rows, wallet_assets)
+    multiplier_validation = validate_configured_multiplier(
+        normalized["events"],
+        registry,
+        mapping_rows,
+        wallet_assets,
+        execution_price_reconciliation,
+    )
     partial_validation = validate_partial_evidence_specs(multiplier_validation)
     multiplier_report = build_multiplier_validation_report(multiplier_validation)
     multiplier_report["partial_evidence_validation"] = partial_validation
     write_multiplier_reports(multiplier_report, reports)
 
     validation_by_spec = {row["spec_id"]: row for row in multiplier_report["rows"]}
+    price_by_exec = {
+        row["execID"]: row
+        for row in execution_price_reconciliation["rows"]
+        if row.get("execID")
+    }
     for row in mapping_rows:
         validation = validation_by_spec.get(row.get("spec_id"))
+        price = price_by_exec.get(row.get("execID"))
         row["declared_evidence_confidence"] = row.get("spec_evidence_confidence", "")
         row["effective_evidence_confidence"] = validation.get("effective_evidence_confidence", "") if validation else row.get("spec_evidence_confidence", "")
         row["multiplier_validation_status"] = validation.get("multiplier_validation_status", "NOT_APPLICABLE") if validation else "NOT_APPLICABLE"
+        row["lastPx_original"] = price.get("lastPx") if price else None
+        row["cost_implied_price"] = price.get("cost_implied_price") if price else None
+        row["canonical_execution_price"] = price.get("canonical_execution_price") if price else None
+        row["execution_price_status"] = price.get("execution_price_status", "NOT_APPLICABLE") if price else "NOT_APPLICABLE"
     write_parquet(mapping_rows, outputs / "execution_spec_mapping.parquet")
 
     used_spec_ids = {row["spec_id"] for row in mapping_rows if row.get("spec_id")}
@@ -390,20 +429,35 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         blockers.append(f"{payout_model_conflicts} payout-model compatibility conflicts")
     if blocking_specs:
         blockers.append("at least one materialized spec lacks a core PnL field or has insufficient multiplier/payout evidence")
+    execution_price_blockers: list[str] = []
+    if execution_price_reconciliation["summary"]["unresolved_count"]:
+        execution_price_blockers.append(
+            f"{execution_price_reconciliation['summary']['unresolved_count']} execution price precision row(s) are unresolved"
+        )
     multiplier_blockers: list[str] = []
     for validation in multiplier_report["rows"]:
         if validation["spec_id"] not in used_spec_ids:
             continue
+        if validation["execution_price_unresolved_count"]:
+            execution_price_blockers.append(
+                f"{validation['spec_id']}: {validation['execution_price_unresolved_count']} execution price row(s) unresolved"
+            )
         if validation["eligible_validation_count"] == 0:
             multiplier_blockers.append(f"{validation['spec_id']}: eligible_validation_count is zero")
-        if validation["mismatch_count"]:
-            multiplier_blockers.append(f"{validation['spec_id']}: {validation['mismatch_count']} execCost mismatch(es)")
+        if validation["multiplier_conflict_count"]:
+            multiplier_blockers.append(f"{validation['spec_id']}: {validation['multiplier_conflict_count']} canonical execCost mismatch(es)")
         if validation["sign_validation_status"] == "CONFLICT":
             multiplier_blockers.append(f"{validation['spec_id']}: signed execution-cost direction conflict")
         if validation["declared_evidence_confidence"] == PARTIAL_EVIDENCE and validation["effective_evidence_confidence"] != PARTIAL_EVIDENCE:
             multiplier_blockers.append(f"{validation['spec_id']}: declared partial evidence did not pass executable validation")
+    blockers.extend(f"execution price precision: {item}" for item in execution_price_blockers)
     blockers.extend(f"multiplier validation: {item}" for item in multiplier_blockers)
-    readiness_status = "READY_FOR_COST_BASIS_REPLAY" if not blockers else ("BLOCKED_BY_MULTIPLIER_VALIDATION" if multiplier_blockers else "BLOCKED")
+    if execution_price_blockers:
+        readiness_status = "BLOCKED_BY_EXECUTION_PRICE_PRECISION"
+    elif multiplier_blockers:
+        readiness_status = "BLOCKED_BY_MULTIPLIER_VALIDATION"
+    else:
+        readiness_status = "READY_FOR_EXECUTION_VALUATION"
     protected = {
         "before": before,
         "after": hash_files(root, PROTECTED_FILES),
@@ -447,10 +501,23 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             "eligible_validation_count": multiplier_report["eligible_validation_count"],
             "exact_match_count": multiplier_report["exact_match_count"],
             "mismatch_count": multiplier_report["mismatch_count"],
+            "raw_lastPx_mismatch_count": multiplier_report.get("raw_lastPx_mismatch_count", 0),
+            "execution_price_recovered_count": multiplier_report.get("execution_price_recovered_count", 0),
+            "execution_price_unresolved_count": multiplier_report.get("execution_price_unresolved_count", 0),
+            "multiplier_conflict_count": multiplier_report.get("multiplier_conflict_count", 0),
+            "multiplier_validation_resolution_counts": multiplier_report.get("multiplier_validation_resolution_counts", {}),
             "match_ratio": multiplier_report["match_ratio"],
             "effective_evidence_confidence_counts": multiplier_report["effective_evidence_confidence_counts"],
             "ineligible_reasons": multiplier_report["ineligible_reasons"],
-            "blocking_spec_ids": [item["spec_id"] for item in multiplier_report["rows"] if item["multiplier_validation_status"] != "PASS" and item["spec_id"] in used_spec_ids],
+            "blocking_spec_ids": [
+                item["spec_id"] for item in multiplier_report["rows"]
+                if item["multiplier_validation_status"] not in {"PASS", "PASS_WITH_PRICE_PRECISION_RECONCILIATION"}
+                and item["spec_id"] in used_spec_ids
+            ],
+        },
+        "execution_price_precision": {
+            "report_paths": {key: str(path.relative_to(root)) for key, path in execution_price_report_paths.items()},
+            "summary": execution_price_reconciliation["summary"],
         },
         "coverage": {
             "derivative_execution_count": len(derivative_events),
@@ -475,7 +542,12 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             "used_in_execution": spec.get("spec_id") in used_spec_ids,
             "fields": [field for field in core_fields if spec.get(field) in {None, ""}],
         } for spec in registry["specs"] if any(spec.get(field) in {None, ""} for field in core_fields)],
-        "readiness": {"m0_02b_spec_readiness": readiness_status, "blockers": blockers},
+        "readiness": {
+            "m0_02b_spec_readiness": readiness_status,
+            "blockers": blockers,
+            "execution_price_precision_blockers": execution_price_blockers,
+            "multiplier_validation_blockers": multiplier_blockers,
+        },
         "protected_files": protected,
     }
     report_json = reports / "historical_spec_coverage.json"
@@ -495,7 +567,7 @@ def main() -> int:
     print(f"Settlement mapping: {report['coverage']['settlement_mapped_count']}/{report['coverage']['settlement_count']}")
     print(f"Protected raw files unchanged: {report['protected_files']['unchanged']}")
     print(f"Report: {ROOT / 'quant' / 'reports' / 'historical_spec_coverage.md'}")
-    return 0 if report["readiness"]["m0_02b_spec_readiness"] == "READY_FOR_COST_BASIS_REPLAY" else 1
+    return 0 if report["readiness"]["m0_02b_spec_readiness"] == "READY_FOR_EXECUTION_VALUATION" else 1
 
 
 if __name__ == "__main__":

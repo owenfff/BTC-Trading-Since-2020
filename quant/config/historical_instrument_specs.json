@@ -141,9 +141,10 @@
       "multiplier_raw": "10000",
       "lot_size": null,
       "tick_size": "0.0005",
+      "tick_size_evidence_confidence": "OFFICIAL_EXPLICIT",
       "evidence_confidence": "OFFICIAL_EXPLICIT",
       "sources": [{"source_type": "BITMEX_OFFICIAL_BLOG", "source_title": "Six New Altcoin Perpetual Swaps Launching on BitMEX in March", "source_url": "https://www.bitmex.com/blog/six-new-altcoin-perpetual-swaps-launching-on-bitmex-in-march", "published_at": "2021-02-23", "notes": "DOTUSDT Quanto listing 2021-03-03 and XBT margin."}, {"source_type": "BITMEX_OFFICIAL_BLOG", "source_title": "ADA, BNB, DOGE, DOT, and FIL Quanto Perpetuals", "source_url": "https://www.bitmex.com/blog/ada-bnb-doge-dot-and-fil-quanto-perpetuals-new-listing-and-early-settlement-of-contracts-due-to-naming-conventions", "published_at": "2021-09-23", "notes": "Old DOTUSDT multiplier 0.0001; early settlement 2021-10-13 12:00 UTC."}],
-      "field_provenance": {"execution_cross_check": "Legacy integer rounding gives modal ratio approximately 0.0001 XBT."},
+      "field_provenance": {"execution_cross_check": "Legacy integer rounding gives modal ratio approximately 0.0001 XBT.", "tick_size": "Official historical BitMEX listing table states a 0.0005 minimum price increment."},
       "notes": "Old underlying is not exposed by the available announcement; null is intentional."
     },
     {
@@ -164,10 +165,11 @@
       "multiplier_currency": "XBT",
       "multiplier_raw": "10000",
       "lot_size": null,
-      "tick_size": null,
+      "tick_size": "0.0005",
+      "tick_size_evidence_confidence": "OFFICIAL_EXPLICIT",
       "evidence_confidence": "OFFICIAL_EXPLICIT",
       "sources": [{"source_type": "BITMEX_OFFICIAL_BLOG", "source_title": "Introducing a new LINKUSDT Quanto Perpetual Contract", "source_url": "https://www.bitmex.com/blog/introducing-a-new-linkusdt-quanto-perpetual-contract-and-increased-leverage-on-our-linkusdt-quanto-future-contract", "published_at": "2020-10-12", "notes": "Quanto, .BLINKT, 0.0001 XBT, live 2020-10-16."}, {"source_type": "BITMEX_OFFICIAL_BLOG", "source_title": "Naming-convention early settlements", "source_url": "https://www.bitmex.com/blog/axs-eos-link-sol-aave-matic-srm-sushi-trx-uni-vet-and-xlm-quanto-perpetuals-new-listing-and-early-settlement-of-contracts-due-to-naming-conventions", "published_at": "2021-10-14", "notes": "Early settlement 2021-11-02 12:00 UTC and old LINKUSDT multiplier 0.0001."}],
-      "field_provenance": {"execution_cross_check": "Trade rows agree approximately after legacy integer rounding."},
+      "field_provenance": {"execution_cross_check": "Trade rows agree approximately after legacy integer rounding.", "tick_size": "Official historical BitMEX naming-convention listing table states a 0.0005 minimum price increment."},
       "notes": "Old LINKUSDT Quanto version."
     },
     {
