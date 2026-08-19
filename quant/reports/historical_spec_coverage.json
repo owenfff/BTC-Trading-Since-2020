@@ -1,10 +1,10 @@
 {
   "report_version": "M0-02B-0/1.0",
-  "generated_at_utc": "2026-08-19T06:24:37.690670Z",
+  "generated_at_utc": "2026-08-19T06:59:35.070820Z",
   "source": {
     "repository": "owenfff/BTC-Trading-Since-2020",
     "data_source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
-    "analysis_commit": "8723f7afd185e57363d7949067087b2643eef822",
+    "analysis_commit": "409911a79b6e31a3721226c73ed737cf35280f48",
     "branch": "quant/m0-02b0-historical-instrument-specs"
   },
   "registry": {
@@ -34,6 +34,22 @@
       "OFFICIAL_EXPLICIT": 172283,
       "OFFICIAL_PARTIAL_EXECUTION_VALIDATED": 943
     }
+  },
+  "multiplier_validation": {
+    "spec_count": 11,
+    "eligible_validation_count": 7234,
+    "exact_match_count": 5809,
+    "mismatch_count": 1425,
+    "match_ratio": "0.803013547139",
+    "effective_evidence_confidence_counts": {
+      "OFFICIAL_EXPLICIT": 9,
+      "OFFICIAL_PARTIAL_EXECUTION_VALIDATED": 2
+    },
+    "ineligible_reasons": {},
+    "blocking_spec_ids": [
+      "DOTUSDT-QUANTO-XBT-2021",
+      "LINKUSDT-QUANTO-XBT-2020"
+    ]
   },
   "coverage": {
     "derivative_execution_count": 173226,
@@ -1393,8 +1409,11 @@
     }
   ],
   "readiness": {
-    "m0_02b_spec_readiness": "READY_FOR_COST_BASIS_REPLAY",
-    "blockers": []
+    "m0_02b_spec_readiness": "BLOCKED_BY_MULTIPLIER_VALIDATION",
+    "blockers": [
+      "multiplier validation: DOTUSDT-QUANTO-XBT-2021: 1369 execCost mismatch(es)",
+      "multiplier validation: LINKUSDT-QUANTO-XBT-2020: 56 execCost mismatch(es)"
+    ]
   },
   "protected_files": {
     "before": {
