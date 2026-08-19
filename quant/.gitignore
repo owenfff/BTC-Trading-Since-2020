@@ -1,4 +1,6 @@
 outputs/*.parquet
 outputs/execution_spec_mapping.parquet
+outputs/execution_valuation.parquet
+outputs/execution_components.parquet
 **/__pycache__/
 .pytest_cache/
