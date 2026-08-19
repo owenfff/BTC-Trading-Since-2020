@@ -1,10 +1,10 @@
 {
   "report_version": "M0-02B-0/1.0",
-  "generated_at_utc": "2026-08-19T06:59:35.070820Z",
+  "generated_at_utc": "2026-08-19T07:55:18.854131Z",
   "source": {
     "repository": "owenfff/BTC-Trading-Since-2020",
     "data_source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
-    "analysis_commit": "409911a79b6e31a3721226c73ed737cf35280f48",
+    "analysis_commit": "15c40f539b30ebb68f77d52437b286213baa062e",
     "branch": "quant/m0-02b0-historical-instrument-specs"
   },
   "registry": {
@@ -38,18 +38,801 @@
   "multiplier_validation": {
     "spec_count": 11,
     "eligible_validation_count": 7234,
-    "exact_match_count": 5809,
-    "mismatch_count": 1425,
-    "match_ratio": "0.803013547139",
+    "exact_match_count": 7234,
+    "mismatch_count": 0,
+    "raw_lastPx_mismatch_count": 1425,
+    "execution_price_recovered_count": 1425,
+    "execution_price_unresolved_count": 0,
+    "multiplier_conflict_count": 0,
+    "multiplier_validation_resolution_counts": {
+      "MULTIPLIER_EXACT_WITH_OBSERVED_PRICE": 9,
+      "MULTIPLIER_VALID_PRICE_PRECISION_RECOVERED": 2
+    },
+    "match_ratio": "1.000000000000",
     "effective_evidence_confidence_counts": {
       "OFFICIAL_EXPLICIT": 9,
       "OFFICIAL_PARTIAL_EXECUTION_VALIDATED": 2
     },
     "ineligible_reasons": {},
-    "blocking_spec_ids": [
-      "DOTUSDT-QUANTO-XBT-2021",
-      "LINKUSDT-QUANTO-XBT-2020"
-    ]
+    "blocking_spec_ids": []
+  },
+  "execution_price_precision": {
+    "report_paths": {
+      "csv": "quant\\reports\\execution_price_precision.csv",
+      "detail_csv": "quant\\reports\\execution_price_precision_trades.csv",
+      "json": "quant\\reports\\execution_price_precision.json",
+      "md": "quant\\reports\\execution_price_precision.md",
+      "unresolved": "quant\\reports\\unresolved.csv",
+      "unresolved_compat": "quant\\reports\\execution_price_unresolved.csv"
+    },
+    "summary": {
+      "trade_count": 7234,
+      "exact_count": 5809,
+      "recovered_count": 1425,
+      "unresolved_count": 0,
+      "raw_lastPx_mismatch_count": 1425,
+      "canonical_reproduction_fail_count": 0,
+      "status_counts": {
+        "EXACT": 5809,
+        "OBSERVED_PRICE_COARSENED_BY_ONE_TICK": 1425
+      },
+      "by_spec": {
+        "AAVEUSDT-QUANTO-XBT-2021": {
+          "spec_id": "AAVEUSDT-QUANTO-XBT-2021",
+          "symbol": "AAVEUSDT",
+          "tick_size": null,
+          "trade_count": 402,
+          "observed_exact_count": 402,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 0,
+          "cost_implied_on_tick_ratio": "0.000000000000",
+          "observed_last_px_on_tick_count": 0,
+          "observed_last_px_on_tick_ratio": "0.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 402
+          },
+          "delta_in_ticks_distribution": {},
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 402
+          },
+          "observed_last_px_decimal_places": {
+            "1": 197,
+            "2": 205
+          },
+          "cost_implied_price_decimal_places": {
+            "0": 172,
+            "1": 25,
+            "2": 205
+          },
+          "canonical_exec_cost_exact_count": 402,
+          "final_status": "PASS"
+        },
+        "ADAUSDT-QUANTO-XBT-2021": {
+          "spec_id": "ADAUSDT-QUANTO-XBT-2021",
+          "symbol": "ADAUSDT",
+          "tick_size": "0.00001",
+          "trade_count": 152,
+          "observed_exact_count": 152,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 152,
+          "cost_implied_on_tick_ratio": "1.000000000000",
+          "observed_last_px_on_tick_count": 152,
+          "observed_last_px_on_tick_ratio": "1.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 152
+          },
+          "delta_in_ticks_distribution": {
+            "0": 152
+          },
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 152
+          },
+          "observed_last_px_decimal_places": {
+            "1": 49,
+            "2": 2,
+            "4": 1,
+            "5": 100
+          },
+          "cost_implied_price_decimal_places": {
+            "1": 49,
+            "2": 2,
+            "4": 1,
+            "5": 100
+          },
+          "canonical_exec_cost_exact_count": 152,
+          "final_status": "PASS"
+        },
+        "BNBUSDT-QUANTO-XBT-2021": {
+          "spec_id": "BNBUSDT-QUANTO-XBT-2021",
+          "symbol": "BNBUSDT",
+          "tick_size": "0.01",
+          "trade_count": 113,
+          "observed_exact_count": 113,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 113,
+          "cost_implied_on_tick_ratio": "1.000000000000",
+          "observed_last_px_on_tick_count": 113,
+          "observed_last_px_on_tick_ratio": "1.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 113
+          },
+          "delta_in_ticks_distribution": {
+            "0": 113
+          },
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 113
+          },
+          "observed_last_px_decimal_places": {
+            "1": 77,
+            "2": 36
+          },
+          "cost_implied_price_decimal_places": {
+            "0": 58,
+            "1": 19,
+            "2": 36
+          },
+          "canonical_exec_cost_exact_count": 113,
+          "final_status": "PASS"
+        },
+        "DOGEUSDT-QUANTO-XBT-2021": {
+          "spec_id": "DOGEUSDT-QUANTO-XBT-2021",
+          "symbol": "DOGEUSDT",
+          "tick_size": "0.00001",
+          "trade_count": 1735,
+          "observed_exact_count": 1735,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 1735,
+          "cost_implied_on_tick_ratio": "1.000000000000",
+          "observed_last_px_on_tick_count": 1735,
+          "observed_last_px_on_tick_ratio": "1.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 1735
+          },
+          "delta_in_ticks_distribution": {
+            "0": 1735
+          },
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 1735
+          },
+          "observed_last_px_decimal_places": {
+            "1": 9,
+            "2": 130,
+            "3": 396,
+            "4": 258,
+            "5": 942
+          },
+          "cost_implied_price_decimal_places": {
+            "1": 9,
+            "2": 130,
+            "3": 396,
+            "4": 258,
+            "5": 942
+          },
+          "canonical_exec_cost_exact_count": 1735,
+          "final_status": "PASS"
+        },
+        "DOTUSDT-QUANTO-XBT-2021": {
+          "spec_id": "DOTUSDT-QUANTO-XBT-2021",
+          "symbol": "DOTUSDT",
+          "tick_size": "0.0005",
+          "trade_count": 3359,
+          "observed_exact_count": 1990,
+          "recovered_count": 1369,
+          "unresolved_count": 0,
+          "exact_ratio": "0.592438225662",
+          "recovered_ratio": "0.407561774338",
+          "cost_implied_on_tick_count": 3359,
+          "cost_implied_on_tick_ratio": "1.000000000000",
+          "observed_last_px_on_tick_count": 3359,
+          "observed_last_px_on_tick_ratio": "1.000000000000",
+          "unique_price_deltas": [
+            "-0.0005",
+            "0",
+            "0.0005"
+          ],
+          "price_delta_frequency": {
+            "-0.0005": 951,
+            "0": 1990,
+            "0.0005": 418
+          },
+          "delta_in_ticks_distribution": {
+            "-1": 951,
+            "0": 1990,
+            "1": 418
+          },
+          "difference_raw_per_signed_qty_frequency": {
+            "-5": 951,
+            "0": 1990,
+            "5": 418
+          },
+          "observed_last_px_decimal_places": {
+            "1": 566,
+            "2": 484,
+            "3": 2309
+          },
+          "cost_implied_price_decimal_places": {
+            "0": 159,
+            "1": 407,
+            "2": 466,
+            "3": 958,
+            "4": 1369
+          },
+          "canonical_exec_cost_exact_count": 3359,
+          "final_status": "PASS"
+        },
+        "LINKUSDT-QUANTO-XBT-2020": {
+          "spec_id": "LINKUSDT-QUANTO-XBT-2020",
+          "symbol": "LINKUSDT",
+          "tick_size": "0.0005",
+          "trade_count": 232,
+          "observed_exact_count": 176,
+          "recovered_count": 56,
+          "unresolved_count": 0,
+          "exact_ratio": "0.758620689655",
+          "recovered_ratio": "0.241379310345",
+          "cost_implied_on_tick_count": 232,
+          "cost_implied_on_tick_ratio": "1.000000000000",
+          "observed_last_px_on_tick_count": 232,
+          "observed_last_px_on_tick_ratio": "1.000000000000",
+          "unique_price_deltas": [
+            "-0.0005",
+            "0",
+            "0.0005"
+          ],
+          "price_delta_frequency": {
+            "-0.0005": 33,
+            "0": 176,
+            "0.0005": 23
+          },
+          "delta_in_ticks_distribution": {
+            "-1": 33,
+            "0": 176,
+            "1": 23
+          },
+          "difference_raw_per_signed_qty_frequency": {
+            "-5": 33,
+            "0": 176,
+            "5": 23
+          },
+          "observed_last_px_decimal_places": {
+            "1": 93,
+            "2": 45,
+            "3": 94
+          },
+          "cost_implied_price_decimal_places": {
+            "0": 26,
+            "1": 66,
+            "2": 43,
+            "3": 41,
+            "4": 56
+          },
+          "canonical_exec_cost_exact_count": 232,
+          "final_status": "PASS"
+        },
+        "LUNAUSD-QUANTO-XBT-2021": {
+          "spec_id": "LUNAUSD-QUANTO-XBT-2021",
+          "symbol": "LUNAUSD",
+          "tick_size": null,
+          "trade_count": 358,
+          "observed_exact_count": 358,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 0,
+          "cost_implied_on_tick_ratio": "0.000000000000",
+          "observed_last_px_on_tick_count": 0,
+          "observed_last_px_on_tick_ratio": "0.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 358
+          },
+          "delta_in_ticks_distribution": {},
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 358
+          },
+          "observed_last_px_decimal_places": {
+            "0": 69,
+            "1": 47,
+            "2": 48,
+            "3": 194
+          },
+          "cost_implied_price_decimal_places": {
+            "0": 69,
+            "1": 47,
+            "2": 48,
+            "3": 194
+          },
+          "canonical_exec_cost_exact_count": 358,
+          "final_status": "PASS"
+        },
+        "ORDIUSD-QUANTO-XBT-2023": {
+          "spec_id": "ORDIUSD-QUANTO-XBT-2023",
+          "symbol": "ORDIUSD",
+          "tick_size": null,
+          "trade_count": 9,
+          "observed_exact_count": 9,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 0,
+          "cost_implied_on_tick_ratio": "0.000000000000",
+          "observed_last_px_on_tick_count": 0,
+          "observed_last_px_on_tick_ratio": "0.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 9
+          },
+          "delta_in_ticks_distribution": {},
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 9
+          },
+          "observed_last_px_decimal_places": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 6
+          },
+          "cost_implied_price_decimal_places": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 6
+          },
+          "canonical_exec_cost_exact_count": 9,
+          "final_status": "PASS"
+        },
+        "TRXUSDT-QUANTO-XBT-2021": {
+          "spec_id": "TRXUSDT-QUANTO-XBT-2021",
+          "symbol": "TRXUSDT",
+          "tick_size": null,
+          "trade_count": 15,
+          "observed_exact_count": 15,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 0,
+          "cost_implied_on_tick_ratio": "0.000000000000",
+          "observed_last_px_on_tick_count": 0,
+          "observed_last_px_on_tick_ratio": "0.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 15
+          },
+          "delta_in_ticks_distribution": {},
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 15
+          },
+          "observed_last_px_decimal_places": {
+            "3": 8,
+            "4": 2,
+            "5": 5
+          },
+          "cost_implied_price_decimal_places": {
+            "3": 8,
+            "4": 2,
+            "5": 5
+          },
+          "canonical_exec_cost_exact_count": 15,
+          "final_status": "PASS"
+        },
+        "UNIUSDT-QUANTO-XBT-2021": {
+          "spec_id": "UNIUSDT-QUANTO-XBT-2021",
+          "symbol": "UNIUSDT",
+          "tick_size": null,
+          "trade_count": 806,
+          "observed_exact_count": 806,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 0,
+          "cost_implied_on_tick_ratio": "0.000000000000",
+          "observed_last_px_on_tick_count": 0,
+          "observed_last_px_on_tick_ratio": "0.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 806
+          },
+          "delta_in_ticks_distribution": {},
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 806
+          },
+          "observed_last_px_decimal_places": {
+            "1": 149,
+            "2": 169,
+            "3": 488
+          },
+          "cost_implied_price_decimal_places": {
+            "0": 6,
+            "1": 143,
+            "2": 169,
+            "3": 488
+          },
+          "canonical_exec_cost_exact_count": 806,
+          "final_status": "PASS"
+        },
+        "XLMUSDT-QUANTO-XBT-2021": {
+          "spec_id": "XLMUSDT-QUANTO-XBT-2021",
+          "symbol": "XLMUSDT",
+          "tick_size": null,
+          "trade_count": 53,
+          "observed_exact_count": 53,
+          "recovered_count": 0,
+          "unresolved_count": 0,
+          "exact_ratio": "1.000000000000",
+          "recovered_ratio": "0.000000000000",
+          "cost_implied_on_tick_count": 0,
+          "cost_implied_on_tick_ratio": "0.000000000000",
+          "observed_last_px_on_tick_count": 0,
+          "observed_last_px_on_tick_ratio": "0.000000000000",
+          "unique_price_deltas": [
+            "0"
+          ],
+          "price_delta_frequency": {
+            "0": 53
+          },
+          "delta_in_ticks_distribution": {},
+          "difference_raw_per_signed_qty_frequency": {
+            "0": 53
+          },
+          "observed_last_px_decimal_places": {
+            "4": 4,
+            "5": 49
+          },
+          "cost_implied_price_decimal_places": {
+            "4": 4,
+            "5": 49
+          },
+          "canonical_exec_cost_exact_count": 53,
+          "final_status": "PASS"
+        }
+      },
+      "candidate_diagnostics": {
+        "AAVEUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "ADAUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "BNBUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "DOGEUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "DOTUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 1369,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 1369,
+            "exact_match_to_cost_implied_count": 1359,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 1369,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 1369,
+            "exact_match_to_cost_implied_count": 1369,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 1369,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 1369
+        },
+        "LINKUSDT-QUANTO-XBT-2020": {
+          "lastPx": {
+            "available_count": 56,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 56,
+            "exact_match_to_cost_implied_count": 44,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 56,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 56,
+            "exact_match_to_cost_implied_count": 56,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 56,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 56
+        },
+        "LUNAUSD-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "ORDIUSD-QUANTO-XBT-2023": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "TRXUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "UNIUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        },
+        "XLMUSDT-QUANTO-XBT-2021": {
+          "lastPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "public Execution price; may have display precision loss"
+          },
+          "avgPx": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "execution-average field; not assumed to equal a single Trade price"
+          },
+          "price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "order/execution price field; not promoted without exact semantic proof"
+          },
+          "cost_implied_price": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "derived from account-cost identity; canonical only after official-price rules"
+          },
+          "foreignNotional_over_homeNotional": {
+            "available_count": 0,
+            "exact_match_to_cost_implied_count": 0,
+            "semantic_note": "not used unless quote/base semantics and sign are valid"
+          },
+          "mismatch_count": 0
+        }
+      }
+    }
   },
   "coverage": {
     "derivative_execution_count": 173226,
@@ -1409,11 +2192,10 @@
     }
   ],
   "readiness": {
-    "m0_02b_spec_readiness": "BLOCKED_BY_MULTIPLIER_VALIDATION",
-    "blockers": [
-      "multiplier validation: DOTUSDT-QUANTO-XBT-2021: 1369 execCost mismatch(es)",
-      "multiplier validation: LINKUSDT-QUANTO-XBT-2020: 56 execCost mismatch(es)"
-    ]
+    "m0_02b_spec_readiness": "READY_FOR_EXECUTION_VALUATION",
+    "blockers": [],
+    "execution_price_precision_blockers": [],
+    "multiplier_validation_blockers": []
   },
   "protected_files": {
     "before": {

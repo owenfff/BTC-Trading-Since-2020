@@ -1,15 +1,17 @@
 # M0-02B-0 Historical BitMEX Instrument Specification Coverage
 
-Data source commit: `f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6`; analysis commit: `409911a79b6e31a3721226c73ed737cf35280f48`; branch: `quant/m0-02b0-historical-instrument-specs`.
+Data source commit: `f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6`; analysis commit: `15c40f539b30ebb68f77d52437b286213baa062e`; branch: `quant/m0-02b0-historical-instrument-specs`.
 
 ## Execution summary
 
-- `m0_02b_spec_readiness`: **BLOCKED_BY_MULTIPLIER_VALIDATION**
+- `m0_02b_spec_readiness`: **READY_FOR_EXECUTION_VALUATION**
 - Registry: `M0-02B-0/1.0`; total materialized specs: `784` (`11` configured historical + `773` frozen snapshot versions).
 - Derivative execution denominator: `173,226`; mapped: `173,226`; coverage: `100.000000`%.
 - `MISSING_SPEC`: `0`; `OVERLAPPING_SPECS`: `0`.
 - Settlement mapping: `19/19`; settlement currency conflicts: `0`; payout-model conflicts: `0`.
-- Multiplier validation: `5809/7234` exact; mismatches: `1425`.
+- Multiplier validation: `7234/7234` exact; mismatches: `0`.
+- Execution-price precision: `5809` EXACT + `1425` RECOVERED + `0` UNRESOLVED; raw lastPx mismatches: `1425`.
+- Canonical multiplier conflicts after price reconciliation: `0`.
 - Spot executions excluded from denominator: `208` Spot Trade rows.
 
 This report only resolves instrument specifications. It does not calculate average cost, realised/unrealised PnL, equity, leverage, margin, candles or trading signals.
@@ -153,10 +155,9 @@ The following materialized snapshot versions still lack `multiplier_major`. They
 
 ## Readiness and blockers
 
-- multiplier validation: DOTUSDT-QUANTO-XBT-2021: 1369 execCost mismatch(es)
-- multiplier validation: LINKUSDT-QUANTO-XBT-2020: 56 execCost mismatch(es)
+- No coverage, interval, settlement-currency or core payout/multiplier blocker was found.
 
-Cost/PnL replay gate: **BLOCKED_BY_MULTIPLIER_VALIDATION**. Core-field blockers are evaluated over specification versions actually used by the frozen derivative execution mapping. Unused current-snapshot rows with unavailable derivations remain listed in `spec_evidence_matrix.csv`; they are not silently filled and do not block this historical dataset gate.
+Execution valuation gate: **READY_FOR_EXECUTION_VALUATION**. Core-field blockers are evaluated over specification versions actually used by the frozen derivative execution mapping. Unused current-snapshot rows with unavailable derivations remain listed in `spec_evidence_matrix.csv`; they are not silently filled and do not block this historical dataset gate.
 
 ## Raw-data protection
 
