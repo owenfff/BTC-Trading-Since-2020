@@ -1,22 +1,25 @@
 {
   "report_version": "M0-02B-1B-0/1.0",
   "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
-  "analysis_commit": "dd6bf27442ebc2f36b6fc189b13c746d0791673f",
+  "analysis_commit": "2b4b9fbe17c22281b45ae3d07867e94295c28d6a",
   "analysis_branch": "quant/m0-02b1b-position-accounting-replay",
   "position_accounting_status": "BLOCKED",
   "m0_02b1b1_readiness": "BLOCKED_BY_ACCOUNTING_ROUNDING_POLICY",
   "blockers": [
     "no candidate policy satisfies conservation and terminal currentCost anchors",
     "XBTUSD snapshot reconciliation failed",
-    "rounding policy selection did not pass"
+    "rounding policy selection did not pass",
+    "no position cost model reproduced the XBTUSD terminal currentCost anchor"
   ],
   "warnings": [
     "150300 valuation warnings remained accounting-eligible",
-    "15739 reported realisedPnl rows differ from reconstructed gross trading PnL; diagnostic only"
+    "6951 reported PnL decomposition rows remain different from reconstructed gross; diagnostic only"
   ],
   "input_counts": {
     "raw_execution_count": 173434,
     "derivative_execution_count": 173226,
+    "raw_trade_count": 160510,
+    "derivative_trade_count": 160302,
     "trade_count": 160302,
     "funding_count": 12905,
     "settlement_count": 19,
@@ -77,17 +80,160 @@
       "average_entry_basis": "0.0013892242613089943973812373403121779178300360478364651685704780955268178548360536566023238613221324595729651761197086105651653521541845453051351443503651343880138491940592034085379332380158959965221797",
       "average_entry_price": "71982.618490822464968098336702587628720357600841946133345892107878589169521669517386375861191593009783898288650769001163067364823586717576221993137280942905343504535017594693555225292123462257237167290",
       "position_cycle_id": "XBTUSD-C0688",
-      "cycle_count": 688
+      "cycle_count": 688,
+      "cycle_open_time": "2026-03-04T09:06:41.266000Z",
+      "cycle_open_execID": "00000000-006d-1000-0000-002c4b221237"
     },
     "snapshot_reconciliation_status": "BLOCKED"
   },
   "reported_realised_pnl": {
     "non_null": 15739,
-    "exact": 0,
-    "mismatch": 15739,
+    "exact": 8788,
+    "mismatch": 6951,
     "missing": 157487,
-    "max_abs_difference_raw": "2516254"
+    "max_abs_difference_raw": "1.285142311374112166059264505327903341113588238886922087858636525631762711533647266711831695719876116994801696650602111417286069624863454136274174890415980823104575929059651073143316863838466904"
   },
+  "reported_pnl_decomposition": {
+    "status": "READY_WITH_WARNINGS",
+    "eligible": 15739,
+    "exact": 8788,
+    "mismatch": 6951,
+    "missing": 157487,
+    "broker_unresolved": 0
+  },
+  "instrument_terms": {
+    "row_count": 173226,
+    "status_counts": {
+      "MATCHED": 104899,
+      "SNAPSHOT_FALLBACK": 68327
+    },
+    "lot_size_counts": {
+      "1": 98990,
+      "100": 63248,
+      "1000": 8983,
+      "10": 889,
+      "1000000": 870,
+      "10000000000": 124,
+      "10000000": 122
+    },
+    "odd_last_qty_count": 7583,
+    "odd_order_qty_count": 7686,
+    "symbols": [
+      "AAVEUSDT",
+      "ADAM20",
+      "ADAUSD",
+      "ADAUSDT",
+      "ALTMEXUSD",
+      "AXSUSDT",
+      "BCHH21",
+      "BCHUSD",
+      "BMEXUSD",
+      "BNBUSD",
+      "BNBUSDT",
+      "DOGEUSD",
+      "DOGEUSDT",
+      "DOTUSDT",
+      "DOTUSDTH21",
+      "EOSH21",
+      "EOSUSDTZ20",
+      "ETHH21",
+      "ETHH22",
+      "ETHH23",
+      "ETHH24",
+      "ETHM20",
+      "ETHM21",
+      "ETHM22",
+      "ETHM23",
+      "ETHM24",
+      "ETHU20",
+      "ETHU21",
+      "ETHU22",
+      "ETHU23",
+      "ETHU24",
+      "ETHUSD",
+      "ETHUSDZ20",
+      "ETHZ20",
+      "ETHZ21",
+      "ETHZ22",
+      "ETHZ23",
+      "ETHZ24",
+      "LINKUSDT",
+      "LINKUSDTZ20",
+      "LTCH21",
+      "LTCM20",
+      "LTCM21",
+      "LTCU20",
+      "LTCU21",
+      "LTCUSD",
+      "LTCZ20",
+      "LTCZ21",
+      "LUNAUSD",
+      "ORDIUSD",
+      "TRXH21",
+      "TRXM20",
+      "TRXM21",
+      "TRXU20",
+      "TRXU21",
+      "TRXUSDT",
+      "TRXZ20",
+      "TRXZ21",
+      "UNIUSDT",
+      "XBTM21",
+      "XBTUSD",
+      "XLMUSDT",
+      "XRPUSD",
+      "XTZUSDTZ20",
+      "YFIUSDTH21",
+      "YFIUSDTZ20"
+    ],
+    "status": "PASS",
+    "snapshot_fallback_count": 68327
+  },
+  "execution_order": {
+    "multi_trade_group_count": 12469,
+    "unique_chain_group_count": 11689,
+    "ambiguous_group_count": 780,
+    "cross_order_tie_count": 371,
+    "status": "READY_WITH_AMBIGUOUS_CROSS_ORDER_TIES",
+    "source_policy_terminal_cost": "1386445848",
+    "cumqty_policy_terminal_cost": "1386445848",
+    "source_policy_cycle_count": 1401,
+    "cumqty_policy_cycle_count": 1402,
+    "source_policy_corrected_gross_exact": 8788,
+    "cumqty_policy_corrected_gross_exact": 8787
+  },
+  "position_cost_models": {
+    "status": "BLOCKED_BY_POSITION_COST_MODEL",
+    "model_count": 4,
+    "passing_model_count": 4
+  },
+  "aep_reconciliation": {
+    "status": "BLOCKED_BY_AEP_ENGINE_STATE_SEMANTICS",
+    "model_count": 5,
+    "current_cycle": {
+      "symbol": "XBTUSD",
+      "cycle_id": "XBTUSD-C0688",
+      "cycle_open_time": "2026-03-04T09:06:41.266000Z",
+      "cycle_open_execID": "00000000-006d-1000-0000-002c4b221237",
+      "execution_count": 627,
+      "first_event_time": "2026-03-04T09:06:41.266000Z",
+      "last_event_time": "2026-07-19T12:00:00.330000Z",
+      "lot_size_versions": "100",
+      "order_tie_count": 70,
+      "price_provenance_counts": {
+        "NOT_AUDITED_IN_M0_02B_0_2": 215,
+        "NOT_APPLICABLE": 412
+      },
+      "terminal_position": -998000,
+      "terminal_current_cost_api_raw": "1386445848",
+      "terminal_aep": "71982.618490822464968098336702587628720357600841946133345892107878589169521669517386375861191593009783898288650769001163067364823586717576221993137280942905343504535017594693555225292123462257237167290"
+    }
+  },
+  "reported_pnl_decomposition_status": "READY_WITH_WARNINGS",
+  "instrument_terms_status": "PASS",
+  "execution_order_status": "READY_WITH_AMBIGUOUS_CROSS_ORDER_TIES",
+  "position_cost_model_status": "BLOCKED_BY_POSITION_COST_MODEL",
+  "aep_reconciliation_status": "BLOCKED_BY_AEP_ENGINE_STATE_SEMANTICS",
   "gross_realised_pnl_by_currency": {
     "XBT": "12949758767.78637640858647551"
   },

@@ -7,9 +7,10 @@
 - `position_accounting_status`: **BLOCKED**
 - `m0_02b1b1_readiness`: **BLOCKED_BY_ACCOUNTING_ROUNDING_POLICY**
 - source commit: `f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6`
-- analysis commit: `dd6bf27442ebc2f36b6fc189b13c746d0791673f`
+- analysis commit: `2b4b9fbe17c22281b45ae3d07867e94295c28d6a`
 - branch: `quant/m0-02b1b-position-accounting-replay`
 - 处理行数: `173226`；Spot 进入 accounting: `0`。
+- Raw Execution: `173434`；Raw Trade: `160510`；Derivative Trade: `160302`。
 
 ## Accounting eligibility
 
@@ -22,11 +23,13 @@
 
 ## 覆盖与动作
 
-| execType | count |
-| --- | --- |
-| Funding | 12905 |
-| Settlement | 19 |
-| Trade | 160510 |
+| scope | event type | count |
+| --- | --- | --- |
+| raw | Trade | 160510 |
+| derivative | Trade | 160302 |
+| derivative | Funding | 12905 |
+| derivative | Settlement | 19 |
+| raw | Spot excluded | 208 |
 
 | action | count |
 | --- | --- |
@@ -96,9 +99,19 @@ Snapshot AEP comparison uses only the declared `Decimal('0.0001')` / ROUND_HALF_
 
 ## reported realisedPnl diagnostics
 
-- non-null: `15739`; exact: `0`; mismatch: `15739`; missing: `157487`。
-- maximum absolute difference raw: `2516254`。
-- reported realisedPnl never updates state and is not automatically combined with execComm or Funding. 詳細分布见 `reported_realised_pnl_diagnostics.csv`。
+- decomposition status: `READY_WITH_WARNINGS`; eligible: `15739`; exact: `8788`; mismatch: `6951`; missing: `157487`; broker unresolved: `0`。
+- corrected gross candidate = reported realisedPnl + execComm. brokerExecComm is not blindly added; a non-zero broker component remains unresolved. The reported fields never update position state.
+- 詳細分布见 `reported_realised_pnl_diagnostics.csv`。
+
+## 分阶段审计状态
+
+- reported_pnl_decomposition_status: `READY_WITH_WARNINGS`
+- instrument_terms_status: `PASS`
+- execution_order_status: `READY_WITH_AMBIGUOUS_CROSS_ORDER_TIES`
+- position_cost_model_status: `BLOCKED_BY_POSITION_COST_MODEL`
+- aep_reconciliation_status: `BLOCKED_BY_AEP_ENGINE_STATE_SEMANTICS`
+
+Temporal lot-size audit and tie-order details are in `instrument_terms_temporal_audit.csv` and `execution_tie_order_audit.csv`. Cost models remain diagnostic candidates; no per-Execution model selection is performed.
 
 ## Gross realised PnL
 
@@ -108,11 +121,12 @@ Snapshot AEP comparison uses only the declared `Decimal('0.0001')` / ROUND_HALF_
 
 ## 未解决异常与边界
 
-- blockers: `["no candidate policy satisfies conservation and terminal currentCost anchors", "XBTUSD snapshot reconciliation failed", "rounding policy selection did not pass"]`
-- warnings: `["150300 valuation warnings remained accounting-eligible", "15739 reported realisedPnl rows differ from reconstructed gross trading PnL; diagnostic only"]`
+- blockers: `["no candidate policy satisfies conservation and terminal currentCost anchors", "XBTUSD snapshot reconciliation failed", "rounding policy selection did not pass", "no position cost model reproduced the XBTUSD terminal currentCost anchor"]`
+- warnings: `["150300 valuation warnings remained accounting-eligible", "6951 reported PnL decomposition rows remain different from reconstructed gross; diagnostic only"]`
 - `position_accounting_anomalies.csv` 最多保留 200 个样例；完整逐 Execution 明细只写入被 `.gitignore` 保护的 Parquet。
 
 ## 输出
 
 - ignored: `quant/outputs/position_accounting_events.parquet`
-- committed summaries: terminal_position_accounting.csv, position_accounting_by_symbol.csv, position_action_summary.csv, cost_rounding_policy_audit.csv, xbtusd_snapshot_reconciliation.csv, reported_realised_pnl_diagnostics.csv, position_accounting_anomalies.csv
+- ignored detailed audits: `quant/outputs/instrument_terms_temporal_audit.csv`, `quant/outputs/execution_tie_order_audit.csv`
+- committed summaries: terminal_position_accounting.csv, position_accounting_by_symbol.csv, position_action_summary.csv, cost_rounding_policy_audit.csv, xbtusd_snapshot_reconciliation.csv, reported_realised_pnl_diagnostics.csv, position_accounting_anomalies.csv, instrument_terms_temporal_audit.csv, execution_tie_order_audit.csv, position_cost_model_audit.csv, aep_model_audit.csv, xbtusd_current_cycle_summary.csv

@@ -1,0 +1,5 @@
+model,exact_conservation_failure_count,api_conservation_failure_count,full_close_residual_cost_count,settlement_residual_cost_count,flip_split_failure_count,corrected_gross_exact_match_count,corrected_gross_mismatch_count,corrected_gross_missing_count,broker_unresolved_count,xbtusd_terminal_current_cost,xbtusd_current_cost_difference,status,selection_status
+PROPORTIONAL_INDEPENDENT_EVENT_ROUNDING,0,0,0,0,0,8788,6951,157487,0,1386445848,37,PASS,DIAGNOSTIC_ONLY
+PROPORTIONAL_CUMULATIVE_ROUNDED_DELTA,0,0,0,0,0,8788,6951,157487,0,1386445813,2,PASS,DIAGNOSTIC_ONLY
+INTEGER_QUOTIENT_REMAINDER_CARRY,0,0,0,0,0,8788,6951,157487,0,1386445813,2,PASS,DIAGNOSTIC_ONLY
+AVERAGE_BASIS_RELEASE,0,0,0,0,0,8788,6951,157487,0,1386445848,37,PASS,DIAGNOSTIC_ONLY
