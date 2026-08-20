@@ -44,7 +44,7 @@
 ## Public market-data artifact
 
 - Code commit: `e83cea15a4a825a9d1269320c51e67febf5ddb19`.
-- Report commit: `2684c4802f64ba9e5f988a5e38244ece8a837a45`.
+- Report commit: `781daedee8afe6d55f4d7b23880085c9b3ec3e75`.
 - Reports: `quant/reports/market_data_audit.md`, `quant/reports/market_data_lineage.json`, and `quant/reports/market_data_gaps.csv`.
 - Canonical source policy: BitMEX public no-key `trade/bucketed` for XBTUSD, 5m requested with 15m fallback; funding from `funding`; mark/index context from `instrument`.
 - Real repository execution bounds used for the request: `2020-05-01T09:03:47.360Z` through `2026-07-18T22:11:15.556Z`; 98,874 XBTUSD Trade rows.
