@@ -21,6 +21,30 @@ python quant/scripts/audit_dataset.py
 pytest quant/tests -v
 ```
 
+## M0-02B-1B-0 仓位成本与平均入场价回放
+
+本阶段在已验证的数量回放和 Execution valuation 之上，按稳定的 `event_time`、`timestamp`、原始行号和 `execID` 顺序，逐 symbol 重放 `current_qty`、`currentCost`、平均成本释放、反手成本拆分、独立 AEP 和 position cycle。`PASS` 与 `WARNING` valuation 都具备 accounting eligibility；只有 `BLOCKED` 行阻塞本阶段。
+
+官方口径相关的 AEP 使用独立状态：Quanto/Linear 使用 Decimal 数量加权，Inverse 使用 `lot_size / canonical_execution_price` 的八位 satoshi basis，并固定长仓 floor、短仓 ROUND_HALF_UP 的 policy。`realisedPnl`、`execComm` 和 Funding 不会反向驱动仓位状态或被自动合并成净现金流。
+
+在仓库根目录运行：
+
+```bash
+python quant/scripts/rebuild_position_accounting.py
+```
+
+Windows 也可以使用：
+
+```powershell
+py -3.11 quant/scripts/rebuild_position_accounting.py
+```
+
+脚本从原始 CSV、历史规格和 Python 模块重新构建输入，不依赖 ignored Parquet。逐 Execution 输出写入被 `.gitignore` 保护的：
+
+- `quant/outputs/position_accounting_events.parquet`
+
+Git 中只保留终态、动作、舍入审计、snapshot 对账、reported `realisedPnl` 诊断和最多 200 条异常样例等小型摘要。任何原始 CSV/JSON SHA256 变化、成本守恒失败、Settlement 残余成本、终态锚点失败或舍入 policy 歧义都会阻塞本阶段。
+
 ## M0-02A.1 合约张数回放
 
 在仓库根目录、`quant/m0-02a-position-replay` 分支执行：

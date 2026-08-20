@@ -1,0 +1,37 @@
+{
+  "schema_version": "M0-02B-1B-0/1.0",
+  "selection_mode": "AUDIT_ALL_CANDIDATES_THEN_SELECT_UNIQUE_OR_OBSERVATIONALLY_EQUIVALENT",
+  "candidate_rounding_modes": [
+    "ROUND_DOWN",
+    "ROUND_FLOOR",
+    "ROUND_CEILING",
+    "ROUND_HALF_UP",
+    "ROUND_HALF_EVEN"
+  ],
+  "canonical_tiebreak": {
+    "average_cost_release": "ROUND_DOWN",
+    "flip_exec_cost_split": "ROUND_DOWN"
+  },
+  "inverse_basis": {
+    "decimal_places": 8,
+    "long_rounding": "ROUND_FLOOR",
+    "short_rounding": "ROUND_HALF_UP"
+  },
+  "snapshot_display": {
+    "quantum": "0.0001",
+    "rounding": "ROUND_HALF_UP"
+  },
+  "scope": {
+    "operation": "GLOBAL_DEFAULT",
+    "payout_model": "ALL",
+    "settlement_currency": "ALL",
+    "symbol_overrides": false,
+    "execid_overrides": false
+  },
+  "notes": [
+    "Raw execCost remains authoritative and signed.",
+    "No per-exec or per-symbol rounding override is allowed.",
+    "Reported realisedPnl is diagnostic only and never updates state.",
+    "Funding execComm is excluded from gross trading realised PnL."
+  ]
+}

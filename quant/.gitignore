@@ -2,5 +2,6 @@ outputs/*.parquet
 outputs/execution_spec_mapping.parquet
 outputs/execution_valuation.parquet
 outputs/execution_components.parquet
+outputs/position_accounting_events.parquet
 **/__pycache__/
 .pytest_cache/
