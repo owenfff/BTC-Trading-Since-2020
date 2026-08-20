@@ -1,15 +1,15 @@
 {
   "program_version": "4.0",
   "program_status": "RUNNING",
-  "current_phase": "PHASE_1_ACCOUNTING_FOUNDATION",
-  "current_work_package": "M0-AUTONOMOUS-1-accounting-foundation",
-  "last_completed_phase": "M0-02B-1B-0.1",
-  "last_code_commit": "c3414514077ca81e9ddfacfd602704d9698a53dc",
-  "last_report_commit": "c3414514077ca81e9ddfacfd602704d9698a53dc",
-  "test_count": 219,
+  "current_phase": "PHASE_2_WALLET_RECONCILIATION",
+  "current_work_package": "M1-wallet-ledger-reconciliation",
+  "last_completed_phase": "PHASE_1_ACCOUNTING_FOUNDATION",
+  "last_code_commit": "86be1f430ece5c64237b2dfc133842124119101c",
+  "last_report_commit": "f52ea4621b807a00f08dce805d7600a97f74a584",
+  "test_count": 223,
   "last_test_status": "PASS",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
-  "wallet_status": "NOT_STARTED",
+  "wallet_status": "IN_PROGRESS",
   "behavior_dataset_status": "NOT_STARTED",
   "market_data_status": "NOT_STARTED",
   "leakage_status": "NOT_STARTED",
@@ -30,6 +30,6 @@
     "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
     "No claim of exact strategy recovery or future profitability is permitted."
   ],
-  "next_action": "Run py -3.11 quant/scripts/build_accounting_foundation.py, run pytest quant/tests, commit code then reports, push quant/autonomous-behavioral-quant-bot-v1, then start the wallet ledger work package.",
-  "updated_at_utc": "2026-08-20T00:00:00Z"
+  "next_action": "Implement quant/src/bitmex_replay/wallet_ledger.py, quant/scripts/build_wallet_ledger.py, and quant/tests/test_wallet_ledger.py; build raw/major currency-separated wallet and daily ledgers; reconcile executions, Funding, snapshots, and equity curve without fabricated event joins.",
+  "updated_at_utc": "2026-08-20T06:52:00Z"
 }

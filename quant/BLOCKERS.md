@@ -12,3 +12,7 @@
 | Market context | NOT_STARTED | No public market dataset built yet | Required before leakage-safe modeling |
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
+
+## Current work package
+
+Phase 1 is complete. Wallet reconciliation is `IN_PROGRESS`; no wallet blocker has been asserted before the ledger is built and checked against snapshots/equity data.
