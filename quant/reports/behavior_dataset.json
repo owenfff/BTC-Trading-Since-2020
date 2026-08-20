@@ -1,0 +1,98 @@
+{
+  "report_version": "M2-BEHAVIOR-1.0",
+  "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
+  "analysis_commit": "8866448fc183929078caf418b09de7307c16d02b",
+  "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
+  "teacher_data_type": "TRADE_RECORDS_ONLY",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "behavior_dataset_status": "READY_WITH_WARNINGS",
+  "wallet_status": "READY_WITH_WARNINGS",
+  "accounting_status": "READY_WITH_KNOWN_ACCOUNTING_RESIDUALS",
+  "accounting_engine_status": "BLOCKED",
+  "execution_order_status": "READY_WITH_AMBIGUOUS_CROSS_ORDER_TIES",
+  "raw_inputs_unchanged": true,
+  "changed_protected_files": [],
+  "counts": {
+    "raw_execution_rows": 173434,
+    "derivative_trade_fills": 160302,
+    "execution_batches": 62388,
+    "order_episodes": 31702,
+    "decision_episodes": 32231,
+    "trade_cycles": 1401
+  },
+  "btc_first_counts": {
+    "trade_actions": 98874,
+    "order_episodes": 20316,
+    "decisions": 20845,
+    "cycles": 688,
+    "synthetic_decisions": 529
+  },
+  "action_counts": {
+    "OPEN_LONG": 890,
+    "ADD_LONG": 10916,
+    "CLOSE_LONG": 871,
+    "OPEN_SHORT": 326,
+    "ADD_SHORT": 6222,
+    "FLIP_SHORT_TO_LONG": 81,
+    "REDUCE_LONG": 7483,
+    "FLIP_LONG_TO_SHORT": 91,
+    "REDUCE_SHORT": 4482,
+    "CLOSE_SHORT": 340,
+    "HOLD_LONG": 128,
+    "NO_TRADE": 117,
+    "HOLD_SHORT": 284
+  },
+  "cycle_close_type_counts": {
+    "FULL_CLOSE": 1211,
+    "FLIP": 170,
+    "SETTLEMENT": 19,
+    "OPEN_AT_DATA_END": 1
+  },
+  "execution_order_audit": {
+    "multi_trade_group_count": 12469,
+    "unique_chain_group_count": 11689,
+    "ambiguous_group_count": 780,
+    "cross_order_tie_count": 371,
+    "status": "READY_WITH_AMBIGUOUS_CROSS_ORDER_TIES"
+  },
+  "accounting_summary": {
+    "position_accounting_engine_status": "BLOCKED",
+    "downstream_accounting_status": "READY_WITH_KNOWN_ACCOUNTING_RESIDUALS",
+    "accounting_event_rows": 173226,
+    "gross_realised_pnl_available": true
+  },
+  "wallet_reconciliation_evidence": {
+    "status": "READY_WITH_WARNINGS",
+    "row_count": 17484,
+    "snapshot_pass_count": 3,
+    "snapshot_zero_without_history_count": 12,
+    "snapshot_unresolved_count": 0
+  },
+  "large_outputs": {
+    "trade_actions": {
+      "format": "csv_fallback_no_parquet_engine",
+      "path": "quant\\outputs\\trade_actions.csv",
+      "requested_path": "quant\\outputs\\trade_actions.parquet",
+      "row_count": 160302
+    },
+    "order_episodes": {
+      "format": "csv_fallback_no_parquet_engine",
+      "path": "quant\\outputs\\order_episodes.csv",
+      "requested_path": "quant\\outputs\\order_episodes.parquet",
+      "row_count": 31702
+    },
+    "decision_episodes": {
+      "format": "csv_fallback_no_parquet_engine",
+      "path": "quant\\outputs\\decision_episodes.csv",
+      "requested_path": "quant\\outputs\\decision_episodes.parquet",
+      "row_count": 32231
+    },
+    "trade_cycles": {
+      "format": "csv_fallback_no_parquet_engine",
+      "path": "quant\\outputs\\trade_cycles.csv",
+      "requested_path": "quant\\outputs\\trade_cycles.parquet",
+      "row_count": 1401
+    }
+  },
+  "next_action": "Acquire and freeze public BTC canonical market context before leakage-safe feature and label construction."
+}
