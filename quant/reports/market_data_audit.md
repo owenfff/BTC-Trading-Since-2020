@@ -1,7 +1,7 @@
 # Public Market Data Audit
 
 - status: **BLOCKED**
-- analysis commit: `ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9`
+- analysis commit: `e83cea15a4a825a9d1269320c51e67febf5ddb19`
 - source: `BitMEX` public API; credentials: `none`
 - symbol: `XBTUSD`
 - requested interval: `5m`; selected interval: `none`
@@ -9,12 +9,13 @@
 
 ## Source lineage
 
-The canonical price series is requested from BitMEX `trade/bucketed`. Funding is requested from `funding`, and mark/index context is requested from `instrument`. Each response is cached only under the ignored `quant/outputs/market_raw/` directory and its SHA-256 is recorded in the JSON report.
+The canonical price series is requested from BitMEX `trade/bucketed`, with the official daily `public.bitmex.com` trade archive as a no-key fallback. Funding is requested from `funding`, and mark/index context is requested from `instrument`. Raw responses are kept only under ignored `quant/data/market/raw/` and their SHA-256 is recorded in the JSON report.
 
 | source | status | rows | sha256 |
 | --- | --- | ---: | --- |
 | trade_bucketed_5m | FAILED | 0 | `` |
 | trade_bucketed_15m | FAILED | 0 | `` |
+| public_archive_trade | FAILED_INCOMPLETE_RANGE | 0 | `` |
 | funding | NOT_ATTEMPTED_NO_BARS | 0 | `` |
 | instrument | NOT_ATTEMPTED_NO_BARS | 0 | `` |
 
@@ -29,8 +30,8 @@ No gap is filled with a forward price. The context join is previous-or-equal UTC
 ## Environment/blocking boundary
 
 - public source status: `BLOCKED_PUBLIC_DATA_UNAVAILABLE`
-- output: `none`
-- A local network denial is an environment blocker, not evidence that BitMEX has no historical data. Rerun this script in a network-enabled environment or place verified cached responses under the ignored cache path.
+- output: `{}`
+- A local network denial is an environment blocker, not evidence that BitMEX has no historical data. Rerun this script in a network-enabled environment or place verified responses/archive objects under the ignored market-data paths.
 - This package does not use account API keys, private endpoints, live balances, or order placement.
 
 ## Next action

@@ -1,18 +1,20 @@
 {
   "report_version": "M3-PUBLIC-MARKET-DATA-1.0",
-  "analysis_commit": "ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9",
+  "analysis_commit": "e83cea15a4a825a9d1269320c51e67febf5ddb19",
   "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
-  "run_time_utc": "2026-08-20T08:20:30.500462Z",
+  "run_time_utc": "2026-08-20T08:30:18.163716Z",
   "market_data_status": "BLOCKED",
   "source_status": "BLOCKED_PUBLIC_DATA_UNAVAILABLE",
   "source": {
     "provider": "BitMEX",
     "credentials": "none",
     "base_url": "https://www.bitmex.com/api/v1",
+    "archive_base_url": "https://public.bitmex.com/",
     "official_docs": {
       "trade_bucketed": "https://docs.bitmex.com/api-explorer/get-trade-bucketed",
       "funding": "https://docs.bitmex.com/api-explorer/get-funding",
-      "instrument": "https://docs.bitmex.com/api-explorer/get-instruments.html"
+      "instrument": "https://docs.bitmex.com/api-explorer/get-instruments.html",
+      "public_archive": "https://public.bitmex.com/"
     }
   },
   "symbol": "XBTUSD",
@@ -55,6 +57,60 @@
       "status": "FAILED",
       "error_type": "MarketDownloadError",
       "error": "public source request failed: <urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。>"
+    },
+    "public_archive_trade": {
+      "provider": "BitMEX",
+      "endpoint": "public.bitmex.com/data/trade/YYYYMMDD.csv.gz",
+      "symbol": "XBTUSD",
+      "interval": "5m",
+      "credentials": "none",
+      "status": "FAILED_INCOMPLETE_RANGE",
+      "requested_start_time_utc": "2020-05-01T09:03:47.360Z",
+      "requested_end_time_utc": "2026-07-18T22:11:15.556Z",
+      "day_count": 2270,
+      "attempted_day_count": 3,
+      "not_attempted_day_count": 2267,
+      "failed_day_count": 3,
+      "cached_day_count": 0,
+      "downloaded_day_count": 0,
+      "row_count": 0,
+      "files": [
+        {
+          "date": "2020-05-01",
+          "url": "https://public.bitmex.com/data/trade/20200501.csv.gz",
+          "status": "FAILED",
+          "path": "C:\\Users\\yhyzd\\Documents\\Codex\\2026-08-19\\m0-01-1-fork-text-fork\\outputs\\BTC-Trading-Since-2020\\quant\\data\\market\\raw\\trade\\20200501.csv.gz",
+          "size_bytes": 0,
+          "sha256": "",
+          "download_time_utc": null,
+          "error_type": "MarketDownloadError",
+          "error": "public archive request failed: <urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。>"
+        },
+        {
+          "date": "2020-05-02",
+          "url": "https://public.bitmex.com/data/trade/20200502.csv.gz",
+          "status": "FAILED",
+          "path": "C:\\Users\\yhyzd\\Documents\\Codex\\2026-08-19\\m0-01-1-fork-text-fork\\outputs\\BTC-Trading-Since-2020\\quant\\data\\market\\raw\\trade\\20200502.csv.gz",
+          "size_bytes": 0,
+          "sha256": "",
+          "download_time_utc": null,
+          "error_type": "MarketDownloadError",
+          "error": "public archive request failed: <urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。>"
+        },
+        {
+          "date": "2020-05-03",
+          "url": "https://public.bitmex.com/data/trade/20200503.csv.gz",
+          "status": "FAILED",
+          "path": "C:\\Users\\yhyzd\\Documents\\Codex\\2026-08-19\\m0-01-1-fork-text-fork\\outputs\\BTC-Trading-Since-2020\\quant\\data\\market\\raw\\trade\\20200503.csv.gz",
+          "size_bytes": 0,
+          "sha256": "",
+          "download_time_utc": null,
+          "error_type": "MarketDownloadError",
+          "error": "public archive request failed: <urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。>"
+        }
+      ],
+      "official_archive": "https://public.bitmex.com/",
+      "note": "Raw trade files are retained separately; bars are local UTC aggregations and do not include inferred mark/index/funding."
     },
     "funding": {
       "status": "NOT_ATTEMPTED_NO_BARS",
@@ -107,7 +163,7 @@
   "gap_row_count": 1,
   "raw_account_inputs_unchanged": true,
   "changed_protected_files": [],
-  "large_output": {},
+  "large_outputs": {},
   "warnings": [
     "Trade bucketed timestamps are treated as BitMEX bucket end/write timestamps; no timezone conversion beyond explicit UTC normalization.",
     "Mark/index and funding are retained as as-of context only and are never substituted for a missing canonical trade price."

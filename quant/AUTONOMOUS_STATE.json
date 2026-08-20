@@ -4,7 +4,7 @@
   "current_phase": "PHASE_4_PUBLIC_MARKET_DATA",
   "current_work_package": "M3-public-market-data",
   "last_completed_phase": "PHASE_3_BEHAVIOR_DATASET",
-  "last_code_commit": "ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9",
+  "last_code_commit": "e83cea15a4a825a9d1269320c51e67febf5ddb19",
   "last_report_commit": "2684c4802f64ba9e5f988a5e38244ece8a837a45",
   "test_count": 247,
   "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_8_MARKET_SMOKE_TESTS",

@@ -43,13 +43,14 @@
 
 ## Public market-data artifact
 
-- Code commit: `ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9`.
+- Code commit: `e83cea15a4a825a9d1269320c51e67febf5ddb19`.
 - Report commit: `2684c4802f64ba9e5f988a5e38244ece8a837a45`.
 - Reports: `quant/reports/market_data_audit.md`, `quant/reports/market_data_lineage.json`, and `quant/reports/market_data_gaps.csv`.
 - Canonical source policy: BitMEX public no-key `trade/bucketed` for XBTUSD, 5m requested with 15m fallback; funding from `funding`; mark/index context from `instrument`.
 - Real repository execution bounds used for the request: `2020-05-01T09:03:47.360Z` through `2026-07-18T22:11:15.556Z`; 98,874 XBTUSD Trade rows.
 - Current run status: `BLOCKED` because the managed runtime denied both public requests with `WinError 10013`; no public response was cached and no market bars were invented.
 - Join policy is `ASOF_PREVIOUS_OR_EQUAL_UTC`; future observations are forbidden. Raw account inputs remained unchanged.
+- M3.1 adds the official daily public trade archive fallback at `https://public.bitmex.com/data/trade/YYYYMMDD.csv.gz`; it aggregates raw trades into UTC 5m bars, preserves daily gzip objects under ignored `quant/data/market/raw/`, and rejects an incomplete date range. The current run attempted 3 of 2,270 UTC partitions before the repeated network error circuit breaker.
 
 ## Upcoming lineage
 
