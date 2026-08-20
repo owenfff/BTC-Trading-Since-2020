@@ -14,6 +14,8 @@ outputs/trade_actions.csv
 outputs/order_episodes.csv
 outputs/decision_episodes.csv
 outputs/trade_cycles.csv
+outputs/btc_market_context.csv
+outputs/market_raw/
 outputs/instrument_terms_temporal_audit.csv
 outputs/execution_tie_order_audit.csv
 **/__pycache__/

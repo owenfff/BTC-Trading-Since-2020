@@ -40,3 +40,10 @@
 - The underlying accounting engine audit remains `BLOCKED` by unresolved global rounding selection, but downstream event-level eligibility remains `PASS/WARNING` and is reported as `READY_WITH_KNOWN_ACCOUNTING_RESIDUALS`.
 - Current runtime could not materialize Parquet because `pyarrow`/`polars` are unavailable and PyPI is unreachable; ignored CSV fallbacks preserve the same schemas and are explicitly recorded in the report.
 - Proceed to public BTC market data; no model training starts before leakage-safe market alignment exists.
+
+## 2026-08-20 — Freeze M3 market-source boundary
+
+- Use BitMEX's public no-key `trade/bucketed` as the canonical XBTUSD price source; request 5m first and 15m only as the documented resolution fallback.
+- Request funding from public `funding` and mark/index context from public `instrument`; preserve source URL, UTC bounds, download/cache time, and SHA256 in `market_data_lineage.json`.
+- Join context using previous-or-equal UTC observations only. Missing bars and missing mark/index/funding values remain explicit; no forward price or future observation is invented.
+- The managed desktop runtime blocked both 5m and 15m public requests with WinError 10013. Keep M3 `BLOCKED` at the environment boundary and do not start leakage-safe features until a verified public cache is available.

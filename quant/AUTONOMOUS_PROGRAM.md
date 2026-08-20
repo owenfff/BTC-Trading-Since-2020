@@ -6,7 +6,7 @@ Build an auditable, BTC-first behavioral approximation from public trade records
 
 ## Current stage
 
-Phases 1 through 3 are complete. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation and behavior data are frozen with explicit warnings. The next work package is public BTC canonical market context.
+Phases 1 through 3 are complete. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation and behavior data are frozen with explicit warnings. The M3 public BTC context package is implemented, but the current managed runtime cannot reach the no-key BitMEX endpoints, so market data is blocked at the environment boundary and leakage-safe features must wait for a verified public cache.
 
 ## Stop conditions
 
