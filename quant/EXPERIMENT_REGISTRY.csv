@@ -1,0 +1,2 @@
+experiment_id,stage,description,source_commit,analysis_commit,seed,status,artifact_path,notes
+M0-02B-1B-0.1,accounting,Position accounting semantics audit,f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6,2b4b9fbe17c22281b45ae3d07867e94295c28d6a,,COMPLETE,quant/reports/position_accounting.json,"Residuals preserved; not a global blocker"

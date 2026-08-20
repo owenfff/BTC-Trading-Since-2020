@@ -1,0 +1,35 @@
+{
+  "program_version": "4.0",
+  "program_status": "RUNNING",
+  "current_phase": "PHASE_1_ACCOUNTING_FOUNDATION",
+  "current_work_package": "M0-AUTONOMOUS-1-accounting-foundation",
+  "last_completed_phase": "M0-02B-1B-0.1",
+  "last_code_commit": "c3414514077ca81e9ddfacfd602704d9698a53dc",
+  "last_report_commit": "c3414514077ca81e9ddfacfd602704d9698a53dc",
+  "test_count": 219,
+  "last_test_status": "PASS",
+  "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
+  "wallet_status": "NOT_STARTED",
+  "behavior_dataset_status": "NOT_STARTED",
+  "market_data_status": "NOT_STARTED",
+  "leakage_status": "NOT_STARTED",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "research_status": "NOT_STARTED",
+  "backtest_status": "NOT_STARTED",
+  "shadow_status": "NOT_STARTED",
+  "paper_status": "NOT_STARTED",
+  "demo_status": "NOT_STARTED",
+  "bot_status": "RESEARCH_FOUNDATION_RUNNING",
+  "blockers": [
+    "Exchange currentCost residual: closest candidate differs by about 2 raw units.",
+    "Exchange AEP engine semantics remain unresolved; displayed difference is 0.2974.",
+    "Execution ordering has 780 ambiguous chains and 371 cross-order ties."
+  ],
+  "warnings": [
+    "Teacher data is TRADE_RECORDS_ONLY.",
+    "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
+    "No claim of exact strategy recovery or future profitability is permitted."
+  ],
+  "next_action": "Run py -3.11 quant/scripts/build_accounting_foundation.py, run pytest quant/tests, commit code then reports, push quant/autonomous-behavioral-quant-bot-v1, then start the wallet ledger work package.",
+  "updated_at_utc": "2026-08-20T00:00:00Z"
+}
