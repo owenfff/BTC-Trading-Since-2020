@@ -6,7 +6,7 @@ Build an auditable, BTC-first behavioral approximation from public trade records
 
 ## Current stage
 
-Phases 1 and 2 are complete. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation is frozen as `READY_WITH_WARNINGS`. The next work package is BTC-first order episodes, decision episodes, and trade cycles.
+Phases 1 through 3 are complete. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation and behavior data are frozen with explicit warnings. The next work package is public BTC canonical market context.
 
 ## Stop conditions
 

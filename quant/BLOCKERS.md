@@ -11,6 +11,8 @@
 | Reported PnL | READY_WITH_WARNINGS | 8788 exact, 6951 mismatch among 15739 eligible | Keep reported and analytical PnL separate |
 | Market context | NOT_STARTED | No public market dataset built yet | Required before leakage-safe modeling |
 | Wallet reconciliation | READY_WITH_WARNINGS | 17474 row PASS, 5 real continuity anomalies, 3/15 exact snapshots, 12 zero snapshots without history, terminal equity PASS | Carry flags; do not fabricate joins |
+| Behavior dataset | READY_WITH_WARNINGS | 160302 fills → 62388 batches → 31702 orders → 32231 decisions → 1401 cycles; XBTUSD 688 cycles | Allowed for market-context alignment; preserve confidence fields |
+| Parquet runtime | ENVIRONMENT_WARNING | pyarrow/polars unavailable and PyPI blocked; explicit ignored CSV fallback generated | Restore pinned dependency before consuming Parquet-only tools |
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
 
@@ -20,4 +22,4 @@ Phases 1 and 2 are complete. Wallet reconciliation is `READY_WITH_WARNINGS`; the
 
 ## Current work package
 
-Phase 3 behavior dataset construction is `IN_PROGRESS`. The pinned Parquet engine is unavailable in the current desktop runtime, so the builder must report any ignored CSV fallback explicitly rather than claiming Parquet output.
+Phases 1 through 3 are complete. Public market data is `IN_PROGRESS`; no strategy training or live connectivity is permitted before market lineage and leakage audits pass.

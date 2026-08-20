@@ -31,3 +31,12 @@
 - Execution batches use a documented 300-second same-order gap boundary and never redefine an order episode as a decision.
 - Daily XBTUSD no-trade days become explicitly synthetic `HOLD_LONG`, `HOLD_SHORT`, or `NO_TRADE` observations; they are never mixed with raw fills.
 - Wallet linkage remains aggregate-only and all six confidence fields are carried into actions, decisions, and cycles.
+
+## 2026-08-20 — Freeze behavioral dataset boundary
+
+- Behavior layers are complete: 160,302 derivative fills, 62,388 execution batches, 31,702 order episodes, 32,231 decisions, and 1,401 position cycles.
+- BTC-first teacher scope is XBTUSD: 98,874 fills, 20,316 order episodes, 20,845 decisions, and 688 cycles; 529 daily synthetic HOLD/NO_TRADE observations are explicit negative/carry-forward samples.
+- All cycles include `overall_confidence` plus the compatibility `confidence_status`; no future cycle result is included in action or decision rows.
+- The underlying accounting engine audit remains `BLOCKED` by unresolved global rounding selection, but downstream event-level eligibility remains `PASS/WARNING` and is reported as `READY_WITH_KNOWN_ACCOUNTING_RESIDUALS`.
+- Current runtime could not materialize Parquet because `pyarrow`/`polars` are unavailable and PyPI is unreachable; ignored CSV fallbacks preserve the same schemas and are explicitly recorded in the report.
+- Proceed to public BTC market data; no model training starts before leakage-safe market alignment exists.

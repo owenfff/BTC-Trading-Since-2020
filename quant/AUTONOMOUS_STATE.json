@@ -1,17 +1,17 @@
 {
   "program_version": "4.0",
   "program_status": "RUNNING",
-  "current_phase": "PHASE_3_BEHAVIOR_DATASET",
-  "current_work_package": "M2-btc-behavior-dataset",
-  "last_completed_phase": "PHASE_2_WALLET_RECONCILIATION",
-  "last_code_commit": "1166e23eff2da21afb5ec3447cccbebf77971295",
-  "last_report_commit": "14335b3aaf312c3e7c42cec7632f7f32f05d0fd5",
-  "test_count": 234,
-  "last_test_status": "PASS",
+  "current_phase": "PHASE_4_PUBLIC_MARKET_DATA",
+  "current_work_package": "M3-public-market-data",
+  "last_completed_phase": "PHASE_3_BEHAVIOR_DATASET",
+  "last_code_commit": "8866448fc183929078caf418b09de7307c16d02b",
+  "last_report_commit": "a2360d58842028d4dfd33bb3bfd95ec42bfcc4d8",
+  "test_count": 239,
+  "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_5_BEHAVIOR_SMOKE_TESTS",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
-  "behavior_dataset_status": "IN_PROGRESS",
-  "market_data_status": "NOT_STARTED",
+  "behavior_dataset_status": "READY_WITH_WARNINGS",
+  "market_data_status": "IN_PROGRESS",
   "leakage_status": "NOT_STARTED",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
   "research_status": "NOT_STARTED",
@@ -28,8 +28,9 @@
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
     "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
-    "No claim of exact strategy recovery or future profitability is permitted."
+    "No claim of exact strategy recovery or future profitability is permitted.",
+    "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration."
   ],
-  "next_action": "Run build_behavior_dataset.py on the frozen execution/accounting foundation; verify layered counts, confidence coverage, raw hashes, and reports before entering public market data.",
-  "updated_at_utc": "2026-08-20T08:05:00Z"
+  "next_action": "Implement quant/src/market/download.py, normalize.py, gaps.py, context.py and quant/scripts/build_market_data.py using a public no-key BTC canonical source; freeze UTC source lineage and gap audit before features.",
+  "updated_at_utc": "2026-08-20T09:00:00Z"
 }

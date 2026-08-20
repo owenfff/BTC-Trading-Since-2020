@@ -31,6 +31,16 @@
 - Results: 17,474 PASS rows, 5 real batch anomalies, 3 exact nonzero snapshot matches, 12 zero snapshots without history, terminal XBT wallet/equity PASS.
 - Raw/major values remain currency-separated and are scaled only from `api-v1-wallet-assets.csv`; wallet-to-execution comparisons are aggregate diagnostics only.
 
+## Behavioral dataset artifact
+
+- Code commit: `8866448fc183929078caf418b09de7307c16d02b`.
+- Report commit: `a2360d58842028d4dfd33bb3bfd95ec42bfcc4d8`.
+- Manifest: `quant/reports/behavior_dataset.json`; profile: `quant/reports/trader_behavior_profile.md`.
+- Layer counts: 160,302 derivative fills; 62,388 execution batches; 31,702 order episodes; 32,231 decisions; 1,401 cycles.
+- BTC-first counts: 98,874 XBTUSD fills; 20,316 order episodes; 20,845 decisions; 688 cycles; 529 synthetic daily observations.
+- `quant/outputs/` contains ignored large outputs. The current runtime wrote schema-equivalent CSV fallbacks because the pinned Parquet engine was unavailable; the report records this without claiming Parquet materialization.
+- Confidence schema is present on actions, orders, decisions, and cycles; wallet confidence is aggregate-only and strategy fidelity remains `BEHAVIORAL_APPROXIMATION`.
+
 ## Upcoming lineage
 
 Wallet ledger, public market data, behavioral episodes, features, labels, models, and experiments must each record source URLs/commits, UTC coverage, SHA256, code commit, dependency versions, and report analysis commit.
