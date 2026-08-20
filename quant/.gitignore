@@ -4,6 +4,8 @@ outputs/execution_valuation.parquet
 outputs/execution_components.parquet
 outputs/position_accounting_events.parquet
 outputs/position_accounting_diagnostics.parquet
+outputs/wallet_ledger.parquet
+outputs/wallet_daily_ledger.parquet
 outputs/instrument_terms_temporal_audit.csv
 outputs/execution_tie_order_audit.csv
 **/__pycache__/
