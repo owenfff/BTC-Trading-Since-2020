@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .instrument_metadata import classify_instrument_typ
+from .instrument_terms import load_historical_instrument_terms, resolve_instrument_terms
 from .io_utils import clean, iso_datetime, iter_csv_dicts, parse_datetime
 
 
@@ -247,6 +248,7 @@ def load_historical_specs(
     config_path: Path,
     instrument_path: Path | None = None,
     data_source_commit: str | None = None,
+    terms_path: Path | None = None,
 ) -> dict[str, Any]:
     """Load configured historical versions and materialize frozen snapshot versions."""
 
@@ -275,6 +277,11 @@ def load_historical_specs(
             spec = _snapshot_spec(row, commit, _canonical_row_hash(row))
             if spec is not None:
                 snapshot_specs.append(spec)
+    if terms_path is None:
+        candidate_terms = config_path.parent / "historical_instrument_terms.json"
+        if candidate_terms.is_file():
+            terms_path = candidate_terms
+    instrument_terms = load_historical_instrument_terms(terms_path) if terms_path is not None else {"terms": [], "terms_by_symbol": {}}
     specs = sorted(configured_specs + snapshot_specs, key=lambda item: (item.get("symbol", ""), item.get("valid_from", ""), item.get("spec_id", "")))
     interval_errors = validate_spec_intervals(specs)
     if interval_errors:
@@ -291,6 +298,7 @@ def load_historical_specs(
         "snapshot_specs": snapshot_specs,
         "specs_by_symbol": by_symbol,
         "source_metadata": payload.get("snapshot_source", {}),
+        "instrument_terms": instrument_terms,
     }
 
 
@@ -349,7 +357,11 @@ def validate_execution_spec_compatibility(event: dict[str, Any], spec_or_resolut
     return {"compatibility_status": "PASS", "compatibility_reason": "currency, execType, interval and payout-model checks passed"}
 
 
-def resolve_specs_for_events(events: Iterable[dict[str, Any]], registry: Any) -> list[dict[str, Any]]:
+def resolve_specs_for_events(
+    events: Iterable[dict[str, Any]],
+    registry: Any,
+    terms_registry: Any | None = None,
+) -> list[dict[str, Any]]:
     """Return one mapping row per DERIVATIVE event; Spot is deliberately excluded."""
 
     rows: list[dict[str, Any]] = []
@@ -360,6 +372,12 @@ def resolve_specs_for_events(events: Iterable[dict[str, Any]], registry: Any) ->
         resolution = resolve_spec(registry, symbol, event.get("_event_dt") or event.get("event_time"))
         compatibility = validate_execution_spec_compatibility(event, resolution)
         spec = resolution.get("spec") or {}
+        terms = resolve_instrument_terms(
+            terms_registry or registry.get("instrument_terms", {}),
+            symbol,
+            event.get("_event_dt") or event.get("event_time"),
+        )
+        resolved_lot_size = terms.get("lot_size") or spec.get("lot_size")
         rows.append({
             "event_time": event.get("event_time") or (event.get("_event_dt").isoformat() if event.get("_event_dt") else ""),
             "source_row_number": event.get("source_row_number"),
@@ -373,6 +391,11 @@ def resolve_specs_for_events(events: Iterable[dict[str, Any]], registry: Any) ->
             "settlement_currency": spec.get("settlement_currency"),
             "multiplier_major": spec.get("multiplier_major"),
             "multiplier_currency": spec.get("multiplier_currency"),
+            "lot_size": spec.get("lot_size"),
+            "resolved_lot_size": resolved_lot_size,
+            "terms_id": terms.get("term_id", ""),
+            "terms_resolution_status": terms.get("status", "MISSING"),
+            "terms_evidence_confidence": (terms.get("term") or {}).get("evidence_confidence", ""),
             "spec_resolution_status": resolution.get("status", ""),
             "spec_evidence_confidence": spec.get("evidence_confidence", ""),
             "execution_settlCurrency": event.get("settlCurrency", ""),
@@ -385,6 +408,7 @@ def resolve_specs_for_events(events: Iterable[dict[str, Any]], registry: Any) ->
 __all__ = [
     "EVIDENCE_LEVELS",
     "load_historical_specs",
+    "load_historical_instrument_terms",
     "normalize_currency",
     "resolve_spec",
     "resolve_specs_for_events",

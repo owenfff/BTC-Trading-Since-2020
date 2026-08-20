@@ -19,6 +19,7 @@ from typing import Any, Iterable
 
 from .execution_valuation import parse_raw_integer_decimal
 from .position_replayer import classify_action
+from .reported_pnl_decomposition import decompose_reported_pnl
 
 
 ROUNDING_MODES = {
@@ -314,7 +315,14 @@ def _replay_position_accounting_impl(
     anomalies: list[dict[str, Any]] = []
     digest = hashlib.sha256()
     terminal: dict[str, dict[str, Any]] = {}
-    reported_stats = {"non_null": 0, "exact": 0, "mismatch": 0, "missing": 0}
+    reported_stats = {
+        "non_null": 0,
+        "eligible": 0,
+        "exact": 0,
+        "mismatch": 0,
+        "missing": 0,
+        "broker_unresolved": 0,
+    }
     blocked_count = 0
 
     for valuation in valuations:
@@ -335,6 +343,9 @@ def _replay_position_accounting_impl(
         eligibility = accounting_eligibility(valuation_status)
         spec_id = _text(valuation.get("spec_id"))
         spec = specs.get(spec_id, {})
+        if valuation.get("resolved_lot_size") not in (None, ""):
+            spec = dict(spec)
+            spec["lot_size"] = valuation.get("resolved_lot_size")
         payout_model = _text(valuation.get("payout_model") or spec.get("payout_model")).upper()
         settlement_currency = _text(valuation.get("settlement_currency") or spec.get("settlement_currency"))
         row: dict[str, Any] = {
@@ -344,11 +355,18 @@ def _replay_position_accounting_impl(
             "execType": event_type,
             "symbol": symbol,
             "spec_id": spec_id,
+            "resolved_lot_size": valuation.get("resolved_lot_size"),
+            "terms_id": valuation.get("terms_id", ""),
+            "terms_resolution_status": valuation.get("terms_resolution_status", ""),
             "payout_model": payout_model,
             "settlement_currency": settlement_currency,
             "accounting_eligibility": eligibility,
             "valuation_status": valuation_status,
             "side": valuation.get("side", ""),
+            "orderID": valuation.get("orderID", ""),
+            "execution_order_policy": valuation.get("execution_order_policy", "SOURCE_ROW_STABLE"),
+            "execution_order_chain_status": valuation.get("execution_order_chain_status", ""),
+            "execution_order_rank": valuation.get("execution_order_rank", 0),
             "canonical_execution_price": valuation.get("canonical_execution_price"),
             "canonical_price_status": valuation.get("canonical_price_status", ""),
             "action": action,
@@ -377,6 +395,17 @@ def _replay_position_accounting_impl(
             "average_entry_price_before": _decimal_text(before_aep),
             "average_entry_price_after": _decimal_text(before_aep),
             "reported_realisedPnl_raw": valuation.get("realisedPnl_raw"),
+            "execComm_raw": valuation.get("execComm_raw"),
+            "brokerExecComm_raw": valuation.get("brokerExecComm_raw"),
+            "reported_realised_pnl_raw": valuation.get("realisedPnl_raw"),
+            "exec_comm_raw": valuation.get("execComm_raw"),
+            "broker_exec_comm_raw": valuation.get("brokerExecComm_raw"),
+            "reported_fee_component_raw": valuation.get("execComm_raw"),
+            "reported_gross_candidate_raw": None,
+            "reconstructed_gross_realised_pnl_raw": "0",
+            "reported_gross_difference_raw": None,
+            "decomposition_status": "MISSING",
+            "decomposition_reason": "",
             "reported_pnl_difference_raw": None,
             "position_cycle_id": state["cycle_id"],
             "closing_cycle_id": "",
@@ -552,18 +581,26 @@ def _replay_position_accounting_impl(
                     "reason": str(exc),
                 })
         action_counts[action] += 1
-        reported = _raw_int(valuation.get("realisedPnl_raw"))
-        gross = _decimal(row.get("gross_realised_pnl_exact_raw"))
-        if reported is None:
+        decomposition = decompose_reported_pnl(
+            row,
+            action=action,
+            reconstructed_gross_realised_pnl_raw=row.get("gross_realised_pnl_exact_raw"),
+        )
+        row.update(decomposition)
+        row["reported_pnl_difference_raw"] = decomposition.get("reported_gross_difference_raw")
+        if decomposition.get("decomposition_eligible"):
+            reported_stats["eligible"] += 1
+        if decomposition.get("reported_realised_pnl_raw") is None:
             reported_stats["missing"] += 1
         else:
             reported_stats["non_null"] += 1
-            difference = reported - (gross or Decimal(0))
-            row["reported_pnl_difference_raw"] = _decimal_text(difference)
-            if difference == 0:
-                reported_stats["exact"] += 1
-            else:
-                reported_stats["mismatch"] += 1
+        status = decomposition.get("decomposition_status")
+        if status == "EXACT":
+            reported_stats["exact"] += 1
+        elif status == "BROKER_COMPONENT_UNRESOLVED":
+            reported_stats["broker_unresolved"] += 1
+        elif status == "MISMATCH":
+            reported_stats["mismatch"] += 1
         _trace_digest_update(digest, row)
         terminal[symbol] = {
             "symbol": symbol,
@@ -576,6 +613,8 @@ def _replay_position_accounting_impl(
             "average_entry_price": _decimal_text(state["aep"]),
             "position_cycle_id": state["cycle_id"],
             "cycle_count": state["cycle_counter"],
+            "cycle_open_time": state["cycle_open_time"],
+            "cycle_open_execID": state["cycle_open_execID"],
         }
         if collect_rows:
             rows.append(row)

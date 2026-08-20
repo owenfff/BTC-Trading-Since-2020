@@ -26,6 +26,10 @@ from bitmex_replay.execution_normalizer import (  # noqa: E402
 )
 from bitmex_replay.execution_price_reconciler import reconcile_execution_prices  # noqa: E402
 from bitmex_replay.execution_valuation import load_asset_scale_registry, build_execution_valuation  # noqa: E402
+from bitmex_replay.execution_order_audit import apply_execution_order_policy, audit_execution_order  # noqa: E402
+from bitmex_replay.instrument_terms import audit_instrument_terms, summarize_instrument_terms  # noqa: E402
+from bitmex_replay.position_cost_models import audit_position_cost_models  # noqa: E402
+from bitmex_replay.aep_models import audit_aep_models, current_cycle_summary  # noqa: E402
 from bitmex_replay.historical_spec_registry import load_historical_specs, resolve_specs_for_events  # noqa: E402
 from bitmex_replay.io_utils import hash_files, iter_csv_dicts, parse_datetime  # noqa: E402
 from bitmex_replay.order_dimension import build_order_dimension  # noqa: E402
@@ -214,8 +218,10 @@ def write_reports(
     source: str,
     analysis: str,
     branch: str,
+    diagnostics: dict[str, Any] | None = None,
 ) -> None:
     reports.mkdir(parents=True, exist_ok=True)
+    diagnostics = diagnostics or {}
     write_csv(tables["terminal"], reports.parent / "outputs" / "terminal_position_accounting.csv", [
         "symbol", "payout_model", "settlement_currency", "position_qty", "current_cost_exact_raw", "current_cost_api_raw",
         "average_entry_basis", "average_entry_price", "position_cycle_id", "cycle_count",
@@ -237,6 +243,36 @@ def write_reports(
         "reported_exact_match_count", "reported_mismatch_count", "difference_raw_sum", "max_abs_difference_raw", "difference_frequency",
     ])
     write_csv(tables["anomalies"], reports / "position_accounting_anomalies.csv", ["execID", "event_time", "symbol", "execType", "anomaly_type", "reason"])
+    instrument_rows = diagnostics.get("instrument_terms_rows", [])
+    order_rows = diagnostics.get("execution_order_rows", [])
+    cost_rows = diagnostics.get("cost_model_rows", [])
+    aep_rows = diagnostics.get("aep_model_rows", [])
+    cycle_rows = diagnostics.get("current_cycle_rows", [])
+    outputs = reports.parent / "outputs"
+    outputs.mkdir(parents=True, exist_ok=True)
+    # Keep the event-level audit reproducible but outside Git. The committed
+    # CSVs below are deliberately compact summaries.
+    write_csv(instrument_rows, outputs / "instrument_terms_temporal_audit.csv", list(instrument_rows[0].keys()) if instrument_rows else ["symbol", "terms_resolution_status", "resolved_lot_size"])
+    write_csv(order_rows, outputs / "execution_tie_order_audit.csv", list(order_rows[0].keys()) if order_rows else ["chain_status", "orderID"])
+    terms_groups: dict[tuple[str, str, str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in instrument_rows:
+        terms_groups[(str(row.get("symbol", "")), str(row.get("terms_resolution_status", "")), str(row.get("resolved_lot_size", "")), str(row.get("lastQty_multiple_status", "")))].append(row)
+    terms_summary_rows = [{
+        "symbol": key[0], "terms_resolution_status": key[1], "resolved_lot_size": key[2], "lastQty_multiple_status": key[3],
+        "execution_count": len(group), "first_event_time": min(str(row.get("event_time", "")) for row in group), "last_event_time": max(str(row.get("event_time", "")) for row in group),
+    } for key, group in sorted(terms_groups.items())]
+    order_groups: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in order_rows:
+        order_groups[(str(row.get("chain_status", "")), str(row.get("symbol", "")))].append(row)
+    order_summary_rows = [{
+        "chain_status": key[0], "symbol": key[1], "group_count": len(group), "trade_count": sum(int(row.get("trade_count") or 0) for row in group),
+        "sample_orderID": group[0].get("orderID", ""), "sample_raw_cumQty_order": group[0].get("raw_cumQty_order", ""), "sample_recovered_execID_order": group[0].get("recovered_execID_order", ""),
+    } for key, group in sorted(order_groups.items())]
+    write_csv(terms_summary_rows, reports / "instrument_terms_temporal_audit.csv", ["symbol", "terms_resolution_status", "resolved_lot_size", "lastQty_multiple_status", "execution_count", "first_event_time", "last_event_time"])
+    write_csv(order_summary_rows, reports / "execution_tie_order_audit.csv", ["chain_status", "symbol", "group_count", "trade_count", "sample_orderID", "sample_raw_cumQty_order", "sample_recovered_execID_order"])
+    write_csv(cost_rows, reports / "position_cost_model_audit.csv", list(cost_rows[0].keys()) if cost_rows else ["model", "status"])
+    write_csv(aep_rows, reports / "aep_model_audit.csv", list(aep_rows[0].keys()) if aep_rows else ["model", "status"])
+    write_csv(cycle_rows, reports / "xbtusd_current_cycle_summary.csv", list(cycle_rows[0].keys()) if cycle_rows else ["symbol", "cycle_id"])
 
     compact = {
         "report_version": "M0-02B-1B-0/1.0",
@@ -257,6 +293,16 @@ def write_reports(
         "rounding_policy": summary["rounding_policy"],
         "terminal_checks": summary["terminal_checks"],
         "reported_realised_pnl": summary["reported_realised_pnl"],
+        "reported_pnl_decomposition": summary.get("reported_pnl_decomposition", {}),
+        "instrument_terms": summary.get("instrument_terms", {}),
+        "execution_order": summary.get("execution_order", {}),
+        "position_cost_models": summary.get("position_cost_models", {}),
+        "aep_reconciliation": summary.get("aep_reconciliation", {}),
+        "reported_pnl_decomposition_status": summary.get("reported_pnl_decomposition_status", ""),
+        "instrument_terms_status": summary.get("instrument_terms_status", ""),
+        "execution_order_status": summary.get("execution_order_status", ""),
+        "position_cost_model_status": summary.get("position_cost_model_status", ""),
+        "aep_reconciliation_status": summary.get("aep_reconciliation_status", ""),
         "gross_realised_pnl_by_currency": summary["gross_realised_pnl_by_currency"],
         "protected_files": protected,
         "output_rows": {"position_accounting_events": summary["output_rows"]},
@@ -279,6 +325,7 @@ def write_reports(
         f"- analysis commit: `{analysis}`",
         f"- branch: `{branch}`",
         f"- 处理行数: `{summary['output_rows']}`；Spot 进入 accounting: `{summary['input_counts']['spot_accounting_rows']}`。",
+        f"- Raw Execution: `{summary['input_counts']['raw_execution_count']}`；Raw Trade: `{summary['input_counts']['raw_trade_count']}`；Derivative Trade: `{summary['input_counts']['derivative_trade_count']}`。",
         "",
         "## Accounting eligibility",
         "",
@@ -288,7 +335,13 @@ def write_reports(
         "",
         "## 覆盖与动作",
         "",
-        _table(["execType", "count"], [[key, value] for key, value in sorted(summary["input_counts"]["exec_type_counts"].items())]),
+        _table(["scope", "event type", "count"], [
+            ["raw", "Trade", summary["input_counts"]["raw_trade_count"]],
+            ["derivative", "Trade", summary["input_counts"]["derivative_trade_count"]],
+            ["derivative", "Funding", summary["input_counts"]["funding_count"]],
+            ["derivative", "Settlement", summary["input_counts"]["settlement_count"]],
+            ["raw", "Spot excluded", summary["input_counts"]["spot_execution_count"]],
+        ]),
         "",
         _table(["action", "count"], [[key, value] for key, value in sorted(summary["action_counts"].items())]),
         "",
@@ -348,9 +401,19 @@ def write_reports(
         "",
         "## reported realisedPnl diagnostics",
         "",
-        f"- non-null: `{summary['reported_realised_pnl']['non_null']}`; exact: `{summary['reported_realised_pnl']['exact']}`; mismatch: `{summary['reported_realised_pnl']['mismatch']}`; missing: `{summary['reported_realised_pnl']['missing']}`。",
-        f"- maximum absolute difference raw: `{summary['reported_realised_pnl']['max_abs_difference_raw']}`。",
-        "- reported realisedPnl never updates state and is not automatically combined with execComm or Funding. 詳細分布见 `reported_realised_pnl_diagnostics.csv`。",
+        f"- decomposition status: `{summary['reported_pnl_decomposition'].get('status')}`; eligible: `{summary['reported_pnl_decomposition'].get('eligible')}`; exact: `{summary['reported_pnl_decomposition'].get('exact')}`; mismatch: `{summary['reported_pnl_decomposition'].get('mismatch')}`; missing: `{summary['reported_pnl_decomposition'].get('missing')}`; broker unresolved: `{summary['reported_pnl_decomposition'].get('broker_unresolved')}`。",
+        "- corrected gross candidate = reported realisedPnl + execComm. brokerExecComm is not blindly added; a non-zero broker component remains unresolved. The reported fields never update position state.",
+        "- 詳細分布见 `reported_realised_pnl_diagnostics.csv`。",
+        "",
+        "## 分阶段审计状态",
+        "",
+        f"- reported_pnl_decomposition_status: `{summary['reported_pnl_decomposition'].get('status')}`",
+        f"- instrument_terms_status: `{summary['instrument_terms'].get('status')}`",
+        f"- execution_order_status: `{summary['execution_order'].get('status')}`",
+        f"- position_cost_model_status: `{summary['position_cost_models'].get('status')}`",
+        f"- aep_reconciliation_status: `{summary['aep_reconciliation'].get('status')}`",
+        "",
+        "Temporal lot-size audit and tie-order details are in `instrument_terms_temporal_audit.csv` and `execution_tie_order_audit.csv`. Cost models remain diagnostic candidates; no per-Execution model selection is performed.",
         "",
         "## Gross realised PnL",
         "",
@@ -365,7 +428,8 @@ def write_reports(
         "## 输出",
         "",
         "- ignored: `quant/outputs/position_accounting_events.parquet`",
-        "- committed summaries: terminal_position_accounting.csv, position_accounting_by_symbol.csv, position_action_summary.csv, cost_rounding_policy_audit.csv, xbtusd_snapshot_reconciliation.csv, reported_realised_pnl_diagnostics.csv, position_accounting_anomalies.csv",
+        "- ignored detailed audits: `quant/outputs/instrument_terms_temporal_audit.csv`, `quant/outputs/execution_tie_order_audit.csv`",
+        "- committed summaries: terminal_position_accounting.csv, position_accounting_by_symbol.csv, position_action_summary.csv, cost_rounding_policy_audit.csv, xbtusd_snapshot_reconciliation.csv, reported_realised_pnl_diagnostics.csv, position_accounting_anomalies.csv, instrument_terms_temporal_audit.csv, execution_tie_order_audit.csv, position_cost_model_audit.csv, aep_model_audit.csv, xbtusd_current_cycle_summary.csv",
     ]
     (reports / "position_accounting.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -381,15 +445,45 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     evidence = load_settlement_evidence(root / "quant" / "config" / "historical_settlement_evidence.json")
     normalized = normalize_executions(root / "api-v1-execution-tradeHistory.csv", order, instruments, evidence)
     assert_unique_exec_ids(normalized)
-    position_replay = replay_positions(normalized["events"])
+    order_audit = audit_execution_order(normalized["events"])
+    source_ordered_events = apply_execution_order_policy(normalized["events"], order_audit, "SOURCE_ROW_STABLE")
+    position_replay = replay_positions(source_ordered_events)
     registry = load_historical_specs(root / "quant" / "config" / "historical_instrument_specs.json", root / "api-v1-instrument.all.csv", source_commit())
-    mapping = resolve_specs_for_events(normalized["events"], registry)
-    price = reconcile_execution_prices(normalized["events"], registry, mapping)
+    mapping = resolve_specs_for_events(source_ordered_events, registry)
+    price = reconcile_execution_prices(source_ordered_events, registry, mapping)
     assets = load_asset_scale_registry(root / "api-v1-wallet-assets.csv")
-    valuation = build_execution_valuation(normalized["events"], registry, mapping, assets, price_reconciliation=price)
+    valuation = build_execution_valuation(source_ordered_events, registry, mapping, assets, price_reconciliation=price)
+    order_status_by_exec = order_audit.get("chain_status_by_exec", {})
+    order_rank_by_exec = order_audit.get("rank_by_exec", {})
+    for item in valuation["valuations"]:
+        exec_id = str(item.get("execID", ""))
+        item["execution_order_policy"] = "SOURCE_ROW_STABLE"
+        item["execution_order_chain_status"] = order_status_by_exec.get(exec_id, "NOT_IN_MULTI_TRADE_GROUP")
+        item["execution_order_rank"] = order_rank_by_exec.get(exec_id, 0)
     policy = load_accounting_policy(root / "quant" / "config" / "position_accounting_policy.json")
     specs = {str(spec.get("spec_id")): spec for spec in registry.get("specs", [])}
     accounting = build_position_accounting(valuation["valuations"], position_replay["position_events"], specs, policy)
+
+    # Re-run only the accounting layer under the recovered within-order chain
+    # for an audit comparison. The source-row replay remains the canonical M0-02A
+    # quantity sequence; no policy is selected per execution.
+    candidate_events = apply_execution_order_policy(normalized["events"], order_audit, "CUMQTY_WITHIN_ORDER")
+    candidate_position_replay = replay_positions(candidate_events)
+    valuation_by_exec = {str(row.get("execID", "")): row for row in valuation["valuations"]}
+    candidate_valuations = [valuation_by_exec[str(event.get("execID", ""))] for event in candidate_events if event.get("instrument_class") == "DERIVATIVE" and str(event.get("execID", "")) in valuation_by_exec]
+    candidate_specs = specs
+    from bitmex_replay.position_accounting import replay_position_accounting  # noqa: E402
+    candidate_accounting = replay_position_accounting(
+        candidate_valuations,
+        {row["execID"]: row for row in candidate_position_replay["position_events"]},
+        candidate_specs,
+        policy,
+        policy["canonical_tiebreak"]["average_cost_release"],
+        policy["canonical_tiebreak"]["flip_exec_cost_split"],
+        collect_rows=True,
+    )
+    terms_rows = audit_instrument_terms(source_ordered_events, registry)
+    cost_model_rows = audit_position_cost_models(valuation["valuations"], position_replay["position_events"])
 
     snapshot = read_snapshot(root / "api-v1-position.snapshot.csv")
     snapshot_result = {"rows": [], "status": BLOCKED}
@@ -405,8 +499,8 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     tables = build_report_tables(events, accounting.get("terminal", []), policy_rows, accounting.get("anomalies", []))
     tables["snapshot"] = snapshot_result.get("rows", [])
 
-    raw_type_counts = Counter(event.get("execType", "") for event in normalized["events"])
-    derivative_events = [event for event in normalized["events"] if event.get("instrument_class") == "DERIVATIVE"]
+    raw_type_counts = Counter(event.get("execType", "") for event in source_ordered_events)
+    derivative_events = [event for event in source_ordered_events if event.get("instrument_class") == "DERIVATIVE"]
     eligibility_counts = Counter(row.get("accounting_eligibility", "") for row in events)
     action_counts = Counter(row.get("action", "") for row in events)
     gross_by_currency: dict[str, Decimal] = defaultdict(Decimal)
@@ -420,11 +514,33 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         if row.get("reported_realisedPnl_raw") not in (None, "")
         and str(row.get("reported_realisedPnl_raw")).strip()
     ]
-    reported_differences = [_decimal(row.get("reported_pnl_difference_raw")) or Decimal(0) for row in reported_non_null]
+    reported_differences = [_decimal(row.get("reported_gross_difference_raw")) or Decimal(0) for row in reported_non_null]
     terminal = accounting.get("terminal", [])
     terminal_by_symbol = {row.get("symbol"): row for row in terminal}
     nonzero_terminal_symbols = sorted(symbol for symbol, row in terminal_by_symbol.items() if int(row.get("position_qty") or 0) != 0)
     flat_residual = sum(int(row.get("position_qty") or 0) == 0 and _decimal(row.get("current_cost_api_raw")) != 0 for row in terminal)
+    decomp_rows = [row for row in events]
+    decomposition_summary = accounting.get("summary", {}).get("reported_pnl", {})
+    terms_summary = summarize_instrument_terms(terms_rows)
+    terms_summary["status"] = "PASS" if terms_summary.get("status_counts", {}).get("MISSING", 0) == 0 and terms_summary.get("status_counts", {}).get("AMBIGUOUS", 0) == 0 else "BLOCKED_BY_TEMPORAL_INSTRUMENT_TERMS"
+    terms_summary["snapshot_fallback_count"] = terms_summary.get("status_counts", {}).get("SNAPSHOT_FALLBACK", 0)
+    order_summary = {
+        key: value
+        for key, value in order_audit.items()
+        if key not in {"rows", "chain_status_by_exec", "rank_by_exec"}
+    }
+    order_summary["source_policy_terminal_cost"] = next((row.get("current_cost_api_raw") for row in terminal if row.get("symbol") == SNAPSHOT_SYMBOL), None)
+    order_summary["cumqty_policy_terminal_cost"] = next((row.get("current_cost_api_raw") for row in candidate_accounting.get("terminal", []) if row.get("symbol") == SNAPSHOT_SYMBOL), None)
+    order_summary["source_policy_cycle_count"] = accounting.get("summary", {}).get("cycle_count", 0)
+    order_summary["cumqty_policy_cycle_count"] = candidate_accounting.get("cycle_count", 0)
+    order_summary["source_policy_corrected_gross_exact"] = accounting.get("summary", {}).get("reported_pnl", {}).get("exact", 0)
+    order_summary["cumqty_policy_corrected_gross_exact"] = candidate_accounting.get("reported_pnl", {}).get("exact", 0)
+    order_summary["status"] = order_audit.get("status", "PASS")
+    cost_status = "PASS" if any(row.get("status") == "PASS" and row.get("xbtusd_current_cost_difference") == "0" for row in cost_model_rows) else "BLOCKED_BY_POSITION_COST_MODEL"
+    cycle_summary = current_cycle_summary(events, SNAPSHOT_SYMBOL)
+    snapshot_for_aep = snapshot.get(SNAPSHOT_SYMBOL, {}) if snapshot else {}
+    aep_rows = audit_aep_models(events, symbol=SNAPSHOT_SYMBOL, snapshot_aep=snapshot_for_aep.get("avgEntryPrice"), snapshot_avg_cost=snapshot_for_aep.get("avgCostPrice"))
+    aep_status = "PASS" if any(row.get("model") == "PUBLISHED_FILL_WEIGHTED_BASIS" and row.get("snapshot_display_difference") == "0.0000" for row in aep_rows) else "BLOCKED_BY_AEP_ENGINE_STATE_SEMANTICS"
     position_after_by_exec = {
         item.get("execID"): item.get("position_after")
         for item in position_replay["position_events"]
@@ -460,17 +576,25 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         blockers.append(f"protected raw files changed: {changed_files}")
     if accounting.get("policy_audit", {}).get("selection_status") != PASS:
         blockers.append("rounding policy selection did not pass")
+    if terms_summary["status"] != PASS:
+        blockers.append("temporal instrument terms did not cover every derivative execution")
+    if cost_status != PASS:
+        blockers.append("no position cost model reproduced the XBTUSD terminal currentCost anchor")
     warnings: list[str] = []
     if eligibility_counts.get("ACCOUNTING_ELIGIBLE_WITH_WARNING", 0):
         warnings.append(f"{eligibility_counts['ACCOUNTING_ELIGIBLE_WITH_WARNING']} valuation warnings remained accounting-eligible")
-    if reported_differences:
-        warnings.append(f"{sum(value != 0 for value in reported_differences)} reported realisedPnl rows differ from reconstructed gross trading PnL; diagnostic only")
+    if decomposition_summary.get("mismatch"):
+        warnings.append(f"{decomposition_summary['mismatch']} reported PnL decomposition rows remain different from reconstructed gross; diagnostic only")
     if not position_replay.get("position_replay_status") == "PASS":
         warnings.append("M0-02A position replay status was not PASS; quantity comparison is still performed row-by-row")
     status = BLOCKED if blockers else ("READY_WITH_WARNINGS" if warnings else PASS)
     if blockers:
         if accounting.get("policy_audit", {}).get("selection_status") != PASS:
             readiness = "BLOCKED_BY_ACCOUNTING_ROUNDING_POLICY"
+        elif cost_status != PASS:
+            readiness = "BLOCKED_BY_POSITION_COST_MODEL"
+        elif aep_status != PASS:
+            readiness = "BLOCKED_BY_AEP_ENGINE_STATE_SEMANTICS"
         elif snapshot_result.get("status") != PASS:
             readiness = "BLOCKED_BY_TERMINAL_COST_RECONCILIATION"
         else:
@@ -485,6 +609,8 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         "input_counts": {
             "raw_execution_count": normalized["raw_rows"],
             "derivative_execution_count": len(derivative_events),
+            "raw_trade_count": raw_type_counts.get("Trade", 0),
+            "derivative_trade_count": sum(event.get("execType") == "Trade" for event in derivative_events),
             "trade_count": sum(event.get("execType") == "Trade" for event in derivative_events),
             "funding_count": sum(event.get("execType") == "Funding" for event in derivative_events),
             "settlement_count": sum(event.get("execType") == "Settlement" for event in derivative_events),
@@ -524,13 +650,37 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             "missing": len(events) - len(reported_non_null),
             "max_abs_difference_raw": format(max((value.copy_abs() for value in reported_differences), default=Decimal(0)), "f"),
         },
+        "reported_pnl_decomposition": {
+            "status": "BLOCKED" if decomposition_summary.get("broker_unresolved") else ("READY_WITH_WARNINGS" if decomposition_summary.get("mismatch") else "PASS"),
+            "eligible": decomposition_summary.get("eligible", 0),
+            "exact": decomposition_summary.get("exact", 0),
+            "mismatch": decomposition_summary.get("mismatch", 0),
+            "missing": decomposition_summary.get("missing", 0),
+            "broker_unresolved": decomposition_summary.get("broker_unresolved", 0),
+        },
+        "instrument_terms": terms_summary,
+        "execution_order": order_summary,
+        "position_cost_models": {"status": cost_status, "model_count": len(cost_model_rows), "passing_model_count": sum(row.get("status") == "PASS" for row in cost_model_rows)},
+        "aep_reconciliation": {"status": aep_status, "model_count": len(aep_rows), "current_cycle": cycle_summary},
+        "reported_pnl_decomposition_status": "BLOCKED" if decomposition_summary.get("broker_unresolved") else ("READY_WITH_WARNINGS" if decomposition_summary.get("mismatch") else "PASS"),
+        "instrument_terms_status": terms_summary["status"],
+        "execution_order_status": order_summary["status"],
+        "position_cost_model_status": cost_status,
+        "aep_reconciliation_status": aep_status,
         "gross_realised_pnl_by_currency": {currency: format(value, "f") for currency, value in sorted(gross_by_currency.items())},
         "output_rows": len(events),
     }
     protected = {"unchanged": not changed_files, "changed_files": changed_files, "before": before_hashes, "after": protected_after}
     if events:
         write_parquet(events, outputs / "position_accounting_events.parquet")
-    write_reports(reports, tables, summary, protected, source_commit(), git_value(["rev-parse", "HEAD"]), git_value(["branch", "--show-current"]))
+    diagnostics = {
+        "instrument_terms_rows": terms_rows,
+        "execution_order_rows": order_audit.get("rows", []),
+        "cost_model_rows": cost_model_rows,
+        "aep_model_rows": aep_rows,
+        "current_cycle_rows": [cycle_summary],
+    }
+    write_reports(reports, tables, summary, protected, source_commit(), git_value(["rev-parse", "HEAD"]), git_value(["branch", "--show-current"]), diagnostics)
     return {"summary": summary, "accounting": accounting, "snapshot": snapshot_result, "protected": protected, "tables": tables}
 
 

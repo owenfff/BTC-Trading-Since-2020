@@ -393,6 +393,7 @@ def normalize_execution_value(
     asset_registry: dict[str, dict[str, Any]],
     *,
     price_row: dict[str, Any] | None = None,
+    resolved_lot_size: Any | None = None,
 ) -> dict[str, Any]:
     """Normalize one derivative execution while preserving component separation."""
 
@@ -465,6 +466,9 @@ def normalize_execution_value(
         "realisedPnl_raw": realised["raw"],
         "realisedPnl_major": realised["major"],
         "realisedPnl_parse_status": realised["status"],
+        "brokerCommission_raw": event.get("brokerCommission", "") or None,
+        "brokerExecComm_raw": event.get("brokerExecComm", "") or None,
+        "resolved_lot_size": resolved_lot_size if resolved_lot_size not in (None, "") else spec.get("lot_size"),
         "homeNotional": _decimal_text(_decimal(event.get("homeNotional"))),
         "foreignNotional": _decimal_text(_decimal(event.get("foreignNotional"))),
         "lastPx": _decimal_text(_decimal(event.get("lastPx"))),
@@ -721,9 +725,17 @@ def build_execution_valuation(
         spec_id = clean(mapping.get("spec_id")).strip()
         spec = specs.get(spec_id, {})
         price_row = price_by_exec.get(exec_id)
-        valuation = normalize_execution_value(event, spec, asset_registry, price_row=price_row)
+        valuation = normalize_execution_value(
+            event,
+            spec,
+            asset_registry,
+            price_row=price_row,
+            resolved_lot_size=mapping.get("resolved_lot_size"),
+        )
         valuation["spec_resolution_status"] = mapping.get("spec_resolution_status", "MISSING_SPEC")
         valuation["compatibility_status"] = mapping.get("compatibility_status", "MISSING_SPEC")
+        valuation["terms_id"] = mapping.get("terms_id", "")
+        valuation["terms_resolution_status"] = mapping.get("terms_resolution_status", "MISSING")
         if not spec_id or valuation["spec_resolution_status"] != "MATCHED" or valuation["compatibility_status"] != "PASS":
             valuation["normalization_status"] = "BLOCKED"
             valuation["normalization_reason"] = "; ".join(filter(None, [

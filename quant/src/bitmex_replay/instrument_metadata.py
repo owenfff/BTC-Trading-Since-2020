@@ -15,6 +15,7 @@ INSTRUMENT_FIELDS = (
     "listing",
     "expiry",
     "settle",
+    "lotSize",
     "settlCurrency",
     "positionCurrency",
     "isInverse",

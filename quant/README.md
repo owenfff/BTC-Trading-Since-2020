@@ -109,6 +109,24 @@ Git 中只保留小型汇总报告：
 pytest quant/tests -v
 ```
 
+## M0-02B-1B-0.1 accounting semantics audit
+
+本补丁在不改动原始 CSV/JSON、也不接交易所的前提下，补齐四类会计语义诊断：
+
+- `reportedPnl + execComm` 的 gross candidate 分解；`brokerExecComm` 非零时单独标记 unresolved，不会盲加。
+- `historical_instrument_terms.json` 固化 XBTUSD、XBTM21、XBTU21 在 2021-06-08 04:30 UTC 的 lot size 1→100 边界；其它合约明确标记为冻结 instrument snapshot fallback。
+- 同一 symbol / transactTime / timestamp / orderID 下，优先审计 cumQty 链；跨 orderID 的同时间并列不使用 UUID 推断。
+- 保留现有 `PROPORTIONAL_INDEPENDENT_EVENT_ROUNDING`，并诊断 cumulative rounded delta、integer quotient/remainder carry 和 average-basis release；不逐 Execution 选择模型。
+
+运行：
+
+```bash
+py -3.11 quant/scripts/rebuild_position_accounting.py
+pytest quant/tests -v
+```
+
+新增的小型报告为 `instrument_terms_temporal_audit.csv`、`execution_tie_order_audit.csv`、`position_cost_model_audit.csv`、`aep_model_audit.csv` 和 `xbtusd_current_cycle_summary.csv`。逐 Execution Parquet 仍只放在 `quant/outputs/` 并由 `.gitignore` 保护。
+
 ## 审计范围
 
 - 校验 `manifest.json` 声明的文件、大小、SHA256、行数、列名和时间范围。

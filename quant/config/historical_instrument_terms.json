@@ -1,0 +1,71 @@
+{
+  "schema_version": "M0-02B-1B-0.1",
+  "terms": [
+    {
+      "term_id": "XBTUSD-LOT1-2016-2021",
+      "symbol": "XBTUSD",
+      "valid_from": "2016-05-13T12:00:00Z",
+      "valid_to_exclusive": "2021-06-08T04:30:00Z",
+      "lot_size": "1",
+      "evidence_confidence": "OFFICIAL_EXPLICIT",
+      "source_url": "https://www.bitmex.com/blog/site-announcement/important-lot-size-change-on-xbtusd-swap-and-futures-moving-to-100-lot-size-effective-8-june",
+      "source_title": "BitMEX Important Lot Size Change announcement",
+      "notes": "Historical minimum trading unit before the UTC boundary."
+    },
+    {
+      "term_id": "XBTUSD-LOT100-2021-PRESENT",
+      "symbol": "XBTUSD",
+      "valid_from": "2021-06-08T04:30:00Z",
+      "valid_to_exclusive": "9999-12-31T00:00:00Z",
+      "lot_size": "100",
+      "evidence_confidence": "OFFICIAL_EXPLICIT",
+      "source_url": "https://www.bitmex.com/blog/site-announcement/important-lot-size-change-on-xbtusd-swap-and-futures-moving-to-100-lot-size-effective-8-june",
+      "source_title": "BitMEX Important Lot Size Change announcement",
+      "notes": "Historical minimum trading unit after the UTC boundary."
+    },
+    {
+      "term_id": "XBTM21-LOT1-2020-2021",
+      "symbol": "XBTM21",
+      "valid_from": "2020-12-11T08:00:00Z",
+      "valid_to_exclusive": "2021-06-08T04:30:00Z",
+      "lot_size": "1",
+      "evidence_confidence": "OFFICIAL_EXPLICIT",
+      "source_url": "https://www.bitmex.com/blog/the-technical-details-of-our-lot-size-change-on-xbtusd-swap-and-xbt-futures",
+      "source_title": "BitMEX technical lot size details",
+      "notes": "XBTM21 was one of the three explicitly named affected contracts."
+    },
+    {
+      "term_id": "XBTM21-LOT100-2021",
+      "symbol": "XBTM21",
+      "valid_from": "2021-06-08T04:30:00Z",
+      "valid_to_exclusive": "2021-06-25T12:00:00Z",
+      "lot_size": "100",
+      "evidence_confidence": "OFFICIAL_EXPLICIT",
+      "source_url": "https://www.bitmex.com/blog/the-technical-details-of-our-lot-size-change-on-xbtusd-swap-and-xbt-futures",
+      "source_title": "BitMEX technical lot size details",
+      "notes": "The interval is bounded by the frozen XBTM21 settle timestamp."
+    },
+    {
+      "term_id": "XBTU21-LOT1-2021",
+      "symbol": "XBTU21",
+      "valid_from": "2021-03-12T08:00:00Z",
+      "valid_to_exclusive": "2021-06-08T04:30:00Z",
+      "lot_size": "1",
+      "evidence_confidence": "OFFICIAL_EXPLICIT",
+      "source_url": "https://www.bitmex.com/blog/the-technical-details-of-our-lot-size-change-on-xbtusd-swap-and-xbt-futures",
+      "source_title": "BitMEX technical lot size details",
+      "notes": "XBTU21 was one of the three explicitly named affected contracts."
+    },
+    {
+      "term_id": "XBTU21-LOT100-2021",
+      "symbol": "XBTU21",
+      "valid_from": "2021-06-08T04:30:00Z",
+      "valid_to_exclusive": "2021-09-24T12:00:00Z",
+      "lot_size": "100",
+      "evidence_confidence": "OFFICIAL_EXPLICIT",
+      "source_url": "https://www.bitmex.com/blog/the-technical-details-of-our-lot-size-change-on-xbtusd-swap-and-xbt-futures",
+      "source_title": "BitMEX technical lot size details",
+      "notes": "The interval is bounded by the frozen XBTU21 settle timestamp."
+    }
+  ]
+}
