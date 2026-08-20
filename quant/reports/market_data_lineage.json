@@ -1,0 +1,116 @@
+{
+  "report_version": "M3-PUBLIC-MARKET-DATA-1.0",
+  "analysis_commit": "ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9",
+  "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
+  "run_time_utc": "2026-08-20T08:20:30.500462Z",
+  "market_data_status": "BLOCKED",
+  "source_status": "BLOCKED_PUBLIC_DATA_UNAVAILABLE",
+  "source": {
+    "provider": "BitMEX",
+    "credentials": "none",
+    "base_url": "https://www.bitmex.com/api/v1",
+    "official_docs": {
+      "trade_bucketed": "https://docs.bitmex.com/api-explorer/get-trade-bucketed",
+      "funding": "https://docs.bitmex.com/api-explorer/get-funding",
+      "instrument": "https://docs.bitmex.com/api-explorer/get-instruments.html"
+    }
+  },
+  "symbol": "XBTUSD",
+  "requested_interval": "5m",
+  "selected_interval": null,
+  "requested_start_time_utc": "2020-05-01T09:03:47.360000Z",
+  "requested_end_time_utc": "2026-07-18T22:11:15.556000Z",
+  "account_trade_count": 98874,
+  "lineage": {
+    "trade_bucketed_5m": {
+      "provider": "BitMEX",
+      "endpoint": "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBTUSD&binSize=5m&partial=false&count=500&start=0&reverse=false&startTime=2020-05-01T09%3A03%3A47.360Z&endTime=2026-07-18T22%3A11%3A15.556Z",
+      "symbol": "XBTUSD",
+      "interval": "5m",
+      "start_time_utc": "2020-05-01T09:03:47.360Z",
+      "end_time_utc": "2026-07-18T22:11:15.556Z",
+      "credentials": "none",
+      "official_documentation": {
+        "trade_bucketed": "https://docs.bitmex.com/api-explorer/get-trade-bucketed",
+        "funding": "https://docs.bitmex.com/api-explorer/get-funding",
+        "instrument": "https://docs.bitmex.com/api-explorer/get-instruments.html"
+      },
+      "status": "FAILED",
+      "error_type": "MarketDownloadError",
+      "error": "public source request failed: <urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。>"
+    },
+    "trade_bucketed_15m": {
+      "provider": "BitMEX",
+      "endpoint": "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBTUSD&binSize=15m&partial=false&count=500&start=0&reverse=false&startTime=2020-05-01T09%3A03%3A47.360Z&endTime=2026-07-18T22%3A11%3A15.556Z",
+      "symbol": "XBTUSD",
+      "interval": "15m",
+      "start_time_utc": "2020-05-01T09:03:47.360Z",
+      "end_time_utc": "2026-07-18T22:11:15.556Z",
+      "credentials": "none",
+      "official_documentation": {
+        "trade_bucketed": "https://docs.bitmex.com/api-explorer/get-trade-bucketed",
+        "funding": "https://docs.bitmex.com/api-explorer/get-funding",
+        "instrument": "https://docs.bitmex.com/api-explorer/get-instruments.html"
+      },
+      "status": "FAILED",
+      "error_type": "MarketDownloadError",
+      "error": "public source request failed: <urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。>"
+    },
+    "funding": {
+      "status": "NOT_ATTEMPTED_NO_BARS",
+      "row_count": 0
+    },
+    "instrument": {
+      "status": "NOT_ATTEMPTED_NO_BARS",
+      "row_count": 0
+    }
+  },
+  "bar_normalization": {
+    "normalized_row_count": 0,
+    "rejected_counts": {}
+  },
+  "funding_normalization": {
+    "normalized_row_count": 0
+  },
+  "instrument_normalization": {
+    "normalized_row_count": 0
+  },
+  "bar_audit": {
+    "status": "BLOCKED",
+    "row_count": 0,
+    "valid_timestamp_count": 0,
+    "unique_timestamp_count": 0,
+    "duplicate_timestamp_count": 0,
+    "timestamp_parse_failure_count": 0,
+    "out_of_order_transition_count": 0,
+    "first_timestamp_utc": "",
+    "last_timestamp_utc": "",
+    "expected_grid_count": 0,
+    "missing_grid_count": 0,
+    "coverage_ratio": 0.0,
+    "gap_count": 0
+  },
+  "context_audit": {
+    "row_count": 0,
+    "status_counts": {
+      "COMPLETE": 0,
+      "MARK_INDEX_MISSING": 0,
+      "FUNDING_MISSING": 0,
+      "STALE_CONTEXT": 0
+    },
+    "instrument_source_row_count": 0,
+    "funding_source_row_count": 0,
+    "join_policy": "ASOF_PREVIOUS_OR_EQUAL_UTC; FUTURE_OBSERVATIONS_FORBIDDEN",
+    "max_mark_age_seconds": 3600,
+    "max_funding_age_seconds": 32400
+  },
+  "gap_row_count": 1,
+  "raw_account_inputs_unchanged": true,
+  "changed_protected_files": [],
+  "large_output": {},
+  "warnings": [
+    "Trade bucketed timestamps are treated as BitMEX bucket end/write timestamps; no timezone conversion beyond explicit UTC normalization.",
+    "Mark/index and funding are retained as as-of context only and are never substituted for a missing canonical trade price."
+  ],
+  "next_action": "If market_data_status is BLOCKED, rerun in a network-enabled environment and freeze the verified public cache before starting leakage-safe features; if READY_WITH_WARNINGS, inspect market_data_gaps.csv and context coverage first."
+}

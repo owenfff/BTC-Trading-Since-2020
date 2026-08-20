@@ -4,7 +4,7 @@
   "current_phase": "PHASE_4_PUBLIC_MARKET_DATA",
   "current_work_package": "M3-public-market-data",
   "last_completed_phase": "PHASE_3_BEHAVIOR_DATASET",
-  "last_code_commit": "8866448fc183929078caf418b09de7307c16d02b",
+  "last_code_commit": "ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9",
   "last_report_commit": "a2360d58842028d4dfd33bb3bfd95ec42bfcc4d8",
   "test_count": 245,
   "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_6_MARKET_SMOKE_TESTS",
@@ -33,5 +33,5 @@
     "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration."
   ],
   "next_action": "Rerun quant/scripts/build_market_data.py in a network-enabled environment; verify the BitMEX public cache SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
-  "updated_at_utc": "2026-08-20T09:00:00Z"
+  "updated_at_utc": "2026-08-20T08:20:30Z"
 }
