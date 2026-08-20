@@ -22,6 +22,15 @@
 - Manifest: `quant/reports/accounting_foundation_manifest.json`
 - Status: `HIGH_CONFIDENCE_WITH_RESIDUALS` / `READY_WITH_KNOWN_ACCOUNTING_RESIDUALS`
 
+## Wallet reconciliation artifact
+
+- Code commit: `1166e23eff2da21afb5ec3447cccbebf77971295`.
+- Report commit: `14335b3aaf312c3e7c42cec7632f7f32f05d0fd5`.
+- Report: `quant/reports/wallet_reconciliation.json` and `quant/reports/wallet_reconciliation.md`.
+- Coverage: 17,484 wallet rows; 17,482 Completed; currencies BMEX, USDT, XBT; 14,292 balance-continuity batches.
+- Results: 17,474 PASS rows, 5 real batch anomalies, 3 exact nonzero snapshot matches, 12 zero snapshots without history, terminal XBT wallet/equity PASS.
+- Raw/major values remain currency-separated and are scaled only from `api-v1-wallet-assets.csv`; wallet-to-execution comparisons are aggregate diagnostics only.
+
 ## Upcoming lineage
 
 Wallet ledger, public market data, behavioral episodes, features, labels, models, and experiments must each record source URLs/commits, UTC coverage, SHA256, code commit, dependency versions, and report analysis commit.

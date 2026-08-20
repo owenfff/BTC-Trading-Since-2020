@@ -1,3 +1,4 @@
 experiment_id,stage,description,source_commit,analysis_commit,seed,status,artifact_path,notes
 M0-02B-1B-0.1,accounting,Position accounting semantics audit,f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6,2b4b9fbe17c22281b45ae3d07867e94295c28d6a,,COMPLETE,quant/reports/position_accounting.json,"Residuals preserved; not a global blocker"
 M0-AUTONOMOUS-1,accounting,Freeze exchange-reported and analytical dual ledgers,f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6,86be1f430ece5c64237b2dfc133842124119101c,,COMPLETE,quant/reports/accounting_foundation_manifest.json,"Downstream research allowed with explicit residuals"
+M1-WALLET-1,wallet,Reconcile currency-separated wallet ledger and snapshots,f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6,1166e23eff2da21afb5ec3447cccbebf77971295,,COMPLETE,quant/reports/wallet_reconciliation.json,"READY_WITH_WARNINGS; no fabricated wallet-to-execution join"

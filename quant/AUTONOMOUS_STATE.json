@@ -1,15 +1,15 @@
 {
   "program_version": "4.0",
   "program_status": "RUNNING",
-  "current_phase": "PHASE_2_WALLET_RECONCILIATION",
-  "current_work_package": "M1-wallet-ledger-reconciliation",
-  "last_completed_phase": "PHASE_1_ACCOUNTING_FOUNDATION",
-  "last_code_commit": "86be1f430ece5c64237b2dfc133842124119101c",
-  "last_report_commit": "f52ea4621b807a00f08dce805d7600a97f74a584",
-  "test_count": 223,
+  "current_phase": "PHASE_3_BEHAVIOR_DATASET",
+  "current_work_package": "M2-btc-behavior-dataset",
+  "last_completed_phase": "PHASE_2_WALLET_RECONCILIATION",
+  "last_code_commit": "1166e23eff2da21afb5ec3447cccbebf77971295",
+  "last_report_commit": "14335b3aaf312c3e7c42cec7632f7f32f05d0fd5",
+  "test_count": 234,
   "last_test_status": "PASS",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
-  "wallet_status": "IN_PROGRESS",
+  "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "NOT_STARTED",
   "market_data_status": "NOT_STARTED",
   "leakage_status": "NOT_STARTED",
@@ -30,6 +30,6 @@
     "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
     "No claim of exact strategy recovery or future profitability is permitted."
   ],
-  "next_action": "Implement quant/src/bitmex_replay/wallet_ledger.py, quant/scripts/build_wallet_ledger.py, and quant/tests/test_wallet_ledger.py; build raw/major currency-separated wallet and daily ledgers; reconcile executions, Funding, snapshots, and equity curve without fabricated event joins.",
-  "updated_at_utc": "2026-08-20T06:52:00Z"
+  "next_action": "Implement BTC-first order episodes, decision episodes, and trade cycles with wallet/reconciliation confidence columns; preserve raw trade-only strategy-fidelity boundaries.",
+  "updated_at_utc": "2026-08-20T07:30:00Z"
 }
