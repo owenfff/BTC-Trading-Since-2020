@@ -1,0 +1,125 @@
+{
+  "report_version": "M0-02B-1B-0/1.0",
+  "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
+  "analysis_commit": "dd6bf27442ebc2f36b6fc189b13c746d0791673f",
+  "analysis_branch": "quant/m0-02b1b-position-accounting-replay",
+  "position_accounting_status": "BLOCKED",
+  "m0_02b1b1_readiness": "BLOCKED_BY_ACCOUNTING_ROUNDING_POLICY",
+  "blockers": [
+    "no candidate policy satisfies conservation and terminal currentCost anchors",
+    "XBTUSD snapshot reconciliation failed",
+    "rounding policy selection did not pass"
+  ],
+  "warnings": [
+    "150300 valuation warnings remained accounting-eligible",
+    "15739 reported realisedPnl rows differ from reconstructed gross trading PnL; diagnostic only"
+  ],
+  "input_counts": {
+    "raw_execution_count": 173434,
+    "derivative_execution_count": 173226,
+    "trade_count": 160302,
+    "funding_count": 12905,
+    "settlement_count": 19,
+    "spot_execution_count": 208,
+    "spot_accounting_rows": 0,
+    "exec_type_counts": {
+      "Trade": 160510,
+      "Funding": 12905,
+      "Settlement": 19
+    }
+  },
+  "accounting_eligibility_counts": {
+    "ACCOUNTING_ELIGIBLE_WITH_WARNING": 150300,
+    "ACCOUNTING_ELIGIBLE": 22926
+  },
+  "action_counts": {
+    "OPEN_LONG": 898,
+    "ADD_LONG": 50952,
+    "REDUCE_LONG": 53580,
+    "CLOSE_LONG": 886,
+    "NO_POSITION_CHANGE": 12905,
+    "OPEN_SHORT": 333,
+    "ADD_SHORT": 27978,
+    "REDUCE_SHORT": 25180,
+    "CLOSE_SHORT": 344,
+    "FLIP_LONG_TO_SHORT": 91,
+    "FLIP_SHORT_TO_LONG": 79
+  },
+  "flip_count": 170,
+  "full_close_count": 1230,
+  "position_cycle_count": 1401,
+  "conservation": {
+    "exact_conservation_failure_count": 0,
+    "api_conservation_failure_count": 0,
+    "flip_exec_cost_split_failure_count": 0,
+    "full_close_residual_cost_count": 0,
+    "settlement_residual_cost_count": 0
+  },
+  "rounding_policy": {
+    "selected_average_cost_release": null,
+    "selected_flip_exec_cost_split": null,
+    "ambiguity_count": 0,
+    "selection_reason": "no candidate policy satisfies conservation and terminal currentCost anchors"
+  },
+  "terminal_checks": {
+    "flat_terminal_residual_cost_count": 0,
+    "settlement_applied_count": 19,
+    "nonzero_terminal_symbols": [
+      "XBTUSD"
+    ],
+    "xbtusd": {
+      "symbol": "XBTUSD",
+      "payout_model": "INVERSE",
+      "settlement_currency": "XBT",
+      "position_qty": -998000,
+      "current_cost_exact_raw": "1386445812.7863764085864748656315535619943759757407922382333371393357642191263815492891192135994881946538192457674691933440350214498761762145248740616644041192378214956710850017208573715398642045291351",
+      "current_cost_api_raw": "1386445848",
+      "average_entry_basis": "0.0013892242613089943973812373403121779178300360478364651685704780955268178548360536566023238613221324595729651761197086105651653521541845453051351443503651343880138491940592034085379332380158959965221797",
+      "average_entry_price": "71982.618490822464968098336702587628720357600841946133345892107878589169521669517386375861191593009783898288650769001163067364823586717576221993137280942905343504535017594693555225292123462257237167290",
+      "position_cycle_id": "XBTUSD-C0688",
+      "cycle_count": 688
+    },
+    "snapshot_reconciliation_status": "BLOCKED"
+  },
+  "reported_realised_pnl": {
+    "non_null": 15739,
+    "exact": 0,
+    "mismatch": 15739,
+    "missing": 157487,
+    "max_abs_difference_raw": "2516254"
+  },
+  "gross_realised_pnl_by_currency": {
+    "XBT": "12949758767.78637640858647551"
+  },
+  "protected_files": {
+    "unchanged": true,
+    "changed_files": [],
+    "before": {
+      "api-v1-execution-tradeHistory.csv": "c778ddc90b7d60c0a47c1a155602595775879f5da7a7cb0843beeb0f6638f998",
+      "api-v1-order.csv": "32d05a5b4482d4c725593596c6f6e09018e42a2221fa73056cb82f6e186caf34",
+      "api-v1-user-walletHistory.csv": "08b875895b10cc62362340eecd761320888756d128515788406680e5d320105d",
+      "api-v1-position.snapshot.csv": "9a3d6dc54e19353c277d3a80b362294755ee1fcc52ef09376be6257a929c1d88",
+      "api-v1-user-wallet.snapshot-all.csv": "b7934fdbc45c714bc7aaf6a51854024f288b7a916202ae4eed51c35a96205777",
+      "api-v1-user-margin.snapshot-all.csv": "b793b9d596d585cedc18f4b87ad1a046bc285e3998ef89be52b665b5871fa100",
+      "api-v1-instrument.all.csv": "457212f89cf40bf854492c500f13d4e117e76f6f8bf583a807921a12a90d5d31",
+      "api-v1-wallet-assets.csv": "1cb904e08fb59647ec7a2c336c49571f5f1cb01253ca816edb5844a1c207b6ff",
+      "derived-equity-curve.csv": "8923c1ced46334f301833d2b117ff89ebb7f33c465031ae1197e6126bf87c206",
+      "manifest.json": "f78ddda15befc422e7be0e37497ae39307a7b26c93acc4f9509d0f362cf7da63"
+    },
+    "after": {
+      "api-v1-execution-tradeHistory.csv": "c778ddc90b7d60c0a47c1a155602595775879f5da7a7cb0843beeb0f6638f998",
+      "api-v1-order.csv": "32d05a5b4482d4c725593596c6f6e09018e42a2221fa73056cb82f6e186caf34",
+      "api-v1-user-walletHistory.csv": "08b875895b10cc62362340eecd761320888756d128515788406680e5d320105d",
+      "api-v1-position.snapshot.csv": "9a3d6dc54e19353c277d3a80b362294755ee1fcc52ef09376be6257a929c1d88",
+      "api-v1-user-wallet.snapshot-all.csv": "b7934fdbc45c714bc7aaf6a51854024f288b7a916202ae4eed51c35a96205777",
+      "api-v1-user-margin.snapshot-all.csv": "b793b9d596d585cedc18f4b87ad1a046bc285e3998ef89be52b665b5871fa100",
+      "api-v1-instrument.all.csv": "457212f89cf40bf854492c500f13d4e117e76f6f8bf583a807921a12a90d5d31",
+      "api-v1-wallet-assets.csv": "1cb904e08fb59647ec7a2c336c49571f5f1cb01253ca816edb5844a1c207b6ff",
+      "derived-equity-curve.csv": "8923c1ced46334f301833d2b117ff89ebb7f33c465031ae1197e6126bf87c206",
+      "manifest.json": "f78ddda15befc422e7be0e37497ae39307a7b26c93acc4f9509d0f362cf7da63"
+    }
+  },
+  "output_rows": {
+    "position_accounting_events": 173226
+  }
+}

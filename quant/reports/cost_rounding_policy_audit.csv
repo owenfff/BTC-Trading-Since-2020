@@ -1,0 +1,11 @@
+operation,payout_model,settlement_currency,candidate_policy,evaluated_event_count,conservation_failure_count,flat_cost_failure_count,settlement_cost_failure_count,xbtusd_terminal_current_cost,xbtusd_current_cost_difference,reported_pnl_exact_match_count,reported_pnl_mismatch_count,status,selection_reason
+average_cost_release,ALL,ALL,ROUND_DOWN,173226,0,0,0,1386445848,37,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+average_cost_release,ALL,ALL,ROUND_FLOOR,173226,0,0,0,1386445848,37,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+average_cost_release,ALL,ALL,ROUND_CEILING,173226,0,0,0,1386445782,-29,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+average_cost_release,ALL,ALL,ROUND_HALF_UP,173226,0,0,0,1386445809,-2,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+average_cost_release,ALL,ALL,ROUND_HALF_EVEN,173226,0,0,0,1386445809,-2,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+flip_exec_cost_split,ALL,ALL,ROUND_DOWN,173226,0,0,0,1386445848,37,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+flip_exec_cost_split,ALL,ALL,ROUND_FLOOR,173226,0,0,0,1386445848,37,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+flip_exec_cost_split,ALL,ALL,ROUND_CEILING,173226,0,0,0,1386445848,37,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+flip_exec_cost_split,ALL,ALL,ROUND_HALF_UP,173226,0,0,0,1386445848,37,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
+flip_exec_cost_split,ALL,ALL,ROUND_HALF_EVEN,173226,0,0,0,1386445848,37,0,15739,BLOCKED,no candidate policy satisfies conservation and terminal currentCost anchors
