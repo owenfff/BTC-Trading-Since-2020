@@ -134,6 +134,16 @@ def fetch_json(url: str, *, timeout: int = 30, opener=urlopen) -> Any:
         raise MarketDownloadError(f"public source returned non-JSON data: {exc}") from exc
 
 
+def fetch_bytes(url: str, *, timeout: int = 60, opener=urlopen) -> bytes:
+    """Fetch one public archive object without credentials."""
+    request = Request(url, headers={"Accept": "*/*", "User-Agent": "btc-replay-research/1.0"})
+    try:
+        with opener(request, timeout=timeout) as response:
+            return response.read()
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        raise MarketDownloadError(f"public archive request failed: {exc}") from exc
+
+
 def _cache_load(path: Path) -> list[dict[str, Any]] | None:
     if not path.exists():
         return None
@@ -241,6 +251,7 @@ __all__ = [
     "build_instrument_url",
     "build_trade_bucketed_url",
     "download_paginated",
+    "fetch_bytes",
     "fetch_json",
     "iso_utc",
     "parse_utc",

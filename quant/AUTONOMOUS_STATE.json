@@ -6,8 +6,8 @@
   "last_completed_phase": "PHASE_3_BEHAVIOR_DATASET",
   "last_code_commit": "ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9",
   "last_report_commit": "2684c4802f64ba9e5f988a5e38244ece8a837a45",
-  "test_count": 245,
-  "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_6_MARKET_SMOKE_TESTS",
+  "test_count": 247,
+  "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_8_MARKET_SMOKE_TESTS",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -23,8 +23,8 @@
   "blockers": [
     "Exchange currentCost residual: closest candidate differs by about 2 raw units.",
     "Exchange AEP engine semantics remain unresolved; displayed difference is 0.2974.",
-    "Execution ordering has 780 ambiguous chains and 371 cross-order ties."
-    ,"BitMEX public market endpoints were blocked by the managed runtime with WinError 10013; no market bars were fabricated."
+    "Execution ordering has 780 ambiguous chains and 371 cross-order ties.",
+    "BitMEX public REST endpoints and the official public archive were blocked by the managed runtime with WinError 10013; no market bars were fabricated."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -33,6 +33,6 @@
     "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration.",
     "Current desktop runtime could not reach GitHub over HTTPS; the autonomous branch is committed locally and awaits a later push retry."
   ],
-  "next_action": "When HTTPS access is restored, push quant/autonomous-behavioral-quant-bot-v1, then rerun quant/scripts/build_market_data.py in a network-enabled environment; verify the BitMEX public cache SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
+  "next_action": "When HTTPS access is restored, push quant/autonomous-behavioral-quant-bot-v1, then rerun quant/scripts/build_market_data.py; verify REST or official archive SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
   "updated_at_utc": "2026-08-20T08:20:30Z"
 }

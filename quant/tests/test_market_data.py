@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+from market.archive import aggregate_trade_rows, archive_trade_url
 from market.context import attach_market_context
 from market.download import build_trade_bucketed_url, parse_utc
 from market.gaps import audit_time_grid, build_gap_rows
@@ -64,3 +65,21 @@ def test_context_join_accepts_equal_timestamp() -> None:
 def test_parse_utc_normalizes_naive_values_to_utc() -> None:
     parsed = parse_utc("2020-01-01T00:00:00")
     assert parsed == datetime(2020, 1, 1, tzinfo=timezone.utc)
+
+
+def test_official_archive_url_is_date_partitioned_and_public() -> None:
+    assert archive_trade_url(datetime(2020, 1, 2, tzinfo=timezone.utc).date()) == "https://public.bitmex.com/data/trade/20200102.csv.gz"
+
+
+def test_archive_trade_aggregation_uses_closed_utc_bucket_without_fill() -> None:
+    rows = [
+        {"timestamp": "2020-01-01T00:00:01Z", "symbol": "XBTUSD", "price": "100", "size": "2", "foreignNotional": "2"},
+        {"timestamp": "2020-01-01T00:04:59Z", "symbol": "XBTUSD", "price": "101", "size": "3", "foreignNotional": "3"},
+        {"timestamp": "2020-01-01T00:10:01Z", "symbol": "XBTUSD", "price": "99", "size": "1", "foreignNotional": "1"},
+    ]
+    bars = aggregate_trade_rows(rows)
+    assert len(bars) == 2
+    assert bars[0]["timestamp"] == "2020-01-01T00:05:00.000Z"
+    assert bars[0]["open"] == 100 and bars[0]["close"] == 101
+    assert bars[0]["volume"] == 5
+    assert bars[1]["timestamp"] == "2020-01-01T00:15:00.000Z"

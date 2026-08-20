@@ -26,6 +26,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from bitmex_replay.io_utils import hash_files, iter_csv_dicts, parse_datetime  # noqa: E402
+from market.archive import download_archive_trade_bars  # noqa: E402
 from market.context import attach_market_context  # noqa: E402
 from market.download import (  # noqa: E402
     MarketDownloadError,
@@ -171,7 +172,7 @@ def _report_markdown(summary: dict[str, Any], path: Path) -> None:
         "",
         "## Source lineage",
         "",
-        "The canonical price series is requested from BitMEX `trade/bucketed`. Funding is requested from `funding`, and mark/index context is requested from `instrument`. Each response is cached only under the ignored `quant/outputs/market_raw/` directory and its SHA-256 is recorded in the JSON report.",
+        "The canonical price series is requested from BitMEX `trade/bucketed`, with the official daily `public.bitmex.com` trade archive as a no-key fallback. Funding is requested from `funding`, and mark/index context is requested from `instrument`. Raw responses are kept only under ignored `quant/data/market/raw/` and their SHA-256 is recorded in the JSON report.",
         "",
         "| source | status | rows | sha256 |",
         "| --- | --- | ---: | --- |",
@@ -191,8 +192,8 @@ def _report_markdown(summary: dict[str, Any], path: Path) -> None:
         "## Environment/blocking boundary",
         "",
         f"- public source status: `{summary['source_status']}`",
-        f"- output: `{summary.get('large_output', {}).get('format', 'none')}`",
-        "- A local network denial is an environment blocker, not evidence that BitMEX has no historical data. Rerun this script in a network-enabled environment or place verified cached responses under the ignored cache path.",
+        f"- output: `{json.dumps(summary.get('large_outputs', {}), ensure_ascii=False)}`",
+        "- A local network denial is an environment blocker, not evidence that BitMEX has no historical data. Rerun this script in a network-enabled environment or place verified responses/archive objects under the ignored market-data paths.",
         "- This package does not use account API keys, private endpoints, live balances, or order placement.",
         "",
         "## Next action",
@@ -206,7 +207,9 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     root = Path(root)
     reports = root / "quant" / "reports"
     outputs = root / "quant" / "outputs"
-    cache = outputs / "market_raw"
+    market_data_root = root / "quant" / "data" / "market"
+    raw_dir = market_data_root / "raw"
+    api_raw_dir = raw_dir / "bitmex_api"
     reports.mkdir(parents=True, exist_ok=True)
     outputs.mkdir(parents=True, exist_ok=True)
     before = hash_files(root, PROTECTED_FILES)
@@ -220,7 +223,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         rows, item = _fetch(
             "trade_bucketed",
             build_trade_bucketed_url,
-            cache / f"{symbol.lower()}_trade_bucketed_{interval}.json",
+            api_raw_dir / f"{symbol.lower()}_trade_bucketed_{interval}.json",
             symbol=symbol,
             interval=interval,
             start_time=start_time,
@@ -232,6 +235,22 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             if bars:
                 selected_interval = interval
                 break
+    archive_lineage: dict[str, Any] = {"status": "NOT_ATTEMPTED_REST_BARS_AVAILABLE", "row_count": 0}
+    if not bars and start_time is not None and end_time is not None:
+        bars, archive_lineage = download_archive_trade_bars(start_time, end_time, raw_dir, symbol=symbol, interval_minutes=5)
+        lineage["public_archive_trade"] = archive_lineage
+        if bars:
+            selected_interval = "5m"
+            bar_normalization = {
+                "source_row_count": len(bars),
+                "normalized_row_count": len(bars),
+                "rejected_counts": {},
+                "duplicate_row_count": 0,
+                "interval": "5m",
+                "source": "bitmex_public_archive_trade_aggregated",
+            }
+    else:
+        lineage["public_archive_trade"] = archive_lineage
     instrument_rows: list[dict[str, Any]] = []
     funding_rows: list[dict[str, Any]] = []
     instrument_normalization: dict[str, Any] = {"normalized_row_count": 0}
@@ -240,7 +259,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         raw_funding, funding_lineage = _fetch(
             "funding",
             build_funding_url,
-            cache / f"{symbol.lower()}_funding.json",
+            api_raw_dir / f"{symbol.lower()}_funding.json",
             symbol=symbol,
             interval=None,
             start_time=start_time,
@@ -249,7 +268,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         raw_instrument, instrument_lineage = _fetch(
             "instrument",
             build_instrument_url,
-            cache / f"{symbol.lower()}_instrument.json",
+            api_raw_dir / f"{symbol.lower()}_instrument.json",
             symbol=symbol,
             interval=None,
             start_time=start_time,
@@ -282,10 +301,12 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             "provider": "BitMEX",
             "credentials": "none",
             "base_url": "https://www.bitmex.com/api/v1",
+            "archive_base_url": "https://public.bitmex.com/",
             "official_docs": {
                 "trade_bucketed": "https://docs.bitmex.com/api-explorer/get-trade-bucketed",
                 "funding": "https://docs.bitmex.com/api-explorer/get-funding",
                 "instrument": "https://docs.bitmex.com/api-explorer/get-instruments.html",
+                "public_archive": "https://public.bitmex.com/",
             },
         },
         "symbol": symbol,
@@ -303,7 +324,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         "gap_row_count": len(gap_rows),
         "raw_account_inputs_unchanged": not changed,
         "changed_protected_files": changed,
-        "large_output": {},
+        "large_outputs": {},
         "warnings": [
             "Trade bucketed timestamps are treated as BitMEX bucket end/write timestamps; no timezone conversion beyond explicit UTC normalization.",
             "Mark/index and funding are retained as as-of context only and are never substituted for a missing canonical trade price.",
@@ -311,7 +332,10 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         "next_action": "If market_data_status is BLOCKED, rerun in a network-enabled environment and freeze the verified public cache before starting leakage-safe features; if READY_WITH_WARNINGS, inspect market_data_gaps.csv and context coverage first.",
     }
     if context_rows:
-        summary["large_output"] = _output_large(context_rows, outputs / "btc_market_context.parquet")
+        summary["large_outputs"] = {
+            "market_bars": _output_large(bars, outputs / "market_bars.parquet"),
+            "market_context": _output_large(context_rows, outputs / "market_context.parquet"),
+        }
     _write_csv(reports / "market_data_gaps.csv", gap_rows, ["series", "gap_start_utc", "gap_end_utc", "missing_bar_count", "gap_seconds", "grid_status"])
     (reports / "market_data_lineage.json").write_text(json.dumps(jsonable(summary), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     _report_markdown(summary, reports / "market_data_audit.md")
