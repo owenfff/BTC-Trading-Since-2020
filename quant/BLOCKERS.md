@@ -14,6 +14,7 @@
 | Behavior dataset | READY_WITH_WARNINGS | 160302 fills → 62388 batches → 31702 orders → 32231 decisions → 1401 cycles; XBTUSD 688 cycles | Allowed for market-context alignment; preserve confidence fields |
 | Parquet runtime | ENVIRONMENT_WARNING | pyarrow/polars unavailable and PyPI blocked; explicit ignored CSV fallback generated | Restore pinned dependency before consuming Parquet-only tools |
 | GitHub remote | ENVIRONMENT_BLOCKED | `git push` failed to connect to `github.com:443`; local branch remains committed and clean | Retry the authorized current-branch push when HTTPS access returns; no PR was created |
+| Public HTTPS permission | HARD_STOP | Managed-runtime network permission request was not granted after repeated BitMEX, archive, and GitHub HTTPS failures | Grant public network access, then resume from `quant/AUTONOMOUS_STATE.json.next_action` |
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
 
@@ -31,3 +32,4 @@ Phases 1 through 3 are complete. Public market data is `BLOCKED_ENVIRONMENT`; no
 - BitMEX `trade/bucketed` was attempted at 5m and the documented 15m fallback. Both public requests failed at the local socket boundary with `WinError 10013`; this is not evidence that the public source lacks history.
 - The official `public.bitmex.com` daily trade archive fallback was attempted for the first three UTC partitions and stopped with the same repeated infrastructure error; the full 2,270-day range was not falsely marked complete.
 - The report is `BLOCKED`, `raw_account_inputs_unchanged=true`, and no market output is treated as valid. No feature or label work may start until a verified public cache is available.
+- This is the task's environment HARD_STOP: no credentials, private account access, live trading, or raw-data mutation is requested or needed.

@@ -1,6 +1,6 @@
 {
   "program_version": "4.0",
-  "program_status": "RUNNING",
+  "program_status": "BLOCKED",
   "current_phase": "PHASE_4_PUBLIC_MARKET_DATA",
   "current_work_package": "M3-public-market-data",
   "last_completed_phase": "PHASE_3_BEHAVIOR_DATASET",
@@ -11,7 +11,7 @@
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
-  "market_data_status": "BLOCKED_ENVIRONMENT_PUBLIC_SOURCE_UNREACHABLE",
+  "market_data_status": "HARD_STOP_NETWORK_PERMISSION_DENIED",
   "leakage_status": "NOT_STARTED",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
   "research_status": "NOT_STARTED",
@@ -24,7 +24,8 @@
     "Exchange currentCost residual: closest candidate differs by about 2 raw units.",
     "Exchange AEP engine semantics remain unresolved; displayed difference is 0.2974.",
     "Execution ordering has 780 ambiguous chains and 371 cross-order ties.",
-    "BitMEX public REST endpoints and the official public archive were blocked by the managed runtime with WinError 10013; no market bars were fabricated."
+    "BitMEX public REST endpoints and the official public archive were blocked by the managed runtime with WinError 10013; no market bars were fabricated.",
+    "Network permission request was not granted; GitHub push and public-data acquisition cannot proceed in this environment."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -33,6 +34,6 @@
     "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration.",
     "Current desktop runtime could not reach GitHub over HTTPS; the autonomous branch is committed locally and awaits a later push retry."
   ],
-  "next_action": "When HTTPS access is restored, push quant/autonomous-behavioral-quant-bot-v1, then rerun quant/scripts/build_market_data.py; verify REST or official archive SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
-  "updated_at_utc": "2026-08-20T08:20:30Z"
+  "next_action": "Grant public HTTPS network access, then run git push origin quant/autonomous-behavioral-quant-bot-v1 and quant/scripts/build_market_data.py; verify REST or official archive SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
+  "updated_at_utc": "2026-08-20T08:32:24Z"
 }

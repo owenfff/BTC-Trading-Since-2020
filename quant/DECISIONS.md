@@ -48,3 +48,8 @@
 - Join context using previous-or-equal UTC observations only. Missing bars and missing mark/index/funding values remain explicit; no forward price or future observation is invented.
 - The managed desktop runtime blocked both 5m and 15m public requests with WinError 10013. Keep M3 `BLOCKED` at the environment boundary and do not start leakage-safe features until a verified public cache is available.
 - Use the official `public.bitmex.com/data/trade/YYYYMMDD.csv.gz` archive as the no-key fallback when REST pagination is unavailable. Aggregate raw trades locally into closed UTC 5m bars, preserve each daily gzip unchanged with SHA-256, reject incomplete date ranges, and never infer mark/index/funding from trade prices.
+
+## 2026-08-20 — Environment HARD_STOP
+
+- BitMEX REST, the official public archive, and GitHub HTTPS all failed with the same managed-runtime socket restriction across repeated attempts.
+- A turn-scoped request for public HTTPS permission was not granted. Stop at M3 with all code, tests, reports, and recovery instructions committed locally; do not start M4 features without real market bars.
