@@ -1,0 +1,243 @@
+{
+  "report_version": "M1-WALLET-LEDGER-1.0",
+  "analysis_commit": "1166e23eff2da21afb5ec3447cccbebf77971295",
+  "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
+  "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
+  "wallet_reconciliation_status": "READY_WITH_WARNINGS",
+  "wallet_row_count": 17484,
+  "completed_row_count": 17482,
+  "non_completed_row_count": 2,
+  "currencies": [
+    "BMEX",
+    "USDT",
+    "XBT"
+  ],
+  "transaction_type_counts": {
+    "Deposit": 2,
+    "RealisedPNL": 15021,
+    "Withdrawal": 6,
+    "Transfer": 53,
+    "Conversion": 24,
+    "SpotTrade": 320,
+    "Funding": 2057,
+    "UnrealisedPNL": 1
+  },
+  "continuity_status_counts": {
+    "BASELINE_FIRST_OBSERVATION": 3,
+    "PASS": 17474,
+    "NOT_APPLICABLE_NON_COMPLETED": 2,
+    "BALANCE_DELTA_MISMATCH": 5
+  },
+  "continuity_batch_count": 14292,
+  "continuity_batch_status_counts": {
+    "BASELINE_FIRST_OBSERVATION": 3,
+    "PASS": 14284,
+    "BALANCE_DELTA_MISMATCH": 5
+  },
+  "parse_status_counts": {
+    "PASS": 17484
+  },
+  "snapshot_row_count": 15,
+  "snapshot_pass_count": 3,
+  "snapshot_zero_without_history_count": 12,
+  "snapshot_unresolved_count": 0,
+  "snapshot_reconciliation": [
+    {
+      "snapshot_source_row": 2,
+      "snapshot_timestamp": "2026-07-19T12:00:00.330000Z",
+      "currency": "XBT",
+      "snapshot_amount_raw": "3215808985",
+      "reconstructed_last_walletBalance_raw": "3215808985",
+      "last_event_time": "2026-07-19T12:00:00.330000Z",
+      "difference_raw": "0",
+      "status": "PASS"
+    },
+    {
+      "snapshot_source_row": 3,
+      "snapshot_timestamp": "2026-05-30T00:01:00Z",
+      "currency": "USDT",
+      "snapshot_amount_raw": "888237518",
+      "reconstructed_last_walletBalance_raw": "888237518",
+      "last_event_time": "2026-05-30T00:01:00Z",
+      "difference_raw": "0",
+      "status": "PASS"
+    },
+    {
+      "snapshot_source_row": 4,
+      "snapshot_timestamp": "2026-04-29T02:09:35.360000Z",
+      "currency": "BMEX",
+      "snapshot_amount_raw": "11000120000",
+      "reconstructed_last_walletBalance_raw": "11000120000",
+      "last_event_time": "2026-04-29T02:09:35.359000Z",
+      "difference_raw": "0",
+      "status": "PASS"
+    },
+    {
+      "snapshot_source_row": 5,
+      "snapshot_timestamp": "2025-11-25T09:26:39.328000Z",
+      "currency": "ADA",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 6,
+      "snapshot_timestamp": "2025-11-25T09:26:35.879000Z",
+      "currency": "BNB",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 7,
+      "snapshot_timestamp": "2025-11-25T09:25:19.588000Z",
+      "currency": "S",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 8,
+      "snapshot_timestamp": "2025-11-25T09:25:15.882000Z",
+      "currency": "ATOM",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 9,
+      "snapshot_timestamp": "2025-11-25T09:25:04.934000Z",
+      "currency": "LTC",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 10,
+      "snapshot_timestamp": "2025-11-25T09:24:33.788000Z",
+      "currency": "AVAX",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 11,
+      "snapshot_timestamp": "2025-11-25T09:24:32.216000Z",
+      "currency": "LOT",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 12,
+      "snapshot_timestamp": "2025-11-25T09:24:03.095000Z",
+      "currency": "POL",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 13,
+      "snapshot_timestamp": "2025-11-25T09:23:29.114000Z",
+      "currency": "BCH",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 14,
+      "snapshot_timestamp": "2025-11-25T09:23:24.734000Z",
+      "currency": "XRP",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 15,
+      "snapshot_timestamp": "2025-11-25T09:22:55.592000Z",
+      "currency": "NEAR",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    },
+    {
+      "snapshot_source_row": 16,
+      "snapshot_timestamp": "2025-11-25T09:22:52.847000Z",
+      "currency": "DOGE",
+      "snapshot_amount_raw": "0",
+      "reconstructed_last_walletBalance_raw": null,
+      "last_event_time": "",
+      "difference_raw": null,
+      "status": "ZERO_SNAPSHOT_NO_HISTORY"
+    }
+  ],
+  "equity_curve": {
+    "wallet_last_event_time": "2026-07-19T12:00:00.330000Z",
+    "equity_last_event_time": "2026-07-19T12:35:02.029Z",
+    "wallet_balance_xbt_major": "32.15808985",
+    "equity_walletBalanceXBT": "32.15808985",
+    "difference_xbt_major": "0.00000000",
+    "status": "PASS",
+    "equity_row_count": 17468
+  },
+  "wallet_execution_comparisons": [
+    {
+      "wallet_type": "RealisedPNL",
+      "execution_type": "Trade",
+      "currency": "USDT",
+      "wallet_amount_raw": null,
+      "execution_comparison_field": "realised",
+      "execution_amount_raw": "0",
+      "difference_raw": null,
+      "status": "NOT_COMPARABLE_NO_WALLET_OR_EXECUTION_VALUE",
+      "note": "Aggregate diagnostic only; no fabricated one-to-one wallet-to-execution mapping."
+    },
+    {
+      "wallet_type": "RealisedPNL",
+      "execution_type": "Trade",
+      "currency": "XBT",
+      "wallet_amount_raw": "9505857152",
+      "execution_comparison_field": "realised",
+      "execution_amount_raw": "1543389629",
+      "difference_raw": "7962467523",
+      "status": "AGGREGATE_DIFFERENCE",
+      "note": "Aggregate diagnostic only; no fabricated one-to-one wallet-to-execution mapping."
+    },
+    {
+      "wallet_type": "Funding",
+      "execution_type": "Funding",
+      "currency": "XBT",
+      "wallet_amount_raw": "129849982",
+      "execution_comparison_field": "comm",
+      "execution_amount_raw": "1526046326",
+      "difference_raw": "-1396196344",
+      "status": "AGGREGATE_DIFFERENCE",
+      "note": "Aggregate diagnostic only; no fabricated one-to-one wallet-to-execution mapping."
+    }
+  ],
+  "raw_inputs_unchanged": true,
+  "changed_protected_files": [],
+  "next_action": "Build BTC-first order episodes, decision episodes, and trade cycles with wallet/reconciliation confidence columns."
+}
