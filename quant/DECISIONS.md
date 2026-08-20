@@ -23,3 +23,11 @@
 - Wallet reconciliation is `READY_WITH_WARNINGS`: 17,474 row-level PASS, 5 real batch anomalies, 3/15 exact snapshot matches, 12 zero snapshots without wallet-history coverage, and terminal XBT/equity agreement.
 - Keep wallet-to-execution comparisons aggregate-only; do not fabricate a row-level join from `transactID`, `orderID`, or address fields.
 - Proceed to BTC-first behavior episodes and trade cycles while carrying wallet continuity and snapshot coverage flags into derived datasets.
+
+## 2026-08-20 — Enter behavioral episode construction
+
+- Preserve the layered structure: raw derivative fills → execution batches → order episodes → position actions → decision episodes → position cycles.
+- XBTUSD is the BTC-first teacher scope; altcoin derivative episodes remain available for generalization diagnostics.
+- Execution batches use a documented 300-second same-order gap boundary and never redefine an order episode as a decision.
+- Daily XBTUSD no-trade days become explicitly synthetic `HOLD_LONG`, `HOLD_SHORT`, or `NO_TRADE` observations; they are never mixed with raw fills.
+- Wallet linkage remains aggregate-only and all six confidence fields are carried into actions, decisions, and cycles.

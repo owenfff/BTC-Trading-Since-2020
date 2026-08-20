@@ -10,7 +10,7 @@
   "last_test_status": "PASS",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
-  "behavior_dataset_status": "NOT_STARTED",
+  "behavior_dataset_status": "IN_PROGRESS",
   "market_data_status": "NOT_STARTED",
   "leakage_status": "NOT_STARTED",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
@@ -30,6 +30,6 @@
     "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
     "No claim of exact strategy recovery or future profitability is permitted."
   ],
-  "next_action": "Implement BTC-first order episodes, decision episodes, and trade cycles with wallet/reconciliation confidence columns; preserve raw trade-only strategy-fidelity boundaries.",
-  "updated_at_utc": "2026-08-20T07:30:00Z"
+  "next_action": "Run build_behavior_dataset.py on the frozen execution/accounting foundation; verify layered counts, confidence coverage, raw hashes, and reports before entering public market data.",
+  "updated_at_utc": "2026-08-20T08:05:00Z"
 }

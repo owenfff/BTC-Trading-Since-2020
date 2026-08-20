@@ -6,6 +6,14 @@ outputs/position_accounting_events.parquet
 outputs/position_accounting_diagnostics.parquet
 outputs/wallet_ledger.parquet
 outputs/wallet_daily_ledger.parquet
+outputs/trade_actions.parquet
+outputs/order_episodes.parquet
+outputs/decision_episodes.parquet
+outputs/trade_cycles.parquet
+outputs/trade_actions.csv
+outputs/order_episodes.csv
+outputs/decision_episodes.csv
+outputs/trade_cycles.csv
 outputs/instrument_terms_temporal_audit.csv
 outputs/execution_tie_order_audit.csv
 **/__pycache__/

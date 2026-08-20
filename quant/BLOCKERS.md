@@ -17,3 +17,7 @@ No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, p
 ## Current work package
 
 Phases 1 and 2 are complete. Wallet reconciliation is `READY_WITH_WARNINGS`; the residuals are preserved as flags and do not block BTC-first behavior episode construction.
+
+## Current work package
+
+Phase 3 behavior dataset construction is `IN_PROGRESS`. The pinned Parquet engine is unavailable in the current desktop runtime, so the builder must report any ignored CSV fallback explicitly rather than claiming Parquet output.

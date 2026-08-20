@@ -136,3 +136,17 @@ pytest quant/tests -v
 - 使用 instrument 和 wallet-assets 作为单位解释上下文；不会把所有数字默认当成 BTC。
 
 所有异常只报告、不自动修复。原始数据文件应保持不变。
+
+## M2 behavioral episodes and trade cycles
+
+`python quant/scripts/build_behavior_dataset.py` 在冻结的 Execution、position replay、accounting foundation 和 wallet reconciliation 之上构建分层行为数据：
+
+- `trade_actions`：每条衍生品 Trade 的 position action；
+- `execution_batches`：同一 order 的相邻 fills，默认 300 秒 gap 边界；
+- `order_episodes`：每个 symbol/orderID 生命周期，不把 partial fills 当作独立决策；
+- `decision_episodes`：订单决策加 XBTUSD 日级 `HOLD_*` / `NO_TRADE` 合成样本；
+- `trade_cycles`：从开仓到完整平仓/反手/数据终点的 position cycle。
+
+每条 action、decision 和 cycle 都保留 `ordering_confidence`、`action_confidence`、`accounting_confidence`、`price_confidence`、`wallet_confidence` 和 `overall_confidence`。XBTUSD 是 BTC-first 教师范围，策略保真度固定为 `BEHAVIORAL_APPROXIMATION`；钱包只做 aggregate-only evidence，不伪造逐笔 join。
+
+Parquet 大文件只写入 `quant/outputs/` 并被 `.gitignore` 保护；若运行时没有 `quant/requirements.txt` 中的 Parquet engine，脚本会生成明确标记的 ignored CSV fallback，并在 `quant/reports/trader_behavior_profile.md` 中记录。

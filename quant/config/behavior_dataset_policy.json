@@ -1,0 +1,16 @@
+{
+  "schema_version": "M2-BEHAVIOR-1.0",
+  "teacher_data_type": "TRADE_RECORDS_ONLY",
+  "btc_first_symbols": ["XBTUSD"],
+  "execution_order_policy": "SOURCE_ROW_STABLE",
+  "execution_batch_gap_seconds": 300,
+  "synthetic_decision_frequency": "UTC_DAY",
+  "wallet_join_policy": "AGGREGATE_ONLY_NO_FABRICATED_ROW_JOIN",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "exact_teacher_labels_forbidden": [
+    "exchange_internal_currentCost",
+    "exchange_internal_AEP",
+    "unproven_cross_order_sequence",
+    "post_cycle_future_outcomes"
+  ]
+}
