@@ -5,7 +5,7 @@
   "current_work_package": "M3-public-market-data",
   "last_completed_phase": "PHASE_3_BEHAVIOR_DATASET",
   "last_code_commit": "ebf6aabe1539c8ca1e906b3aa5e1e6530130edb9",
-  "last_report_commit": "a2360d58842028d4dfd33bb3bfd95ec42bfcc4d8",
+  "last_report_commit": "2684c4802f64ba9e5f988a5e38244ece8a837a45",
   "test_count": 245,
   "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_6_MARKET_SMOKE_TESTS",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -30,8 +30,9 @@
     "Teacher data is TRADE_RECORDS_ONLY.",
     "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
     "No claim of exact strategy recovery or future profitability is permitted.",
-    "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration."
+    "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration.",
+    "Current desktop runtime could not reach GitHub over HTTPS; the autonomous branch is committed locally and awaits a later push retry."
   ],
-  "next_action": "Rerun quant/scripts/build_market_data.py in a network-enabled environment; verify the BitMEX public cache SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
+  "next_action": "When HTTPS access is restored, push quant/autonomous-behavioral-quant-bot-v1, then rerun quant/scripts/build_market_data.py in a network-enabled environment; verify the BitMEX public cache SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
   "updated_at_utc": "2026-08-20T08:20:30Z"
 }
