@@ -46,6 +46,45 @@ python quant/scripts/rebuild_positions.py
 
 原始数据文件始终只读；脚本会在输出前后重新计算受保护文件的 SHA256，并对 XBTUSD 与位置快照进行终态对账。
 
+## M0-02B-1A Execution 价值、费用与币种单位标准化
+
+本阶段从原始 Execution CSV 重新构建一条衍生品 Execution 价值表和一条长表组件账本。使用 `api-v1-wallet-assets.csv` 的冻结 `scale` 将整数最小单位转换为 Decimal 主单位，并保留 `execCost`、`execComm`、`realisedPnl` 的独立语义和原始符号。不进行跨币种相加，不计算平均成本、策略 PnL、未实现 PnL、净值、杠杆或保证金。
+
+在仓库根目录运行：
+
+```bash
+python quant/scripts/build_execution_valuation.py
+```
+
+Windows 也可以显式使用：
+
+```powershell
+py -3.11 quant/scripts/build_execution_valuation.py
+```
+
+构建会直接读取原始 CSV、重新执行历史规格匹配和 M0-02B-0.2 canonical price reconciliation，生成两个被 `.gitignore` 保护的 Parquet：
+
+- `quant/outputs/execution_valuation.parquet`
+- `quant/outputs/execution_components.parquet`
+
+Git 中只保留小型汇总报告：
+
+- `quant/reports/execution_valuation.md`
+- `quant/reports/execution_valuation.json`
+- `quant/reports/execution_valuation.csv`
+- `quant/reports/execution_component_summary.csv`
+- `quant/reports/currency_scale_coverage.csv`
+- `quant/reports/funding_summary.csv`
+- `quant/reports/trade_fee_summary.csv`
+- `quant/reports/settlement_value_summary.csv`
+- `quant/reports/execution_value_anomalies.csv`
+
+运行测试：
+
+```bash
+pytest quant/tests -v
+```
+
 ## 审计范围
 
 - 校验 `manifest.json` 声明的文件、大小、SHA256、行数、列名和时间范围。
