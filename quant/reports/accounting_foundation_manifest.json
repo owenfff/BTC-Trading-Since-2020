@@ -1,0 +1,122 @@
+{
+  "manifest_version": "M0-AUTONOMOUS-1.0",
+  "generated_at_utc": "2026-08-20T06:48:59.230658Z",
+  "analysis_commit": "86be1f430ece5c64237b2dfc133842124119101c",
+  "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
+  "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
+  "source_position_accounting_report_analysis_commit": "2b4b9fbe17c22281b45ae3d07867e94295c28d6a",
+  "teacher_data_type": "TRADE_RECORDS_ONLY",
+  "downstream_behavioral_research_status": "READY_WITH_KNOWN_ACCOUNTING_RESIDUALS",
+  "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
+  "count_checks": {
+    "raw_execution_count": {
+      "expected": 173434,
+      "actual": 173434,
+      "status": "PASS"
+    },
+    "derivative_execution_count": {
+      "expected": 173226,
+      "actual": 173226,
+      "status": "PASS"
+    },
+    "raw_trade_count": {
+      "expected": 160510,
+      "actual": 160510,
+      "status": "PASS"
+    },
+    "derivative_trade_count": {
+      "expected": 160302,
+      "actual": 160302,
+      "status": "PASS"
+    },
+    "funding_count": {
+      "expected": 12905,
+      "actual": 12905,
+      "status": "PASS"
+    },
+    "settlement_count": {
+      "expected": 19,
+      "actual": 19,
+      "status": "PASS"
+    },
+    "spot_execution_count": {
+      "expected": 208,
+      "actual": 208,
+      "status": "PASS"
+    }
+  },
+  "raw_inputs_unchanged": true,
+  "ledgers": {
+    "exchange_reported_accounting": {
+      "purpose": "Preserve values reported by the exchange and wallet exports without treating them as reconstructed state.",
+      "fields": [
+        "realisedPnl",
+        "execComm",
+        "Funding",
+        "walletHistory",
+        "position_snapshot.currentCost",
+        "position_snapshot.avgEntryPrice"
+      ]
+    },
+    "analytical_accounting": {
+      "purpose": "Deterministic behavioral replay using quantity, execution cost, analytical gross PnL, AEP, cycles, and confidence flags.",
+      "fields": [
+        "signed_contract_qty",
+        "position_before",
+        "position_after",
+        "action",
+        "execCost",
+        "analytical_gross_realised_pnl",
+        "analytical_aep",
+        "position_cycle_id",
+        "confidence_flags"
+      ]
+    }
+  },
+  "fidelity": {
+    "quantity_fidelity": "EXACT",
+    "execution_price_fidelity": "EXACT_OR_AUDITED_RECOVERED",
+    "fee_fidelity": "REPORTED_EXCHANGE_VALUE",
+    "funding_fidelity": "REPORTED_EXCHANGE_VALUE",
+    "wallet_fidelity": "PENDING_WALLET_RECONCILIATION",
+    "current_cost_engine_fidelity": "HIGH_CONFIDENCE_WITH_RESIDUAL",
+    "aep_engine_fidelity": "HIGH_CONFIDENCE_WITH_ENGINE_SEMANTICS_UNRESOLVED",
+    "execution_order_fidelity": "PARTIAL_WITH_CONFIDENCE_FLAGS"
+  },
+  "accounting_eligibility": {
+    "eligible_normalization_statuses": [
+      "PASS",
+      "WARNING"
+    ],
+    "blocked_normalization_statuses": [
+      "BLOCKED"
+    ],
+    "rule": "accounting_eligible = normalization_status in {PASS, WARNING}"
+  },
+  "reported_pnl_decomposition": {
+    "status": "READY_WITH_WARNINGS",
+    "eligible": 15739,
+    "exact": 8788,
+    "mismatch": 6951,
+    "missing": 157487,
+    "broker_unresolved": 0
+  },
+  "execution_order": {
+    "multi_trade_group_count": 12469,
+    "unique_chain_group_count": 11689,
+    "ambiguous_group_count": 780,
+    "cross_order_tie_count": 371,
+    "status": "READY_WITH_AMBIGUOUS_CROSS_ORDER_TIES",
+    "source_policy_terminal_cost": "1386445848",
+    "cumqty_policy_terminal_cost": "1386445848",
+    "source_policy_cycle_count": 1401,
+    "cumqty_policy_cycle_count": 1402,
+    "source_policy_corrected_gross_exact": 8788,
+    "cumqty_policy_corrected_gross_exact": 8787
+  },
+  "known_residuals": {
+    "current_cost": "Closest analytical cost candidate differs from snapshot by about 2 raw units.",
+    "aep": "Displayed analytical AEP differs from snapshot by 0.2974; exchange engine semantics remain unresolved."
+  },
+  "next_action": "Build wallet ledger with raw/major currency separation and day/hour/terminal reconciliation."
+}
