@@ -10,6 +10,14 @@
 - Use `PASS` and `WARNING` valuation rows for downstream accounting; only `BLOCKED` rows are excluded.
 - The dataset is `TRADE_RECORDS_ONLY`, so strategy fidelity is permanently reported as `BEHAVIORAL_APPROXIMATION`.
 
+## 2026-08-20 — Freeze M5.1 strategy-core boundary
+
+- Use one exchange-neutral Strategy Core contract for research callers. The strategy layer must not import exchange SDKs or submit orders.
+- The first fidelity comparison is intentionally limited to a TRAIN-only historical frequency baseline and deterministic rules. No opaque ML model, hyperparameter search, profitability claim, or live connection is introduced in M5.1.
+- The Strategy Core receives only M4 features and prior account state; observed target/action and all `label_*` columns are forbidden inputs.
+- Preserve the required fidelity measures, including action macro/weighted F1, target exposure MAE/correlation, open/close miss-latency proxies, add/reduce/flip recall, cycle direction match, regime fidelity, and confidence calibration.
+- M5.2 may add Logistic Regression and Decision Tree comparisons only if dependencies are available and the same leakage-safe input and signal contracts remain in force.
+
 ## 2026-08-20 — Enter wallet reconciliation
 
 - Phase 1 is frozen in `accounting_foundation_manifest.json` with downstream status `READY_WITH_KNOWN_ACCOUNTING_RESIDUALS`.

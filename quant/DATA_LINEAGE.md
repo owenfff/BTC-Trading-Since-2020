@@ -66,3 +66,12 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Leakage status: `PASS`; future bar, funding, history, label, and invalid-time violation counts are all zero. Labels use the next strictly later decision and skip same-timestamp ties.
 - Market warning: all 20,845 rows carry explicit `MARK_INDEX_MISSING` because no historical mark/index series was accepted from the current public instrument snapshot.
 - Large dataset path: `quant/outputs/model_dataset.parquet` requested, with ignored `quant/outputs/model_dataset.csv` fallback due unavailable Parquet dependencies. Raw account inputs remained unchanged.
+
+## M5.1 strategy distillation artifact
+
+- Strategy code/analysis commit: `2daab36eb75c6e1cc876b12ff4e369ea57e8ae5`.
+- Report commit: `30c0d19f4b283ce9dd5c3de52db0036b4094fb81`.
+- Reports: `quant/reports/strategy_fidelity.md`, `quant/reports/strategy_fidelity.json`, `quant/reports/strategy_action_confusion.csv`, `quant/reports/strategy_position_tracking.csv`, and `quant/reports/strategy_regime_fidelity.csv`.
+- Models: a TRAIN-only historical frequency baseline and deterministic interpretable rules. Both use only the M4 feature contract; observed target/action and all `label_*` columns are excluded from Strategy Core inputs.
+- Strategy output contract includes version, timestamps, target exposure, action, confidence, validity, slippage field, execution preference, and risk tags. The strategy layer has no exchange SDK dependency.
+- Fidelity label is fixed as `BEHAVIORAL_APPROXIMATION`; no profitability or exact intent claim is made.

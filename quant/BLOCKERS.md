@@ -16,6 +16,7 @@
 | GitHub remote | READY | Autonomous branch pushed successfully; no PR was created | Continue pushing only the autonomous branch; never push `main` |
 | Public HTTPS permission | CLEARED_FOR_M3 | Public BitMEX and GitHub HTTPS access succeeded in the resumed runtime | Keep no-key/public-only boundary |
 | Leakage-safe features and labels | PASS_WITH_WARNINGS | 20,845 chronological BTC decision rows; all five future-information checks are zero; historical mark/index remains explicitly missing | Eligible for interpretable M5 distillation; no model training or live connectivity |
+| Strategy distillation M5.1 | COMPLETE_WITH_WARNINGS | Frequency baseline and deterministic rule strategy evaluated on TRAIN/VALIDATION/TEST; fidelity remains `BEHAVIORAL_APPROXIMATION` | M5.2 may compare Logistic Regression and Decision Tree under the same input/signal contract |
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
 
@@ -40,3 +41,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - `quant/reports/leakage_audit.md` is `PASS`: future bars, future funding, future history, non-future labels, and invalid decision times all have zero violations.
 - The large dataset is a local ignored CSV fallback because the runtime lacks a Parquet engine; no raw account input changed.
 - Historical mark/index context remains `MARK_INDEX_MISSING` for all 20,845 rows and is represented explicitly, never backfilled from a current snapshot.
+
+## M5.1 strategy fidelity boundary
+
+- `quant/reports/strategy_fidelity.json` evaluates a TRAIN-only frequency baseline and a deterministic rule strategy across chronological TRAIN, VALIDATION, and TEST splits.
+- Action confusion, position tracking, and regime fidelity are retained in separate small CSV reports.
+- The results are descriptive behavioral fidelity only. They do not establish profitability, exact intent recovery, or permission to trade.
