@@ -27,6 +27,7 @@ class BybitAdapter:
         self.websocket = websocket
         self.connected = False
         self._order_symbols: dict[str, str] = {}
+        self._symbol_categories: dict[str, str] = {}
 
     @classmethod
     def from_environment(cls) -> "BybitAdapter":
@@ -64,7 +65,10 @@ class BybitAdapter:
     def load_instruments(self, *, category: str = "linear") -> list[Instrument]:
         response = self.transport.request("GET", f"/v5/market/instruments-info?category={category}")
         self._check(response)
-        return [self._instrument(item, category) for item in response.get("result", {}).get("list", [])]
+        instruments = [self._instrument(item, category) for item in response.get("result", {}).get("list", [])]
+        for instrument in instruments:
+            self._symbol_categories[instrument.canonical_symbol] = category
+        return instruments
 
     def load_all_instruments(self) -> list[Instrument]:
         result: list[Instrument] = []
@@ -90,14 +94,17 @@ class BybitAdapter:
             multiplier = abs(self._decimal(raw_multiplier, Decimal("1"))) if raw_multiplier not in (None, "", "0", 0) else Decimal("1")
             instrument_type = InstrumentType.INVERSE_PERPETUAL if category == "inverse" else InstrumentType.LINEAR_PERPETUAL
         tick = self._decimal(price_filter.get("tickSize"))
-        terms_complete = bool(item.get("symbol")) and tick > 0 and step > 0 and minimum > 0 and (category == "spot" or item.get("contractMultiplier", item.get("contractValue", "")) not in (None, ""))
+        terms_complete = bool(item.get("symbol")) and tick > 0 and step > 0 and minimum > 0
         return Instrument(
             str(item["symbol"]), instrument_type, str(item.get("baseCoin") or item.get("baseCurrency") or "BTC"),
             str(item.get("quoteCoin") or "USDT"), str(item.get("settleCoin") or item.get("quoteCoin") or "USDT"),
             tick or Decimal("0.01"), step or Decimal("1"), minimum or Decimal("1"),
             self._decimal(filters.get("minNotionalValue")), contract_multiplier=multiplier,
-            terms_complete=terms_complete, metadata={"category": category, "status": item.get("status"), "raw_multiplier": item.get("contractMultiplier", item.get("contractValue", "")), "raw": item},
+            terms_complete=terms_complete, metadata={"category": category, "status": item.get("status"), "raw_multiplier": item.get("contractMultiplier", item.get("contractValue", "")), "multiplier_source": "BYBIT_V5_CATEGORY_UNIT_SEMANTICS", "raw": item},
         )
+
+    def _category_for(self, symbol: str) -> str:
+        return self._symbol_categories.get(symbol.upper(), "linear")
 
     @staticmethod
     def _check(response: dict[str, Any]) -> None:
@@ -153,39 +160,47 @@ class BybitAdapter:
 
     def fetch_positions(self) -> list[Position]:
         self._private_guard()
-        response = self.transport.request("GET", "/v5/position/list?category=linear&settleCoin=USDT", private=True)
-        self._check(response)
         result = []
-        for row in response.get("result", {}).get("list", []):
-            size = self._decimal(row.get("size"))
-            if size == 0 or not row.get("symbol"):
-                continue
-            signed = size if str(row.get("side", "Buy")).lower() == "buy" else -size
-            result.append(Position(str(row["symbol"]), str(row.get("settleCoin") or "USDT"), signed, self._decimal(row.get("avgPrice")) if row.get("avgPrice") else None, self._decimal(row.get("cumRealisedPnl"))))
+        for category in ("linear", "inverse"):
+            suffix = "&settleCoin=USDT" if category == "linear" else ""
+            response = self.transport.request("GET", f"/v5/position/list?category={category}{suffix}", private=True)
+            self._check(response)
+            for row in response.get("result", {}).get("list", []):
+                size = self._decimal(row.get("size"))
+                if size == 0 or not row.get("symbol"):
+                    continue
+                signed = size if str(row.get("side", "Buy")).lower() == "buy" else -size
+                result.append(Position(str(row["symbol"]), str(row.get("settleCoin") or "USDT"), signed, self._decimal(row.get("avgPrice")) if row.get("avgPrice") else None, self._decimal(row.get("cumRealisedPnl"))))
         return result
 
     def fetch_open_orders(self) -> list[Order]:
         self._private_guard()
-        response = self.transport.request("GET", "/v5/order/realtime?category=linear&settleCoin=USDT", private=True)
-        self._check(response)
-        return [self._order(row) for row in response.get("result", {}).get("list", [])]
+        orders: list[Order] = []
+        for category in ("linear", "inverse"):
+            suffix = "&settleCoin=USDT" if category == "linear" else ""
+            response = self.transport.request("GET", f"/v5/order/realtime?category={category}{suffix}", private=True)
+            self._check(response)
+            orders.extend(self._order(row) for row in response.get("result", {}).get("list", []))
+        return orders
 
     def fetch_recent_fills(self) -> list[Fill]:
         self._private_guard()
-        response = self.transport.request("GET", "/v5/execution/list?category=linear&limit=100", private=True)
-        self._check(response)
         result = []
-        for row in response.get("result", {}).get("list", []):
-            quantity = abs(self._decimal(row.get("execQty")))
-            price = self._decimal(row.get("execPrice"))
-            if quantity <= 0 or price <= 0:
-                continue
-            client_id = str(row.get("orderLinkId") or row.get("orderId") or row.get("execId"))
-            result.append(Fill(str(row.get("execId") or row.get("orderId")), client_id, str(row.get("symbol") or ""), self._side(row.get("side")), quantity, price, abs(self._decimal(row.get("execFee"))), str(row.get("feeCurrency") or row.get("execFeeCurrency") or "USDT"), self._timestamp(row.get("execTime")), str(row.get("execId")) if row.get("execId") else None))
+        for category in ("linear", "inverse"):
+            response = self.transport.request("GET", f"/v5/execution/list?category={category}&limit=100", private=True)
+            self._check(response)
+            for row in response.get("result", {}).get("list", []):
+                quantity = abs(self._decimal(row.get("execQty")))
+                price = self._decimal(row.get("execPrice"))
+                if quantity <= 0 or price <= 0:
+                    continue
+                client_id = str(row.get("orderLinkId") or row.get("orderId") or row.get("execId"))
+                result.append(Fill(str(row.get("execId") or row.get("orderId")), client_id, str(row.get("symbol") or ""), self._side(row.get("side")), quantity, price, abs(self._decimal(row.get("execFee"))), str(row.get("feeCurrency") or row.get("execFeeCurrency") or "USDT"), self._timestamp(row.get("execTime")), str(row.get("execId")) if row.get("execId") else None))
         return result
 
-    def fetch_closed_bars(self, symbol: str, *, limit: int = 100) -> list[MarketBar]:
-        response = self.transport.request("GET", f"/v5/market/kline?category=linear&symbol={symbol}&interval=60&limit={limit}")
+    def fetch_closed_bars(self, symbol: str, *, category: str | None = None, limit: int = 100) -> list[MarketBar]:
+        category = category or self._category_for(symbol)
+        response = self.transport.request("GET", f"/v5/market/kline?category={category}&symbol={symbol}&interval=60&limit={limit}")
         self._check(response)
         bars: list[MarketBar] = []
         for row in reversed(response.get("result", {}).get("list", [])):
@@ -197,8 +212,9 @@ class BybitAdapter:
             bars.append(MarketBar(symbol, bar_time, row[1], row[2], row[3], row[4], row[5], source="bybit-demo-rest-closed-1h"))
         return bars
 
-    def fetch_quote(self, symbol: str) -> tuple[Decimal, Decimal]:
-        response = self.transport.request("GET", f"/v5/market/tickers?category=linear&symbol={symbol}")
+    def fetch_quote(self, symbol: str, *, category: str | None = None) -> tuple[Decimal, Decimal]:
+        category = category or self._category_for(symbol)
+        response = self.transport.request("GET", f"/v5/market/tickers?category={category}&symbol={symbol}")
         self._check(response)
         rows = response.get("result", {}).get("list", [])
         if not rows or rows[0].get("bid1Price") in (None, "") or rows[0].get("ask1Price") in (None, ""):
@@ -211,7 +227,8 @@ class BybitAdapter:
 
     def place_order(self, order: Order) -> Order:
         self._private_guard()
-        body: dict[str, Any] = {"category": "linear", "symbol": order.symbol, "side": order.side.value.title(), "orderType": order.order_type.value.title(), "qty": str(order.quantity), "orderLinkId": order.client_order_id}
+        category = self._category_for(order.symbol)
+        body: dict[str, Any] = {"category": category, "symbol": order.symbol, "side": order.side.value.title(), "orderType": order.order_type.value.title(), "qty": str(order.quantity), "orderLinkId": order.client_order_id}
         if order.price is not None:
             body["price"] = str(order.price)
         if order.post_only:
@@ -228,15 +245,20 @@ class BybitAdapter:
 
     def amend_order(self, client_order_id: str, changes: dict[str, object]) -> Any:
         self._private_guard()
-        return self.transport.request("POST", "/v5/order/amend", private=True, body={"category": "linear", "symbol": self._order_symbols.get(client_order_id, str(changes.get("symbol", ""))), "orderLinkId": client_order_id, **changes})
+        symbol = self._order_symbols.get(client_order_id, str(changes.get("symbol", "")))
+        return self.transport.request("POST", "/v5/order/amend", private=True, body={"category": self._category_for(symbol), "symbol": symbol, "orderLinkId": client_order_id, **changes})
 
     def cancel_order(self, client_order_id: str) -> Any:
         self._private_guard()
-        return self.transport.request("POST", "/v5/order/cancel", private=True, body={"category": "linear", "symbol": self._order_symbols.get(client_order_id, ""), "orderLinkId": client_order_id})
+        symbol = self._order_symbols.get(client_order_id, "")
+        return self.transport.request("POST", "/v5/order/cancel", private=True, body={"category": self._category_for(symbol), "symbol": symbol, "orderLinkId": client_order_id})
 
     def cancel_all(self) -> Any:
         self._private_guard()
-        return self.transport.request("POST", "/v5/order/cancel-all", private=True, body={"category": "linear"})
+        responses = []
+        for category in ("linear", "inverse"):
+            responses.append(self.transport.request("POST", "/v5/order/cancel-all", private=True, body={"category": category}))
+        return responses
 
     def cancel_all_after(self, timeout_ms: int = 60_000) -> dict[str, Any]:
         if timeout_ms < 1_000 or timeout_ms > 600_000:

@@ -24,8 +24,9 @@ def _f(value: Any, default: float = 0.0) -> float:
 class RealtimeFeatureEngine:
     """Closed-bar-only feature state; no labels or remote future state enter it."""
 
-    def __init__(self, instrument: Instrument, *, position_scale: float = 1.0) -> None:
+    def __init__(self, instrument: Instrument, *, feature_symbol: str | None = None, position_scale: float = 1.0) -> None:
         self.instrument = instrument
+        self.feature_symbol = feature_symbol or instrument.canonical_symbol
         self.position_scale = max(float(position_scale), 1.0)
         self.bars: deque[MarketBar] = deque(maxlen=100)
         self.latest_decision: datetime | None = None
@@ -72,7 +73,7 @@ class RealtimeFeatureEngine:
         regime = "UP" if latest_close > ma and ret(6) > 0 else ("DOWN" if latest_close < ma and ret(6) < 0 else "RANGE")
         values: dict[str, Any] = {key: "" for key in FEATURE_COLUMNS}
         values.update({
-            "feature_symbol": self.instrument.canonical_symbol,
+            "feature_symbol": self.feature_symbol,
             "feature_instrument_class": "SPOT" if self.instrument.instrument_type == InstrumentType.SPOT else "DERIVATIVE",
             "feature_payout_model": "INVERSE" if self.instrument.instrument_type == InstrumentType.INVERSE_PERPETUAL else "LINEAR",
             "feature_quote_currency": self.instrument.quote_currency,

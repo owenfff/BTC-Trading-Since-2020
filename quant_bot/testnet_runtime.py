@@ -21,6 +21,7 @@ from quant_bot.strategy.realtime_features import RealtimeFeatureEngine
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ARTIFACT = ROOT / "quant" / "outputs" / "cross_asset_deployment_model.json"
+VENUE_SYMBOL_ALIASES: dict[str, tuple[str, ...]] = {"XBTUSD": ("BTCUSD",)}
 
 
 def _json_default(value: Any) -> Any:
@@ -45,12 +46,25 @@ def _instrument_status(instrument: Any) -> str:
     return "ACTIVE" if state in (None, "Trading") else str(state).upper()
 
 
+def _select_instrument(symbol: str, policy: dict[str, Any], instruments: list[Any]) -> tuple[Any | None, str | None]:
+    candidates = [symbol, *VENUE_SYMBOL_ALIASES.get(symbol, ())]
+    for candidate in candidates:
+        matches = [item for item in instruments if item.canonical_symbol == candidate]
+        if str(policy.get("instrument_class", "")).upper() != "SPOT":
+            matches = [item for item in matches if item.instrument_type.value != "SPOT"]
+        if matches:
+            # Derivatives win over Spot for a derivative historical row. A
+            # complete, currently trading specification wins over others.
+            matches.sort(key=lambda item: (item.terms_complete, _instrument_status(item) == "ACTIVE", item.instrument_type.value != "SPOT"), reverse=True)
+            return matches[0], candidate
+    return None, None
+
+
 def build_symbol_mapping(bundle: DeploymentBundle, instruments: list[Any]) -> dict[str, Any]:
-    by_symbol = {str(item.canonical_symbol): item for item in instruments}
     rows: list[dict[str, Any]] = []
     for symbol in bundle.symbols:
         policy = dict(bundle.symbol_policy.get(symbol, {}))
-        instrument = by_symbol.get(symbol)
+        instrument, venue_symbol = _select_instrument(symbol, policy, instruments)
         if not instrument:
             status = "UNAVAILABLE_ON_BYBIT_DEMO"
         elif str(policy.get("instrument_class", "")).upper() == "SPOT" or str(getattr(instrument.instrument_type, "value", instrument.instrument_type)) == "SPOT":
@@ -61,7 +75,7 @@ def build_symbol_mapping(bundle: DeploymentBundle, instruments: list[Any]) -> di
             status = "BLOCKED_SPEC_UNRESOLVED"
         else:
             status = "ALLOW_DERIVATIVE_TRADING"
-        rows.append({"symbol": symbol, "status": status, "bybit_symbol": symbol if instrument else None, "instrument_type": getattr(getattr(instrument, "instrument_type", None), "value", None), "settlement_currency": getattr(instrument, "settlement_currency", None), "contract_multiplier": getattr(instrument, "contract_multiplier", None), "tick_size": getattr(instrument, "tick_size", None), "lot_size": getattr(instrument, "lot_size", None)})
+        rows.append({"symbol": symbol, "status": status, "bybit_symbol": venue_symbol, "instrument_type": getattr(getattr(instrument, "instrument_type", None), "value", None), "settlement_currency": getattr(instrument, "settlement_currency", None), "contract_multiplier": getattr(instrument, "contract_multiplier", None), "tick_size": getattr(instrument, "tick_size", None), "lot_size": getattr(instrument, "lot_size", None), "mapping_reason": "EXACT_SYMBOL" if venue_symbol == symbol else "EXPLICIT_XBT_TO_BTC_ALIAS" if venue_symbol else None})
     return {"report_version": "BYBIT-DEMO-SYMBOL-MAPPING-1.0", "venue": "bybit-demo", "strategy_fidelity": "BEHAVIORAL_APPROXIMATION", "symbols": rows, "allowed_count": sum(row["status"] == "ALLOW_DERIVATIVE_TRADING" for row in rows), "monitor_only_count": sum(row["status"].startswith("MONITOR_ONLY") for row in rows), "blocked_count": sum(row["status"].startswith("BLOCKED") for row in rows), "unavailable_count": sum(row["status"].startswith("UNAVAILABLE") for row in rows)}
 
 
@@ -70,6 +84,8 @@ def preflight(*, artifact_path: Path = DEFAULT_ARTIFACT, write_reports: bool = T
     adapter = BybitAdapter.from_environment()
     instruments = adapter.load_all_instruments()
     mapping = build_symbol_mapping(bundle, instruments)
+    if mapping["allowed_count"] <= 0:
+        raise AdapterError("bybit-demo", "NO_TRADABLE_SYMBOLS", "no historical derivative symbol currently has a complete Bybit Demo mapping")
     server_time = adapter.get_server_time()
     clock_drift = (datetime.now(timezone.utc) - server_time).total_seconds()
     state = adapter.reconcile_state()
@@ -153,17 +169,18 @@ class TestnetRuntime:
 
     def _plan_symbol(self, symbol: str, equity: Decimal) -> TargetOrderPlan | None:
         instrument = self.instruments[symbol]
-        bars = self.adapter.fetch_closed_bars(symbol, limit=100)
+        venue_symbol = instrument.canonical_symbol
+        bars = self.adapter.fetch_closed_bars(venue_symbol, limit=100)
         if not bars:
             return None
-        engine = self.engines.setdefault(symbol, RealtimeFeatureEngine(instrument, position_scale=self.bundle.position_scales.get(symbol, 1.0)))
+        engine = self.engines.setdefault(symbol, RealtimeFeatureEngine(instrument, feature_symbol=symbol, position_scale=self.bundle.position_scales.get(symbol, 1.0)))
         engine.ingest_closed_bars(bars)
         latest = bars[-1]
-        bid, ask = self.adapter.fetch_quote(symbol)
         decision_time = datetime.now(timezone.utc)
-        strategy_input = engine.build_input(decision_time=decision_time, current_qty=self.positions.get(symbol, Decimal("0")), current_equity=equity)
+        current = self.positions.get(venue_symbol, Decimal("0"))
+        strategy_input = engine.build_input(decision_time=decision_time, current_qty=current, current_equity=equity)
         signal = self.bundle.model.predict(strategy_input)
-        current = self.positions.get(symbol, Decimal("0"))
+        bid, ask = self.adapter.fetch_quote(venue_symbol)
         limit = risk_envelope_for_symbol(self.bundle.risk_envelope, symbol)
         return plan_target_order(instrument, current_contracts=current, target_exposure=Decimal(str(signal.target_exposure)), equity=equity, reference_price=latest.close, bid=bid, ask=ask, decision_time=decision_time, active_orders=self.active_orders, max_target_exposure=limit)
 
@@ -222,11 +239,12 @@ class TestnetRuntime:
 def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: bool = False, confirm_testnet: bool = False, symbols: str = "auto", once: bool = False, poll_seconds: int = 60) -> dict[str, Any]:
     bundle = load_deployment_bundle(artifact_path)
     adapter = BybitAdapter.from_environment()
-    instruments = {item.canonical_symbol: item for item in adapter.load_all_instruments()}
-    mapping = build_symbol_mapping(bundle, list(instruments.values()))
+    live_instruments = adapter.load_all_instruments()
+    mapping = build_symbol_mapping(bundle, live_instruments)
     allowed = {row["symbol"] for row in mapping["symbols"] if row["status"] == "ALLOW_DERIVATIVE_TRADING"}
     selected = allowed if symbols == "auto" else allowed.intersection({item.strip().upper() for item in symbols.split(",") if item.strip()})
-    runtime = TestnetRuntime(adapter, bundle, enable_orders, confirm_testnet, instruments={symbol: instruments[symbol] for symbol in selected})
+    by_venue_symbol = {item.canonical_symbol: item for item in live_instruments}
+    runtime = TestnetRuntime(adapter, bundle, enable_orders, confirm_testnet, instruments={symbol: by_venue_symbol[str(next(row["bybit_symbol"] for row in mapping["symbols"] if row["symbol"] == symbol))] for symbol in selected})
     runtime.refresh()
     runtime.start_private_stream()
     watchdog = threading.Thread(target=runtime._watchdog, name="bybit-demo-local-watchdog", daemon=True)
