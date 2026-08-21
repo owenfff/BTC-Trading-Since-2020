@@ -5,7 +5,7 @@
   "current_work_package": "M12-clean-room-release-audit",
   "last_completed_phase": "PHASE_12_OPEN_SOURCE_CLEAN_ROOM",
   "last_code_commit": "223d121605a16135a2613cace95102e22a7d3e1b",
-  "last_report_commit": "PENDING_M12_REPORT_COMMIT",
+  "last_report_commit": "2bd3432af511194dd4bf65792b34fa54bfab1b76",
   "test_count": 275,
   "last_test_status": "LOCAL_275_PASSED;_CLEAN_ROOM_273_PASSED_2_SKIPPED;_PYTHON311_DEPENDENCIES_INSTALLED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
