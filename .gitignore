@@ -1,0 +1,3 @@
+quant_bot/**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
