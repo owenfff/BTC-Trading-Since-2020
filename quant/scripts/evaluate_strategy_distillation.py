@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
 from quant_bot.strategy.distilled_rules import DistilledRuleStrategy  # noqa: E402
 from quant_bot.strategy.feature_contract import strategy_input_from_row  # noqa: E402
 from quant_bot.strategy.imitation_model import HistoricalBehaviorBaseline  # noqa: E402
+from quant_bot.strategy.supervised_models import NumpyDecisionTreeStrategy, NumpyLogisticStrategy  # noqa: E402
 from quant_bot.strategy.signal_contract import (  # noqa: E402
     ADD_ACTIONS,
     CLOSE_ACTIONS,
@@ -170,7 +171,12 @@ def main() -> None:
 
     baseline = HistoricalBehaviorBaseline().fit(rows)
     rules = DistilledRuleStrategy()
-    models = {"frequency_baseline": baseline, "distilled_rules": rules}
+    models = {
+        "frequency_baseline": baseline,
+        "distilled_rules": rules,
+        "logistic_numpy": NumpyLogisticStrategy().fit(rows),
+        "decision_tree_numpy": NumpyDecisionTreeStrategy().fit(rows),
+    }
     predictions: dict[str, list[tuple[dict[str, Any], Any]]] = {}
     for name, model in models.items():
         predictions[name] = [(row, model.predict(strategy_input_from_row(row))) for row in rows]
@@ -209,13 +215,13 @@ def main() -> None:
         "analysis_commit": _git_commit(),
         "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
         "strategy_fidelity": STRATEGY_FIDELITY,
-        "training_policy": "Frequency baseline fits TRAIN labels only; distilled rules are deterministic; no opaque ML model is trained in M5.1.",
+        "training_policy": "Frequency baseline and supervised models fit TRAIN labels only; distilled rules are deterministic. Logistic and tree implementations use deterministic NumPy with no external ML dependency.",
         "input_contract": "M4 feature contract only; observed target/action and all label_* fields are excluded from Strategy Core inputs.",
         "dataset_rows": len(rows),
         "models": report_metrics,
         "raw_account_inputs_unchanged": manifest.get("raw_account_inputs_unchanged"),
         "market_warning": "Historical mark/index context remains explicitly missing and is never backfilled from a current snapshot.",
-        "next_stage": "M5.2 Logistic Regression and Decision Tree comparison, only if dependencies and leakage controls remain available.",
+        "next_stage": "M5.3 optional LightGBM/XGBoost comparison only if a pinned dependency becomes available; otherwise proceed to walk-forward backtesting.",
     }
     (REPORTS / "strategy_fidelity.json").write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -225,8 +231,8 @@ def main() -> None:
         f"- strategy fidelity: **{STRATEGY_FIDELITY}**",
         f"- source dataset rows: `{len(rows)}`",
         f"- analysis commit: `{result['analysis_commit']}`",
-        "- M5.1 scope: behavior frequency baseline plus deterministic interpretable rules.",
-        "- The frequency baseline fits labels from TRAIN only. The rule strategy uses no labels and no exchange SDK.",
+        "- M5.1/M5.2 scope: behavior frequency baseline, deterministic interpretable rules, NumPy Logistic Regression, and a small NumPy Decision Tree.",
+        "- Every fitted model uses TRAIN labels only; the rule strategy uses no labels and no exchange SDK.",
         "- Historical mark/index context is missing by source limitation and remains an explicit risk tag.",
         "",
         "## Metrics",
@@ -248,7 +254,7 @@ def main() -> None:
         "",
         "## Boundary",
         "",
-        "This artifact is a behavioral approximation from trade records. It does not establish profitability, exact intent recovery, or live-trading readiness. Logistic Regression, Decision Tree, walk-forward backtesting, funding/slippage/latency simulation, and exchange adapters remain later stages.",
+        "This artifact is a behavioral approximation from trade records. It does not establish profitability, exact intent recovery, or live-trading readiness. Optional boosted-tree comparison, walk-forward backtesting, funding/slippage/latency simulation, and exchange adapters remain later stages.",
     ])
     (REPORTS / "strategy_fidelity.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(json.dumps({"status": "PASS", "rows": len(rows), "models": list(models), "analysis_commit": result["analysis_commit"]}, ensure_ascii=False))

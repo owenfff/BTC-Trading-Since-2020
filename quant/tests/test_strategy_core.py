@@ -13,6 +13,7 @@ from quant_bot.strategy.distilled_rules import DistilledRuleStrategy  # noqa: E4
 from quant_bot.strategy.feature_contract import FEATURE_COLUMNS, strategy_input_from_row  # noqa: E402
 from quant_bot.strategy.imitation_model import HistoricalBehaviorBaseline  # noqa: E402
 from quant_bot.strategy.strategy_state import StrategyState  # noqa: E402
+from quant_bot.strategy.supervised_models import NumpyDecisionTreeStrategy, NumpyLogisticStrategy  # noqa: E402
 
 
 def features(**overrides: object) -> dict[str, object]:
@@ -71,3 +72,20 @@ def test_strategy_state_tracks_only_signal_contract() -> None:
     state.apply_signal(signal)
     assert state.current_exposure == signal.target_exposure
     assert state.last_action == signal.action
+
+
+def supervised_rows() -> list[dict[str, object]]:
+    rows = []
+    for index in range(12):
+        direction = "OPEN_LONG" if index % 2 == 0 else "OPEN_SHORT"
+        rows.append({"dataset_split": "TRAIN", "label_status": "AVAILABLE", "label_next_action": direction, "label_next_target_exposure": "0.2" if index % 2 == 0 else "-0.2", **features(feature_return_24bar=0.02 if index % 2 == 0 else -0.02, feature_trend_slope_24bar=0.001 if index % 2 == 0 else -0.001)})
+    return rows
+
+
+def test_numpy_supervised_models_fit_train_only() -> None:
+    rows = supervised_rows()
+    for model in (NumpyLogisticStrategy(epochs=5), NumpyDecisionTreeStrategy(max_depth=2, min_leaf=2)):
+        model.fit(rows)
+        signal = model.predict(StrategyInput(datetime(2020, 1, 1, tzinfo=timezone.utc), features(feature_return_24bar=0.02, feature_trend_slope_24bar=0.001)))
+        signal.validate()
+        assert model.fit_row_count == 12

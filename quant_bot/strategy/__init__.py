@@ -4,6 +4,7 @@ from .base import StrategyInput, StrategySignal
 from .distilled_rules import DistilledRuleStrategy
 from .imitation_model import HistoricalBehaviorBaseline
 from .strategy_state import StrategyState
+from .supervised_models import NumpyDecisionTreeStrategy, NumpyLogisticStrategy
 
 __all__ = [
     "StrategyInput",
@@ -11,4 +12,6 @@ __all__ = [
     "DistilledRuleStrategy",
     "HistoricalBehaviorBaseline",
     "StrategyState",
+    "NumpyDecisionTreeStrategy",
+    "NumpyLogisticStrategy",
 ]
