@@ -115,11 +115,26 @@ def _predict(rows: list[dict[str, Any]], models: dict[str, Any]) -> dict[str, li
 
 
 def _walk_forward(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    windows = [
-        ("WF1", datetime(2020, 1, 1, tzinfo=UTC), datetime(2023, 1, 1, tzinfo=UTC), datetime(2024, 1, 1, tzinfo=UTC), datetime(2025, 1, 1, tzinfo=UTC)),
-        ("WF2", datetime(2020, 1, 1, tzinfo=UTC), datetime(2024, 1, 1, tzinfo=UTC), datetime(2025, 1, 1, tzinfo=UTC), datetime(2026, 1, 1, tzinfo=UTC)),
-        ("WF3", datetime(2020, 1, 1, tzinfo=UTC), datetime(2025, 1, 1, tzinfo=UTC), datetime(2026, 1, 1, tzinfo=UTC), datetime(2030, 1, 1, tzinfo=UTC)),
-    ]
+    ordered = sorted((row for row in rows if parse_utc(row.get("decision_time")) is not None), key=lambda row: parse_utc(row["decision_time"]))
+    if not ordered:
+        return []
+    times = [parse_utc(row["decision_time"]) for row in ordered]
+    minimum = times[0]
+    maximum = times[-1]
+    span = maximum - minimum
+    # Three expanding-window, chronological out-of-time tests. Boundaries are
+    # derived from the available eligible sample rather than assuming that
+    # every historical instrument traded through 2026.
+    windows = []
+    for name, train_fraction, validation_fraction, test_fraction in (
+        ("WF1", 0.50, 0.15, 0.15),
+        ("WF2", 0.65, 0.15, 0.15),
+        ("WF3", 0.80, 0.10, 0.10),
+    ):
+        train_end = minimum + span * train_fraction
+        validation_end = train_end + span * validation_fraction
+        test_end = validation_end + span * test_fraction
+        windows.append((name, minimum, train_end, validation_end, test_end))
     output: list[dict[str, Any]] = []
     for name, start, train_end, validation_end, test_end in windows:
         train = [row for row in rows if start <= (parse_utc(row["decision_time"]) or datetime.max.replace(tzinfo=UTC)) < train_end]

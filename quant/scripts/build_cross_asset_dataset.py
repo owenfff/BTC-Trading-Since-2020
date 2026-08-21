@@ -217,7 +217,8 @@ def build() -> dict[str, Any]:
                 "synthetic_negative_sample": str(decision.get("synthetic_negative_sample", "")).lower() == "true",
                 "observed_overall_confidence": decision.get("overall_confidence", ""),
                 "market_coverage_status": market_status,
-                "model_eligible": market_status == "PASS" and str(meta["feature_instrument_class"]).upper() != "SPOT",
+                "position_scale_fit_available": symbol in scales,
+                "model_eligible": market_status == "PASS" and str(meta["feature_instrument_class"]).upper() != "SPOT" and bool(market_features.get("feature_market_data_available")),
                 **meta,
                 **market_features,
                 **{key: (iso_utc(value) if isinstance(value, datetime) else value) for key, value in account_by_id[decision_id].items() if key not in {"decision_episode_id", "decision_time"}},
@@ -225,10 +226,17 @@ def build() -> dict[str, Any]:
                 "dataset_split": decision.get("dataset_split", ""),
             }
             rows.append(row)
+    before = hash_files(ROOT, PROTECTED_FILES)
     rows.sort(key=lambda row: (row["decision_time"], row["symbol"], row["decision_episode_id"]))
     leakage = _leakage_audit(rows)
+    for row in rows:
+        row["model_eligible"] = bool(row.get("model_eligible")) and str(row.get("position_scale_fit_available", "")).lower() == "true"
     eligible = [row for row in rows if row.get("model_eligible")]
-    before = hash_files(ROOT, PROTECTED_FILES)
+    # No operation in this script is allowed to mutate the account exports;
+    # take the second snapshot only after all derived outputs are written.
+    _write_csv(outputs / "cross_asset_model_dataset.csv", rows)
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / "cross_asset_model_dataset_manifest.json").write_text(json.dumps({"status": "PENDING"}) + "\n", encoding="utf-8")
     after = hash_files(ROOT, PROTECTED_FILES)
     changed = [name for name in PROTECTED_FILES if before.get(name) != after.get(name)]
     report = {
@@ -240,6 +248,7 @@ def build() -> dict[str, Any]:
         "model_eligible_row_count": len(eligible),
         "model_eligible_symbol_count": len({row["symbol"] for row in eligible}),
         "excluded_symbols": sorted(symbol for symbol in symbols if symbol not in {row["symbol"] for row in eligible}),
+        "position_scale_missing_symbols": sorted(symbol for symbol in symbols if symbol not in scales),
         "dataset_split_counts": dict(Counter(str(row.get("dataset_split")) for row in rows)),
         "market_coverage_status_counts": dict(Counter(str(row.get("market_coverage_status")) for row in rows)),
         "instrument_class_counts": dict(Counter(str(row.get("feature_instrument_class")) for row in rows)),
@@ -250,8 +259,6 @@ def build() -> dict[str, Any]:
         "changed_protected_files": changed,
         "large_output": "quant/outputs/cross_asset_model_dataset.csv (ignored)",
     }
-    _write_csv(outputs / "cross_asset_model_dataset.csv", rows)
-    reports.mkdir(parents=True, exist_ok=True)
     (reports / "cross_asset_model_dataset_manifest.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (reports / "cross_asset_leakage_audit.md").write_text(
         "\n".join([

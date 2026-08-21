@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 
 from cross_asset.market import _audit, _join_funding
@@ -9,6 +10,7 @@ from features.market_features import build_market_features
 from quant_bot.strategy.base import StrategyInput
 from quant_bot.strategy.feature_contract import FEATURE_COLUMNS
 from quant_bot.strategy.supervised_models import CrossAssetNumpyLogisticStrategy
+from quant_bot.paper import PaperTradingEngine
 
 
 UTC = timezone.utc
@@ -94,6 +96,19 @@ def test_cross_asset_logistic_uses_symbol_metadata_and_versioned_signal() -> Non
     signal = model.predict(StrategyInput(datetime(2020, 1, 2, tzinfo=UTC), rows[0]))
     assert signal.strategy_version == "behavioral-distillation-v2-cross-asset-logistic"
     assert signal.action in {"OPEN_LONG", "OPEN_SHORT"}
+
+
+def test_cross_asset_signal_can_be_consumed_by_local_paper_engine() -> None:
+    signal = CrossAssetNumpyLogisticStrategy().version
+    assert signal == "behavioral-distillation-v2-cross-asset-logistic"
+    engine = PaperTradingEngine()
+    # The engine contract is exchange-neutral: a StrategySignal is all it
+    # needs, and the test never opens a network connection.
+    from quant_bot.strategy.base import make_signal as build_signal
+    model_signal = build_signal(datetime(2020, 1, 1, tzinfo=UTC), target_exposure=0.25, action="OPEN_LONG", confidence=0.8, strategy_version=signal)
+    engine.apply_signal(model_signal, reference_price=Decimal("100"))
+    assert engine.state.partial_orders == 1
+    assert engine.state.position > 0
 
 
 def test_market_coverage_audit_marks_out_of_range_series_insufficient() -> None:

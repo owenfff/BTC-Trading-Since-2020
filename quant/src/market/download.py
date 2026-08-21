@@ -239,6 +239,7 @@ def download_windowed(
     page_limit: int = 1000,
     sleep_seconds: float = 0.0,
     retries: int = 2,
+    split_on_failure: bool = True,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Download a long time series in bounded, resumable UTC windows.
 
@@ -290,12 +291,14 @@ def download_windowed(
                     break
                 time.sleep(min(2.0 * (attempt + 1), 5.0))
 
-        # A problematic seven-day range can still contain a perfectly valid
-        # smaller range.  Split it rather than abandoning the entire source
-        # or falling through to multi-gigabyte raw trade archives.
+        # A problematic range can still contain a perfectly valid smaller
+        # range.  The caller may disable this recovery for bounded batch jobs
+        # so one unavailable public window cannot make the whole run wait
+        # indefinitely.  A disabled recovery is reported as a coverage
+        # failure by the caller; it never fabricates market data.
         span_seconds = int((window_end - window_start).total_seconds())
         minimum_seconds = 24 * 60 * 60
-        if span_seconds > minimum_seconds:
+        if split_on_failure and span_seconds > minimum_seconds:
             midpoint = window_start + timedelta(seconds=span_seconds // 2)
             left_rows, left_lineage = fetch_window(window_start, midpoint)
             right_rows, right_lineage = fetch_window(midpoint, window_end)

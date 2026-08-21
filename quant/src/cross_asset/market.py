@@ -178,6 +178,7 @@ def build_cross_asset_market(
                 page_limit=1000,
                 sleep_seconds=0.05,
                 retries=2,
+                split_on_failure=False,
             )
             bars = [compact for row in raw_bars if (compact := _compact_bar(row, symbol, "bitmex_public_trade_bucketed_1h"))]
             try:
@@ -192,6 +193,7 @@ def build_cross_asset_market(
                     page_limit=1000,
                     sleep_seconds=0.05,
                     retries=1,
+                    split_on_failure=False,
                 )
             except MarketDownloadError:
                 raw_funding = []
