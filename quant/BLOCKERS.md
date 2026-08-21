@@ -15,6 +15,7 @@
 | Parquet runtime | ENVIRONMENT_WARNING | pyarrow/polars unavailable and PyPI blocked; explicit ignored CSV fallback generated | Restore pinned dependency before consuming Parquet-only tools |
 | GitHub remote | READY | Autonomous branch pushed successfully; no PR was created | Continue pushing only the autonomous branch; never push `main` |
 | Public HTTPS permission | CLEARED_FOR_M3 | Public BitMEX and GitHub HTTPS access succeeded in the resumed runtime | Keep no-key/public-only boundary |
+| Leakage-safe features and labels | PASS_WITH_WARNINGS | 20,845 chronological BTC decision rows; all five future-information checks are zero; historical mark/index remains explicitly missing | Eligible for interpretable M5 distillation; no model training or live connectivity |
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
 
@@ -32,3 +33,10 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - BitMEX public REST `trade/bucketed` returned 653,630 XBTUSD 5m bars from `2020-05-01T09:05:00Z` through `2026-07-18T22:10:00Z`; the UTC grid has zero gaps and zero duplicates.
 - Funding returned 6,809 rows. The current `/instrument` endpoint is a current snapshot, not a historical mark/index series; all historical mark/index values remain missing rather than using future data.
 - The report is `READY_WITH_WARNINGS`, `raw_account_inputs_unchanged=true`, and large outputs remain ignored local artifacts. M4 may start only with the explicit context warning and leakage audit.
+
+## M4 leakage-safe feature and label audit
+
+- `quant/reports/model_dataset_manifest.json` records 20,845 XBTUSD decision rows, 529 synthetic daily HOLD/NO_TRADE rows, and a chronological 70/15/15 split.
+- `quant/reports/leakage_audit.md` is `PASS`: future bars, future funding, future history, non-future labels, and invalid decision times all have zero violations.
+- The large dataset is a local ignored CSV fallback because the runtime lacks a Parquet engine; no raw account input changed.
+- Historical mark/index context remains `MARK_INDEX_MISSING` for all 20,845 rows and is represented explicitly, never backfilled from a current snapshot.

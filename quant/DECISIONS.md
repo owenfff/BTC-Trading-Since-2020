@@ -60,3 +60,11 @@
 - The frozen XBTUSD range contains 653,630 valid 5m bars with zero duplicates, zero timestamp parse failures, zero out-of-order transitions, and zero grid gaps. A local 1h series contains 54,470 derived bars and records one incomplete edge bucket without filling it.
 - Funding coverage contains 6,809 rows. The current public `/instrument` endpoint is not accepted as historical mark/index data; all 653,630 context rows remain `MARK_INDEX_MISSING` rather than using a future snapshot.
 - M3 is `READY_WITH_WARNINGS`. Begin M4 leakage-safe features and labels only with previous-or-equal UTC joins, no future observations, and an explicit mark/index missingness feature/flag.
+
+## 2026-08-20 — Complete M4 leakage-safe features and labels
+
+- Build one chronological row per XBTUSD decision, including the 529 explicit synthetic daily HOLD/NO_TRADE observations; do not restrict the dataset to trade timestamps.
+- Market features use only closed bars with `bar_end_time < decision_time`; funding is as-of with source time `<= decision_time`; account history is strictly earlier than the decision.
+- Labels use the next strictly later decision, skip same-timestamp ties, and remain separate from features. No future cycle profit/high/low or test-period normalization statistic is used.
+- The 20,845-row dataset has a chronological 70/15/15 split and a `PASS` leakage audit with zero violations in all five checks.
+- Historical mark/index context remains explicitly missing. The dataset is eligible for interpretable strategy distillation, but model training, API credentials, live trading, and PR creation remain out of scope.

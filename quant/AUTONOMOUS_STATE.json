@@ -1,18 +1,18 @@
 {
   "program_version": "4.0",
   "program_status": "RUNNING",
-  "current_phase": "PHASE_5_LEAKAGE_SAFE_FEATURES",
-  "current_work_package": "M4-leakage-safe-features-labels",
-  "last_completed_phase": "PHASE_4_PUBLIC_MARKET_DATA",
-  "last_code_commit": "827106a2e5d8c20afe23bb20f52954baccb0f6e5",
-  "last_report_commit": "cb45b621d17cbc33e2d72874a9e69d653a669b2e",
+  "current_phase": "PHASE_6_STRATEGY_DISTILLATION",
+  "current_work_package": "M5-interpretable-strategy-distillation",
+  "last_completed_phase": "PHASE_5_LEAKAGE_SAFE_FEATURES",
+  "last_code_commit": "83d636a2e5d8c20afe23bb20f52954baccb0f6e5",
+  "last_report_commit": "f10f575db9aee5d67d72dceffd7d03b209ad7e69",
   "test_count": 248,
-  "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_9_MARKET_SMOKE_TESTS",
+  "last_test_status": "PASS_WITH_3_M4_TARGETED_TESTS;_PYTEST_UNAVAILABLE_IN_RUNTIME",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
   "market_data_status": "READY_WITH_WARNINGS",
-  "leakage_status": "NOT_STARTED",
+  "leakage_status": "PASS",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
   "research_status": "NOT_STARTED",
   "backtest_status": "NOT_STARTED",
@@ -33,6 +33,6 @@
     "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration.",
     "Public market bars use verified BitMEX REST responses with per-window cache SHA256; no synthetic bars are permitted."
   ],
-  "next_action": "Begin M4 leakage-safe features and labels using only as-of market bars, funding, and frozen behavior data; preserve the explicit MARK_INDEX_MISSING warning and run a feature leakage audit before any model training.",
+  "next_action": "Begin M5 interpretable strategy distillation from the frozen leakage-safe BTC dataset; do not train opaque models, connect APIs, or place trades.",
   "updated_at_utc": "2026-08-21T04:36:56Z"
 }

@@ -55,3 +55,14 @@
 ## Upcoming lineage
 
 Wallet ledger, public market data, behavioral episodes, features, labels, models, and experiments must each record source URLs/commits, UTC coverage, SHA256, code commit, dependency versions, and report analysis commit.
+
+## Leakage-safe feature and label artifact
+
+- Code/analysis commit: `83d636a2e5d8c20afe23bb20f52954baccb0f6e5`.
+- Manifest: `quant/reports/model_dataset_manifest.json`.
+- Reports: `quant/reports/feature_dictionary.md`, `quant/reports/label_dictionary.md`, `quant/reports/leakage_audit.md`, `quant/reports/label_distribution.csv`, `quant/reports/no_trade_sampling_audit.md`, and `quant/reports/dataset_time_split.csv`.
+- BTC-first scope: 20,845 XBTUSD decision rows, including 529 explicit synthetic daily HOLD/NO_TRADE observations; 58 feature/label columns in the local CSV fallback.
+- Split: chronological 70% TRAIN / 15% VALIDATION / 15% TEST; no random shuffle and no test-period fit statistics.
+- Leakage status: `PASS`; future bar, funding, history, label, and invalid-time violation counts are all zero. Labels use the next strictly later decision and skip same-timestamp ties.
+- Market warning: all 20,845 rows carry explicit `MARK_INDEX_MISSING` because no historical mark/index series was accepted from the current public instrument snapshot.
+- Large dataset path: `quant/outputs/model_dataset.parquet` requested, with ignored `quant/outputs/model_dataset.csv` fallback due unavailable Parquet dependencies. Raw account inputs remained unchanged.
