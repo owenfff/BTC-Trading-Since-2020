@@ -18,6 +18,13 @@
 - Preserve the required fidelity measures, including action macro/weighted F1, target exposure MAE/correlation, open/close miss-latency proxies, add/reduce/flip recall, cycle direction match, regime fidelity, and confidence calibration.
 - M5.2 may add Logistic Regression and Decision Tree comparisons only if dependencies are available and the same leakage-safe input and signal contracts remain in force.
 
+## 2026-08-20 — Complete M5 strategy comparison boundary
+
+- M5 completed four descriptive models: TRAIN-only frequency baseline, deterministic rules, deterministic NumPy Logistic Regression, and a depth-limited NumPy Decision Tree.
+- The exact Strategy Core signal contract is shared across these models; no strategy code imports exchange SDKs.
+- External sklearn, LightGBM, and XGBoost were unavailable in the runtime and were not installed. This is an environment warning, not a reason to change the raw-data or no-live-trading boundary.
+- Proceed to Phase 7 only through a single Strategy Core parity harness and a chronological backtest that models fees, funding, slippage, delay, next-bar execution, limits, lots, ticks, and settlement currencies.
+
 ## 2026-08-20 — Enter wallet reconciliation
 
 - Phase 1 is frozen in `accounting_foundation_manifest.json` with downstream status `READY_WITH_KNOWN_ACCOUNTING_RESIDUALS`.

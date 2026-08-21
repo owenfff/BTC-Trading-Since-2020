@@ -6,7 +6,7 @@ Build an auditable, BTC-first behavioral approximation from public trade records
 
 ## Current stage
 
-Phases 1 through 5 are complete, and M5.1 has completed the frequency baseline plus deterministic rule strategy. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation and behavior data are frozen with explicit warnings. M3 has verified BitMEX public 5m bars, derived 1h bars, funding, UTC lineage, and zero 5m grid gaps. M4 produced 20,845 chronological BTC decision rows with a PASS leakage audit. Historical mark/index context is unavailable from the current public instrument snapshot endpoint and remains explicitly missing; M5.2 must preserve this warning and use only the frozen leakage-safe dataset.
+Phases 1 through 6 are complete. M5 evaluated the frequency baseline, deterministic rules, NumPy Logistic Regression, and a depth-limited NumPy Decision Tree; all fidelity remains `BEHAVIORAL_APPROXIMATION`. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation and behavior data are frozen with explicit warnings. M3 has verified BitMEX public 5m bars, derived 1h bars, funding, UTC lineage, and zero 5m grid gaps. M4 produced 20,845 chronological BTC decision rows with a PASS leakage audit. Historical mark/index context is unavailable from the current public instrument snapshot endpoint and remains explicitly missing; Phase 7 must preserve this warning and use the same Strategy Core for parity-safe backtesting.
 
 ## Stop conditions
 

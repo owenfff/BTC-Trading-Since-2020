@@ -1,11 +1,11 @@
 {
   "program_version": "4.0",
   "program_status": "RUNNING",
-  "current_phase": "PHASE_6_STRATEGY_DISTILLATION",
-  "current_work_package": "M5.2-logistic-regression-decision-tree-comparison",
-  "last_completed_phase": "PHASE_5_LEAKAGE_SAFE_FEATURES",
-  "last_code_commit": "2daab36eb75c6e1cc876b12ff4e369ea57e8ae5e",
-  "last_report_commit": "30c0d19f4b283ce9dd5c3de52db0036b4094fb81",
+  "current_phase": "PHASE_7_BACKTEST_WALK_FORWARD",
+  "current_work_package": "M6-strategy-parity-and-walk-forward-backtest",
+  "last_completed_phase": "PHASE_6_STRATEGY_DISTILLATION",
+  "last_code_commit": "66c9e34e8189d1fffbd8caf913a876c08df95f31",
+  "last_report_commit": "39077bddcff28cf4d6fa2c2c46b95ee2abe13a84",
   "test_count": 248,
   "last_test_status": "PASS_WITH_3_M4_TARGETED_TESTS;_PYTEST_UNAVAILABLE_IN_RUNTIME",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -33,6 +33,6 @@
     "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration.",
     "Public market bars use verified BitMEX REST responses with per-window cache SHA256; no synthetic bars are permitted."
   ],
-  "next_action": "Compare leakage-safe Logistic Regression and Decision Tree baselines only if the runtime has suitable dependencies; preserve the shared Strategy Core contract and do not connect APIs or place trades.",
+  "next_action": "Build a single Strategy Core parity harness and leakage-safe chronological backtest with fees, funding, slippage, delay, next-bar execution, limits, tick size, and minimum lot; do not connect APIs or place trades.",
   "updated_at_utc": "2026-08-21T04:36:56Z"
 }

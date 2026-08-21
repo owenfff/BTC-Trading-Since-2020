@@ -75,3 +75,10 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Models: a TRAIN-only historical frequency baseline and deterministic interpretable rules. Both use only the M4 feature contract; observed target/action and all `label_*` columns are excluded from Strategy Core inputs.
 - Strategy output contract includes version, timestamps, target exposure, action, confidence, validity, slippage field, execution preference, and risk tags. The strategy layer has no exchange SDK dependency.
 - Fidelity label is fixed as `BEHAVIORAL_APPROXIMATION`; no profitability or exact intent claim is made.
+- M5.2 comparison commit: `66c9e34e8189d1fffbd8caf913a876c08df95f31`; report commit: `39077bddcff28cf4d6fa2c2c46b95ee2abe13a84`.
+- M5.2 models: deterministic NumPy Logistic Regression and a depth-limited NumPy Decision Tree, each fit only on TRAIN labels. External sklearn/LightGBM/XGBoost packages were not available and were not installed.
+
+## Strategy/backtest parity boundary
+
+- Phase 7 must call the same `quant_bot.strategy` Strategy Core for offline replay and streaming-style signal generation.
+- Backtest execution must model historical fees, funding, configurable slippage and signal delay, next-bar execution, target exposure, position limits, partial fills, minimum lot, tick size, and separate settlement currencies without using same-bar close prices as ideal fills.
