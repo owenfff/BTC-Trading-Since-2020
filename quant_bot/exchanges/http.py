@@ -13,14 +13,14 @@ class AdapterError(RuntimeError):
 
 
 class Transport(Protocol):
-    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False) -> dict[str, Any]: ...
+    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False) -> Any: ...
 
 
 @dataclass
 class FakeTransport:
-    responses: dict[tuple[str, str], dict[str, Any]]
+    responses: dict[tuple[str, str], Any]
     calls: list[tuple[str, str, bool, dict[str, Any] | None]] = field(default_factory=list)
 
-    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False) -> dict[str, Any]:
+    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False) -> Any:
         self.calls.append((method, path, private, body))
         return self.responses[(method.upper(), path)]

@@ -2,3 +2,4 @@ numpy==2.3.5
 polars==1.43.2
 pytest==8.4.2
 pyarrow==24.0.0
+websockets==15.0.1

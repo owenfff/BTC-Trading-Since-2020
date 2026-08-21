@@ -83,6 +83,28 @@ class FeatureEncoder:
             values.extend(1.0 if value == category else 0.0 for category in self.categories[key])
         return np.asarray(values, dtype=float)
 
+    def to_dict(self) -> dict[str, Any]:
+        if self.means is None or self.scales is None or self.categories is None:
+            raise RuntimeError("cannot serialize an unfitted FeatureEncoder")
+        return {
+            "means": self.means,
+            "scales": self.scales,
+            "categories": {key: list(values) for key, values in self.categories.items()},
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "FeatureEncoder":
+        encoder = cls(
+            means={str(key): float(value) for key, value in dict(payload.get("means", {})).items()},
+            scales={str(key): float(value) for key, value in dict(payload.get("scales", {})).items()},
+            categories={str(key): tuple(str(item) for item in values) for key, values in dict(payload.get("categories", {})).items()},
+        )
+        missing = [key for key in NUMERIC_FEATURES if key not in encoder.means or key not in encoder.scales]
+        missing.extend(key for key in CATEGORICAL_FEATURES if key not in encoder.categories)
+        if missing:
+            raise ValueError(f"deployment encoder is missing feature definitions: {missing[:5]}")
+        return encoder
+
 
 def _train_rows(rows: Iterable[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
     return [row for row in rows if row.get("dataset_split") in {None, "TRAIN"} and row.get("label_status") == "AVAILABLE" and row.get("label_next_action")]
@@ -157,6 +179,44 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
     """Shared deterministic imitation model for the m13 cross-asset contract."""
 
     version = "behavioral-distillation-v2-cross-asset-logistic"
+
+    def to_dict(self) -> dict[str, Any]:
+        if self.weights is None or self.bias is None or self.target_coef is None:
+            raise RuntimeError("cannot serialize an unfitted strategy")
+        return {
+            "model_type": "CrossAssetNumpyLogisticStrategy",
+            "version": self.version,
+            "epochs": self.epochs,
+            "learning_rate": self.learning_rate,
+            "l2": self.l2,
+            "fit_row_count": self.fit_row_count,
+            "actions": list(self.actions),
+            "weights": self.weights.tolist(),
+            "bias": self.bias.tolist(),
+            "target_coef": self.target_coef.tolist(),
+            "encoder": self.encoder.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "CrossAssetNumpyLogisticStrategy":
+        if payload.get("model_type") != "CrossAssetNumpyLogisticStrategy":
+            raise ValueError("unsupported deployment model type")
+        model = cls(
+            epochs=int(payload.get("epochs", 60)),
+            learning_rate=float(payload.get("learning_rate", 0.18)),
+            l2=float(payload.get("l2", 1e-3)),
+        )
+        model.actions = [str(item) for item in payload.get("actions", [])]
+        model.weights = np.asarray(payload.get("weights", []), dtype=float)
+        model.bias = np.asarray(payload.get("bias", []), dtype=float)
+        model.target_coef = np.asarray(payload.get("target_coef", []), dtype=float)
+        model.encoder = FeatureEncoder.from_dict(payload.get("encoder", {}))
+        model.fit_row_count = int(payload.get("fit_row_count", 0))
+        if not model.actions or model.weights.ndim != 2 or model.bias.ndim != 1 or model.target_coef.ndim != 1:
+            raise ValueError("invalid deployment model arrays")
+        if model.weights.shape[1] != len(model.actions) or model.bias.shape[0] != len(model.actions) or model.target_coef.shape[0] != model.weights.shape[0] + 1:
+            raise ValueError("deployment model dimensions do not match actions/features")
+        return model
 
 
 @dataclass
