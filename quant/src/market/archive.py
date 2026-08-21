@@ -12,7 +12,10 @@ from typing import Any, Iterable, Iterator
 from .download import MarketDownloadError, fetch_bytes, iso_utc, parse_utc, utc_now
 
 
-PUBLIC_ARCHIVE_BASE = "https://public.bitmex.com/data"
+# The public website is a static listing backed by this official S3 bucket.
+# The website's /data/... path currently returns 404 for objects that are
+# present in the bucket, so downloads use the canonical bucket URL directly.
+PUBLIC_ARCHIVE_BASE = "https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data"
 
 
 def archive_trade_url(day: date) -> str:

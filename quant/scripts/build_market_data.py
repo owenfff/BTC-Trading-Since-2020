@@ -34,6 +34,7 @@ from market.download import (  # noqa: E402
     build_instrument_url,
     build_trade_bucketed_url,
     download_paginated,
+    download_windowed,
     source_descriptor,
     utc_now,
 )
@@ -144,6 +145,41 @@ def _fetch(
         return [], descriptor
 
 
+def _fetch_windowed(
+    name: str,
+    builder: Callable[..., str],
+    cache_dir: Path,
+    cache_stem: str,
+    *,
+    symbol: str,
+    interval: str | None,
+    start_time: datetime | None,
+    end_time: datetime | None,
+    window_days: int,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    if start_time is None or end_time is None:
+        return [], {"status": "FAILED_NO_TIME_BOUNDS", "row_count": 0}
+    endpoint = builder(symbol, **({"bin_size": interval} if name == "trade_bucketed" else {}), start_time=start_time, end_time=end_time)
+    descriptor = source_descriptor(endpoint, symbol=symbol, interval=interval, start_time=start_time, end_time=end_time)
+    try:
+        rows, lineage = download_windowed(
+            lambda **kwargs: builder(symbol, **({"bin_size": interval} if name == "trade_bucketed" else {}), **kwargs),
+            cache_dir=cache_dir,
+            cache_stem=cache_stem,
+            start_time=start_time,
+            end_time=end_time,
+            window_days=window_days,
+            timeout=60,
+            page_limit=1000,
+        )
+        descriptor.update(lineage)
+        descriptor["status"] = "PASS" if rows else "EMPTY"
+        return rows, descriptor
+    except MarketDownloadError as exc:
+        descriptor.update({"status": "FAILED", "error_type": type(exc).__name__, "error": str(exc)})
+        return [], descriptor
+
+
 def _output_large(rows: list[dict[str, Any]], parquet_path: Path) -> dict[str, Any]:
     try:
         write_parquet(rows, parquet_path)
@@ -219,15 +255,17 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     selected_interval: str | None = None
     bars: list[dict[str, Any]] = []
     requested_interval = "5m"
-    for interval in ("5m", "15m"):
-        rows, item = _fetch(
+    for interval in ("5m",):
+        rows, item = _fetch_windowed(
             "trade_bucketed",
             build_trade_bucketed_url,
-            api_raw_dir / f"{symbol.lower()}_trade_bucketed_{interval}.json",
+            api_raw_dir,
+            f"{symbol.lower()}_trade_bucketed_{interval}",
             symbol=symbol,
             interval=interval,
             start_time=start_time,
             end_time=end_time,
+            window_days=30,
         )
         lineage[f"trade_bucketed_{interval}"] = item
         if rows:
@@ -256,24 +294,31 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     instrument_normalization: dict[str, Any] = {"normalized_row_count": 0}
     funding_normalization: dict[str, Any] = {"normalized_row_count": 0}
     if bars:
-        raw_funding, funding_lineage = _fetch(
+        raw_funding, funding_lineage = _fetch_windowed(
             "funding",
             build_funding_url,
-            api_raw_dir / f"{symbol.lower()}_funding.json",
+            api_raw_dir,
+            f"{symbol.lower()}_funding",
             symbol=symbol,
             interval=None,
             start_time=start_time,
             end_time=end_time,
+            window_days=90,
         )
-        raw_instrument, instrument_lineage = _fetch(
-            "instrument",
-            build_instrument_url,
-            api_raw_dir / f"{symbol.lower()}_instrument.json",
-            symbol=symbol,
-            interval=None,
-            start_time=start_time,
-            end_time=end_time,
-        )
+        # /instrument returns the current instrument snapshot.  It is not a
+        # historical time series: an old startTime/endTime query returns no
+        # rows, and using today's mark/index for old bars would be look-ahead.
+        raw_instrument = []
+        instrument_lineage = {
+            "provider": "BitMEX",
+            "endpoint": build_instrument_url(symbol, start_time=start_time, end_time=end_time),
+            "symbol": symbol,
+            "interval": None,
+            "credentials": "none",
+            "status": "UNAVAILABLE_HISTORICAL_SNAPSHOT_SERIES",
+            "row_count": 0,
+            "note": "The public instrument endpoint exposes the current snapshot; no historical mark/index series was accepted for as-of joins.",
+        }
         lineage["funding"] = funding_lineage
         lineage["instrument"] = instrument_lineage
         funding_rows, funding_normalization = normalize_funding(raw_funding, symbol=symbol)
@@ -283,7 +328,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         lineage["funding"] = {"status": "NOT_ATTEMPTED_NO_BARS", "row_count": 0}
         lineage["instrument"] = {"status": "NOT_ATTEMPTED_NO_BARS", "row_count": 0}
     context_rows, context_audit = attach_market_context(bars, instrument_rows=instrument_rows, funding_rows=funding_rows)
-    interval_seconds = {"5m": 300, "15m": 900}.get(selected_interval or requested_interval, 300)
+    interval_seconds = {"5m": 300}.get(selected_interval or requested_interval, 300)
     bar_audit = audit_time_grid(context_rows, time_field="timestamp", interval_seconds=interval_seconds)
     gap_rows = build_gap_rows(context_rows, time_field="timestamp", interval_seconds=interval_seconds, series=f"{symbol}:{selected_interval or requested_interval}")
     after = hash_files(root, PROTECTED_FILES)

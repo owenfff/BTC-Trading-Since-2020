@@ -68,7 +68,7 @@ def test_parse_utc_normalizes_naive_values_to_utc() -> None:
 
 
 def test_official_archive_url_is_date_partitioned_and_public() -> None:
-    assert archive_trade_url(datetime(2020, 1, 2, tzinfo=timezone.utc).date()) == "https://public.bitmex.com/data/trade/20200102.csv.gz"
+    assert archive_trade_url(datetime(2020, 1, 2, tzinfo=timezone.utc).date()) == "https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/trade/20200102.csv.gz"
 
 
 def test_archive_trade_aggregation_uses_closed_utc_bucket_without_fill() -> None:

@@ -11,7 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.error import HTTPError, URLError
@@ -226,6 +226,81 @@ def download_paginated(
     }
 
 
+def download_windowed(
+    url_builder,
+    *,
+    cache_dir: Path,
+    cache_stem: str,
+    start_time: Any,
+    end_time: Any,
+    window_days: int = 30,
+    timeout: int = 60,
+    page_limit: int = 1000,
+    sleep_seconds: float = 0.0,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Download a long time series in bounded, resumable UTC windows.
+
+    BitMEX can serve a small bounded interval reliably, while a six-year
+    ``startTime``/``endTime`` request can time out before the first page is
+    returned.  Each window is cached independently, so a rerun resumes from
+    the last verified window instead of silently accepting a partial series.
+    Boundary rows are deduplicated by timestamp and symbol after all windows
+    have been read.
+    """
+    start = parse_utc(start_time)
+    end = parse_utc(end_time)
+    if start is None or end is None or end < start:
+        raise MarketDownloadError("windowed download requires an ordered UTC time range")
+    if window_days <= 0:
+        raise ValueError("window_days must be positive")
+
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    all_rows: list[dict[str, Any]] = []
+    windows: list[dict[str, Any]] = []
+    current = start
+    started = utc_now()
+    while current < end:
+        window_end = min(current + timedelta(days=window_days), end)
+        cache_path = cache_dir / (
+            f"{cache_stem}_{current.strftime('%Y%m%dT%H%M%S')}_"
+            f"{window_end.strftime('%Y%m%dT%H%M%S')}.json"
+        )
+        rows, lineage = download_paginated(
+            url_builder,
+            cache_path=cache_path,
+            start_time=current,
+            end_time=window_end,
+            timeout=timeout,
+            page_limit=page_limit,
+            sleep_seconds=sleep_seconds,
+        )
+        all_rows.extend(rows)
+        windows.append({
+            "start_time_utc": iso_utc(current),
+            "end_time_utc": iso_utc(window_end),
+            **lineage,
+        })
+        current = window_end
+
+    unique: dict[tuple[Any, ...], dict[str, Any]] = {}
+    for row in all_rows:
+        unique[(row.get("timestamp"), row.get("symbol"), row.get("id"))] = row
+    rows = sorted(unique.values(), key=lambda row: (parse_utc(row.get("timestamp")) or datetime.max.replace(tzinfo=timezone.utc), str(row.get("id") or "")))
+    encoded = json.dumps(rows, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    digest = hashlib.sha256(encoded).hexdigest()
+    return rows, {
+        "status": "DOWNLOADED",
+        "cache_path": str(cache_dir),
+        "sha256": digest,
+        "row_count": len(rows),
+        "download_time_utc": started,
+        "request_count": sum(int(item.get("request_count") or 0) for item in windows),
+        "window_count": len(windows),
+        "window_days": window_days,
+        "windows": windows,
+    }
+
+
 def source_descriptor(endpoint: str, *, symbol: str, interval: str | None, start_time: Any, end_time: Any) -> dict[str, Any]:
     return {
         "provider": "BitMEX",
@@ -251,6 +326,7 @@ __all__ = [
     "build_instrument_url",
     "build_trade_bucketed_url",
     "download_paginated",
+    "download_windowed",
     "fetch_bytes",
     "fetch_json",
     "iso_utc",
