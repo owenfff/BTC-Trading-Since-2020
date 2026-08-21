@@ -237,6 +237,7 @@ def download_windowed(
     timeout: int = 60,
     page_limit: int = 1000,
     sleep_seconds: float = 0.0,
+    retries: int = 2,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Download a long time series in bounded, resumable UTC windows.
 
@@ -265,15 +266,26 @@ def download_windowed(
             f"{cache_stem}_{current.strftime('%Y%m%dT%H%M%S')}_"
             f"{window_end.strftime('%Y%m%dT%H%M%S')}.json"
         )
-        rows, lineage = download_paginated(
-            url_builder,
-            cache_path=cache_path,
-            start_time=current,
-            end_time=window_end,
-            timeout=timeout,
-            page_limit=page_limit,
-            sleep_seconds=sleep_seconds,
-        )
+        last_error: MarketDownloadError | None = None
+        for attempt in range(retries + 1):
+            try:
+                rows, lineage = download_paginated(
+                    url_builder,
+                    cache_path=cache_path,
+                    start_time=current,
+                    end_time=window_end,
+                    timeout=timeout,
+                    page_limit=page_limit,
+                    sleep_seconds=sleep_seconds,
+                )
+                break
+            except MarketDownloadError as exc:
+                last_error = exc
+                if attempt >= retries:
+                    raise
+                time.sleep(min(2.0 * (attempt + 1), 5.0))
+        else:
+            raise last_error or MarketDownloadError("windowed download failed")
         all_rows.extend(rows)
         windows.append({
             "start_time_utc": iso_utc(current),
@@ -297,6 +309,7 @@ def download_windowed(
         "request_count": sum(int(item.get("request_count") or 0) for item in windows),
         "window_count": len(windows),
         "window_days": window_days,
+        "retries": retries,
         "windows": windows,
     }
 

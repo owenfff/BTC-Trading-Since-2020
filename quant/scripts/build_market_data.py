@@ -265,7 +265,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             interval=interval,
             start_time=start_time,
             end_time=end_time,
-            window_days=30,
+            window_days=7,
         )
         lineage[f"trade_bucketed_{interval}"] = item
         if rows:
