@@ -48,12 +48,12 @@ class DistilledRuleStrategy:
         if str(f.get("feature_accounting_confidence") or "") in {"LOW", "UNKNOWN"}:
             tags.append("LOW_ACCOUNTING_CONFIDENCE")
 
-        bullish = regime == "UPTREND" or (slope > 0 and return_24 > 0)
-        bearish = regime == "DOWNTREND" or (slope < 0 and return_24 < 0)
+        bullish = regime in {"UPTREND", "TREND_UP"} or (slope > 0 and return_24 > 0)
+        bearish = regime in {"DOWNTREND", "TREND_DOWN"} or (slope < 0 and return_24 < 0)
         confidence = 0.40
         if complete:
             confidence += 0.15
-        if regime in {"UPTREND", "DOWNTREND", "RANGE"}:
+        if regime in {"UPTREND", "DOWNTREND", "RANGE", "TREND_UP", "TREND_DOWN", "RANGE_OR_MIXED"}:
             confidence += 0.10
         confidence = min(0.80, confidence + min(abs(return_6) * 2.0, 0.15))
         if volatility > 0.05:
