@@ -1,0 +1,45 @@
+{
+  "report_version": "M4-FEATURE-LABEL-1.0",
+  "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
+  "analysis_commit": "83d636abf994b1a57ed751c9b6f1051a00a13204",
+  "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
+  "status": "READY_WITH_WARNINGS",
+  "row_count": 20845,
+  "btc_decision_count": 20845,
+  "synthetic_decision_count": 529,
+  "market_bar_count": 653630,
+  "market_data_range_utc": {
+    "first": "2020-05-01T09:05:00.000Z",
+    "last": "2026-07-18T22:10:00.000Z"
+  },
+  "feature_missingness": {
+    "market_data_unavailable": 2,
+    "mark_index_missing": 20845,
+    "funding_missing": 4
+  },
+  "label_status_counts": {
+    "AVAILABLE": 20844,
+    "NO_LATER_DECISION": 1
+  },
+  "split_policy": "Chronological 70% TRAIN / 15% VALIDATION / 15% TEST by decision_time; no random shuffle; no fit statistics",
+  "leakage_audit": {
+    "status": "PASS",
+    "checks": {
+      "future_bar_observation_count": 0,
+      "future_funding_observation_count": 0,
+      "future_history_observation_count": 0,
+      "non_future_label_violation_count": 0,
+      "invalid_decision_time_count": 0
+    },
+    "feature_rule": "bar_end_time < decision_time; funding_source_time <= decision_time; history_time < decision_time",
+    "label_rule": "next_decision_time > decision_time; same-timestamp ties are skipped"
+  },
+  "raw_account_inputs_unchanged": true,
+  "changed_protected_files": [],
+  "large_output": {
+    "format": "csv_fallback_no_parquet_engine",
+    "path": "quant\\outputs\\model_dataset.csv",
+    "requested_path": "quant\\outputs\\model_dataset.parquet",
+    "row_count": 20845
+  }
+}
