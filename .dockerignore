@@ -1,0 +1,11 @@
+.git
+.gitignore
+.pytest_cache
+**/__pycache__
+**/*.pyc
+quant/outputs
+quant/data
+api-v1-*.csv
+derived-equity-curve.csv
+cumulative-performance.png
+quant/reports/execution_price_precision.json
