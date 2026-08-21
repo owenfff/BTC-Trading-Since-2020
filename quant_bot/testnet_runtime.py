@@ -76,6 +76,8 @@ def preflight(*, artifact_path: Path = DEFAULT_ARTIFACT, write_reports: bool = T
     if not state.get("ok"):
         raise AdapterError(adapter.name, "RECONCILIATION_NOT_OK", "Bybit Demo account state could not be reconciled")
     equity = adapter.fetch_equity()
+    if equity <= 0:
+        raise AdapterError(adapter.name, "EQUITY_UNRESOLVED", "Bybit Demo equity is zero or unavailable")
     result = {"status": "PASS", "venue": "bybit-demo", "model_version": bundle.model_version, "feature_contract_version": bundle.feature_contract_version, "instrument_count": len(instruments), "mapping": mapping, "equity_available": equity > 0, "clock_drift_seconds": clock_drift, "reconciliation_ok": True, "order_submission_performed": False, "private_websocket": "NOT_STARTED", "local_watchdog": "REQUIRED_FOR_RUN", "credentials": "READ_FROM_LOCAL_ENVIRONMENT_ONLY"}
     if write_reports:
         report_dir = ROOT / "quant" / "reports"

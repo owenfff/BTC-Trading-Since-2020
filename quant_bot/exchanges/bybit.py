@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from quant_bot.domain.balance import Balance
@@ -38,6 +38,16 @@ class BybitAdapter:
         if self.credentials is None:
             raise AdapterError(self.name, "DEMO_CREDENTIALS_REQUIRED", "private Demo endpoint requires local credentials")
 
+    @staticmethod
+    def _decimal(value: Any, default: Decimal = Decimal("0")) -> Decimal:
+        if value in (None, ""):
+            return default
+        try:
+            parsed = Decimal(str(value))
+        except (InvalidOperation, TypeError, ValueError):
+            return default
+        return parsed if parsed.is_finite() else default
+
     def connect(self) -> None:
         self.connected = True
 
@@ -69,23 +79,23 @@ class BybitAdapter:
         filters = item.get("lotSizeFilter", {})
         price_filter = item.get("priceFilter", {})
         if category == "spot":
-            step = Decimal(str(filters.get("basePrecision", filters.get("qtyStep", "0"))))
-            minimum = Decimal(str(filters.get("minOrderQty", step or "0")))
+            step = self._decimal(filters.get("basePrecision", filters.get("qtyStep", "0")))
+            minimum = self._decimal(filters.get("minOrderQty"), step)
             multiplier = Decimal("1")
             instrument_type = InstrumentType.SPOT
         else:
-            step = Decimal(str(filters.get("qtyStep", "0")))
-            minimum = Decimal(str(filters.get("minOrderQty", step or "0")))
+            step = self._decimal(filters.get("qtyStep"))
+            minimum = self._decimal(filters.get("minOrderQty"), step)
             raw_multiplier = item.get("contractMultiplier", item.get("contractValue", ""))
-            multiplier = abs(Decimal(str(raw_multiplier))) if raw_multiplier not in (None, "", "0", 0) else Decimal("1")
+            multiplier = abs(self._decimal(raw_multiplier, Decimal("1"))) if raw_multiplier not in (None, "", "0", 0) else Decimal("1")
             instrument_type = InstrumentType.INVERSE_PERPETUAL if category == "inverse" else InstrumentType.LINEAR_PERPETUAL
-        tick = Decimal(str(price_filter.get("tickSize", "0")))
+        tick = self._decimal(price_filter.get("tickSize"))
         terms_complete = bool(item.get("symbol")) and tick > 0 and step > 0 and minimum > 0 and (category == "spot" or item.get("contractMultiplier", item.get("contractValue", "")) not in (None, ""))
         return Instrument(
             str(item["symbol"]), instrument_type, str(item.get("baseCoin") or item.get("baseCurrency") or "BTC"),
             str(item.get("quoteCoin") or "USDT"), str(item.get("settleCoin") or item.get("quoteCoin") or "USDT"),
             tick or Decimal("0.01"), step or Decimal("1"), minimum or Decimal("1"),
-            Decimal(str(filters.get("minNotionalValue", "0"))), contract_multiplier=multiplier,
+            self._decimal(filters.get("minNotionalValue")), contract_multiplier=multiplier,
             terms_complete=terms_complete, metadata={"category": category, "status": item.get("status"), "raw_multiplier": item.get("contractMultiplier", item.get("contractValue", "")), "raw": item},
         )
 
@@ -125,7 +135,7 @@ class BybitAdapter:
         accounts = response.get("result", {}).get("list", [])
         if not accounts or accounts[0].get("totalEquity") in (None, ""):
             raise AdapterError(self.name, "EQUITY_UNRESOLVED", "Unified Demo account returned no totalEquity")
-        return Decimal(str(accounts[0]["totalEquity"]))
+        return self._decimal(accounts[0]["totalEquity"])
 
     def fetch_balances(self) -> list[Balance]:
         self._private_guard()
@@ -134,11 +144,11 @@ class BybitAdapter:
         accounts = response.get("result", {}).get("list", [])
         if not accounts:
             raise AdapterError(self.name, "SCHEMA", "wallet balance returned no account")
-        result = [Balance("USD", Decimal(str(accounts[0].get("totalEquity", "0"))), Decimal(str(accounts[0].get("totalAvailableBalance", accounts[0].get("totalEquity", "0")))))]
+        result = [Balance("USD", self._decimal(accounts[0].get("totalEquity")), self._decimal(accounts[0].get("totalAvailableBalance"), self._decimal(accounts[0].get("totalEquity"))))]
         for coin in accounts[0].get("coin", []):
             currency = str(coin.get("coin") or "").upper()
             if currency and coin.get("walletBalance") not in (None, ""):
-                result.append(Balance(currency, Decimal(str(coin["walletBalance"])), Decimal(str(coin.get("availableToWithdraw", coin["walletBalance"])))) )
+                result.append(Balance(currency, self._decimal(coin["walletBalance"]), self._decimal(coin.get("availableToWithdraw"), self._decimal(coin["walletBalance"]))))
         return result
 
     def fetch_positions(self) -> list[Position]:
@@ -147,11 +157,11 @@ class BybitAdapter:
         self._check(response)
         result = []
         for row in response.get("result", {}).get("list", []):
-            size = Decimal(str(row.get("size", "0")))
+            size = self._decimal(row.get("size"))
             if size == 0 or not row.get("symbol"):
                 continue
             signed = size if str(row.get("side", "Buy")).lower() == "buy" else -size
-            result.append(Position(str(row["symbol"]), str(row.get("settleCoin") or "USDT"), signed, Decimal(str(row["avgPrice"])) if row.get("avgPrice") else None, Decimal(str(row.get("cumRealisedPnl", "0")))))
+            result.append(Position(str(row["symbol"]), str(row.get("settleCoin") or "USDT"), signed, self._decimal(row.get("avgPrice")) if row.get("avgPrice") else None, self._decimal(row.get("cumRealisedPnl"))))
         return result
 
     def fetch_open_orders(self) -> list[Order]:
@@ -166,12 +176,12 @@ class BybitAdapter:
         self._check(response)
         result = []
         for row in response.get("result", {}).get("list", []):
-            quantity = abs(Decimal(str(row.get("execQty", "0"))))
-            price = Decimal(str(row.get("execPrice", "0")))
+            quantity = abs(self._decimal(row.get("execQty")))
+            price = self._decimal(row.get("execPrice"))
             if quantity <= 0 or price <= 0:
                 continue
             client_id = str(row.get("orderLinkId") or row.get("orderId") or row.get("execId"))
-            result.append(Fill(str(row.get("execId") or row.get("orderId")), client_id, str(row.get("symbol") or ""), self._side(row.get("side")), quantity, price, abs(Decimal(str(row.get("execFee", "0")))), str(row.get("feeCurrency") or row.get("execFeeCurrency") or "USDT"), self._timestamp(row.get("execTime")), str(row.get("execId")) if row.get("execId") else None))
+            result.append(Fill(str(row.get("execId") or row.get("orderId")), client_id, str(row.get("symbol") or ""), self._side(row.get("side")), quantity, price, abs(self._decimal(row.get("execFee"))), str(row.get("feeCurrency") or row.get("execFeeCurrency") or "USDT"), self._timestamp(row.get("execTime")), str(row.get("execId")) if row.get("execId") else None))
         return result
 
     def fetch_closed_bars(self, symbol: str, *, limit: int = 100) -> list[MarketBar]:
