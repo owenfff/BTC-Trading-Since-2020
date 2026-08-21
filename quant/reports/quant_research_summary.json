@@ -1,0 +1,59 @@
+{
+  "report_version": "M6-QUANT-RESEARCH-1.0",
+  "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
+  "analysis_commit": "b43e428c752383436485813fd5a0c8ae3a02b920",
+  "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
+  "research_status": "RESEARCH_ONLY",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "public_market_source": "verified BitMEX public XBTUSD 5m bars; historical mark/index unavailable",
+  "market_rows": 653630,
+  "market_range_utc": {
+    "first": "2020-05-01T09:05:00.000Z",
+    "last": "2026-07-18T22:10:00.000Z"
+  },
+  "decision_rows": 20845,
+  "fee_rate": 0.0005142955428165985,
+  "fee_evidence": {
+    "method": "sum(abs(execComm_raw))/sum(abs(execCost_raw))",
+    "rows": 98874,
+    "fee_raw_sum": 1984730216.0,
+    "cost_raw_sum": 3859123890381.0
+  },
+  "backtest_unit_boundary": "Unitless normalized exposure-return proxy; fee and funding are normalized costs, not wallet/account PnL.",
+  "tick_size_boundary": "0.1 from frozen current XBTUSD instrument snapshot; historical tick terms remain a warning.",
+  "lot_size_boundary": "Historical XBTUSD lot schedule is 1 before 2021-06-08T04:30Z and 100 thereafter; normalized minimum exposure is applied.",
+  "parity": {
+    "status": "PASS",
+    "sample_count": {
+      "distilled_rules": 256,
+      "frequency_baseline": 256,
+      "logistic_numpy": 256,
+      "decision_tree_numpy": 256
+    },
+    "contract": "same Strategy Core model, fixed inputs, seed 42; batch and streaming signals identical"
+  },
+  "walk_forward_windows": [
+    {
+      "window": "WF1_2020_2022_train_2023_val_2024_test",
+      "train_end": "2023-01-01T00:00:00+00:00",
+      "validation_end": "2024-01-01T00:00:00+00:00",
+      "test_end": "2025-01-01T00:00:00+00:00"
+    },
+    {
+      "window": "WF2_2020_2023_train_2024_val_2025_test",
+      "train_end": "2024-01-01T00:00:00+00:00",
+      "validation_end": "2025-01-01T00:00:00+00:00",
+      "test_end": "2026-01-01T00:00:00+00:00"
+    },
+    {
+      "window": "WF3_2020_2024_train_2025_val_2026_test",
+      "train_end": "2025-01-01T00:00:00+00:00",
+      "validation_end": "2026-01-01T00:00:00+00:00",
+      "test_end": "2027-01-01T00:00:00+00:00"
+    }
+  ],
+  "walk_forward_row_count": 54,
+  "robustness_row_count": 22,
+  "future_data_policy": "Signals use closed history only; execution is next-bar open with configurable delay; no same-bar close execution.",
+  "no_live_boundary": "No exchange SDK, API key, account, order submission, or live capital."
+}
