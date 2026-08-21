@@ -92,3 +92,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Walk-forward: 2020–2022 train / 2023 validation / 2024 test; 2020–2023 train / 2024 validation / 2025 test; 2020–2024 train / 2025 validation / 2026 test.
 - Research status: `RESEARCH_ONLY`. No stable out-of-sample profitability claim is made; all controls and unfavorable results are retained.
 - Cost boundary: blended historical XBTUSD fee ratio from 98,874 BTC-first action rows; Funding charged only at unique `funding_source_timestamp_utc` events; slippage/tick and normalized exposure assumptions remain explicit.
+
+## Exchange-neutral engineering artifacts
+
+- Phase 8 domain model and paper-safety code: `86634c0...`; Decimal/UTC domain objects, allocator, pre-trade risk, execution planner, event store, health checks, and safety defaults.
+- Phase 9 execution and risk controls: `0438315...`; idempotency, retry/query policy, order state machine, fill tracking, reconciliation, clock/stale-data/exchange/drawdown guards, circuit breaker, and kill switch.
+- Phase 10 offline runtime: code `0594629...`, reports `dc7b87e...`; shadow and paper smoke paths pass without credentials or network access.
+- Phase 11 exchange capability matrix: `61aa22f...`; injected-transport BitMEX/Bybit adapter tests are recorded in code commit `f2c64da...`. Real private endpoints remain credential-gated.
+- Phase 12 release safeguards: code commit `d2bd86b...`; clean-room report and release manifest record the fixture smoke pass and the intentional full-research rehydration boundary.

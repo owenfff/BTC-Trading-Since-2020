@@ -21,6 +21,14 @@
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
 
+## Phase 8–12 delivery boundary
+
+- Domain model and fail-closed risk controls are complete; live mode remains disabled.
+- Offline shadow and paper smoke tests pass using a checked-in one-row fixture. No exchange network call or order submission was made.
+- BitMEX and Bybit adapters are mock-tested through injected transports. Real private endpoints are `DEMO_CREDENTIALS_REQUIRED`; credentials must not be requested automatically.
+- Clean-room release status is `PASS_WITH_RESEARCH_INPUT_REHYDRATION_REQUIRED`. A fresh clone can compile and run the fixture smoke paths, while the full research command correctly stops until verified ignored market/behavior outputs are rehydrated.
+- Release audit found no credential-like secrets. Tracked historical teacher/source exports remain subject to redistribution and licensing review.
+
 ## Current work package
 
 Phases 1 and 2 are complete. Wallet reconciliation is `READY_WITH_WARNINGS`; the residuals are preserved as flags and do not block BTC-first behavior episode construction.

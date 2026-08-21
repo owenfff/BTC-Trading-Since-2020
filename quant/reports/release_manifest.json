@@ -1,0 +1,32 @@
+{
+  "report_version": "M12-RELEASE-AUDIT-1.0",
+  "analysis_commit": "d2bd86bef426bc2288249328ad5afa821293c92a",
+  "tracked_file_count": 269,
+  "secret_findings": [],
+  "large_tracked_files": [
+    {
+      "path": "api-v1-execution-tradeHistory.csv",
+      "bytes": 68562804,
+      "classification": "historical_teacher_or_source_export_review_required"
+    },
+    {
+      "path": "quant\\reports\\execution_price_precision.json",
+      "bytes": 11415211,
+      "classification": "historical_teacher_or_source_export_review_required"
+    }
+  ],
+  "large_ignored_outputs_policy": "quant/outputs large fallbacks remain ignored",
+  "live_enabled_default": false,
+  "maximum_live_risk_default": "0",
+  "maximum_live_notional_default": "0",
+  "paper_smoke_status": "PAPER_SMOKE_PASS",
+  "clean_room_status": "PASS_WITH_RESEARCH_INPUT_REHYDRATION_REQUIRED",
+  "clean_room_clone_head": "d2bd86bef426bc2288249328ad5afa821293c92a",
+  "compile_status": "PASS",
+  "shadow_smoke_status": "SHADOW_SMOKE_PASS",
+  "phase10_smoke_status": "PASS",
+  "quant_research_runnable": false,
+  "paper_code_ready": true,
+  "demo_status": "DEMO_CREDENTIALS_REQUIRED",
+  "notes": "Raw account exports are tracked teacher inputs with redistribution/licensing review required; no credentials are included. Full research requires rehydrating verified ignored market and behavior artifacts."
+}

@@ -91,3 +91,15 @@
 - Labels use the next strictly later decision, skip same-timestamp ties, and remain separate from features. No future cycle profit/high/low or test-period normalization statistic is used.
 - The 20,845-row dataset has a chronological 70/15/15 split and a `PASS` leakage audit with zero violations in all five checks.
 - Historical mark/index context remains explicitly missing. The dataset is eligible for interpretable strategy distillation, but model training, API credentials, live trading, and PR creation remain out of scope.
+
+## 2026-08-21 — Freeze offline runtime boundary
+
+- Shadow and paper modes are allowed only as offline, credential-free smoke paths until a separate human review authorizes any exchange connectivity.
+- Clean-room releases include a small checked-in fixture. Large verified market and behavior outputs remain ignored and require explicit rehydration; a fresh clone must not silently fabricate them.
+- `quant_research_runnable=false` is an intentional release-manifest value when those ignored inputs are absent. The research command must fail closed with an input error rather than substitute synthetic market history.
+
+## 2026-08-21 — Freeze adapter credential boundary
+
+- Mock transports may test normalization, idempotency, and adapter error handling without network access.
+- Real private exchange calls remain `DEMO_CREDENTIALS_REQUIRED`; no API key or private account is requested in autonomous mode.
+- Default live risk and notional limits remain zero, and `live_enabled` remains false.

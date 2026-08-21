@@ -1,11 +1,11 @@
 {
   "program_version": "4.0",
   "program_status": "RUNNING",
-  "current_phase": "PHASE_8_EXCHANGE_NEUTRAL_DOMAIN_MODEL",
-  "current_work_package": "M7-domain-model-and-paper-safety",
-  "last_completed_phase": "PHASE_7_BACKTEST_WALK_FORWARD",
-  "last_code_commit": "b43e428c752383436485813fd5a0c8ae3a02b920",
-  "last_report_commit": "51d21d646c9f65a15f5cc6b34fe6fe63564a7c63",
+  "current_phase": "PHASE_12_OPEN_SOURCE_CLEAN_ROOM",
+  "current_work_package": "M12-clean-room-release-audit",
+  "last_completed_phase": "PHASE_11_EXCHANGE_ADAPTER_INTERFACES",
+  "last_code_commit": "d2bd86bef426bc2288249328ad5afa821293c92a",
+  "last_report_commit": "PENDING_M12_REPORT_COMMIT",
   "test_count": 248,
   "last_test_status": "PASS_WITH_3_M4_TARGETED_TESTS;_PYTEST_UNAVAILABLE_IN_RUNTIME",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -15,24 +15,28 @@
   "leakage_status": "PASS",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
   "research_status": "RESEARCH_ONLY",
-  "backtest_status": "NOT_STARTED",
-  "shadow_status": "NOT_STARTED",
-  "paper_status": "NOT_STARTED",
-  "demo_status": "NOT_STARTED",
-  "bot_status": "RESEARCH_FOUNDATION_RUNNING",
+  "backtest_status": "RESEARCH_ONLY",
+  "shadow_status": "SHADOW_SMOKE_PASS",
+  "paper_status": "PAPER_SMOKE_PASS",
+  "demo_status": "DEMO_CREDENTIALS_REQUIRED",
+  "bot_status": "OFFLINE_RELEASE_READY_WITH_REHYDRATION_REQUIRED",
   "blockers": [
     "Exchange currentCost residual: closest candidate differs by about 2 raw units.",
     "Exchange AEP engine semantics remain unresolved; displayed difference is 0.2974.",
     "Execution ordering has 780 ambiguous chains and 371 cross-order ties.",
-    "Historical mark/index context is unavailable from the current public instrument snapshot endpoint; all 653630 context rows retain MARK_INDEX_MISSING and no current snapshot was backfilled."
+    "Historical mark/index context is unavailable from the current public instrument snapshot endpoint; all 653630 context rows retain MARK_INDEX_MISSING and no current snapshot was backfilled.",
+    "Full research outputs under quant/outputs are intentionally ignored and must be rehydrated before a clean clone can run the full research command.",
+    "Real private exchange endpoints remain blocked at the credential boundary; no credentials are requested."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
     "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
     "No claim of exact strategy recovery or future profitability is permitted.",
     "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration.",
-    "Public market bars use verified BitMEX REST responses with per-window cache SHA256; no synthetic bars are permitted."
+    "Public market bars use verified BitMEX REST responses with per-window cache SHA256; no synthetic bars are permitted.",
+    "Tracked historical teacher/source exports require redistribution and licensing review before an open-source release.",
+    "Clean-room fixture smoke passed; full quant research is intentionally not runnable without rehydrated verified inputs."
   ],
-  "next_action": "Build exchange-neutral domain models, paper/shadow safety gates, and adapter interfaces without credentials, API calls, order submission, or live capital.",
-  "updated_at_utc": "2026-08-21T04:36:56Z"
+  "next_action": "Keep the autonomous branch clean and credential-free; rehydrate verified ignored research inputs only when a full research rerun is needed, then continue with reviewed open-source release work.",
+  "updated_at_utc": "2026-08-21T05:20:00Z"
 }
