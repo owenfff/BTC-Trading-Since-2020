@@ -18,11 +18,26 @@ def tracked_files() -> list[Path]:
     return [ROOT / item for item in output.decode().split("\0") if item]
 
 
+def _requirements(path: Path) -> list[str]:
+    return [
+        line.strip()
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
+
+
 def dependency_audit() -> dict[str, object]:
-    path = ROOT / "quant" / "requirements.txt"
-    lines = [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip() and not line.startswith("#")]
-    unpinned = [line for line in lines if "==" not in line]
-    return {"status": "PASS" if not unpinned else "WARNING_UNPINNED", "requirements": lines, "unpinned": unpinned}
+    full_requirements = _requirements(ROOT / "quant" / "requirements.txt")
+    runtime_requirements = _requirements(ROOT / "quant" / "runtime-requirements.txt")
+    unpinned = [line for line in full_requirements if "==" not in line]
+    runtime_unpinned = [line for line in runtime_requirements if "==" not in line]
+    return {
+        "status": "PASS" if not unpinned and not runtime_unpinned else "WARNING_UNPINNED",
+        "requirements": full_requirements,
+        "runtime_requirements": runtime_requirements,
+        "unpinned": unpinned,
+        "runtime_unpinned": runtime_unpinned,
+    }
 
 
 def main() -> None:
