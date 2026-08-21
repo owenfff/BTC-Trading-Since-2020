@@ -69,8 +69,11 @@ def load_funding() -> dict[datetime, float]:
     with CONTEXT_PATH.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle):
             rate = _float(row.get("funding_rate"))
-            if rate is not None:
-                funding[parse_time(row["timestamp"])] = rate
+            source_time = row.get("funding_source_timestamp_utc")
+            if rate is not None and source_time:
+                # market_context is an as-of join and repeats one funding
+                # event across later bars; charge only at the source event.
+                funding[parse_time(source_time)] = rate
     return funding
 
 
