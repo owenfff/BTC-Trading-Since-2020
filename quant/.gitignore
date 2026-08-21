@@ -21,6 +21,10 @@ outputs/trade_cycles.csv
 outputs/btc_market_context.csv
 outputs/market_raw/
 outputs/runtime_state.json
+outputs/cross_asset_model_dataset.csv
+outputs/cross_asset_market_context.csv
+outputs/cross_asset_market/
+outputs/cross_asset_market_coverage.json
 data/market/raw/
 data/market/cache/
 outputs/instrument_terms_temporal_audit.csv

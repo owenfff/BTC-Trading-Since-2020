@@ -54,8 +54,11 @@ def build_account_features(
     cycles: list[dict[str, Any]] | None = None,
     trade_actions: list[dict[str, Any]] | None = None,
     order_episodes: list[dict[str, Any]] | None = None,
+    position_scale_contracts: float = POSITION_SCALE_CONTRACTS,
 ) -> list[dict[str, Any]]:
     """Return one row per decision, with all state sourced from prior rows."""
+    if position_scale_contracts <= 0:
+        raise ValueError("position_scale_contracts must be positive")
     decisions = sorted(decisions, key=lambda row: (parse_utc(row.get("decision_time")) or datetime.max.replace(tzinfo=UTC), str(row.get("decision_episode_id", ""))))
     cycles = sorted(cycles or [], key=lambda row: parse_utc(row.get("close_time")) or datetime.max.replace(tzinfo=UTC))
     actions = sorted(trade_actions or [], key=lambda row: parse_utc(row.get("event_time")) or datetime.max.replace(tzinfo=UTC))
@@ -122,8 +125,8 @@ def build_account_features(
         strict_previous_accounting = previous_accounting_confidence if strict_prior_times and max(strict_prior_times) < decision_time else ""
         row = {
             "feature_current_net_position_contracts": position_before,
-            "feature_current_normalized_exposure": position_before / POSITION_SCALE_CONTRACTS,
-            "feature_position_scale_contracts": POSITION_SCALE_CONTRACTS,
+            "feature_current_normalized_exposure": position_before / position_scale_contracts,
+            "feature_position_scale_contracts": position_scale_contracts,
             "feature_cycle_duration_seconds": current_cycle_duration,
             "feature_latest_action": strict_previous,
             "feature_recent_add_count_24h": recent_counts["ADD"],

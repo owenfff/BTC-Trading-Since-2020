@@ -6,9 +6,17 @@ from typing import Any, Mapping
 from .base import StrategyInput
 
 
-FEATURE_CONTRACT_VERSION = "m4-v1"
+FEATURE_CONTRACT_VERSION = "m13-v2-cross-asset"
 
 FEATURE_COLUMNS = (
+    "feature_symbol",
+    "feature_instrument_class",
+    "feature_payout_model",
+    "feature_quote_currency",
+    "feature_settlement_currency",
+    "feature_market_bar_interval",
+    "feature_contract_lot_size",
+    "feature_multiplier_major",
     "feature_latest_bar_time",
     "feature_market_data_available",
     "feature_mark_index_missing",

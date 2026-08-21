@@ -47,7 +47,13 @@ def position_delta_bucket(delta: float, scale: float = POSITION_SCALE_CONTRACTS)
     return "LARGE"
 
 
-def build_next_decision_labels(decisions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def build_next_decision_labels(
+    decisions: list[dict[str, Any]],
+    *,
+    position_scale_contracts: float = POSITION_SCALE_CONTRACTS,
+) -> list[dict[str, Any]]:
+    if position_scale_contracts <= 0:
+        raise ValueError("position_scale_contracts must be positive")
     ordered = sorted(decisions, key=lambda row: (parse_utc(row.get("decision_time")) or datetime.max.replace(tzinfo=UTC), str(row.get("decision_episode_id", ""))))
     output: list[dict[str, Any]] = []
     for index, current in enumerate(ordered):
@@ -78,9 +84,9 @@ def build_next_decision_labels(decisions: list[dict[str, Any]]) -> list[dict[str
                 row.update({
                     "label_next_decision_time": iso_utc(next_time),
                     "label_next_target_position_contracts": next_target,
-                    "label_next_target_exposure": next_target / POSITION_SCALE_CONTRACTS,
+                    "label_next_target_exposure": next_target / position_scale_contracts,
                     "label_next_action": str(next_row.get("action", "")),
-                    "label_next_position_delta_bucket": position_delta_bucket(next_delta),
+                    "label_next_position_delta_bucket": position_delta_bucket(next_delta, position_scale_contracts),
                     "label_time_to_next_action_seconds": (next_time - current_time).total_seconds(),
                     "label_status": "AVAILABLE",
                 })

@@ -73,18 +73,18 @@ def load_market_context(path: Path, *, symbol: str = "XBTUSD") -> list[dict[str,
     return rows
 
 
-def _complete_window(rows: list[dict[str, Any]], start: int, end: int) -> bool:
+def _complete_window(rows: list[dict[str, Any]], start: int, end: int, *, bar_seconds: int = BAR_SECONDS) -> bool:
     if start < 0 or end >= len(rows) or start > end:
         return False
     for index in range(start + 1, end + 1):
-        if (rows[index]["timestamp"] - rows[index - 1]["timestamp"]).total_seconds() != BAR_SECONDS:
+        if (rows[index]["timestamp"] - rows[index - 1]["timestamp"]).total_seconds() != bar_seconds:
             return False
     return all(rows[index].get("close") is not None for index in range(start, end + 1))
 
 
-def _log_returns(rows: list[dict[str, Any]], index: int, count: int) -> list[float] | None:
+def _log_returns(rows: list[dict[str, Any]], index: int, count: int, *, bar_seconds: int = BAR_SECONDS) -> list[float] | None:
     start = index - count + 1
-    if start < 1 or not _complete_window(rows, start - 1, index):
+    if start < 1 or not _complete_window(rows, start - 1, index, bar_seconds=bar_seconds):
         return None
     values: list[float] = []
     for cursor in range(start, index + 1):
@@ -105,7 +105,13 @@ def _asof_index(rows: list[dict[str, Any]], decision_time: datetime, timestamps:
     return bisect_left(timestamps if timestamps is not None else [row["timestamp"] for row in rows], decision_time) - 1
 
 
-def build_market_features(rows: list[dict[str, Any]], decision_time: datetime, *, timestamps: list[datetime] | None = None) -> dict[str, Any]:
+def build_market_features(
+    rows: list[dict[str, Any]],
+    decision_time: datetime,
+    *,
+    timestamps: list[datetime] | None = None,
+    bar_seconds: int = BAR_SECONDS,
+) -> dict[str, Any]:
     """Build features using only bars with ``bar_end < decision_time``."""
     index = _asof_index(rows, decision_time, timestamps)
     output: dict[str, Any] = {
@@ -144,17 +150,17 @@ def build_market_features(rows: list[dict[str, Any]], decision_time: datetime, *
     output["feature_market_data_available"] = True
 
     for lag in RETURN_LAGS:
-        if index - lag >= 0 and _complete_window(rows, index - lag, index):
+        if index - lag >= 0 and _complete_window(rows, index - lag, index, bar_seconds=bar_seconds):
             previous = rows[index - lag].get("close")
             if previous and previous > 0:
                 output[f"feature_return_{lag}bar"] = close / previous - 1.0
 
-    log_returns = _log_returns(rows, index, 72)
+    log_returns = _log_returns(rows, index, 72, bar_seconds=bar_seconds)
     if log_returns:
         output["feature_realized_volatility_72bar"] = pstdev(log_returns)
 
     atr_start = index - 13
-    if _complete_window(rows, atr_start - 1, index) and atr_start >= 1:
+    if _complete_window(rows, atr_start - 1, index, bar_seconds=bar_seconds) and atr_start >= 1:
         ranges: list[float] = []
         for cursor in range(atr_start, index + 1):
             high = rows[cursor].get("high")
@@ -166,18 +172,18 @@ def build_market_features(rows: list[dict[str, Any]], decision_time: datetime, *
             ranges.append(max(high - low, abs(high - previous_close), abs(low - previous_close)))
         output["feature_atr_14bar"] = _safe_mean(ranges)
 
-    previous_volume = rows[index - 1].get("volume") if index > 0 and _complete_window(rows, index - 1, index) else None
+    previous_volume = rows[index - 1].get("volume") if index > 0 and _complete_window(rows, index - 1, index, bar_seconds=bar_seconds) else None
     if previous_volume and previous_volume > 0 and current.get("volume") is not None:
         output["feature_volume_change_1bar"] = current["volume"] / previous_volume - 1.0
 
     volume_start = index - 71
-    if volume_start >= 0 and _complete_window(rows, volume_start, index):
+    if volume_start >= 0 and _complete_window(rows, volume_start, index, bar_seconds=bar_seconds):
         volumes = [row.get("volume") for row in rows[volume_start:index + 1]]
         if all(value is not None for value in volumes):
             output["feature_volume_percentile_72bar"] = sum(value <= current["volume"] for value in volumes) / len(volumes)
 
     ma_start = index - 23
-    if ma_start >= 0 and _complete_window(rows, ma_start, index):
+    if ma_start >= 0 and _complete_window(rows, ma_start, index, bar_seconds=bar_seconds):
         closes = [rows[cursor].get("close") for cursor in range(ma_start, index + 1)]
         if all(value is not None and value > 0 for value in closes):
             mean_close = sum(closes) / len(closes)
@@ -188,7 +194,7 @@ def build_market_features(rows: list[dict[str, Any]], decision_time: datetime, *
             output["feature_trend_slope_24bar"] = sum((cursor - x_mean) * (value - sum(log_closes) / len(log_closes)) for cursor, value in enumerate(log_closes)) / denominator if denominator else None
 
     rolling_start = index - 71
-    if rolling_start >= 0 and _complete_window(rows, rolling_start, index):
+    if rolling_start >= 0 and _complete_window(rows, rolling_start, index, bar_seconds=bar_seconds):
         highs = [rows[cursor].get("high") for cursor in range(rolling_start, index + 1)]
         lows = [rows[cursor].get("low") for cursor in range(rolling_start, index + 1)]
         if all(value is not None for value in highs) and max(highs) > 0:

@@ -14,6 +14,12 @@ NUMERIC_FEATURES = tuple(
     for key in FEATURE_COLUMNS
     if key.startswith("feature_")
     and key not in {
+        "feature_symbol",
+        "feature_instrument_class",
+        "feature_payout_model",
+        "feature_quote_currency",
+        "feature_settlement_currency",
+        "feature_market_bar_interval",
         "feature_latest_bar_time",
         "feature_funding_source_time",
         "feature_market_regime",
@@ -25,6 +31,12 @@ NUMERIC_FEATURES = tuple(
     }
 )
 CATEGORICAL_FEATURES = (
+    "feature_symbol",
+    "feature_instrument_class",
+    "feature_payout_model",
+    "feature_quote_currency",
+    "feature_settlement_currency",
+    "feature_market_bar_interval",
     "feature_market_regime",
     "feature_latest_action",
     "feature_order_execution_style",
@@ -139,6 +151,12 @@ class NumpyLogisticStrategy:
         if str(strategy_input.features.get("feature_mark_index_missing")) in {"True", "true", "1"}:
             tags.append("MARK_INDEX_MISSING")
         return make_signal(strategy_input.decision_time, target_exposure=target, action=self.actions[class_index], confidence=float(probabilities[class_index]), risk_tags=tuple(tags), strategy_version=self.version)
+
+
+class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
+    """Shared deterministic imitation model for the m13 cross-asset contract."""
+
+    version = "behavioral-distillation-v2-cross-asset-logistic"
 
 
 @dataclass
