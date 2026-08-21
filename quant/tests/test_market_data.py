@@ -6,7 +6,7 @@ from market.archive import aggregate_trade_rows, archive_trade_url
 from market.context import attach_market_context
 from market.download import build_trade_bucketed_url, parse_utc
 from market.gaps import audit_time_grid, build_gap_rows
-from market.normalize import normalize_trade_bars
+from market.normalize import normalize_trade_bars, resample_trade_bars
 
 
 def _bar(timestamp: str, close: float = 100.0) -> dict[str, object]:
@@ -60,6 +60,17 @@ def test_context_join_accepts_equal_timestamp() -> None:
     funding = [{"timestamp": "2020-01-01T00:05:00Z", "funding_rate": 0.001}]
     joined, _ = attach_market_context(bars, instrument_rows=instrument, funding_rows=funding)
     assert joined[0]["context_status"] == "COMPLETE"
+
+
+def test_resample_derives_one_hour_bars_without_filling_missing_children() -> None:
+    source = [_bar(f"2020-01-01T00:{minute:02d}:00Z", close=100 + minute) for minute in (5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 0)]
+    source[-1]["timestamp"] = "2020-01-01T01:00:00Z"
+    rows, audit = resample_trade_bars(source, source_interval_minutes=5, target_interval_minutes=60)
+    assert len(rows) == 1
+    assert rows[0]["bar_interval"] == "1h"
+    assert rows[0]["child_bar_count"] == 12
+    assert rows[0]["expected_child_bar_count"] == 12
+    assert audit["incomplete_target_bar_count"] == 0
 
 
 def test_parse_utc_normalizes_naive_values_to_utc() -> None:

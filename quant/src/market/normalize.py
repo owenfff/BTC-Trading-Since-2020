@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections import defaultdict
 from datetime import timedelta
 from typing import Any, Iterable
 
@@ -78,6 +79,66 @@ def normalize_trade_bars(
     }
 
 
+def resample_trade_bars(
+    source_rows: Iterable[dict[str, Any]],
+    *,
+    source_interval_minutes: int = 5,
+    target_interval_minutes: int = 60,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Derive larger UTC bars without filling missing source bars."""
+    if source_interval_minutes <= 0 or target_interval_minutes <= source_interval_minutes:
+        raise ValueError("target interval must be larger than the source interval")
+    if target_interval_minutes % source_interval_minutes:
+        raise ValueError("target interval must be a multiple of the source interval")
+    source = sorted(
+        (row for row in source_rows if parse_utc(row.get("timestamp")) is not None),
+        key=lambda row: parse_utc(row.get("timestamp")),
+    )
+    buckets: dict[Any, list[dict[str, Any]]] = defaultdict(list)
+    target_delta = timedelta(minutes=target_interval_minutes)
+    for row in source:
+        timestamp = parse_utc(row["timestamp"])
+        assert timestamp is not None
+        bucket_end = timestamp.replace(minute=0, second=0, microsecond=0)
+        if timestamp.minute or timestamp.second or timestamp.microsecond:
+            bucket_end += timedelta(hours=1)
+        buckets[bucket_end].append(row)
+
+    expected_child_count = target_interval_minutes // source_interval_minutes
+    output: list[dict[str, Any]] = []
+    for bucket_end in sorted(buckets):
+        children = buckets[bucket_end]
+        values = [float(row[field]) for row in children for field in ("open", "high", "low", "close") if row.get(field) is not None]
+        volume = sum(float(row.get("volume") or 0) for row in children)
+        turnover = sum(float(row.get("turnover") or 0) for row in children)
+        output.append({
+            "symbol": children[0].get("symbol", "XBTUSD"),
+            "bar_interval": f"{target_interval_minutes}m" if target_interval_minutes < 60 else f"{target_interval_minutes // 60}h",
+            "bar_start_time_utc": iso_utc(bucket_end - target_delta),
+            "bar_end_time_utc": iso_utc(bucket_end),
+            "timestamp": iso_utc(bucket_end),
+            "open": children[0].get("open"),
+            "high": max(float(row["high"]) for row in children if row.get("high") is not None),
+            "low": min(float(row["low"]) for row in children if row.get("low") is not None),
+            "close": children[-1].get("close"),
+            "volume": volume,
+            "turnover": turnover,
+            "vwap": (turnover / volume) if volume else None,
+            "child_bar_count": len(children),
+            "expected_child_bar_count": expected_child_count,
+            "child_coverage_ratio": len(children) / expected_child_count,
+            "source": "derived_from_bitmex_trade_bucketed_5m",
+        })
+    return output, {
+        "source_row_count": len(source),
+        "normalized_row_count": len(output),
+        "target_interval": output[0]["bar_interval"] if output else f"{target_interval_minutes // 60}h",
+        "expected_child_count": expected_child_count,
+        "incomplete_target_bar_count": sum(row["child_bar_count"] < expected_child_count for row in output),
+        "note": "Derived by UTC bucket aggregation; no missing 5m child bar is filled.",
+    }
+
+
 def normalize_funding(source_rows: Iterable[dict[str, Any]], *, symbol: str = "XBTUSD") -> tuple[list[dict[str, Any]], dict[str, Any]]:
     output: list[dict[str, Any]] = []
     rejected = Counter()
@@ -131,4 +192,4 @@ def normalize_instrument(source_rows: Iterable[dict[str, Any]], *, symbol: str =
     return output, {"source_row_count": len(output) + sum(rejected.values()), "normalized_row_count": len(output), "rejected_counts": dict(rejected)}
 
 
-__all__ = ["normalize_funding", "normalize_instrument", "normalize_trade_bars"]
+__all__ = ["normalize_funding", "normalize_instrument", "normalize_trade_bars", "resample_trade_bars"]

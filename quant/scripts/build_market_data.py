@@ -39,7 +39,7 @@ from market.download import (  # noqa: E402
     utc_now,
 )
 from market.gaps import audit_time_grid, build_gap_rows  # noqa: E402
-from market.normalize import normalize_funding, normalize_instrument, normalize_trade_bars  # noqa: E402
+from market.normalize import normalize_funding, normalize_instrument, normalize_trade_bars, resample_trade_bars  # noqa: E402
 from bitmex_replay.reconciliation import write_parquet  # noqa: E402
 
 
@@ -254,6 +254,8 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     lineage: dict[str, Any] = {}
     selected_interval: str | None = None
     bars: list[dict[str, Any]] = []
+    bars_1h: list[dict[str, Any]] = []
+    bars_1h_audit: dict[str, Any] = {"normalized_row_count": 0, "status": "NOT_AVAILABLE"}
     requested_interval = "5m"
     for interval in ("5m",):
         rows, item = _fetch_windowed(
@@ -270,9 +272,10 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         lineage[f"trade_bucketed_{interval}"] = item
         if rows:
             bars, bar_normalization = normalize_trade_bars(rows, symbol=symbol, interval=interval)
-            if bars:
-                selected_interval = interval
-                break
+        if bars:
+            selected_interval = interval
+            bars_1h, bars_1h_audit = resample_trade_bars(bars, source_interval_minutes=5, target_interval_minutes=60)
+            break
     archive_lineage: dict[str, Any] = {
         "status": "AVAILABLE_EXPLICIT_FALLBACK_NOT_AUTO_SELECTED",
         "row_count": 0,
@@ -356,6 +359,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         "funding_normalization": funding_normalization,
         "instrument_normalization": instrument_normalization,
         "bar_audit": bar_audit,
+        "bar_1h_audit": bars_1h_audit,
         "context_audit": context_audit,
         "gap_row_count": len(gap_rows),
         "raw_account_inputs_unchanged": not changed,
@@ -371,6 +375,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
         summary["large_outputs"] = {
             "market_bars": _output_large(bars, outputs / "market_bars.parquet"),
             "market_context": _output_large(context_rows, outputs / "market_context.parquet"),
+            "market_bars_1h": _output_large(bars_1h, outputs / "market_bars_1h.parquet"),
         }
     _write_csv(reports / "market_data_gaps.csv", gap_rows, ["series", "gap_start_utc", "gap_end_utc", "missing_bar_count", "gap_seconds", "grid_status"])
     (reports / "market_data_lineage.json").write_text(json.dumps(jsonable(summary), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
