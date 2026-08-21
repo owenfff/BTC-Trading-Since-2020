@@ -1,0 +1,14 @@
+{
+  "live_enabled": false,
+  "maximum_live_risk": "0",
+  "maximum_live_notional": "0",
+  "max_order_notional": "0",
+  "max_symbol_exposure": "0",
+  "max_total_exposure": "0",
+  "max_leverage": "0",
+  "max_daily_loss": "0",
+  "max_drawdown": "0",
+  "max_consecutive_losses": 0,
+  "stale_after_seconds": 0,
+  "max_clock_drift_seconds": 0
+}
