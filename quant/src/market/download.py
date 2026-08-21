@@ -12,6 +12,7 @@ import hashlib
 import json
 import time
 from datetime import datetime, timedelta, timezone
+from http.client import HTTPException
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.error import HTTPError, URLError
@@ -126,7 +127,7 @@ def fetch_json(url: str, *, timeout: int = 30, opener=urlopen) -> Any:
     try:
         with opener(request, timeout=timeout) as response:
             payload = response.read()
-    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+    except (HTTPError, URLError, TimeoutError, OSError, HTTPException) as exc:
         raise MarketDownloadError(f"public source request failed: {exc}") from exc
     try:
         return json.loads(payload.decode("utf-8"))
@@ -140,7 +141,7 @@ def fetch_bytes(url: str, *, timeout: int = 60, opener=urlopen) -> bytes:
     try:
         with opener(request, timeout=timeout) as response:
             return response.read()
-    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+    except (HTTPError, URLError, TimeoutError, OSError, HTTPException) as exc:
         raise MarketDownloadError(f"public archive request failed: {exc}") from exc
 
 
