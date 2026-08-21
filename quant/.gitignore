@@ -20,6 +20,7 @@ outputs/decision_episodes.csv
 outputs/trade_cycles.csv
 outputs/btc_market_context.csv
 outputs/market_raw/
+outputs/runtime_state.json
 data/market/raw/
 data/market/cache/
 outputs/instrument_terms_temporal_audit.csv
