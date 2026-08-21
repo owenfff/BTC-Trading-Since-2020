@@ -15,13 +15,14 @@
 
 ## Clean-room verification
 
-- clean-room commit: `659e32c5e536b5ae75eeffd17990c63336b8afb4`
-- release-audit commit: `223d121605a16135a2613cace95102e22a7d3e1b`
+- clean-room commit: `9c8cf2413dd8e93239941dbe42e012155f0a6524`
+- release-audit commit: `9c8cf2413dd8e93239941dbe42e012155f0a6524`
 - fresh runtime: Python 3.11.9
 - pinned dependencies: NumPy 2.3.5; Polars 1.43.2; PyArrow 24.0.0; Pytest 8.4.2
 - clean-room tests: 273 passed, 2 skipped because two checks require intentionally ignored derived outputs
 - shadow and paper fixture smoke: each repeated twice with identical one-row output
 - full research without rehydration: controlled `BLOCKED_INPUTS_MISSING`, exit code 2
-- Docker Compose config: PASS; Docker image build: environment-blocked while resolving public `python:3.11-slim`
+- Docker Compose config: PASS; Docker image build/run: PASS with `btc-trading-clean-room:9c8cf24` and `PAPER_SMOKE_PASS` under read-only filesystem
 - secret scan: PASS; personal-data scan: PASS; dependency pin audit: PASS; license audit: warning for tracked teacher/source redistribution review
 - `quant_research_runnable`: `false`; `paper_code_ready`: `true`
+- Docker uses the pinned runtime-only dependency set in `quant/runtime-requirements.txt`; full research/test dependencies remain in `quant/requirements.txt`.

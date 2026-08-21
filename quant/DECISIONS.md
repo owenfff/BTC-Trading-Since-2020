@@ -109,4 +109,4 @@
 - Lock the release dependencies to the versions installed in the fresh Python 3.11.9 environment: NumPy 2.3.5, Polars 1.43.2, PyArrow 24.0.0, and Pytest 8.4.2.
 - The full research command fails closed with structured `BLOCKED_INPUTS_MISSING` when ignored market/behavior outputs are absent. It must never substitute synthetic market history for a release smoke test.
 - Repeated fixture shadow and paper runs are reproducible. This proves framework smoke behavior only; it does not prove long-running stability or profitability.
-- Docker Compose configuration is valid, but Docker image cold start remains an environment warning until the public base image can be resolved.
+- Keep full research/test dependencies in `quant/requirements.txt` and use the smaller pinned `quant/runtime-requirements.txt` for the paper/shadow Docker image. The image was built and run successfully as `btc-trading-clean-room:9c8cf24` with read-only storage and temporary `/tmp`; this validates packaging and fixture smoke only, not exchange connectivity or profitability.

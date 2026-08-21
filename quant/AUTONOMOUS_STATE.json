@@ -4,7 +4,7 @@
   "current_phase": "PHASE_12_OPEN_SOURCE_CLEAN_ROOM",
   "current_work_package": "M12-clean-room-release-audit",
   "last_completed_phase": "PHASE_12_OPEN_SOURCE_CLEAN_ROOM",
-  "last_code_commit": "223d121605a16135a2613cace95102e22a7d3e1b",
+  "last_code_commit": "9c8cf2413dd8e93239941dbe42e012155f0a6524",
   "last_report_commit": "2bd3432af511194dd4bf65792b34fa54bfab1b76",
   "test_count": 275,
   "last_test_status": "LOCAL_275_PASSED;_CLEAN_ROOM_273_PASSED_2_SKIPPED;_PYTHON311_DEPENDENCIES_INSTALLED",
@@ -27,7 +27,7 @@
     "Historical mark/index context is unavailable from the current public instrument snapshot endpoint; all 653630 context rows retain MARK_INDEX_MISSING and no current snapshot was backfilled.",
     "Full research outputs under quant/outputs are intentionally ignored and must be rehydrated before a clean clone can run the full research command.",
     "Real private exchange endpoints remain blocked at the credential boundary; no credentials are requested.",
-    "Docker Compose is valid, but Docker Hub access to python:3.11-slim was unavailable; Docker cold start is not claimed."
+    "The offline Docker paper image passed build and read-only tmpfs cold-start smoke; no exchange connectivity is claimed."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -38,7 +38,8 @@
     "Tracked historical teacher/source exports require redistribution and licensing review before an open-source release.",
     "Clean-room fixture smoke passed twice for shadow and paper; full quant research is intentionally not runnable without rehydrated verified inputs.",
     "Fresh Python 3.11 dependencies installed and clean-room pytest passed with two output-dependent skips.",
-    "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning."
+    "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
+    "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Offline scope is complete and credential-free. If Demo/Testnet private API validation is requested later, first ask the user to configure credentials locally and name the target exchange; never request secrets in chat.",
   "updated_at_utc": "2026-08-21T06:45:00Z"

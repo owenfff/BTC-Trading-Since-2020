@@ -29,7 +29,7 @@ No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, p
 - Clean-room release status is `PASS_WITH_RESEARCH_INPUT_REHYDRATION_REQUIRED`. A fresh clone can compile and run the fixture smoke paths, while the full research command correctly stops until verified ignored market/behavior outputs are rehydrated.
 - Release audit found no credential-like secrets. Tracked historical teacher/source exports remain subject to redistribution and licensing review.
 - A fresh Python 3.11.9 environment installed all declared pinned dependencies; the clean-room suite passed 273 tests and skipped 2 tests that require intentionally ignored derived outputs.
-- Docker Compose configuration passed. Docker image build could not reach Docker Hub's public `python:3.11-slim` registry, so Docker cold start remains unverified as an environment warning.
+- Docker Compose configuration and cold-start validation passed. The image uses pinned `quant/runtime-requirements.txt` and returned `PAPER_SMOKE_PASS` under a read-only filesystem with a temporary `/tmp`; no network or exchange call was made.
 
 ## Current work package
 

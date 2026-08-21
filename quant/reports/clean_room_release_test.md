@@ -4,7 +4,7 @@
 
 **PASS_WITH_RESEARCH_INPUT_REHYDRATION_REQUIRED**
 
-The remote branch was cloned into a fresh temporary directory at commit `659e32c5e536b5ae75eeffd17990c63336b8afb4` with no local ignored outputs or caches copied into it.
+The remote branch was cloned into a fresh temporary directory at commit `9c8cf2413dd8e93239941dbe42e012155f0a6524` with no local ignored outputs or caches copied into it.
 
 | Check | Result |
 | --- | --- |
@@ -14,7 +14,7 @@ The remote branch was cloned into a fresh temporary directory at commit `659e32c
 | Shadow mode, one fixture row, repeated twice | `SHADOW_SMOKE_PASS`; deterministic |
 | Paper mode, one fixture row, repeated twice | `PAPER_SMOKE_PASS`; deterministic |
 | Docker Compose configuration | PASS |
-| Docker image build/run | ENVIRONMENT_BLOCKED; Docker Hub `python:3.11-slim` registry access failed |
+| Docker image build/run | PASS; `btc-trading-clean-room:9c8cf24` built and returned `PAPER_SMOKE_PASS` under read-only filesystem and temporary `/tmp` |
 | Release secret scan | PASS; 0 findings |
 | Personal-data scan | PASS; 0 findings |
 | Dependency audit | PASS; all declared requirements pinned |
@@ -22,7 +22,7 @@ The remote branch was cloned into a fresh temporary directory at commit `659e32c
 | Large-file scan | WARNING; 2 tracked historical/source files require review |
 | Research command | `BLOCKED_INPUTS_MISSING`, exit 2, controlled preflight |
 | Live default | Disabled |
-| Demo/private exchange access | `DEMO_CREDENTIALS_REQUIRED` |
+| Demo/private exchange access | `DEMO_CREDENTIALS_REQUIRED`; no credentials requested |
 
 ## Research input boundary
 
@@ -34,4 +34,4 @@ To rerun full research, rehydrate the exact verified outputs described by the ma
 
 The clean-room smoke path uses only the checked-in fixture. No API key, private account, exchange connection, order submission, or live capital was used. The checked-in defaults keep live mode disabled and both live risk and notional limits at zero.
 
-The Docker build was attempted once from the latest clean clone. Docker Desktop could parse the Compose file, but the environment could not reach Docker Hub's public registry to resolve `python:3.11-slim`; no Docker run result is claimed.
+The Docker image uses the smaller, pinned runtime dependency file `quant/runtime-requirements.txt`; full research and test dependencies remain in `quant/requirements.txt`. The image was built from the current branch after the base image was made available locally, then run with `--read-only --tmpfs /tmp`. It returned one deterministic fixture paper signal with `PAPER_SMOKE_PASS`; no network, credentials, exchange connection, or live capital was used.
