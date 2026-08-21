@@ -1,0 +1,9 @@
+services:
+  quant-bot:
+    build: .
+    command: ["python", "-m", "quant_bot", "run", "--mode", "paper"]
+    environment:
+      LIVE_ENABLED: "false"
+      MAXIMUM_LIVE_RISK: "0"
+      MAXIMUM_LIVE_NOTIONAL: "0"
+    read_only: true

@@ -1,0 +1,13 @@
+mode: paper
+live_enabled: false
+maximum_live_risk: "0"
+maximum_live_notional: "0"
+market_data:
+  source: local_or_public_provider
+  symbol: XBTUSD
+strategy:
+  version: behavioral-distillation-v1-rules
+  max_exposure: "0.25"
+exchange:
+  adapter: none
+  credentials_env: DISABLED

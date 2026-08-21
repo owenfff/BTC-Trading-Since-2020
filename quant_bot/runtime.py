@@ -42,6 +42,11 @@ class SignalDeduplicator:
 def run_local(mode: str, dataset_path: Path, state_path: Path, limit: int = 100) -> dict[str, Any]:
     if mode not in {"shadow", "paper"}:
         raise ValueError("mode must be shadow or paper")
+    if not dataset_path.exists():
+        fallback = Path("quant/fixtures/model_dataset_smoke.csv")
+        if not fallback.exists():
+            raise FileNotFoundError(f"missing dataset and clean-room fixture: {dataset_path}")
+        dataset_path = fallback
     with dataset_path.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))[:limit]
     strategy = DistilledRuleStrategy()
