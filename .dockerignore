@@ -1,6 +1,8 @@
 .git
 .gitignore
 .pytest_cache
+.venv
+.clean-venv
 **/__pycache__
 **/*.pyc
 quant/outputs
