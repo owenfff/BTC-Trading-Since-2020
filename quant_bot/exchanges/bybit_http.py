@@ -99,6 +99,13 @@ class BybitDemoTransport:
                 raw = response.read().decode("utf-8")
         except urllib.error.HTTPError as error:
             raw = error.read().decode("utf-8", errors="replace")
+            if error.code == 403 and "configured to block access from your country" in raw.lower():
+                raise AdapterError(
+                    "bybit-demo",
+                    "BYBIT_REGION_BLOCKED",
+                    "Bybit Demo blocked this server's country or region",
+                    retryable=False,
+                ) from error
             raise AdapterError("bybit-demo", str(error.code), "Bybit Demo REST request failed", retryable=error.code in {408, 429, 500, 502, 503, 504}) from error
         except (OSError, TimeoutError) as error:
             raise AdapterError("bybit-demo", "NETWORK", "Bybit Demo REST request failed", retryable=True) from error

@@ -75,7 +75,11 @@ class BybitAdapter:
         for category in ("linear", "inverse", "spot"):
             try:
                 result.extend(self.load_instruments(category=category))
-            except (AdapterError, KeyError):
+            except AdapterError as error:
+                if error.code == "BYBIT_REGION_BLOCKED":
+                    raise
+                continue
+            except KeyError:
                 continue
         return result
 

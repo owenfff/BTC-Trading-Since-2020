@@ -9,7 +9,7 @@ from quant_bot.domain.instrument import Instrument, InstrumentType
 from quant_bot.domain.order import Order, OrderSide, OrderType
 from quant_bot.execution.target_planner import plan_target_order
 from quant_bot.exchanges.bybit import BybitAdapter
-from quant_bot.exchanges.bybit_http import BybitCredentials, assert_demo_url, bybit_signature, bybit_websocket_signature
+from quant_bot.exchanges.bybit_http import BybitCredentials, BybitDemoTransport, assert_demo_url, bybit_signature, bybit_websocket_signature
 from quant_bot.exchanges.bybit_ws import BybitDemoWebSocket
 from quant_bot.exchanges.http import AdapterError, FakeTransport
 
@@ -34,6 +34,30 @@ def test_missing_demo_credentials_and_repr_are_safe(monkeypatch: pytest.MonkeyPa
     assert error.value.code == "DEMO_CREDENTIALS_REQUIRED"
     assert "secret-value" not in repr(BybitCredentials("key-value", "secret-value"))
     assert "secret-value" not in str(error.value)
+
+
+def test_bybit_region_block_is_explicit(monkeypatch: pytest.MonkeyPatch) -> None:
+    class BlockedResponse:
+        def read(self) -> bytes:
+            return b'{"error":"The Amazon CloudFront distribution is configured to block access from your country."}'
+
+    class BlockedHttpError(Exception):
+        code = 403
+
+        def read(self) -> bytes:
+            return BlockedResponse().read()
+
+    import urllib.error
+
+    def blocked_urlopen(*args: object, **kwargs: object) -> object:
+        raise urllib.error.HTTPError("https://api-demo.bybit.com", 403, "Forbidden", {}, BlockedResponse())
+
+    monkeypatch.setattr("urllib.request.urlopen", blocked_urlopen)
+    transport = BybitDemoTransport(BybitCredentials("key", "secret"))
+    with pytest.raises(AdapterError) as error:
+        transport.request("GET", "/v5/market/instruments-info?category=linear")
+    assert error.value.code == "BYBIT_REGION_BLOCKED"
+    assert "secret" not in str(error.value)
 
 
 def test_private_ws_auth_and_duplicate_event_protection() -> None:
