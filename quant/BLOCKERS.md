@@ -17,6 +17,7 @@
 | Public HTTPS permission | CLEARED_FOR_M3 | Public BitMEX and GitHub HTTPS access succeeded in the resumed runtime | Keep no-key/public-only boundary |
 | Leakage-safe features and labels | PASS_WITH_WARNINGS | 20,845 chronological BTC decision rows; all five future-information checks are zero; historical mark/index remains explicitly missing | Eligible for interpretable M5 distillation; no model training or live connectivity |
 | Strategy distillation M5 | COMPLETE_WITH_WARNINGS | Frequency baseline, deterministic rules, NumPy Logistic Regression, and NumPy Decision Tree evaluated on TRAIN/VALIDATION/TEST; fidelity remains `BEHAVIORAL_APPROXIMATION` | Phase 7 may use the same Strategy Core; optional boosted-tree comparison is deferred because the runtime lacks pinned LightGBM/XGBoost |
+| Phase 7 research | RESEARCH_ONLY | Three chronological walk-forward windows, 54 result rows, 22 robustness rows, parity PASS; no stable profitability claim | Proceed to Phase 8 while preserving unitless-return and historical mark/index warnings |
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
 
@@ -48,3 +49,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - Action confusion, position tracking, and regime fidelity are retained in separate small CSV reports.
 - The results are descriptive behavioral fidelity only. They do not establish profitability, exact intent recovery, or permission to trade.
 - Logistic and tree implementations use deterministic NumPy because sklearn, LightGBM, and XGBoost are unavailable in this runtime; no unpinned dependency was installed.
+
+## M6 research boundary
+
+- `quant/reports/quant_research_summary.json` is `RESEARCH_ONLY`, not an engineering block. It records 54 chronological validation/test rows and 22 robustness rows.
+- All required families are present: fees +50% and ×2, 1/2/5 tick slippage, one-bar delay, ±10%/±20% exposure perturbations, top-cycle removal, bull/bear/sideways subsets, long-only, short-only, and multiple exposure limits.
+- Results are a normalized exposure-return proxy, not BitMEX wallet/account PnL. Buy & Hold, teacher trajectory, and random controls are retained for context; teacher trajectory is descriptive only.

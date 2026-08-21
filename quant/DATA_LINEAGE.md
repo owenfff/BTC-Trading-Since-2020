@@ -82,3 +82,13 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 
 - Phase 7 must call the same `quant_bot.strategy` Strategy Core for offline replay and streaming-style signal generation.
 - Backtest execution must model historical fees, funding, configurable slippage and signal delay, next-bar execution, target exposure, position limits, partial fills, minimum lot, tick size, and separate settlement currencies without using same-bar close prices as ideal fills.
+
+## M6 walk-forward research artifact
+
+- Code/analysis commit: `b43e428c752383436485813fd5a0c8ae3a02b920`.
+- Report commit: `51d21d646c9f65a15f5cc6b34fe6fe63564a7c63`.
+- Reports: `quant/reports/quant_research_summary.md`, `quant/reports/quant_research_summary.json`, `quant/reports/walk_forward_results.csv`, `quant/reports/robustness_results.csv`, `quant/reports/failure_analysis.md`, and `quant/reports/reproducibility.md`.
+- Parity: 256 fixed-input signals per model across four Strategy Core implementations matched exactly between batch and streaming-style calls.
+- Walk-forward: 2020–2022 train / 2023 validation / 2024 test; 2020–2023 train / 2024 validation / 2025 test; 2020–2024 train / 2025 validation / 2026 test.
+- Research status: `RESEARCH_ONLY`. No stable out-of-sample profitability claim is made; all controls and unfavorable results are retained.
+- Cost boundary: blended historical XBTUSD fee ratio from 98,874 BTC-first action rows; Funding charged only at unique `funding_source_timestamp_utc` events; slippage/tick and normalized exposure assumptions remain explicit.

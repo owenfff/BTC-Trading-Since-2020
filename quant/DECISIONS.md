@@ -25,6 +25,14 @@
 - External sklearn, LightGBM, and XGBoost were unavailable in the runtime and were not installed. This is an environment warning, not a reason to change the raw-data or no-live-trading boundary.
 - Proceed to Phase 7 only through a single Strategy Core parity harness and a chronological backtest that models fees, funding, slippage, delay, next-bar execution, limits, lots, ticks, and settlement currencies.
 
+## 2026-08-21 — Complete M6 research boundary
+
+- Use `RESEARCH_ONLY` for the current research result. It is a valid reproducibility outcome, not an engineering blocker and not a profitability claim.
+- Funding from the as-of context table must be charged only at unique `funding_source_timestamp_utc` event times; repeated as-of rows are not separate payments.
+- Use the same Strategy Core for batch and streaming-style signal generation. The parity sample passed for all four models.
+- Keep Buy & Hold, simple moving-average trend, volatility-filtered trend, distilled rules, imitation baseline, same-turnover random, and teacher trajectory in the comparison set. Teacher trajectory remains descriptive only.
+- The normalized exposure-return proxy is not the BitMEX wallet/account ledger. Phase 8 must not convert it into live capital claims or order instructions.
+
 ## 2026-08-20 — Enter wallet reconciliation
 
 - Phase 1 is frozen in `accounting_foundation_manifest.json` with downstream status `READY_WITH_KNOWN_ACCOUNTING_RESIDUALS`.
