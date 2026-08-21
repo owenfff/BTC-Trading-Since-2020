@@ -1,4 +1,7 @@
 outputs/*.parquet
+outputs/market_bars.csv
+outputs/market_bars_1h.csv
+outputs/market_context.csv
 outputs/execution_spec_mapping.parquet
 outputs/execution_valuation.parquet
 outputs/execution_components.parquet
