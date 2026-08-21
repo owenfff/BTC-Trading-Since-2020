@@ -6,7 +6,7 @@ Build an auditable, BTC-first behavioral approximation from public trade records
 
 ## Current stage
 
-Phases 1 through 3 are complete. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation and behavior data are frozen with explicit warnings. The M3 public BTC context package now supports the no-key BitMEX REST source and official daily public archive fallback, but the current managed runtime cannot reach either source, so market data is blocked at the environment boundary and leakage-safe features must wait for a verified public cache.
+Phases 1 through 4 are complete. `currentCost` and AEP residuals remain visible but are not a global blocker; wallet reconciliation and behavior data are frozen with explicit warnings. M3 now has verified BitMEX public 5m bars, derived 1h bars, funding, UTC lineage, and zero 5m grid gaps. Historical mark/index context is unavailable from the current public instrument snapshot endpoint and remains explicitly missing; M4 must preserve this warning and use leakage-safe as-of joins.
 
 ## Stop conditions
 

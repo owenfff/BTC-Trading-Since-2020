@@ -53,3 +53,10 @@
 
 - BitMEX REST, the official public archive, and GitHub HTTPS all failed with the same managed-runtime socket restriction across repeated attempts.
 - A turn-scoped request for public HTTPS permission was not granted. Stop at M3 with all code, tests, reports, and recovery instructions committed locally; do not start M4 features without real market bars.
+
+## 2026-08-20 — Complete M3 public market data
+
+- Public BitMEX REST access succeeded after the environment resumed. The downloader uses 7-day UTC windows, retries truncated responses, and recursively splits unstable windows; each complete response is cached with SHA256 under ignored paths.
+- The frozen XBTUSD range contains 653,630 valid 5m bars with zero duplicates, zero timestamp parse failures, zero out-of-order transitions, and zero grid gaps. A local 1h series contains 54,470 derived bars and records one incomplete edge bucket without filling it.
+- Funding coverage contains 6,809 rows. The current public `/instrument` endpoint is not accepted as historical mark/index data; all 653,630 context rows remain `MARK_INDEX_MISSING` rather than using a future snapshot.
+- M3 is `READY_WITH_WARNINGS`. Begin M4 leakage-safe features and labels only with previous-or-equal UTC joins, no future observations, and an explicit mark/index missingness feature/flag.

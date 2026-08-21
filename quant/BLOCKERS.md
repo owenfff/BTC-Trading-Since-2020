@@ -9,12 +9,12 @@
 | AEP engine | HIGH_CONFIDENCE_WITH_ENGINE_SEMANTICS_UNRESOLVED | Displayed difference 0.2974 | Never used as an exact teacher label |
 | Execution order | PARTIAL_WITH_CONFIDENCE_FLAGS | 11689 unique chains, 780 ambiguous, 371 cross-order ties | Carry ordering confidence into behavior dataset |
 | Reported PnL | READY_WITH_WARNINGS | 8788 exact, 6951 mismatch among 15739 eligible | Keep reported and analytical PnL separate |
-| Market context | BLOCKED_ENVIRONMENT | M3 downloader/audit plus official daily public-trade archive fallback are implemented; BitMEX public 5m, 15m, and archive requests failed with managed-runtime WinError 10013; no bars were fabricated | Rerun in a network-enabled environment, verify cache/archive lineage, gaps, and context coverage, then allow leakage-safe modeling |
+| Market context | READY_WITH_WARNINGS | 653,630 verified 5m bars and 54,470 derived 1h bars; zero 5m grid gaps; 6,809 funding rows; historical mark/index series unavailable from the current public instrument snapshot endpoint | Allow M4 only with explicit `MARK_INDEX_MISSING` flags and previous-or-equal UTC joins |
 | Wallet reconciliation | READY_WITH_WARNINGS | 17474 row PASS, 5 real continuity anomalies, 3/15 exact snapshots, 12 zero snapshots without history, terminal equity PASS | Carry flags; do not fabricate joins |
 | Behavior dataset | READY_WITH_WARNINGS | 160302 fills → 62388 batches → 31702 orders → 32231 decisions → 1401 cycles; XBTUSD 688 cycles | Allowed for market-context alignment; preserve confidence fields |
 | Parquet runtime | ENVIRONMENT_WARNING | pyarrow/polars unavailable and PyPI blocked; explicit ignored CSV fallback generated | Restore pinned dependency before consuming Parquet-only tools |
-| GitHub remote | ENVIRONMENT_BLOCKED | `git push` failed to connect to `github.com:443`; local branch remains committed and clean | Retry the authorized current-branch push when HTTPS access returns; no PR was created |
-| Public HTTPS permission | HARD_STOP | Managed-runtime network permission request was not granted after repeated BitMEX, archive, and GitHub HTTPS failures | Grant public network access, then resume from `quant/AUTONOMOUS_STATE.json.next_action` |
+| GitHub remote | READY | Autonomous branch pushed successfully; no PR was created | Continue pushing only the autonomous branch; never push `main` |
+| Public HTTPS permission | CLEARED_FOR_M3 | Public BitMEX and GitHub HTTPS access succeeded in the resumed runtime | Keep no-key/public-only boundary |
 
 No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, paid data, destructive raw-data actions, unresolvable Git conflicts, repeated infrastructure failure, unavailable public data, or forced environment interruption.
 
@@ -24,12 +24,11 @@ Phases 1 and 2 are complete. Wallet reconciliation is `READY_WITH_WARNINGS`; the
 
 ## Current work package
 
-Phases 1 through 3 are complete. Public market data is `BLOCKED_ENVIRONMENT`; no strategy training or live connectivity is permitted before market lineage and leakage audits pass.
+Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no strategy training or live connectivity is permitted before the M4 leakage audit passes.
 
 ## M3 public-market attempt
 
 - `quant/reports/market_data_audit.md` and `quant/reports/market_data_lineage.json` are generated from the real repository execution bounds (`2020-05-01T09:03:47.360Z` through `2026-07-18T22:11:15.556Z` for XBTUSD Trade rows).
-- BitMEX `trade/bucketed` was attempted at 5m and the documented 15m fallback. Both public requests failed at the local socket boundary with `WinError 10013`; this is not evidence that the public source lacks history.
-- The official `public.bitmex.com` daily trade archive fallback was attempted for the first three UTC partitions and stopped with the same repeated infrastructure error; the full 2,270-day range was not falsely marked complete.
-- The report is `BLOCKED`, `raw_account_inputs_unchanged=true`, and no market output is treated as valid. No feature or label work may start until a verified public cache is available.
-- This is the task's environment HARD_STOP: no credentials, private account access, live trading, or raw-data mutation is requested or needed.
+- BitMEX public REST `trade/bucketed` returned 653,630 XBTUSD 5m bars from `2020-05-01T09:05:00Z` through `2026-07-18T22:10:00Z`; the UTC grid has zero gaps and zero duplicates.
+- Funding returned 6,809 rows. The current `/instrument` endpoint is a current snapshot, not a historical mark/index series; all historical mark/index values remain missing rather than using future data.
+- The report is `READY_WITH_WARNINGS`, `raw_account_inputs_unchanged=true`, and large outputs remain ignored local artifacts. M4 may start only with the explicit context warning and leakage audit.

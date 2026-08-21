@@ -1,17 +1,17 @@
 {
   "program_version": "4.0",
-  "program_status": "BLOCKED",
-  "current_phase": "PHASE_4_PUBLIC_MARKET_DATA",
-  "current_work_package": "M3-public-market-data",
-  "last_completed_phase": "PHASE_3_BEHAVIOR_DATASET",
-  "last_code_commit": "e83cea15a4a825a9d1269320c51e67febf5ddb19",
-  "last_report_commit": "781daedee8afe6d55f4d7b23880085c9b3ec3e75",
-  "test_count": 247,
-  "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_8_MARKET_SMOKE_TESTS",
+  "program_status": "RUNNING",
+  "current_phase": "PHASE_5_LEAKAGE_SAFE_FEATURES",
+  "current_work_package": "M4-leakage-safe-features-labels",
+  "last_completed_phase": "PHASE_4_PUBLIC_MARKET_DATA",
+  "last_code_commit": "827106a2e5d8c20afe23bb20f52954baccb0f6e5",
+  "last_report_commit": "PENDING_M3_REPORT_COMMIT",
+  "test_count": 248,
+  "last_test_status": "PASS_WITH_234_PRIOR_FULL_SUITE_AND_9_MARKET_SMOKE_TESTS",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
-  "market_data_status": "HARD_STOP_NETWORK_PERMISSION_DENIED",
+  "market_data_status": "READY_WITH_WARNINGS",
   "leakage_status": "NOT_STARTED",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
   "research_status": "NOT_STARTED",
@@ -24,16 +24,15 @@
     "Exchange currentCost residual: closest candidate differs by about 2 raw units.",
     "Exchange AEP engine semantics remain unresolved; displayed difference is 0.2974.",
     "Execution ordering has 780 ambiguous chains and 371 cross-order ties.",
-    "BitMEX public REST endpoints and the official public archive were blocked by the managed runtime with WinError 10013; no market bars were fabricated.",
-    "Network permission request was not granted; GitHub push and public-data acquisition cannot proceed in this environment."
+    "Historical mark/index context is unavailable from the current public instrument snapshot endpoint; all 653630 context rows retain MARK_INDEX_MISSING and no current snapshot was backfilled."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
     "Reported PnL decomposition has 6951 mismatches among 15739 eligible rows.",
     "No claim of exact strategy recovery or future profitability is permitted.",
     "Current desktop runtime lacks pyarrow/polars and cannot reach PyPI; behavior outputs are explicit ignored CSV fallbacks pending dependency restoration.",
-    "Current desktop runtime could not reach GitHub over HTTPS; the autonomous branch is committed locally and awaits a later push retry."
+    "Public market bars use verified BitMEX REST responses with per-window cache SHA256; no synthetic bars are permitted."
   ],
-  "next_action": "Grant public HTTPS network access, then run git push origin quant/autonomous-behavioral-quant-bot-v1 and quant/scripts/build_market_data.py; verify REST or official archive SHA256, UTC grid, gaps, mark/index/funding as-of coverage, and only then begin leakage-safe features.",
-  "updated_at_utc": "2026-08-20T08:32:24Z"
+  "next_action": "Begin M4 leakage-safe features and labels using only as-of market bars, funding, and frozen behavior data; preserve the explicit MARK_INDEX_MISSING warning and run a feature leakage audit before any model training.",
+  "updated_at_utc": "2026-08-21T04:36:56Z"
 }

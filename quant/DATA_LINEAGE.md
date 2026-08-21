@@ -43,14 +43,14 @@
 
 ## Public market-data artifact
 
-- Code commit: `e83cea15a4a825a9d1269320c51e67febf5ddb19`.
-- Report commit: `781daedee8afe6d55f4d7b23880085c9b3ec3e75`.
+- Code commit: `827106a2e5d8c20afe23bb20f52954baccb0f6e5`.
+- Report commit: `PENDING_M3_REPORT_COMMIT`.
 - Reports: `quant/reports/market_data_audit.md`, `quant/reports/market_data_lineage.json`, and `quant/reports/market_data_gaps.csv`.
-- Canonical source policy: BitMEX public no-key `trade/bucketed` for XBTUSD, 5m requested with 15m fallback; funding from `funding`; mark/index context from `instrument`.
+- Canonical source policy: BitMEX public no-key `trade/bucketed` for XBTUSD 5m; 1h is derived locally without filling missing 5m bars; funding from `funding`; the current `instrument` snapshot is not used as historical mark/index context.
 - Real repository execution bounds used for the request: `2020-05-01T09:03:47.360Z` through `2026-07-18T22:11:15.556Z`; 98,874 XBTUSD Trade rows.
-- Current run status: `BLOCKED` because the managed runtime denied both public requests with `WinError 10013`; no public response was cached and no market bars were invented.
+- Current run status: `READY_WITH_WARNINGS`; 653,630 5m bars, 54,470 derived 1h bars, 6,809 funding rows, zero 5m grid gaps, and 653,630 explicit `MARK_INDEX_MISSING` context rows.
 - Join policy is `ASOF_PREVIOUS_OR_EQUAL_UTC`; future observations are forbidden. Raw account inputs remained unchanged.
-- M3.1 adds the official daily public trade archive fallback at `https://public.bitmex.com/data/trade/YYYYMMDD.csv.gz`; it aggregates raw trades into UTC 5m bars, preserves daily gzip objects under ignored `quant/data/market/raw/`, and rejects an incomplete date range. The current run attempted 3 of 2,270 UTC partitions before the repeated network error circuit breaker.
+- The official BitMEX S3 public trade archive remains an explicit fallback, but was not blindly downloaded because each daily raw trade object is large and REST succeeded after bounded window retries. The REST cache has per-window SHA256 lineage under ignored `quant/data/market/raw/bitmex_api/`.
 
 ## Upcoming lineage
 
