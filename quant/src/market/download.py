@@ -260,10 +260,10 @@ def download_windowed(
     windows: list[dict[str, Any]] = []
     current = start
     started = utc_now()
-    while current < end:
-        window_end = min(current + timedelta(days=window_days), end)
+
+    def fetch_window(window_start: datetime, window_end: datetime) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         cache_path = cache_dir / (
-            f"{cache_stem}_{current.strftime('%Y%m%dT%H%M%S')}_"
+            f"{cache_stem}_{window_start.strftime('%Y%m%dT%H%M%S')}_"
             f"{window_end.strftime('%Y%m%dT%H%M%S')}.json"
         )
         last_error: MarketDownloadError | None = None
@@ -272,26 +272,40 @@ def download_windowed(
                 rows, lineage = download_paginated(
                     url_builder,
                     cache_path=cache_path,
-                    start_time=current,
+                    start_time=window_start,
                     end_time=window_end,
                     timeout=timeout,
                     page_limit=page_limit,
                     sleep_seconds=sleep_seconds,
                 )
-                break
+                return rows, [{
+                    "start_time_utc": iso_utc(window_start),
+                    "end_time_utc": iso_utc(window_end),
+                    **lineage,
+                }]
             except MarketDownloadError as exc:
                 last_error = exc
                 if attempt >= retries:
-                    raise
+                    break
                 time.sleep(min(2.0 * (attempt + 1), 5.0))
-        else:
-            raise last_error or MarketDownloadError("windowed download failed")
+
+        # A problematic seven-day range can still contain a perfectly valid
+        # smaller range.  Split it rather than abandoning the entire source
+        # or falling through to multi-gigabyte raw trade archives.
+        span_seconds = int((window_end - window_start).total_seconds())
+        minimum_seconds = 24 * 60 * 60
+        if span_seconds > minimum_seconds:
+            midpoint = window_start + timedelta(seconds=span_seconds // 2)
+            left_rows, left_lineage = fetch_window(window_start, midpoint)
+            right_rows, right_lineage = fetch_window(midpoint, window_end)
+            return left_rows + right_rows, left_lineage + right_lineage
+        raise last_error or MarketDownloadError("windowed download failed")
+
+    while current < end:
+        window_end = min(current + timedelta(days=window_days), end)
+        rows, window_lineage = fetch_window(current, window_end)
         all_rows.extend(rows)
-        windows.append({
-            "start_time_utc": iso_utc(current),
-            "end_time_utc": iso_utc(window_end),
-            **lineage,
-        })
+        windows.extend(window_lineage)
         current = window_end
 
     unique: dict[tuple[Any, ...], dict[str, Any]] = {}

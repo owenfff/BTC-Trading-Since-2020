@@ -273,22 +273,13 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             if bars:
                 selected_interval = interval
                 break
-    archive_lineage: dict[str, Any] = {"status": "NOT_ATTEMPTED_REST_BARS_AVAILABLE", "row_count": 0}
-    if not bars and start_time is not None and end_time is not None:
-        bars, archive_lineage = download_archive_trade_bars(start_time, end_time, raw_dir, symbol=symbol, interval_minutes=5)
-        lineage["public_archive_trade"] = archive_lineage
-        if bars:
-            selected_interval = "5m"
-            bar_normalization = {
-                "source_row_count": len(bars),
-                "normalized_row_count": len(bars),
-                "rejected_counts": {},
-                "duplicate_row_count": 0,
-                "interval": "5m",
-                "source": "bitmex_public_archive_trade_aggregated",
-            }
-    else:
-        lineage["public_archive_trade"] = archive_lineage
+    archive_lineage: dict[str, Any] = {
+        "status": "AVAILABLE_EXPLICIT_FALLBACK_NOT_AUTO_SELECTED",
+        "row_count": 0,
+        "endpoint": "https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/trade/YYYYMMDD.csv.gz",
+        "note": "The official archive contains large daily raw-trade objects. It remains available through market.archive, but is not blindly downloaded after a transient REST failure; the REST window splitter must first exhaust bounded retries."
+    }
+    lineage["public_archive_trade"] = archive_lineage
     instrument_rows: list[dict[str, Any]] = []
     funding_rows: list[dict[str, Any]] = []
     instrument_normalization: dict[str, Any] = {"normalized_row_count": 0}
