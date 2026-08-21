@@ -56,6 +56,17 @@
 
 Wallet ledger, public market data, behavioral episodes, features, labels, models, and experiments must each record source URLs/commits, UTC coverage, SHA256, code commit, dependency versions, and report analysis commit.
 
+## M13 cross-asset behavior artifact
+
+- Code commits: `cf220e4` initial cross-asset pipeline; `07f5304e0101852538d52914927f11ef7e8d01ee` bounded public retries, train-only scale eligibility, dynamic walk-forward, and paper replay.
+- Universe reports: `quant/reports/cross_asset_universe.csv`, `quant/reports/cross_asset_universe.json`, `quant/reports/cross_asset_universe.md`.
+- Dataset reports: `quant/reports/cross_asset_model_dataset_manifest.json` and `quant/reports/cross_asset_leakage_audit.md`.
+- Strategy reports: `quant/reports/cross_asset_strategy_fidelity.json`, `quant/reports/cross_asset_per_symbol_metrics.csv`, `quant/reports/cross_asset_walk_forward.csv`, and `quant/reports/cross_asset_sensitivity.csv`.
+- Paper report: `quant/reports/cross_asset_paper_replay.json` and `quant/reports/cross_asset_paper_replay.md`.
+- Source policy: public no-key BitMEX hourly trade buckets and funding; detailed raw response caches and full cross-asset datasets remain under ignored `quant/outputs/`.
+- Coverage result: 66 symbols inventoried; 65 market `PASS`, 1 `INSUFFICIENT`; 10,630 model-eligible rows across 53 symbols after train-only position-scale and derivative filters.
+- Analysis commit in the generated model and paper reports: `07f5304e0101852538d52914927f11ef7e8d01ee`.
+
 ## Leakage-safe feature and label artifact
 
 - Code/analysis commit: `83d636a2e5d8c20afe23bb20f52954baccb0f6e5`.

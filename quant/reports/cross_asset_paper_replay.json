@@ -1,0 +1,80 @@
+{
+  "report_version": "M13-CROSS-ASSET-PAPER-REPLAY-1.0",
+  "analysis_commit": "07f5304e0101852538d52914927f11ef7e8d01ee",
+  "status": "PAPER_REPLAY_PASS",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "strategy_version": "behavioral-distillation-v2-cross-asset-logistic",
+  "train_rows": 8879,
+  "replay_rows": 1751,
+  "replay_symbols": 5,
+  "signal_count": 1751,
+  "action_counts": {
+    "ADD_LONG": 988,
+    "ADD_SHORT": 28,
+    "REDUCE_LONG": 735
+  },
+  "paper_filled_orders": 0,
+  "paper_partial_orders": 1751,
+  "paper_rejected_orders": 0,
+  "per_symbol_state": {
+    "ETHUSD": {
+      "position": "-0.00256171166275486706541688653",
+      "cash": "0.9972597625654970173593295932",
+      "fees": "0.002283531195419152200558672431",
+      "funding": "0E-31",
+      "slippage": "0.0004567062390838304401117344868",
+      "filled_orders": 0,
+      "partial_orders": 512,
+      "canceled_orders": 0,
+      "rejected_orders": 0
+    },
+    "ETHM22": {
+      "position": "0.3000122171360999296435546875",
+      "cash": "0.9998195685395505279346416016",
+      "fees": "0.0001503595503745600544653320312",
+      "funding": "0E-28",
+      "slippage": "0.00003007191007491201089306640625",
+      "filled_orders": 0,
+      "partial_orders": 12,
+      "canceled_orders": 0,
+      "rejected_orders": 0
+    },
+    "DOGEUSD": {
+      "position": "0.04722333774223543250386511139",
+      "cash": "0.9875802867341067504514673053",
+      "fees": "0.01034976105491104129044391120",
+      "funding": "0E-30",
+      "slippage": "0.002069952210982208258088782236",
+      "filled_orders": 0,
+      "partial_orders": 823,
+      "canceled_orders": 0,
+      "rejected_orders": 0
+    },
+    "XRPUSD": {
+      "position": "0.03839702496064585424362066650",
+      "cash": "0.9993610335712339130852952877",
+      "fees": "0.0005324720239717390955872603584",
+      "funding": "0E-30",
+      "slippage": "0.0001064944047943478191174520718",
+      "filled_orders": 0,
+      "partial_orders": 72,
+      "canceled_orders": 0,
+      "rejected_orders": 0
+    },
+    "LTCUSD": {
+      "position": "0.01083245023143156729688016875",
+      "cash": "0.9966813722610426362992052278",
+      "fees": "0.002765523115797803083995643494",
+      "funding": "0E-30",
+      "slippage": "0.0005531046231595606167991286991",
+      "filled_orders": 0,
+      "partial_orders": 332,
+      "canceled_orders": 0,
+      "rejected_orders": 0
+    }
+  },
+  "reference_price_source": "latest public hourly close at or before decision; local fallback only if unavailable",
+  "private_api_used": false,
+  "real_funds_used": false,
+  "profitability_claim": false
+}

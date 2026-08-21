@@ -31,6 +31,15 @@ No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, p
 - A fresh Python 3.11.9 environment installed all declared pinned dependencies; the clean-room suite passed 273 tests and skipped 2 tests that require intentionally ignored derived outputs.
 - Docker Compose configuration and cold-start validation passed. The image uses pinned `quant/runtime-requirements.txt` and returned `PAPER_SMOKE_PASS` under a read-only filesystem with a temporary `/tmp`; no network or exchange call was made.
 
+## M13 cross-asset behavior boundary
+
+- Full behavior inventory: 66 symbols and 32,231 decisions. Public hourly market coverage: 65 `PASS`, 1 `INSUFFICIENT` (`XBTUSD` first-edge coverage).
+- Unified model eligibility: 10,630 rows across 53 symbols. Twelve symbols without a chronological TRAIN position scale are excluded rather than scaled from future observations; excluded symbols remain in the inventory and coverage reports.
+- Leakage audit: `PASS`; future bar, funding, history, label, and invalid-time checks are all zero.
+- Cross-asset fidelity, walk-forward, sensitivity, and paper replay are descriptive `RESEARCH_ONLY` artifacts. They do not establish profitability or exact strategy recovery.
+- Public endpoint timeout recovery is bounded and fail-closed. A missing public window produces an explicit coverage failure and never triggers synthetic market data.
+- Real private exchange endpoints remain `DEMO_CREDENTIALS_REQUIRED`; no credentials are requested in this phase.
+
 ## Current work package
 
 Phases 1 and 2 are complete. Wallet reconciliation is `READY_WITH_WARNINGS`; the residuals are preserved as flags and do not block BTC-first behavior episode construction.

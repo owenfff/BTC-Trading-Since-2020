@@ -104,6 +104,15 @@
 - Real private exchange calls remain `DEMO_CREDENTIALS_REQUIRED`; no API key or private account is requested in autonomous mode.
 - Default live risk and notional limits remain zero, and `live_enabled` remains false.
 
+## 2026-08-21 — Freeze cross-asset behavioral boundary
+
+- Use all 66 historical symbols for the behavior inventory, but keep Spot and derivative semantics separate.
+- Use only public no-key BitMEX hourly trade buckets and funding; no synthetic market history and no current-snapshot backfill for historical mark/index values.
+- Fit position scales from chronological TRAIN rows only. Symbols without a TRAIN scale are excluded from the unified model instead of using future information.
+- Keep the Strategy Core exchange-neutral and label the model `BEHAVIORAL_APPROXIMATION`; it outputs action, target exposure, confidence, risk tags, and validity but never submits orders.
+- Require zero leakage violations, per-symbol traceability, three time-out windows, sensitivity diagnostics, and repeatable local paper replay before considering the phase complete.
+- No API key, private endpoint, demo account, testnet account, or real capital is needed for this phase.
+
 ## 2026-08-21 — Freeze clean-room release evidence
 
 - Lock the release dependencies to the versions installed in the fresh Python 3.11.9 environment: NumPy 2.3.5, Polars 1.43.2, PyArrow 24.0.0, and Pytest 8.4.2.
