@@ -1,0 +1,21 @@
+# Documentation-only adapter configuration. No credentials are accepted here.
+# Concrete adapters remain disabled until human-approved Demo/Testnet work.
+exchanges:
+  bitmex:
+    environment: testnet
+    rest_base_url: https://testnet.bitmex.com/api/v1
+    websocket_url: wss://ws.testnet.bitmex.com/realtime
+    credentials_env: DISABLED
+  bybit:
+    environment: testnet
+    rest_base_url: https://api-testnet.bybit.com
+    credentials_env: DISABLED
+  okx:
+    environment: demo
+    rest_base_url: https://us.okx.com
+    simulated_trading_header: x-simulated-trading: 1
+    credentials_env: DISABLED
+  binance:
+    environment: product_specific_testnet_or_demo
+    rest_base_url: DOCUMENTATION_REQUIRED
+    credentials_env: DISABLED
