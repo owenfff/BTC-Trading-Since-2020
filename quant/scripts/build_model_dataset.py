@@ -202,7 +202,7 @@ def _write_leakage_report(path: Path, audit: dict[str, Any], summary: dict[str, 
         "No future high/low, future cycle PnL, future action, or test-period normalization statistic is used as a feature. Historical mark/index context is missing by source limitation and is represented by an explicit missingness flag.",
         "",
         f"- dataset split: `{summary['split_policy']}`",
-        f"- raw account inputs unchanged: `{summary['raw_inputs_unchanged']}`",
+        f"- raw account inputs unchanged: `{summary['raw_account_inputs_unchanged']}`",
     ])
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
