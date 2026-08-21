@@ -8,8 +8,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY quant/requirements.txt /app/quant/requirements.txt
-RUN python -m pip install --no-cache-dir --disable-pip-version-check -r /app/quant/requirements.txt
+COPY quant/runtime-requirements.txt /app/quant/runtime-requirements.txt
+RUN python -m pip install --no-cache-dir --disable-pip-version-check -r /app/quant/runtime-requirements.txt
 
 COPY . /app
 RUN python -m compileall -q quant_bot

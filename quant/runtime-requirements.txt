@@ -1,0 +1,2 @@
+# Runtime-only dependency set for shadow/paper fixture execution.
+numpy==2.3.5
