@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -12,6 +13,7 @@ from quant_bot.exchanges.bybit import BybitAdapter
 from quant_bot.exchanges.bybit_http import BybitCredentials, BybitDemoTransport, assert_demo_url, bybit_signature, bybit_websocket_signature
 from quant_bot.exchanges.bybit_ws import BybitDemoWebSocket
 from quant_bot.exchanges.http import AdapterError, FakeTransport
+from frontend.server import status_payload
 
 
 def _order() -> Order:
@@ -58,6 +60,16 @@ def test_bybit_region_block_is_explicit(monkeypatch: pytest.MonkeyPatch) -> None
         transport.request("GET", "/v5/market/instruments-info?category=linear")
     assert error.value.code == "BYBIT_REGION_BLOCKED"
     assert "secret" not in str(error.value)
+
+
+def test_frontend_dashboard_is_read_only_and_never_exposes_credentials() -> None:
+    payload = status_payload()
+    serialized = json.dumps(payload, ensure_ascii=False)
+    assert payload["dashboard_role"] == "FRONTEND_ONLY"
+    assert payload["exchange_connection"] == "NONE_FROM_THIS_SERVER"
+    assert payload["trading_enabled_here"] is False
+    assert "BYBIT_DEMO_API_KEY" not in serialized
+    assert "BYBIT_DEMO_API_SECRET" not in serialized
 
 
 def test_private_ws_auth_and_duplicate_event_protection() -> None:
