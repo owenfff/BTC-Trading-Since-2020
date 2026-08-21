@@ -1,10 +1,10 @@
 {
   "report_version": "M5-STRATEGY-DISTILLATION-1.0",
   "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
-  "analysis_commit": "2daab36eb75c6e1cc876b12ff4e369ea57e8ae5e",
+  "analysis_commit": "66c9e34e8189d1fffbd8caf913a876c08df95f31",
   "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
-  "training_policy": "Frequency baseline fits TRAIN labels only; distilled rules are deterministic; no opaque ML model is trained in M5.1.",
+  "training_policy": "Frequency baseline and supervised models fit TRAIN labels only; distilled rules are deterministic. Logistic and tree implementations use deterministic NumPy with no external ML dependency.",
   "input_contract": "M4 feature contract only; observed target/action and all label_* fields are excluded from Strategy Core inputs.",
   "dataset_rows": 20845,
   "models": {
@@ -113,9 +113,115 @@
         "cycle_direction_match": 0.95271791572853,
         "confidence_calibration_gap": 0.345377250342686
       }
+    },
+    "logistic_numpy": {
+      "TRAIN": {
+        "rows_seen": 14591,
+        "rows_with_future_label": 14591,
+        "action_accuracy": 0.7138647111232952,
+        "direction_accuracy": 0.9139195394421219,
+        "action_macro_f1": 0.22606840168598683,
+        "action_weighted_f1": 0.6843298422459564,
+        "target_exposure_mae": 0.011163140074891739,
+        "target_exposure_correlation": 0.9915386046978546,
+        "open_timing_error_seconds": 15168.03868302544,
+        "close_timing_error_seconds": 3124.8849245844563,
+        "add_recall": 0.8643660725571989,
+        "reduce_recall": 0.6973613354873451,
+        "flip_recall": 0.0,
+        "cycle_direction_match": 0.9466846514269488,
+        "confidence_calibration_gap": 0.10175230395477945
+      },
+      "VALIDATION": {
+        "rows_seen": 3127,
+        "rows_with_future_label": 3127,
+        "action_accuracy": 0.6437480012791813,
+        "direction_accuracy": 0.8810361368724017,
+        "action_macro_f1": 0.21228448967007946,
+        "action_weighted_f1": 0.5997659797443279,
+        "target_exposure_mae": 0.007031784696344145,
+        "target_exposure_correlation": 0.9868863099776504,
+        "open_timing_error_seconds": 27278.74402729932,
+        "close_timing_error_seconds": 5869.014272472136,
+        "add_recall": 0.8543505674653216,
+        "reduce_recall": 0.6824146981627297,
+        "flip_recall": 0.0,
+        "cycle_direction_match": 0.9279218592118559,
+        "confidence_calibration_gap": 0.12872353015640223
+      },
+      "TEST": {
+        "rows_seen": 3127,
+        "rows_with_future_label": 3126,
+        "action_accuracy": 0.5783749200255918,
+        "direction_accuracy": 0.9782469609724888,
+        "action_macro_f1": 0.18522245790273395,
+        "action_weighted_f1": 0.5391315861062799,
+        "target_exposure_mae": 0.010020955750873587,
+        "target_exposure_correlation": 0.9887460918311194,
+        "open_timing_error_seconds": 11683.962461692308,
+        "close_timing_error_seconds": 2888.546342022712,
+        "add_recall": 0.4353790613718412,
+        "reduce_recall": 0.8395649218218899,
+        "flip_recall": 0.0,
+        "cycle_direction_match": 0.9835960115792859,
+        "confidence_calibration_gap": 0.11240122701600896
+      }
+    },
+    "decision_tree_numpy": {
+      "TRAIN": {
+        "rows_seen": 14591,
+        "rows_with_future_label": 14591,
+        "action_accuracy": 0.7344938660818313,
+        "direction_accuracy": 0.9346857651977246,
+        "action_macro_f1": 0.23373263627897867,
+        "action_weighted_f1": 0.7046767046746778,
+        "target_exposure_mae": 0.06667651723097273,
+        "target_exposure_correlation": 0.7614257620181313,
+        "open_timing_error_seconds": 15168.03868302544,
+        "close_timing_error_seconds": 3106.8699009242523,
+        "add_recall": 0.8646188850967008,
+        "reduce_recall": 0.7250044875246814,
+        "flip_recall": 0.0,
+        "cycle_direction_match": 0.9681953712906431,
+        "confidence_calibration_gap": 0.0
+      },
+      "VALIDATION": {
+        "rows_seen": 3127,
+        "rows_with_future_label": 3127,
+        "action_accuracy": 0.6734889670610809,
+        "direction_accuracy": 0.9075791493444195,
+        "action_macro_f1": 0.2196680130363681,
+        "action_weighted_f1": 0.6276234122162365,
+        "target_exposure_mae": 0.04936250587106949,
+        "target_exposure_correlation": 0.7473575136571536,
+        "open_timing_error_seconds": 27278.74402729932,
+        "close_timing_error_seconds": 6112.737402505418,
+        "add_recall": 0.8675914249684742,
+        "reduce_recall": 0.6832895888013998,
+        "flip_recall": 0.0,
+        "cycle_direction_match": 0.9558773997979118,
+        "confidence_calibration_gap": 0.060103096134241724
+      },
+      "TEST": {
+        "rows_seen": 3127,
+        "rows_with_future_label": 3126,
+        "action_accuracy": 0.6413947536788228,
+        "direction_accuracy": 0.9801663467690339,
+        "action_macro_f1": 0.1978560353418097,
+        "action_weighted_f1": 0.6137161077129517,
+        "target_exposure_mae": 0.0680945419966931,
+        "target_exposure_correlation": 0.7405291129193411,
+        "open_timing_error_seconds": 11683.962461692308,
+        "close_timing_error_seconds": 7619.78564131463,
+        "add_recall": 0.7458483754512636,
+        "reduce_recall": 0.6648538409245411,
+        "flip_recall": 0.0,
+        "cycle_direction_match": 0.9855258925699582,
+        "confidence_calibration_gap": 0.1714288227784307
+      }
     }
   },
   "raw_account_inputs_unchanged": true,
   "market_warning": "Historical mark/index context remains explicitly missing and is never backfilled from a current snapshot.",
-  "next_stage": "M5.2 Logistic Regression and Decision Tree comparison, only if dependencies and leakage controls remain available."
+  "next_stage": "M5.3 optional LightGBM/XGBoost comparison only if a pinned dependency becomes available; otherwise proceed to walk-forward backtesting."
 }
