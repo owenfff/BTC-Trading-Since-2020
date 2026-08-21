@@ -66,6 +66,13 @@ def build(*, skip_market: bool = False) -> dict[str, object]:
     }
     coverage = None if skip_market else build_cross_asset_market(ROOT, ranges)
     coverage_by_symbol = {item["symbol"]: item for item in (coverage or {}).get("coverage", [])}
+    coverage_summary = None
+    if coverage is not None:
+        coverage_summary = {key: value for key, value in coverage.items() if key != "coverage"}
+        coverage_summary["coverage"] = [
+            {key: value for key, value in item.items() if key != "market_lineage"}
+            for item in coverage.get("coverage", [])
+        ]
 
     inventory: list[dict[str, object]] = []
     for symbol, rows in sorted(grouped.items()):
@@ -104,7 +111,7 @@ def build(*, skip_market: bool = False) -> dict[str, object]:
         "payout_model_counts": dict(Counter(str(row["payout_model"]) for row in inventory)),
         "settlement_currency_counts": dict(Counter(str(row["settlement_currency"]) for row in inventory)),
         "total_synthetic_rows": sum(int(row["synthetic_row_count"]) for row in inventory),
-        "market_coverage": coverage,
+        "market_coverage": coverage_summary,
         "position_scales_fit_on": "TRAIN rows only using global chronological 70/15/15 split",
         "position_scales": scales,
         "raw_account_inputs_unchanged": not changed,
