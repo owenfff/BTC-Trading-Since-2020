@@ -208,7 +208,7 @@ def _report_markdown(summary: dict[str, Any], path: Path) -> None:
         "",
         "## Source lineage",
         "",
-        "The canonical price series is requested from BitMEX `trade/bucketed`, with the official daily `public.bitmex.com` trade archive as a no-key fallback. Funding is requested from `funding`, and mark/index context is requested from `instrument`. Raw responses are kept only under ignored `quant/data/market/raw/` and their SHA-256 is recorded in the JSON report.",
+        "The canonical price series is requested from BitMEX `trade/bucketed`, with the official public S3 trade archive as an explicit fallback. Funding is requested from `funding`; the current `/instrument` endpoint is not treated as a historical mark/index series. Raw responses are kept only under ignored `quant/data/market/raw/` and their SHA-256 is recorded in the JSON report.",
         "",
         "| source | status | rows | sha256 |",
         "| --- | --- | ---: | --- |",
@@ -220,6 +220,7 @@ def _report_markdown(summary: dict[str, Any], path: Path) -> None:
         "## Coverage and gaps",
         "",
         f"- bar audit: `{json.dumps(summary['bar_audit'], ensure_ascii=False)}`",
+        f"- derived 1h bar audit: `{json.dumps(summary['bar_1h_audit'], ensure_ascii=False)}`",
         f"- gap rows: `{summary['gap_row_count']}`; details: `market_data_gaps.csv`",
         f"- context status counts: `{json.dumps(summary['context_audit'].get('status_counts', {}), ensure_ascii=False)}`",
         "",
@@ -229,7 +230,7 @@ def _report_markdown(summary: dict[str, Any], path: Path) -> None:
         "",
         f"- public source status: `{summary['source_status']}`",
         f"- output: `{json.dumps(summary.get('large_outputs', {}), ensure_ascii=False)}`",
-        "- A local network denial is an environment blocker, not evidence that BitMEX has no historical data. Rerun this script in a network-enabled environment or place verified responses/archive objects under the ignored market-data paths.",
+        "- A future local network denial is an environment blocker, not evidence that BitMEX has no historical data. Rerun this script in a network-enabled environment or use the verified cached responses under the ignored market-data paths.",
         "- This package does not use account API keys, private endpoints, live balances, or order placement.",
         "",
         "## Next action",
@@ -324,6 +325,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
     context_rows, context_audit = attach_market_context(bars, instrument_rows=instrument_rows, funding_rows=funding_rows)
     interval_seconds = {"5m": 300}.get(selected_interval or requested_interval, 300)
     bar_audit = audit_time_grid(context_rows, time_field="timestamp", interval_seconds=interval_seconds)
+    bars_1h_audit["grid_audit"] = audit_time_grid(bars_1h, time_field="timestamp", interval_seconds=3600) if bars_1h else {"status": "BLOCKED"}
     gap_rows = build_gap_rows(context_rows, time_field="timestamp", interval_seconds=interval_seconds, series=f"{symbol}:{selected_interval or requested_interval}")
     after = hash_files(root, PROTECTED_FILES)
     changed = [name for name in PROTECTED_FILES if before.get(name) != after.get(name)]
@@ -369,7 +371,7 @@ def run(root: Path = ROOT) -> dict[str, Any]:
             "Trade bucketed timestamps are treated as BitMEX bucket end/write timestamps; no timezone conversion beyond explicit UTC normalization.",
             "Mark/index and funding are retained as as-of context only and are never substituted for a missing canonical trade price.",
         ],
-        "next_action": "If market_data_status is BLOCKED, rerun in a network-enabled environment and freeze the verified public cache before starting leakage-safe features; if READY_WITH_WARNINGS, inspect market_data_gaps.csv and context coverage first.",
+        "next_action": "Market data is READY_WITH_WARNINGS: inspect the explicit mark/index warning and 1h child coverage, then begin leakage-safe M4 features and labels. Do not use current instrument snapshots for historical bars.",
     }
     if context_rows:
         summary["large_outputs"] = {
