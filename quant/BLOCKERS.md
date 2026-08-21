@@ -28,6 +28,8 @@ No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, p
 - BitMEX and Bybit adapters are mock-tested through injected transports. Real private endpoints are `DEMO_CREDENTIALS_REQUIRED`; credentials must not be requested automatically.
 - Clean-room release status is `PASS_WITH_RESEARCH_INPUT_REHYDRATION_REQUIRED`. A fresh clone can compile and run the fixture smoke paths, while the full research command correctly stops until verified ignored market/behavior outputs are rehydrated.
 - Release audit found no credential-like secrets. Tracked historical teacher/source exports remain subject to redistribution and licensing review.
+- A fresh Python 3.11.9 environment installed all declared pinned dependencies; the clean-room suite passed 273 tests and skipped 2 tests that require intentionally ignored derived outputs.
+- Docker Compose configuration passed. Docker image build could not reach Docker Hub's public `python:3.11-slim` registry, so Docker cold start remains unverified as an environment warning.
 
 ## Current work package
 

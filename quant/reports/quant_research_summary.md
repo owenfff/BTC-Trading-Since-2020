@@ -2,7 +2,7 @@
 
 - research status: **RESEARCH_ONLY**
 - strategy fidelity: **BEHAVIORAL_APPROXIMATION**
-- analysis commit: `b43e428c752383436485813fd5a0c8ae3a02b920`
+- analysis commit: `659e32c5e536b5ae75eeffd17990c63336b8afb4`
 - market bars: `653630` verified 5m XBTUSD rows
 - decision rows: `20845`
 - historical blended fee rate: `0.00051430` from `98874` XBTUSD action rows

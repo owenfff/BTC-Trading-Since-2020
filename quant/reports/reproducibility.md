@@ -2,7 +2,7 @@
 
 - command: `python quant/scripts/run_quant_research.py`
 - source commit: `f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6`
-- analysis commit: `b43e428c752383436485813fd5a0c8ae3a02b920`
+- analysis commit: `659e32c5e536b5ae75eeffd17990c63336b8afb4`
 - branch: `quant/autonomous-behavioral-quant-bot-v1`
 - model dataset: `quant/outputs/model_dataset.csv` (ignored local fallback)
 - market bars: `quant/outputs/market_bars.csv` (ignored verified public cache output)
@@ -12,3 +12,16 @@
 - execution: next closed bar's open, configurable bar delay, no same-bar close ideal fill
 - external ML dependencies: not used; Logistic Regression and Decision Tree use deterministic NumPy
 - research reports: `quant/reports/quant_research_summary.json`, `quant/reports/quant_research_summary.md`, `quant/reports/walk_forward_results.csv`, `quant/reports/robustness_results.csv`
+
+## Clean-room verification
+
+- clean-room commit: `659e32c5e536b5ae75eeffd17990c63336b8afb4`
+- release-audit commit: `223d121605a16135a2613cace95102e22a7d3e1b`
+- fresh runtime: Python 3.11.9
+- pinned dependencies: NumPy 2.3.5; Polars 1.43.2; PyArrow 24.0.0; Pytest 8.4.2
+- clean-room tests: 273 passed, 2 skipped because two checks require intentionally ignored derived outputs
+- shadow and paper fixture smoke: each repeated twice with identical one-row output
+- full research without rehydration: controlled `BLOCKED_INPUTS_MISSING`, exit code 2
+- Docker Compose config: PASS; Docker image build: environment-blocked while resolving public `python:3.11-slim`
+- secret scan: PASS; personal-data scan: PASS; dependency pin audit: PASS; license audit: warning for tracked teacher/source redistribution review
+- `quant_research_runnable`: `false`; `paper_code_ready`: `true`

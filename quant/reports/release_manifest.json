@@ -1,8 +1,22 @@
 {
   "report_version": "M12-RELEASE-AUDIT-1.0",
-  "analysis_commit": "d2bd86bef426bc2288249328ad5afa821293c92a",
-  "tracked_file_count": 269,
+  "analysis_commit": "223d121605a16135a2613cace95102e22a7d3e1b",
+  "tracked_file_count": 274,
   "secret_findings": [],
+  "secret_scan_status": "PASS",
+  "personal_data_findings": [],
+  "personal_data_scan_status": "PASS",
+  "dependency_audit": {
+    "status": "PASS",
+    "requirements": [
+      "numpy==2.3.5",
+      "polars==1.43.2",
+      "pytest==8.4.2",
+      "pyarrow==24.0.0"
+    ],
+    "unpinned": []
+  },
+  "license_audit_status": "PASS_WITH_DATA_REVIEW_WARNING",
   "large_tracked_files": [
     {
       "path": "api-v1-execution-tradeHistory.csv",
@@ -15,18 +29,25 @@
       "classification": "historical_teacher_or_source_export_review_required"
     }
   ],
+  "large_file_scan_status": "WARNING_TRACKED_TEACHER_EXPORTS",
   "large_ignored_outputs_policy": "quant/outputs large fallbacks remain ignored",
   "live_enabled_default": false,
   "maximum_live_risk_default": "0",
   "maximum_live_notional_default": "0",
   "paper_smoke_status": "PAPER_SMOKE_PASS",
   "clean_room_status": "PASS_WITH_RESEARCH_INPUT_REHYDRATION_REQUIRED",
-  "clean_room_clone_head": "d2bd86bef426bc2288249328ad5afa821293c92a",
+  "clean_room_clone_head": "659e32c5e536b5ae75eeffd17990c63336b8afb4",
+  "verified_runtime": "Python 3.11.9",
+  "dependency_install_status": "PASS",
+  "clean_room_test_status": "273_PASSED_2_SKIPPED",
   "compile_status": "PASS",
-  "shadow_smoke_status": "SHADOW_SMOKE_PASS",
+  "shadow_smoke_status": "SHADOW_SMOKE_PASS_REPEATED",
+  "paper_smoke_status_repeated": "PAPER_SMOKE_PASS_REPEATED",
   "phase10_smoke_status": "PASS",
+  "compose_config_status": "PASS",
+  "docker_status": "ENVIRONMENT_BLOCKED_DOCKER_HUB_UNREACHABLE",
   "quant_research_runnable": false,
   "paper_code_ready": true,
   "demo_status": "DEMO_CREDENTIALS_REQUIRED",
-  "notes": "Raw account exports are tracked teacher inputs with redistribution/licensing review required; no credentials are included. Full research requires rehydrating verified ignored market and behavior artifacts."
+  "notes": "Raw account exports are tracked teacher inputs with redistribution/licensing review required; no credentials are included. Full research requires rehydrating verified ignored market and behavior artifacts. Docker image build was not completed because Docker Hub registry access was unavailable."
 }

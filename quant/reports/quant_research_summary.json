@@ -1,7 +1,7 @@
 {
   "report_version": "M6-QUANT-RESEARCH-1.0",
   "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
-  "analysis_commit": "b43e428c752383436485813fd5a0c8ae3a02b920",
+  "analysis_commit": "659e32c5e536b5ae75eeffd17990c63336b8afb4",
   "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
   "research_status": "RESEARCH_ONLY",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",

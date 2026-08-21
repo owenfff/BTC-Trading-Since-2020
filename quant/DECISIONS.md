@@ -103,3 +103,10 @@
 - Mock transports may test normalization, idempotency, and adapter error handling without network access.
 - Real private exchange calls remain `DEMO_CREDENTIALS_REQUIRED`; no API key or private account is requested in autonomous mode.
 - Default live risk and notional limits remain zero, and `live_enabled` remains false.
+
+## 2026-08-21 — Freeze clean-room release evidence
+
+- Lock the release dependencies to the versions installed in the fresh Python 3.11.9 environment: NumPy 2.3.5, Polars 1.43.2, PyArrow 24.0.0, and Pytest 8.4.2.
+- The full research command fails closed with structured `BLOCKED_INPUTS_MISSING` when ignored market/behavior outputs are absent. It must never substitute synthetic market history for a release smoke test.
+- Repeated fixture shadow and paper runs are reproducible. This proves framework smoke behavior only; it does not prove long-running stability or profitability.
+- Docker Compose configuration is valid, but Docker image cold start remains an environment warning until the public base image can be resolved.
