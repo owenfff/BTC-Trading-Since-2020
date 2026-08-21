@@ -40,6 +40,14 @@ CYCLES_PATH = ROOT / "quant" / "outputs" / "trade_cycles.csv"
 REPORTS = ROOT / "quant" / "reports"
 REGISTRY = ROOT / "quant" / "EXPERIMENT_REGISTRY.csv"
 POSITION_SCALE = 10_000_000.0
+RESEARCH_INPUTS = (MARKET_PATH, CONTEXT_PATH, DECISIONS_PATH, TRADE_ACTIONS_PATH, CYCLES_PATH)
+
+
+def _display_input_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
 
 
 def _float(value: Any) -> float | None:
@@ -282,7 +290,17 @@ def append_registry(rows: list[dict[str, Any]], analysis_commit: str) -> None:
             writer.writerow([experiment_id, stage, description, "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6", analysis_commit, "42", status, "quant/reports/quant_research_summary.json", notes])
 
 
-def main() -> None:
+def main() -> int:
+    missing = [_display_input_path(path) for path in RESEARCH_INPUTS if not path.is_file()]
+    if missing:
+        print(json.dumps({
+            "status": "BLOCKED_INPUTS_MISSING",
+            "analysis_commit": _git_commit(),
+            "missing_inputs": missing,
+            "quant_research_runnable": False,
+            "message": "Rehydrate the verified ignored research outputs before running the full research command; no synthetic market history is substituted.",
+        }, ensure_ascii=False))
+        return 2
     series = load_market_series()
     decisions = load_decisions()
     fee_rate, fee_evidence = load_fee_rate()
@@ -433,6 +451,7 @@ def main() -> None:
     (REPORTS / "reproducibility.md").write_text(reproducibility, encoding="utf-8")
     append_registry(walk_rows, summary["analysis_commit"])
     print(json.dumps({"status": "PASS", "analysis_commit": summary["analysis_commit"], "walk_forward_rows": len(walk_rows), "robustness_rows": len(robustness_rows), "parity": parity["status"]}, ensure_ascii=False))
+    return 0
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -451,4 +470,4 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
