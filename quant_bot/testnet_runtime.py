@@ -266,7 +266,7 @@ class TestnetRuntime:
         try:
             equity = self.refresh()
         except AdapterError as error:
-            self.last_error = f"{error.code}: Bybit Demo account refresh failed"
+            self.last_error = f"{error.code}: {error}"
             if self.enable_orders:
                 self.cancel_created_orders()
                 self.stop_reason = "ACCOUNT_REFRESH_FAILED"
@@ -362,6 +362,10 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
     selected = allowed if symbols == "auto" else allowed.intersection({item.strip().upper() for item in symbols.split(",") if item.strip()})
     by_venue_symbol = {item.canonical_symbol: item for item in live_instruments}
     runtime = TestnetRuntime(adapter, bundle, enable_orders, confirm_testnet, instruments={symbol: by_venue_symbol[str(next(row["bybit_symbol"] for row in mapping["symbols"] if row["symbol"] == symbol))] for symbol in selected}, poll_seconds=max(5, poll_seconds))
+    # The preflight connector is separate from the runtime connector. Sync the
+    # runtime connector's signing clock before the first private request so a
+    # local clock offset cannot trigger Bybit error 10002.
+    adapter.get_server_time()
     runtime.refresh()
     runtime.start_private_stream()
     watchdog = threading.Thread(target=runtime._watchdog, name="bybit-demo-local-watchdog", daemon=True)

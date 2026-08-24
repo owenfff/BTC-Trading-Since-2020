@@ -273,12 +273,18 @@ class BybitAdapter:
         return {"ok": True, "balances": self.fetch_balances(), "positions": self.fetch_positions(), "open_orders": self.fetch_open_orders(), "recent_fills": self.fetch_recent_fills()}
 
     def get_server_time(self) -> datetime:
+        local_before_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
         response = self.transport.request("GET", "/v5/market/time")
+        local_after_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
         self._check(response)
         timestamp = response.get("time") or response.get("result", {}).get("timeNano", "")
         if not timestamp:
             raise AdapterError(self.name, "SCHEMA", "Bybit Demo returned no server time")
-        return datetime.fromtimestamp(int(str(timestamp)[:13]) / 1000, timezone.utc)
+        server_ms = int(str(timestamp)[:13])
+        if hasattr(self.transport, "set_clock_offset_ms"):
+            midpoint_ms = (local_before_ms + local_after_ms) // 2
+            self.transport.set_clock_offset_ms(server_ms - midpoint_ms)
+        return datetime.fromtimestamp(server_ms / 1000, timezone.utc)
 
     def get_rate_limit_state(self) -> object:
         return getattr(self.transport, "last_rate_limit", {})

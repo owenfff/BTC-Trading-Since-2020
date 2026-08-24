@@ -99,6 +99,32 @@ def test_bybit_get_retries_transient_network_timeout(monkeypatch: pytest.MonkeyP
     assert attempts == 2
 
 
+def test_private_requests_apply_server_clock_offset(monkeypatch: pytest.MonkeyPatch) -> None:
+    class Response:
+        headers: dict[str, str] = {}
+
+        def __enter__(self) -> "Response":
+            return self
+
+        def __exit__(self, *args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return b'{"retCode":0,"result":{"list":[]}}'
+
+    captured: dict[str, str] = {}
+
+    def fake_urlopen(request: object, **kwargs: object) -> Response:
+        captured.update({key.lower(): value for key, value in request.header_items()})
+        return Response()
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    transport = BybitDemoTransport(BybitCredentials("key", "secret"), clock_ms=lambda: 1_700_000_000_000)
+    transport.set_clock_offset_ms(2_500)
+    transport.request("GET", "/v5/account/wallet-balance?accountType=UNIFIED", private=True)
+    assert captured["x-bapi-timestamp"] == "1700000002500"
+
+
 def test_frontend_dashboard_is_read_only_and_never_exposes_credentials() -> None:
     payload = status_payload()
     serialized = json.dumps(payload, ensure_ascii=False)

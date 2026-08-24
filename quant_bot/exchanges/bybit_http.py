@@ -67,7 +67,13 @@ class BybitDemoTransport:
         self.recv_window = recv_window
         self.timeout = timeout
         self.clock_ms = clock_ms
+        self.clock_offset_ms = 0
         self.last_rate_limit: dict[str, str] = {}
+
+    def set_clock_offset_ms(self, offset_ms: int) -> None:
+        """Apply a server-minus-local clock offset to signed requests."""
+
+        self.clock_offset_ms = int(offset_ms)
 
     @staticmethod
     def _payload(body: dict[str, Any] | None) -> str:
@@ -84,7 +90,7 @@ class BybitDemoTransport:
         if body is not None:
             headers["Content-Type"] = "application/json"
         if private:
-            timestamp = int(self.clock_ms())
+            timestamp = int(self.clock_ms()) + self.clock_offset_ms
             headers.update({
                 "X-BAPI-API-KEY": self.credentials.api_key,
                 "X-BAPI-TIMESTAMP": str(timestamp),
