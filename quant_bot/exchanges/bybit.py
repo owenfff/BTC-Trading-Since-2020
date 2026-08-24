@@ -283,10 +283,10 @@ class BybitAdapter:
     def get_rate_limit_state(self) -> object:
         return getattr(self.transport, "last_rate_limit", {})
 
-    async def stream_messages(self, stop: Any, on_message: Any) -> None:
+    async def stream_messages(self, stop: Any, on_message: Any, on_error: Any | None = None) -> None:
         if self.websocket is None:
             raise AdapterError(self.name, "WEBSOCKET_NOT_CONFIGURED", "Demo websocket is not configured")
-        await self.websocket.run(on_message, stop, ["order", "execution", "position", "wallet"])
+        await self.websocket.run(on_message, stop, ["order", "execution", "position", "wallet"], on_error=on_error)
 
     def stream_market_data(self, symbol: str) -> Any:
         return iter(self.fetch_closed_bars(symbol))

@@ -73,7 +73,7 @@ class BybitDemoWebSocket:
             await self.socket.close()
             self.socket = None
 
-    async def run(self, on_message: Callable[[dict[str, Any]], Any], stop: asyncio.Event, topics: list[str], *, reconnect_delay: float = 2.0) -> None:
+    async def run(self, on_message: Callable[[dict[str, Any]], Any], stop: asyncio.Event, topics: list[str], *, reconnect_delay: float = 2.0, on_error: Callable[[BaseException], Any] | None = None) -> None:
         while not stop.is_set():
             heartbeat_task: asyncio.Task[Any] | None = None
             try:
@@ -88,8 +88,12 @@ class BybitDemoWebSocket:
                     result = on_message(await self.receive())
                     if inspect.isawaitable(result):
                         await result
-            except (OSError, asyncio.CancelledError, AdapterError):
+            except (OSError, asyncio.CancelledError, AdapterError) as error:
                 self.connected = False
+                if on_error is not None and not stop.is_set() and not isinstance(error, asyncio.CancelledError):
+                    result = on_error(error)
+                    if inspect.isawaitable(result):
+                        await result
                 if stop.is_set():
                     break
                 await asyncio.sleep(reconnect_delay)

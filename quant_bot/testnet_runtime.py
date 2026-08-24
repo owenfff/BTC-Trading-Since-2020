@@ -207,13 +207,17 @@ class TestnetRuntime:
         if message.get("success") is False or message.get("retCode") not in (None, 0, "0"):
             self.websocket_connected = False
 
+    def on_private_error(self, error: BaseException) -> None:
+        self.websocket_connected = False
+        self.websocket_error = f"{type(error).__name__}: {str(error)[:160]}"
+
     def start_private_stream(self) -> None:
         async def runner() -> None:
             stop = asyncio.Event()
             self._async_stop = stop
             self._async_loop = asyncio.get_running_loop()
             try:
-                await self.adapter.stream_messages(stop, self.on_private_message)
+                await self.adapter.stream_messages(stop, self.on_private_message, self.on_private_error)
             finally:
                 self.websocket_connected = False
 
