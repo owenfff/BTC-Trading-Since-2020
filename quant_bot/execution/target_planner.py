@@ -24,6 +24,9 @@ class TargetOrderPlan:
     target_contracts: Decimal
     current_contracts: Decimal
     reason: str
+    reference_price: Decimal | None = None
+    bid: Decimal | None = None
+    ask: Decimal | None = None
 
 
 def _signed_target_contracts(instrument: Instrument, target_exposure: Decimal, equity: Decimal, reference_price: Decimal) -> Decimal:
@@ -92,6 +95,7 @@ def plan_target_order(
     return TargetOrderPlan(
         _client_id(instrument.canonical_symbol, target_contracts, current_contracts, decision_time), instrument.canonical_symbol,
         side, OrderType.LIMIT, quantity, price, reducing, not reducing, target_exposure, target_contracts, current_contracts, reason,
+        reference_price, bid, ask,
     )
 
 

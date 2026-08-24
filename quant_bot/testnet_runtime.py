@@ -14,7 +14,7 @@ from quant_bot.domain.order import Order
 from quant_bot.exchanges.bybit import BybitAdapter
 from quant_bot.exchanges.http import AdapterError
 from quant_bot.execution.target_planner import TargetOrderPlan, plan_target_order
-from quant_bot.risk.testnet_gate import check_testnet_order, risk_envelope_for_symbol
+from quant_bot.risk.testnet_gate import check_testnet_order, portfolio_target_scale, risk_envelope_for_symbol
 from quant_bot.strategy.deployment import DeploymentBundle, load_deployment_bundle
 from quant_bot.strategy.realtime_features import RealtimeFeatureEngine
 
@@ -187,6 +187,7 @@ class TestnetRuntime:
     stop_reason: str | None = None
     websocket_error: str | None = None
     last_error: str | None = None
+    portfolio_target_scale: Decimal = Decimal("1")
     poll_seconds: int = 60
     _async_stop: Any = field(default=None, init=False, repr=False)
     _async_loop: Any = field(default=None, init=False, repr=False)
@@ -285,6 +286,7 @@ class TestnetRuntime:
                 "stop_reason": self.stop_reason,
                 "websocket_error": self.websocket_error,
                 "last_error": self.last_error,
+                "portfolio_target_scale": self.portfolio_target_scale,
             }
             _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
             return result
@@ -301,10 +303,36 @@ class TestnetRuntime:
                 continue
             total_target += abs(plan.target_exposure)
             plans.append(plan)
+        total_limit = Decimal(str(self.bundle.risk_envelope.get("historical_simultaneous_total_exposure_cap", "0")))
+        self.portfolio_target_scale = portfolio_target_scale(total_target, total_limit)
+        if plans and self.portfolio_target_scale < Decimal("1"):
+            scaled_plans: list[TargetOrderPlan] = []
+            for plan in plans:
+                instrument = next((item for item in self.instruments.values() if item.canonical_symbol == plan.symbol), None)
+                historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
+                if instrument is None or plan.reference_price is None or plan.bid is None or plan.ask is None:
+                    continue
+                scaled = plan_target_order(
+                    instrument,
+                    current_contracts=plan.current_contracts,
+                    target_exposure=plan.target_exposure * self.portfolio_target_scale,
+                    equity=equity,
+                    reference_price=plan.reference_price,
+                    bid=plan.bid,
+                    ask=plan.ask,
+                    decision_time=datetime.now(timezone.utc),
+                    active_orders=self.active_orders,
+                    max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol),
+                )
+                if scaled is not None:
+                    scaled_plans.append(scaled)
+            plans = scaled_plans
+            total_target = sum((abs(plan.target_exposure) for plan in plans), Decimal("0"))
         submitted: list[str] = []
         blocked: dict[str, list[str]] = {}
         for plan in plans:
-            decision = check_testnet_order(enable_orders=self.enable_orders, confirm_testnet=self.confirm_testnet, symbol=plan.symbol, target_exposure=plan.target_exposure, total_target_exposure=total_target, envelope=self.bundle.risk_envelope, reconciliation_ok=self.reconciliation_ok, websocket_connected=self.websocket_connected, market_fresh=True, clock_drift_seconds=Decimal("0"))
+            historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
+            decision = check_testnet_order(enable_orders=self.enable_orders, confirm_testnet=self.confirm_testnet, symbol=historical_symbol, target_exposure=plan.target_exposure, total_target_exposure=total_target, envelope=self.bundle.risk_envelope, reconciliation_ok=self.reconciliation_ok, websocket_connected=self.websocket_connected, market_fresh=True, clock_drift_seconds=Decimal("0"))
             if not decision.allowed:
                 blocked[plan.symbol] = list(decision.reasons)
                 continue
@@ -331,6 +359,7 @@ class TestnetRuntime:
             "stop_reason": self.stop_reason,
             "websocket_error": self.websocket_error,
             "last_error": self.last_error,
+            "portfolio_target_scale": self.portfolio_target_scale,
         }
         _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
         return result
@@ -379,6 +408,7 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
         "stop_reason": None,
         "websocket_error": runtime.websocket_error,
         "last_error": runtime.last_error,
+        "portfolio_target_scale": runtime.portfolio_target_scale,
     }
     _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", last)
     try:

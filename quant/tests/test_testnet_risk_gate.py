@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from quant_bot.risk.testnet_gate import check_testnet_order
+from quant_bot.risk.testnet_gate import check_testnet_order, portfolio_target_scale
 
 
 def envelope() -> dict[str, object]:
@@ -14,6 +14,11 @@ def test_testnet_gate_is_fail_closed_without_explicit_order_confirmation() -> No
     assert not decision.allowed
     assert "ORDERS_DISABLED" in decision.reasons
     assert "TESTNET_CONFIRMATION_REQUIRED" in decision.reasons
+
+
+def test_portfolio_scale_preserves_historical_cap() -> None:
+    assert portfolio_target_scale(Decimal("5"), Decimal("4")) == Decimal("0.8")
+    assert portfolio_target_scale(Decimal("3"), Decimal("4")) == Decimal("1")
 
 
 def test_testnet_gate_allows_only_reconciled_fresh_within_historical_envelope() -> None:

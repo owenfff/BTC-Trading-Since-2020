@@ -11,6 +11,14 @@ class TestnetRiskDecision:
     reasons: tuple[str, ...]
 
 
+def portfolio_target_scale(total_target_exposure: Decimal, total_limit: Decimal) -> Decimal:
+    """Return a proportional scale that fits a portfolio inside its cap."""
+
+    if total_target_exposure <= 0 or total_limit <= 0:
+        return Decimal("0")
+    return min(Decimal("1"), total_limit / total_target_exposure)
+
+
 def risk_envelope_for_symbol(envelope: Mapping[str, Any], symbol: str) -> Decimal:
     item = dict(envelope.get("per_symbol_target_exposure", {})).get(symbol, {})
     return Decimal(str(item.get("p99_abs_target_exposure", "0")))
@@ -62,4 +70,4 @@ def check_testnet_order(
     return TestnetRiskDecision(not reasons, tuple(reasons))
 
 
-__all__ = ["TestnetRiskDecision", "check_testnet_order", "risk_envelope_for_symbol"]
+__all__ = ["TestnetRiskDecision", "check_testnet_order", "portfolio_target_scale", "risk_envelope_for_symbol"]

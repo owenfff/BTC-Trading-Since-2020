@@ -99,6 +99,7 @@ def status_payload() -> dict[str, Any]:
             "websocket_connected": runtime.get("websocket_connected", False),
             "order_submission_enabled": runtime.get("order_submission_enabled", False),
             "plans": runtime.get("plans", 0),
+            "portfolio_target_scale": runtime.get("portfolio_target_scale", "1"),
             "stop_reason": runtime.get("stop_reason"),
             "last_error": runtime.get("last_error"),
         },
