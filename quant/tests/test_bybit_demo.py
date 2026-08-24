@@ -198,6 +198,15 @@ def test_adapter_maps_instruments_and_order_lifecycle() -> None:
     assert transport.calls[-1][3]["orderLinkId"] == "client-1"
 
 
+def test_adapter_enables_inverse_settlement_collateral() -> None:
+    transport = FakeTransport({
+        ("GET", "/v5/account/collateral-info?currency=ADA"): {"retCode": 0, "result": {"list": [{"currency": "ADA", "marginCollateral": True, "collateralSwitch": False}]}},
+        ("POST", "/v5/account/set-collateral-switch"): {"retCode": 0, "result": {}},
+    })
+    adapter = BybitAdapter(transport, credentials=BybitCredentials("key", "secret"))
+    assert adapter.ensure_collateral_coins({"ADA", "USDT"}) == {"ADA": "ENABLED", "USDT": "INHERENT_COLLATERAL"}
+
+
 def test_target_planner_uses_decimal_reduce_only_and_splits_flip() -> None:
     instrument = Instrument("BTCUSDT", InstrumentType.LINEAR_PERPETUAL, "BTC", "USDT", "USDT", Decimal("0.1"), Decimal("0.001"), Decimal("0.001"), Decimal("0"), contract_multiplier=Decimal("1"))
     plan = plan_target_order(instrument, current_contracts=Decimal("1"), target_exposure=Decimal("0.001"), equity=Decimal("1000"), reference_price=Decimal("100"), bid=Decimal("99.9"), ask=Decimal("100.1"), decision_time=datetime.now(timezone.utc), max_target_exposure=Decimal("0.01"))

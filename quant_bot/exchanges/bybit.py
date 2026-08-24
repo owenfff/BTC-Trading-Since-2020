@@ -202,6 +202,31 @@ class BybitAdapter:
                 result.append(Fill(str(row.get("execId") or row.get("orderId")), client_id, str(row.get("symbol") or ""), self._side(row.get("side")), quantity, price, abs(self._decimal(row.get("execFee"))), str(row.get("feeCurrency") or row.get("execFeeCurrency") or "USDT"), self._timestamp(row.get("execTime")), str(row.get("execId")) if row.get("execId") else None))
         return result
 
+    def ensure_collateral_coins(self, coins: set[str]) -> dict[str, str]:
+        """Enable eligible inverse-settlement coins for an explicit Demo run."""
+
+        self._private_guard()
+        status: dict[str, str] = {}
+        for raw_coin in sorted({str(coin).upper() for coin in coins if str(coin).strip()}):
+            if raw_coin in {"USDT", "USDC"}:
+                status[raw_coin] = "INHERENT_COLLATERAL"
+                continue
+            response = self.transport.request("GET", f"/v5/account/collateral-info?currency={raw_coin}", private=True)
+            self._check(response)
+            rows = response.get("result", {}).get("list", [])
+            if not rows:
+                raise AdapterError(self.name, "COLLATERAL_INFO_UNRESOLVED", f"no collateral information for {raw_coin}")
+            info = rows[0]
+            if not bool(info.get("marginCollateral")):
+                raise AdapterError(self.name, "COLLATERAL_UNAVAILABLE", f"{raw_coin} cannot be used as collateral")
+            if bool(info.get("collateralSwitch")):
+                status[raw_coin] = "ALREADY_ON"
+                continue
+            switched = self.transport.request("POST", "/v5/account/set-collateral-switch", body={"coin": raw_coin, "collateralSwitch": "ON"}, private=True)
+            self._check(switched)
+            status[raw_coin] = "ENABLED"
+        return status
+
     def fetch_closed_bars(self, symbol: str, *, category: str | None = None, limit: int = 100) -> list[MarketBar]:
         category = category or self._category_for(symbol)
         response = self.transport.request("GET", f"/v5/market/kline?category={category}&symbol={symbol}&interval=60&limit={limit}")

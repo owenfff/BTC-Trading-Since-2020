@@ -188,6 +188,8 @@ class TestnetRuntime:
     websocket_error: str | None = None
     last_error: str | None = None
     portfolio_target_scale: Decimal = Decimal("1")
+    collateral_prepared: bool = False
+    collateral_status: dict[str, str] = field(default_factory=dict)
     poll_seconds: int = 60
     _async_stop: Any = field(default=None, init=False, repr=False)
     _async_loop: Any = field(default=None, init=False, repr=False)
@@ -331,8 +333,22 @@ class TestnetRuntime:
         submitted: list[str] = []
         blocked: dict[str, list[str]] = {}
         order_errors: dict[str, str] = {}
+        collateral_error: AdapterError | None = None
+        if self.enable_orders and plans and not self.collateral_prepared:
+            try:
+                required_coins = {str(next(item for item in self.instruments.values() if item.canonical_symbol == plan.symbol).settlement_currency).upper() for plan in plans}
+                self.collateral_status = self.adapter.ensure_collateral_coins(required_coins)
+                self.collateral_prepared = True
+            except AdapterError as error:
+                collateral_error = error
+                self.last_error = f"{error.code}: {error}"
+                self.stop_reason = "COLLATERAL_PREPARATION_FAILED"
+                self.stop_event.set()
         for plan in plans:
             historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
+            if collateral_error is not None:
+                blocked[plan.symbol] = [collateral_error.code]
+                continue
             decision = check_testnet_order(enable_orders=self.enable_orders, confirm_testnet=self.confirm_testnet, symbol=historical_symbol, target_exposure=plan.target_exposure, total_target_exposure=total_target, envelope=self.bundle.risk_envelope, reconciliation_ok=self.reconciliation_ok, websocket_connected=self.websocket_connected, market_fresh=True, clock_drift_seconds=Decimal("0"), consecutive_rejects=self.consecutive_rejects)
             if not decision.allowed:
                 blocked[plan.symbol] = list(decision.reasons)
@@ -369,6 +385,8 @@ class TestnetRuntime:
             "last_error": self.last_error,
             "portfolio_target_scale": self.portfolio_target_scale,
             "order_errors": order_errors,
+            "collateral_status": self.collateral_status,
+            "collateral_error": f"{collateral_error.code}: {collateral_error}" if collateral_error else None,
         }
         _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
         return result
