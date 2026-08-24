@@ -330,17 +330,25 @@ class TestnetRuntime:
             total_target = sum((abs(plan.target_exposure) for plan in plans), Decimal("0"))
         submitted: list[str] = []
         blocked: dict[str, list[str]] = {}
+        order_errors: dict[str, str] = {}
         for plan in plans:
             historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
-            decision = check_testnet_order(enable_orders=self.enable_orders, confirm_testnet=self.confirm_testnet, symbol=historical_symbol, target_exposure=plan.target_exposure, total_target_exposure=total_target, envelope=self.bundle.risk_envelope, reconciliation_ok=self.reconciliation_ok, websocket_connected=self.websocket_connected, market_fresh=True, clock_drift_seconds=Decimal("0"))
+            decision = check_testnet_order(enable_orders=self.enable_orders, confirm_testnet=self.confirm_testnet, symbol=historical_symbol, target_exposure=plan.target_exposure, total_target_exposure=total_target, envelope=self.bundle.risk_envelope, reconciliation_ok=self.reconciliation_ok, websocket_connected=self.websocket_connected, market_fresh=True, clock_drift_seconds=Decimal("0"), consecutive_rejects=self.consecutive_rejects)
             if not decision.allowed:
                 blocked[plan.symbol] = list(decision.reasons)
                 continue
             order = Order(plan.client_order_id, plan.symbol, plan.side, plan.order_type, plan.quantity, datetime.now(timezone.utc), price=plan.price, reduce_only=plan.reduce_only, post_only=plan.post_only)
             try:
                 accepted = self.adapter.place_order(order)
-            except AdapterError:
+            except AdapterError as error:
                 self.consecutive_rejects += 1
+                order_errors[plan.symbol] = f"{error.code}: {error}"
+                self.last_error = order_errors[plan.symbol]
+                if self.consecutive_rejects >= 3:
+                    self.cancel_created_orders()
+                    self.stop_reason = "CONSECUTIVE_ORDER_REJECTS"
+                    self.stop_event.set()
+                    break
                 continue
             self.consecutive_rejects = 0
             self.created_order_ids.add(accepted.client_order_id)
@@ -360,6 +368,7 @@ class TestnetRuntime:
             "websocket_error": self.websocket_error,
             "last_error": self.last_error,
             "portfolio_target_scale": self.portfolio_target_scale,
+            "order_errors": order_errors,
         }
         _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
         return result

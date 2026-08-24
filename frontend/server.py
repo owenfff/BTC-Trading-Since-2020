@@ -100,6 +100,7 @@ def status_payload() -> dict[str, Any]:
             "order_submission_enabled": runtime.get("order_submission_enabled", False),
             "plans": runtime.get("plans", 0),
             "portfolio_target_scale": runtime.get("portfolio_target_scale", "1"),
+            "order_errors": runtime.get("order_errors", {}),
             "stop_reason": runtime.get("stop_reason"),
             "last_error": runtime.get("last_error"),
         },
