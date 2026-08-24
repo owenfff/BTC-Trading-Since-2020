@@ -26,6 +26,7 @@ outputs/cross_asset_market_context.csv
 outputs/cross_asset_market/
 outputs/cross_asset_deployment_model.json
 outputs/bybit_demo_*.json
+outputs/bybit_demo_*.log
 outputs/bybit_demo_runtime_state.json
 outputs/cross_asset_market_coverage.json
 data/market/raw/
