@@ -27,11 +27,37 @@ def _read_json(path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def _account_payload(runtime: dict[str, Any], preflight: dict[str, Any]) -> dict[str, Any]:
+    """Return only whitelisted account telemetry for the public read-only UI."""
+
+    source = runtime.get("account") if isinstance(runtime.get("account"), dict) else None
+    source_name = "RUNTIME" if source else "PREFLIGHT"
+    if not source:
+        source = preflight.get("account") if isinstance(preflight.get("account"), dict) else {}
+
+    def rows(name: str) -> list[dict[str, Any]]:
+        value = source.get(name, [])
+        return [item for item in value[:100] if isinstance(item, dict)] if isinstance(value, list) else []
+
+    return {
+        "source": source_name if source else "NONE",
+        "equity": source.get("equity") if source else None,
+        "equity_unit": source.get("equity_unit", "USD_EQUIVALENT") if source else "USD_EQUIVALENT",
+        "captured_at_utc": source.get("captured_at_utc") if source else None,
+        "reconciliation_ok": bool(source.get("reconciliation_ok")) if source else False,
+        "balances": rows("balances"),
+        "positions": rows("positions"),
+        "open_orders": rows("open_orders"),
+        "recent_fills": rows("recent_fills"),
+    }
+
+
 def status_payload() -> dict[str, Any]:
     preflight = _read_json(PROJECT_ROOT / "quant" / "outputs" / "bybit_demo_preflight.json")
     runtime = _read_json(PROJECT_ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json")
     mapping = _read_json(PROJECT_ROOT / "quant" / "reports" / "bybit_demo_symbol_mapping.json")
     has_feed = bool(preflight or runtime or mapping)
+    account = _account_payload(runtime, preflight)
     mapping_rows = mapping.get("symbols", []) if isinstance(mapping.get("symbols"), list) else []
     return {
         "dashboard_role": "FRONTEND_ONLY",
@@ -69,8 +95,16 @@ def status_payload() -> dict[str, Any]:
         "runtime": {
             "status": runtime.get("status", "NOT_RUNNING"),
             "selected_symbols": runtime.get("selected_symbols", []),
-            "submitted_orders": [],
+            "submitted_orders": runtime.get("submitted", []),
             "websocket_connected": runtime.get("websocket_connected", False),
+            "order_submission_enabled": runtime.get("order_submission_enabled", False),
+            "plans": runtime.get("plans", 0),
+        },
+        "account": account,
+        "activity": {
+            "position_count": len(account["positions"]),
+            "open_order_count": len(account["open_orders"]),
+            "recent_fill_count": len(account["recent_fills"]),
         },
         "operator_note": (
             "美国服务器只托管这个只读面板。交易引擎必须运行在可访问目标交易所的本地或非美国节点。"

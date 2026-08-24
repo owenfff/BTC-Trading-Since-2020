@@ -69,6 +69,89 @@
         </article>
       </section>
 
+      <section class="account-grid" aria-label="账户遥测">
+        <article class="panel equity-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">ACCOUNT TELEMETRY</p>
+              <h3>账户总权益</h3>
+            </div>
+            <span id="account-source" class="panel-code">等待快照</span>
+          </div>
+          <div class="equity-reading">
+            <span id="equity-value">—</span>
+            <small id="equity-unit">USD 估值</small>
+          </div>
+          <p id="account-note" class="account-note">机器人尚未启动；当前没有实时账户快照。</p>
+          <div id="balance-list" class="balance-list">
+            <span class="empty-state">预检或运行后显示余额明细</span>
+          </div>
+        </article>
+
+        <article class="panel activity-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">ACTIVITY REGISTER</p>
+              <h3>交易活动</h3>
+            </div>
+            <span id="runtime-status" class="panel-code">NOT RUNNING</span>
+          </div>
+          <div class="activity-metrics">
+            <div><strong id="position-count">0</strong><span>持仓</span></div>
+            <div><strong id="order-count">0</strong><span>活动订单</span></div>
+            <div><strong id="fill-count">0</strong><span>最近成交</span></div>
+          </div>
+          <p class="account-note">面板只读取脱敏快照，不保存密钥，也不提供下单操作。</p>
+        </article>
+      </section>
+
+      <section class="records-grid" aria-label="账户记录">
+        <article class="panel table-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">POSITION LEDGER</p>
+              <h3>当前持仓</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>品种</th><th>数量</th><th>均价</th><th>已实现</th></tr></thead>
+              <tbody id="positions-table"><tr><td colspan="4" class="empty-cell">暂无持仓</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel table-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">ORDER REGISTER</p>
+              <h3>活动订单</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>品种</th><th>方向</th><th>数量</th><th>价格</th></tr></thead>
+              <tbody id="orders-table"><tr><td colspan="4" class="empty-cell">暂无活动订单</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel table-panel fills-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">EXECUTION TAPE</p>
+              <h3>最近成交</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>时间</th><th>品种</th><th>方向</th><th>数量 / 价格</th></tr></thead>
+              <tbody id="fills-table"><tr><td colspan="4" class="empty-cell">暂无成交记录</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
       <section class="content-grid">
         <article class="panel pipeline-panel">
           <div class="panel-heading">

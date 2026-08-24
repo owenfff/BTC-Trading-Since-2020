@@ -41,6 +41,68 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, default=_json_default) + "\n", encoding="utf-8")
 
 
+def _public_account_snapshot(state: dict[str, Any], equity: Decimal) -> dict[str, Any]:
+    """Build a dashboard-safe account snapshot without exchange raw payloads."""
+
+    def iso(value: Any) -> str | None:
+        return value.isoformat() if isinstance(value, datetime) else str(value) if value is not None else None
+
+    def balance_row(item: Any) -> dict[str, Any]:
+        return {
+            "currency": str(getattr(item, "currency", "")),
+            "total": str(getattr(item, "total", Decimal("0"))),
+            "available": str(getattr(item, "available", Decimal("0"))),
+        }
+
+    def position_row(item: Any) -> dict[str, Any]:
+        return {
+            "symbol": str(getattr(item, "symbol", "")),
+            "settlement_currency": str(getattr(item, "settlement_currency", "")),
+            "quantity": str(getattr(item, "quantity", Decimal("0"))),
+            "average_entry_price": str(getattr(item, "average_entry_price", "")) if getattr(item, "average_entry_price", None) is not None else None,
+            "realized_pnl": str(getattr(item, "realized_pnl", Decimal("0"))),
+        }
+
+    def order_row(item: Any) -> dict[str, Any]:
+        return {
+            "client_order_id": str(getattr(item, "client_order_id", "")),
+            "exchange_order_id": str(getattr(item, "exchange_order_id", "")) if getattr(item, "exchange_order_id", None) else None,
+            "symbol": str(getattr(item, "symbol", "")),
+            "side": str(getattr(item, "side", "")),
+            "status": str(getattr(item, "status", "")),
+            "quantity": str(getattr(item, "quantity", Decimal("0"))),
+            "price": str(getattr(item, "price", "")) if getattr(item, "price", None) is not None else None,
+            "reduce_only": bool(getattr(item, "reduce_only", False)),
+            "post_only": bool(getattr(item, "post_only", False)),
+            "created_at": iso(getattr(item, "created_at", None)),
+        }
+
+    def fill_row(item: Any) -> dict[str, Any]:
+        return {
+            "event_id": str(getattr(item, "event_id", "")),
+            "exchange_fill_id": str(getattr(item, "exchange_fill_id", "")) if getattr(item, "exchange_fill_id", None) else None,
+            "client_order_id": str(getattr(item, "client_order_id", "")),
+            "symbol": str(getattr(item, "symbol", "")),
+            "side": str(getattr(item, "side", "")),
+            "quantity": str(getattr(item, "quantity", Decimal("0"))),
+            "price": str(getattr(item, "price", Decimal("0"))),
+            "fee": str(getattr(item, "fee", Decimal("0"))),
+            "fee_currency": str(getattr(item, "fee_currency", "")),
+            "timestamp": iso(getattr(item, "timestamp", None)),
+        }
+
+    return {
+        "equity": str(equity),
+        "equity_unit": "USD_EQUIVALENT",
+        "reconciliation_ok": bool(state.get("ok")),
+        "captured_at_utc": datetime.now(timezone.utc).isoformat(),
+        "balances": [balance_row(item) for item in state.get("balances", [])],
+        "positions": [position_row(item) for item in state.get("positions", [])],
+        "open_orders": [order_row(item) for item in state.get("open_orders", [])],
+        "recent_fills": [fill_row(item) for item in state.get("recent_fills", [])],
+    }
+
+
 def _instrument_status(instrument: Any) -> str:
     state = instrument.metadata.get("status") if hasattr(instrument, "metadata") else None
     return "ACTIVE" if state in (None, "Trading") else str(state).upper()
@@ -94,7 +156,7 @@ def preflight(*, artifact_path: Path = DEFAULT_ARTIFACT, write_reports: bool = T
     equity = adapter.fetch_equity()
     if equity <= 0:
         raise AdapterError(adapter.name, "EQUITY_UNRESOLVED", "Bybit Demo equity is zero or unavailable")
-    result = {"status": "PASS", "venue": "bybit-demo", "model_version": bundle.model_version, "feature_contract_version": bundle.feature_contract_version, "instrument_count": len(instruments), "mapping": mapping, "equity_available": equity > 0, "clock_drift_seconds": clock_drift, "reconciliation_ok": True, "order_submission_performed": False, "private_websocket": "NOT_STARTED", "local_watchdog": "REQUIRED_FOR_RUN", "credentials": "READ_FROM_LOCAL_ENVIRONMENT_ONLY"}
+    result = {"status": "PASS", "venue": "bybit-demo", "model_version": bundle.model_version, "feature_contract_version": bundle.feature_contract_version, "instrument_count": len(instruments), "mapping": mapping, "equity_available": equity > 0, "clock_drift_seconds": clock_drift, "reconciliation_ok": True, "order_submission_performed": False, "private_websocket": "NOT_STARTED", "local_watchdog": "REQUIRED_FOR_RUN", "credentials": "READ_FROM_LOCAL_ENVIRONMENT_ONLY", "account": _public_account_snapshot(state, equity)}
     if write_reports:
         report_dir = ROOT / "quant" / "reports"
         _write_json(report_dir / "bybit_demo_symbol_mapping.json", mapping)
@@ -121,6 +183,7 @@ class TestnetRuntime:
     stop_event: threading.Event = field(default_factory=threading.Event)
     ws_thread: threading.Thread | None = None
     ws_seen: bool = False
+    account_snapshot: dict[str, Any] = field(default_factory=dict)
     _async_stop: Any = field(default=None, init=False, repr=False)
     _async_loop: Any = field(default=None, init=False, repr=False)
 
@@ -129,7 +192,9 @@ class TestnetRuntime:
         self.reconciliation_ok = bool(state.get("ok"))
         self.positions = {item.symbol: item.quantity for item in state.get("positions", [])}
         self.active_orders = list(state.get("open_orders", []))
-        return self.adapter.fetch_equity()
+        equity = self.adapter.fetch_equity()
+        self.account_snapshot = _public_account_snapshot(state, equity)
+        return equity
 
     def on_private_message(self, message: dict[str, Any]) -> None:
         self.websocket_connected = True
@@ -216,7 +281,20 @@ class TestnetRuntime:
             self.consecutive_rejects = 0
             self.created_order_ids.add(accepted.client_order_id)
             submitted.append(accepted.client_order_id)
-        return {"status": "RUNNING", "equity": equity, "plans": len(plans), "submitted": submitted, "blocked": blocked, "websocket_connected": self.websocket_connected}
+        result = {
+            "status": "RUNNING" if self.enable_orders else "RUNNING_READ_ONLY",
+            "equity": equity,
+            "plans": len(plans),
+            "submitted": submitted,
+            "blocked": blocked,
+            "websocket_connected": self.websocket_connected,
+            "selected_symbols": sorted(self.instruments),
+            "order_submission_enabled": self.enable_orders and self.confirm_testnet,
+            "created_order_ids": sorted(self.created_order_ids),
+            "account": self.account_snapshot,
+        }
+        _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
+        return result
 
     def cancel_created_orders(self) -> None:
         for client_id in sorted(self.created_order_ids):
@@ -249,7 +327,14 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
     runtime.start_private_stream()
     watchdog = threading.Thread(target=runtime._watchdog, name="bybit-demo-local-watchdog", daemon=True)
     watchdog.start()
-    last: dict[str, Any] = {"status": "STARTED", "selected_symbols": sorted(selected), "mapping": mapping}
+    last: dict[str, Any] = {
+        "status": "STARTED",
+        "selected_symbols": sorted(selected),
+        "mapping": mapping,
+        "order_submission_enabled": enable_orders and confirm_testnet,
+        "account": runtime.account_snapshot,
+    }
+    _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", last)
     try:
         while not runtime.stop_event.is_set():
             last = runtime.process_once()

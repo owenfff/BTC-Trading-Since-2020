@@ -7,12 +7,16 @@ from decimal import Decimal
 import pytest
 
 from quant_bot.domain.instrument import Instrument, InstrumentType
+from quant_bot.domain.balance import Balance
+from quant_bot.domain.fill import Fill
 from quant_bot.domain.order import Order, OrderSide, OrderType
+from quant_bot.domain.position import Position
 from quant_bot.execution.target_planner import plan_target_order
 from quant_bot.exchanges.bybit import BybitAdapter
 from quant_bot.exchanges.bybit_http import BybitCredentials, BybitDemoTransport, assert_demo_url, bybit_signature, bybit_websocket_signature
 from quant_bot.exchanges.bybit_ws import BybitDemoWebSocket
 from quant_bot.exchanges.http import AdapterError, FakeTransport
+from quant_bot.testnet_runtime import _public_account_snapshot
 from frontend.server import status_payload
 
 
@@ -70,6 +74,18 @@ def test_frontend_dashboard_is_read_only_and_never_exposes_credentials() -> None
     assert payload["trading_enabled_here"] is False
     assert "BYBIT_DEMO_API_KEY" not in serialized
     assert "BYBIT_DEMO_API_SECRET" not in serialized
+
+
+def test_account_snapshot_is_sanitized_for_dashboard() -> None:
+    order = _order()
+    fill = Fill("fill-1", "client-1", "BTCUSDT", OrderSide.BUY, Decimal("1"), Decimal("100"), Decimal("0.1"), "USDT", datetime(2024, 1, 1, tzinfo=timezone.utc))
+    snapshot = _public_account_snapshot({"ok": True, "balances": [Balance("USDT", "10", "9")], "positions": [Position("BTCUSDT", "USDT", "1", "100", "0")], "open_orders": [order], "recent_fills": [fill]}, Decimal("10"))
+    assert snapshot["equity"] == "10"
+    assert snapshot["balances"][0]["available"] == "9"
+    assert snapshot["positions"][0]["quantity"] == "1"
+    assert snapshot["open_orders"][0]["client_order_id"] == "client-1"
+    assert snapshot["recent_fills"][0]["event_id"] == "fill-1"
+    assert "raw" not in json.dumps(snapshot)
 
 
 def test_private_ws_auth_and_duplicate_event_protection() -> None:

@@ -20,6 +20,21 @@ The dashboard reads only these optional, sanitized local artifacts:
 - `quant/outputs/bybit_demo_runtime_state.json`
 - `quant/reports/bybit_demo_symbol_mapping.json`
 
+The account section is read-only and shows the latest sanitized snapshot:
+
+- total equity as the exchange-reported USD-equivalent value;
+- currency balances and available amounts;
+- current non-zero positions;
+- open orders;
+- the latest execution records returned by the trading node.
+
+Before the trading node runs, the dashboard intentionally shows empty account
+and activity sections. A successful preflight does not submit orders. Once the
+Demo runtime is explicitly started, it rewrites
+`quant/outputs/bybit_demo_runtime_state.json` after each loop. That file may be
+copied to this host by a separately secured status-sync process; it must remain
+sanitized and must never contain API credentials or raw authenticated payloads.
+
 If no artifacts are present it stays in `WAITING_FOR_TRADING_NODE` mode. The
 trading runtime must run on a separate local or non-US node that can reach its
 target exchange. A separate status-sync mechanism can later copy sanitized
