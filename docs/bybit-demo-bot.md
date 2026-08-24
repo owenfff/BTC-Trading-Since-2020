@@ -26,6 +26,18 @@ Run the read-only preflight first:
 python -m quant_bot preflight --venue bybit-demo
 ```
 
+For a one-command local launch, use the checked-in PowerShell wrapper. It
+reuses the current process environment; if credentials are missing, it asks
+for them locally and clears temporary values when it exits. They are never
+written to the repository or sent to the dashboard host:
+
+```powershell
+.\deploy\start-bybit-demo.ps1 -Mode readonly
+```
+
+Use `-Once` for a single read-only cycle. The default is continuous read-only
+monitoring. The wrapper is deliberately read-only by default.
+
 Only after preflight passes, a user may explicitly enable Demo orders:
 
 ```powershell
@@ -35,6 +47,12 @@ python -m quant_bot run `
   --symbols auto `
   --enable-orders `
   --confirm-testnet
+```
+
+The equivalent wrapper command requires two explicit confirmations:
+
+```powershell
+.\deploy\start-bybit-demo.ps1 -Mode demo -ConfirmTestnet
 ```
 
 The `--confirm-testnet` flag is retained as a safety-oriented CLI name; it
