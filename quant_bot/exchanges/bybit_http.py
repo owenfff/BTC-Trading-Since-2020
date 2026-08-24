@@ -93,22 +93,30 @@ class BybitDemoTransport:
                 "X-BAPI-SIGN-TYPE": "2",
             })
         request = urllib.request.Request(url, data=payload.encode("utf-8") if body is not None else None, headers=headers, method=verb)
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                self.last_rate_limit = {key: value for key, value in response.headers.items() if "ratelimit" in key.lower()}
-                raw = response.read().decode("utf-8")
-        except urllib.error.HTTPError as error:
-            raw = error.read().decode("utf-8", errors="replace")
-            if error.code == 403 and "configured to block access from your country" in raw.lower():
-                raise AdapterError(
-                    "bybit-demo",
-                    "BYBIT_REGION_BLOCKED",
-                    "Bybit Demo blocked this server's country or region",
-                    retryable=False,
-                ) from error
-            raise AdapterError("bybit-demo", str(error.code), "Bybit Demo REST request failed", retryable=error.code in {408, 429, 500, 502, 503, 504}) from error
-        except (OSError, TimeoutError) as error:
-            raise AdapterError("bybit-demo", "NETWORK", "Bybit Demo REST request failed", retryable=True) from error
+        network_attempts = 3 if verb == "GET" else 1
+        for attempt in range(network_attempts):
+            try:
+                with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                    self.last_rate_limit = {key: value for key, value in response.headers.items() if "ratelimit" in key.lower()}
+                    raw = response.read().decode("utf-8")
+                break
+            except urllib.error.HTTPError as error:
+                raw_error = error.read().decode("utf-8", errors="replace")
+                if error.code in {408, 429, 500, 502, 503, 504} and attempt + 1 < network_attempts:
+                    time.sleep(0.5 * (attempt + 1))
+                    continue
+                if error.code == 403 and "configured to block access from your country" in raw_error.lower():
+                    raise AdapterError(
+                        "bybit-demo",
+                        "BYBIT_REGION_BLOCKED",
+                        "Bybit Demo blocked this server's country or region",
+                        retryable=False,
+                    ) from error
+                raise AdapterError("bybit-demo", str(error.code), "Bybit Demo REST request failed", retryable=error.code in {408, 429, 500, 502, 503, 504}) from error
+            except (OSError, TimeoutError) as error:
+                if attempt + 1 >= network_attempts:
+                    raise AdapterError("bybit-demo", "NETWORK", "Bybit Demo REST request failed", retryable=True) from error
+                time.sleep(0.5 * (attempt + 1))
         try:
             return json.loads(raw) if raw else {}
         except json.JSONDecodeError as error:

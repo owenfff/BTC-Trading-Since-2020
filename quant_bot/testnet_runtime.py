@@ -186,6 +186,7 @@ class TestnetRuntime:
     account_snapshot: dict[str, Any] = field(default_factory=dict)
     stop_reason: str | None = None
     websocket_error: str | None = None
+    last_error: str | None = None
     poll_seconds: int = 60
     _async_stop: Any = field(default=None, init=False, repr=False)
     _async_loop: Any = field(default=None, init=False, repr=False)
@@ -197,6 +198,7 @@ class TestnetRuntime:
         self.active_orders = list(state.get("open_orders", []))
         equity = self.adapter.fetch_equity()
         self.account_snapshot = _public_account_snapshot(state, equity)
+        self.last_error = None
         return equity
 
     def on_private_message(self, message: dict[str, Any]) -> None:
@@ -257,7 +259,31 @@ class TestnetRuntime:
 
     def process_once(self) -> dict[str, Any]:
         self.last_loop_monotonic = time.monotonic()
-        equity = self.refresh()
+        try:
+            equity = self.refresh()
+        except AdapterError as error:
+            self.last_error = f"{error.code}: Bybit Demo account refresh failed"
+            if self.enable_orders:
+                self.cancel_created_orders()
+                self.stop_reason = "ACCOUNT_REFRESH_FAILED"
+                self.stop_event.set()
+            result = {
+                "status": "RUNNING_READ_ONLY" if not self.enable_orders else "BLOCKED",
+                "equity": self.account_snapshot.get("equity"),
+                "plans": 0,
+                "submitted": [],
+                "blocked": {"account_refresh": [error.code]},
+                "websocket_connected": self.websocket_connected,
+                "selected_symbols": sorted(self.instruments),
+                "order_submission_enabled": self.enable_orders and self.confirm_testnet,
+                "created_order_ids": sorted(self.created_order_ids),
+                "account": self.account_snapshot,
+                "stop_reason": self.stop_reason,
+                "websocket_error": self.websocket_error,
+                "last_error": self.last_error,
+            }
+            _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
+            return result
         total_target = Decimal("0")
         plans: list[TargetOrderPlan] = []
         for symbol, instrument in self.instruments.items():
@@ -300,6 +326,7 @@ class TestnetRuntime:
             "account": self.account_snapshot,
             "stop_reason": self.stop_reason,
             "websocket_error": self.websocket_error,
+            "last_error": self.last_error,
         }
         _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
         return result
@@ -343,6 +370,7 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
         "account": runtime.account_snapshot,
         "stop_reason": None,
         "websocket_error": runtime.websocket_error,
+        "last_error": runtime.last_error,
     }
     _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", last)
     try:
@@ -361,6 +389,7 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
         last["status"] = "STOPPED"
     last["stop_reason"] = runtime.stop_reason
     last["websocket_error"] = runtime.websocket_error
+    last["last_error"] = runtime.last_error
     _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", last)
     return last
 

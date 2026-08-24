@@ -67,6 +67,38 @@ def test_bybit_region_block_is_explicit(monkeypatch: pytest.MonkeyPatch) -> None
     assert "secret" not in str(error.value)
 
 
+def test_bybit_get_retries_transient_network_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    class Response:
+        headers: dict[str, str] = {}
+
+        def __enter__(self) -> "Response":
+            return self
+
+        def __exit__(self, *args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return b'{"retCode":0,"result":{"timeNano":"1700000000000000000"}}'
+
+    attempts = 0
+
+    def flaky_urlopen(*args: object, **kwargs: object) -> Response:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            import urllib.error
+
+            raise urllib.error.URLError(TimeoutError("timed out"))
+        return Response()
+
+    monkeypatch.setattr("urllib.request.urlopen", flaky_urlopen)
+    monkeypatch.setattr("quant_bot.exchanges.bybit_http.time.sleep", lambda seconds: None)
+    transport = BybitDemoTransport(BybitCredentials("key", "secret"))
+    result = transport.request("GET", "/v5/market/time")
+    assert result["retCode"] == 0
+    assert attempts == 2
+
+
 def test_frontend_dashboard_is_read_only_and_never_exposes_credentials() -> None:
     payload = status_payload()
     serialized = json.dumps(payload, ensure_ascii=False)

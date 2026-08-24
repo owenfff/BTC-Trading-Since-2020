@@ -47,7 +47,8 @@ function renderAccount(payload) {
   setText("#account-source", hasAccount ? `${account.source} SNAPSHOT` : "等待快照");
   setText("#equity-value", hasAccount ? displayNumber(account.equity) : "—");
   setText("#equity-unit", account.equity_unit === "USD_EQUIVALENT" ? "USD 估值" : (account.equity_unit || "账户单位"));
-  setText("#account-note", hasAccount ? `账户对账 · ${account.reconciliation_ok ? "PASS" : "WAITING"} · ${account.captured_at_utc || "时间未知"}` : "机器人尚未启动；当前没有实时账户快照。");
+  const diagnostic = runtime.last_error || runtime.stop_reason;
+  setText("#account-note", diagnostic ? `运行诊断 · ${diagnostic}` : hasAccount ? `账户对账 · ${account.reconciliation_ok ? "PASS" : "WAITING"} · ${account.captured_at_utc || "时间未知"}` : "机器人尚未启动；当前没有实时账户快照。");
   setText("#position-count", positions.length);
   setText("#order-count", orders.length);
   setText("#fill-count", fills.length);
