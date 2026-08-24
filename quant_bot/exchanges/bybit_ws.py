@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import inspect
 import json
 import time
 from collections import defaultdict
-from typing import Any, Awaitable, Callable
+from typing import Any, Callable
 
 from .bybit_http import BybitCredentials, DEMO_WS_URL, assert_demo_ws_url, bybit_websocket_signature
 from .http import AdapterError
@@ -72,7 +73,7 @@ class BybitDemoWebSocket:
             await self.socket.close()
             self.socket = None
 
-    async def run(self, on_message: Callable[[dict[str, Any]], Awaitable[None]], stop: asyncio.Event, topics: list[str], *, reconnect_delay: float = 2.0) -> None:
+    async def run(self, on_message: Callable[[dict[str, Any]], Any], stop: asyncio.Event, topics: list[str], *, reconnect_delay: float = 2.0) -> None:
         while not stop.is_set():
             heartbeat_task: asyncio.Task[Any] | None = None
             try:
@@ -84,7 +85,9 @@ class BybitDemoWebSocket:
                             await self.socket.send(json.dumps({"op": "ping"}, separators=(",", ":")))
                 heartbeat_task = asyncio.create_task(heartbeat())
                 while not stop.is_set():
-                    await on_message(await self.receive())
+                    result = on_message(await self.receive())
+                    if inspect.isawaitable(result):
+                        await result
             except (OSError, asyncio.CancelledError, AdapterError):
                 self.connected = False
                 if stop.is_set():

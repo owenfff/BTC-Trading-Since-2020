@@ -184,6 +184,9 @@ class TestnetRuntime:
     ws_thread: threading.Thread | None = None
     ws_seen: bool = False
     account_snapshot: dict[str, Any] = field(default_factory=dict)
+    stop_reason: str | None = None
+    websocket_error: str | None = None
+    poll_seconds: int = 60
     _async_stop: Any = field(default=None, init=False, repr=False)
     _async_loop: Any = field(default=None, init=False, repr=False)
 
@@ -215,20 +218,23 @@ class TestnetRuntime:
         def target() -> None:
             try:
                 asyncio.run(runner())
-            except (AdapterError, OSError):
+            except Exception as error:  # noqa: BLE001 - keep the main loop alive and record a safe diagnostic
                 self.websocket_connected = False
+                self.websocket_error = f"{type(error).__name__}: {str(error)[:160]}"
 
         self.ws_thread = threading.Thread(target=target, name="bybit-demo-private-ws", daemon=True)
         self.ws_thread.start()
 
     def _watchdog(self) -> None:
         while not self.stop_event.wait(15):
-            if self.ws_seen and not self.websocket_connected:
+            if self.enable_orders and self.ws_seen and not self.websocket_connected:
                 self.cancel_created_orders()
+                self.stop_reason = "WEBSOCKET_DISCONNECTED"
                 self.stop_event.set()
                 break
-            if time.monotonic() - self.last_loop_monotonic > 60:
+            if time.monotonic() - self.last_loop_monotonic > max(90, self.poll_seconds * 2 + 30):
                 self.cancel_created_orders()
+                self.stop_reason = "WATCHDOG_TIMEOUT"
                 self.stop_event.set()
                 break
 
@@ -292,6 +298,8 @@ class TestnetRuntime:
             "order_submission_enabled": self.enable_orders and self.confirm_testnet,
             "created_order_ids": sorted(self.created_order_ids),
             "account": self.account_snapshot,
+            "stop_reason": self.stop_reason,
+            "websocket_error": self.websocket_error,
         }
         _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", result)
         return result
@@ -322,7 +330,7 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
     allowed = {row["symbol"] for row in mapping["symbols"] if row["status"] == "ALLOW_DERIVATIVE_TRADING"}
     selected = allowed if symbols == "auto" else allowed.intersection({item.strip().upper() for item in symbols.split(",") if item.strip()})
     by_venue_symbol = {item.canonical_symbol: item for item in live_instruments}
-    runtime = TestnetRuntime(adapter, bundle, enable_orders, confirm_testnet, instruments={symbol: by_venue_symbol[str(next(row["bybit_symbol"] for row in mapping["symbols"] if row["symbol"] == symbol))] for symbol in selected})
+    runtime = TestnetRuntime(adapter, bundle, enable_orders, confirm_testnet, instruments={symbol: by_venue_symbol[str(next(row["bybit_symbol"] for row in mapping["symbols"] if row["symbol"] == symbol))] for symbol in selected}, poll_seconds=max(5, poll_seconds))
     runtime.refresh()
     runtime.start_private_stream()
     watchdog = threading.Thread(target=runtime._watchdog, name="bybit-demo-local-watchdog", daemon=True)
@@ -333,6 +341,8 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
         "mapping": mapping,
         "order_submission_enabled": enable_orders and confirm_testnet,
         "account": runtime.account_snapshot,
+        "stop_reason": None,
+        "websocket_error": runtime.websocket_error,
     }
     _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", last)
     try:
@@ -345,6 +355,12 @@ def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: boo
         last = {"status": "STOPPING", **last}
     finally:
         runtime.shutdown()
+    if last.get("status") == "RUNNING_READ_ONLY":
+        last["status"] = "STOPPED_READ_ONLY"
+    elif last.get("status") == "RUNNING":
+        last["status"] = "STOPPED"
+    last["stop_reason"] = runtime.stop_reason
+    last["websocket_error"] = runtime.websocket_error
     _write_json(ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json", last)
     return last
 

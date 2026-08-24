@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -97,6 +98,32 @@ def test_private_ws_auth_and_duplicate_event_protection() -> None:
     assert ws.accept_message(message)
     assert not ws.accept_message(message)
     assert ws.latest["order"][0]["orderId"] == "1"
+
+
+def test_private_ws_accepts_sync_runtime_callback() -> None:
+    class Socket:
+        async def send(self, value: str) -> None:
+            return None
+
+        async def recv(self) -> str:
+            return json.dumps({"success": True, "topic": "wallet", "data": [{"coin": "USDT"}]})
+
+        async def close(self) -> None:
+            return None
+
+    async def fake_connect(*args: object, **kwargs: object) -> Socket:
+        return Socket()
+
+    ws = BybitDemoWebSocket(BybitCredentials("key", "secret"), connect_factory=fake_connect)
+    stop = asyncio.Event()
+    received: list[dict[str, object]] = []
+
+    def on_message(message: dict[str, object]) -> None:
+        received.append(message)
+        stop.set()
+
+    asyncio.run(ws.run(on_message, stop, []))
+    assert received[0]["success"] is True
 
 
 def test_adapter_maps_instruments_and_order_lifecycle() -> None:
