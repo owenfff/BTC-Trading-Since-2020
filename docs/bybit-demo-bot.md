@@ -12,8 +12,10 @@ $env:PYTHONPATH = "$PWD;$PWD\quant\src"
 python quant/scripts/build_cross_asset_deployment_model.py
 ```
 
-Credentials are read only from the local process environment. Do not paste
-them into chat, source files, reports, or logs:
+Credentials are read from the local process environment or a Windows-user
+DPAPI-encrypted local store. The store is ignored by Git and is never sent to
+the dashboard host. Do not paste credentials into chat, source files, reports,
+or logs:
 
 ```powershell
 $env:BYBIT_DEMO_API_KEY = "your-demo-key"
@@ -26,10 +28,11 @@ Run the read-only preflight first:
 python -m quant_bot preflight --venue bybit-demo
 ```
 
-For a one-command local launch, use the checked-in PowerShell wrapper. It
-reuses the current process environment; if credentials are missing, it asks
-for them locally and clears temporary values when it exits. They are never
-written to the repository or sent to the dashboard host:
+For a one-command local launch, use the checked-in PowerShell wrapper. On the
+first run it asks for the raw ASCII credentials locally and stores them using
+Windows-user DPAPI. Later runs reuse that local store; use `-ForgetCredentials`
+once to replace it. Plaintext values are cleared from the process when it
+exits and are never sent to the dashboard host:
 
 ```powershell
 .\deploy\start-bybit-demo.ps1 -Mode readonly

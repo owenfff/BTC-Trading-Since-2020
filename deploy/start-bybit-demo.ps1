@@ -3,7 +3,8 @@ param(
     [string]$Mode = "readonly",
     [switch]$Once,
     [switch]$ConfirmTestnet,
-    [string]$PythonPath = ""
+    [string]$PythonPath = "",
+    [switch]$ForgetCredentials
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,6 +13,7 @@ $oldPythonPath = $env:PYTHONPATH
 $oldKey = [Environment]::GetEnvironmentVariable("BYBIT_DEMO_API_KEY", "Process")
 $oldSecret = [Environment]::GetEnvironmentVariable("BYBIT_DEMO_API_SECRET", "Process")
 $temporaryCredentials = $false
+$credentialStorePath = Join-Path $repo "quant\outputs\bybit_demo_credentials.json"
 $exitCode = 1
 
 function Read-LocalSecret([string]$Prompt) {
@@ -22,6 +24,51 @@ function Read-LocalSecret([string]$Prompt) {
     } finally {
         [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer)
     }
+}
+
+function ConvertTo-PlainText([string]$EncryptedValue) {
+    $secure = ConvertTo-SecureString -String $EncryptedValue
+    $pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+    try {
+        return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)
+    } finally {
+        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer)
+    }
+}
+
+function ConvertTo-DpapiText([string]$PlainValue) {
+    $secure = ConvertTo-SecureString -String $PlainValue -AsPlainText -Force
+    return ConvertFrom-SecureString -SecureString $secure
+}
+
+function Assert-AsciiCredential([string]$Name, [string]$Value) {
+    if ([string]::IsNullOrWhiteSpace($Value)) { throw "$Name is empty" }
+    foreach ($character in $Value.ToCharArray()) {
+        if ([int][char]$character -gt 127) {
+            throw "$Name contains non-ASCII characters. Paste the raw Bybit credential, not formatted text or smart quotes."
+        }
+    }
+}
+
+function Read-DpapiCredentials([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $null }
+    try {
+        $stored = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+        if (-not $stored.api_key -or -not $stored.api_secret) { return $null }
+        return @{
+            ApiKey = ConvertTo-PlainText ([string]$stored.api_key)
+            ApiSecret = ConvertTo-PlainText ([string]$stored.api_secret)
+        }
+    } catch {
+        throw "Local DPAPI credential store could not be decrypted for this Windows user. Use -ForgetCredentials to replace it."
+    }
+}
+
+function Save-DpapiCredentials([string]$Path, [string]$ApiKey, [string]$ApiSecret) {
+    $parent = Split-Path -Parent $Path
+    New-Item -ItemType Directory -Force -Path $parent | Out-Null
+    $payload = @{ api_key = ConvertTo-DpapiText $ApiKey; api_secret = ConvertTo-DpapiText $ApiSecret } | ConvertTo-Json
+    Set-Content -LiteralPath $Path -Value $payload -Encoding UTF8
 }
 
 try {
@@ -41,19 +88,32 @@ try {
         throw "Python executable not found: $PythonPath"
     }
 
+    if ($ForgetCredentials -and (Test-Path -LiteralPath $credentialStorePath)) {
+        Remove-Item -LiteralPath $credentialStorePath -Force
+        Write-Host "[quant] local DPAPI credentials forgotten"
+    }
+    $storedCredentials = if (-not $ForgetCredentials) { Read-DpapiCredentials $credentialStorePath } else { $null }
+    if (-not $env:BYBIT_DEMO_API_KEY -and $storedCredentials) { $env:BYBIT_DEMO_API_KEY = $storedCredentials.ApiKey }
+    if (-not $env:BYBIT_DEMO_API_SECRET -and $storedCredentials) { $env:BYBIT_DEMO_API_SECRET = $storedCredentials.ApiSecret }
     if (-not $env:BYBIT_DEMO_API_KEY) {
-        $env:BYBIT_DEMO_API_KEY = Read-LocalSecret "Bybit Demo API key (local only)"
+        $env:BYBIT_DEMO_API_KEY = Read-LocalSecret "Bybit Demo API key (local only; raw ASCII)"
         $temporaryCredentials = $true
     }
     if (-not $env:BYBIT_DEMO_API_SECRET) {
-        $env:BYBIT_DEMO_API_SECRET = Read-LocalSecret "Bybit Demo API secret (local only)"
+        $env:BYBIT_DEMO_API_SECRET = Read-LocalSecret "Bybit Demo API secret (local only; raw ASCII)"
         $temporaryCredentials = $true
+    }
+    Assert-AsciiCredential "BYBIT_DEMO_API_KEY" $env:BYBIT_DEMO_API_KEY
+    Assert-AsciiCredential "BYBIT_DEMO_API_SECRET" $env:BYBIT_DEMO_API_SECRET
+    if (-not $storedCredentials -or $ForgetCredentials) {
+        Save-DpapiCredentials $credentialStorePath $env:BYBIT_DEMO_API_KEY $env:BYBIT_DEMO_API_SECRET
+        Write-Host "[quant] credentials saved in Windows-user DPAPI store"
     }
 
     $env:PYTHONPATH = "$repo;$repo\quant\src"
     Write-Host "[quant] repository: $repo"
     Write-Host "[quant] mode: $Mode"
-    Write-Host "[quant] credentials: process-local only"
+    Write-Host "[quant] credentials: Windows-user DPAPI + process-local only"
 
     & $PythonPath -m quant_bot preflight --venue bybit-demo
     if ($LASTEXITCODE -ne 0) {
@@ -84,7 +144,7 @@ try {
     if ($null -eq $oldPythonPath) { Remove-Item Env:PYTHONPATH -ErrorAction SilentlyContinue } else { $env:PYTHONPATH = $oldPythonPath }
     if ($null -eq $oldKey) { Remove-Item Env:BYBIT_DEMO_API_KEY -ErrorAction SilentlyContinue } else { $env:BYBIT_DEMO_API_KEY = $oldKey }
     if ($null -eq $oldSecret) { Remove-Item Env:BYBIT_DEMO_API_SECRET -ErrorAction SilentlyContinue } else { $env:BYBIT_DEMO_API_SECRET = $oldSecret }
-    if ($temporaryCredentials) { Write-Host "[quant] temporary credentials cleared from this PowerShell process" }
+    if ($temporaryCredentials) { Write-Host "[quant] plaintext credentials cleared from this PowerShell process" }
 }
 
 exit $exitCode

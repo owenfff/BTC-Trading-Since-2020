@@ -5,3 +5,4 @@ quant_bot/**/__pycache__/
 # Local Bybit Demo preflight/runtime reports
 quant/reports/bybit_demo_symbol_mapping.json
 quant/reports/bybit_demo_symbol_mapping.md
+quant/outputs/bybit_demo_credentials.json

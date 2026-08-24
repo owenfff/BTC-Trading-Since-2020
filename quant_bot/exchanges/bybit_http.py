@@ -33,6 +33,11 @@ class BybitCredentials:
         secret = os.environ.get("BYBIT_DEMO_API_SECRET", "").strip()
         if not key or not secret:
             raise AdapterError("bybit-demo", "DEMO_CREDENTIALS_REQUIRED", "BYBIT_DEMO_API_KEY and BYBIT_DEMO_API_SECRET are required locally")
+        for name, value in (("BYBIT_DEMO_API_KEY", key), ("BYBIT_DEMO_API_SECRET", secret)):
+            try:
+                value.encode("ascii")
+            except UnicodeEncodeError as error:
+                raise AdapterError("bybit-demo", "NON_ASCII_CREDENTIAL", f"{name} contains non-ASCII characters; use the raw Bybit credential") from error
         return cls(key, secret)
 
 
