@@ -147,6 +147,34 @@ def test_account_snapshot_is_sanitized_for_dashboard() -> None:
     assert "raw" not in json.dumps(snapshot)
 
 
+def test_unified_account_balance_can_preserve_asset_liability() -> None:
+    balance = Balance("BTC", "-0.25", "-0.25")
+    assert balance.total == Decimal("-0.25")
+    assert balance.available == Decimal("-0.25")
+    with pytest.raises(ValueError, match="reserved balance"):
+        Balance("BTC", "1", "1", "-0.1")
+
+
+def test_bybit_wallet_balance_preserves_negative_coin_liability() -> None:
+    transport = FakeTransport({
+        ("GET", "/v5/account/wallet-balance?accountType=UNIFIED"): {
+            "retCode": 0,
+            "result": {
+                "list": [{
+                    "totalEquity": "1000",
+                    "totalAvailableBalance": "900",
+                    "coin": [{"coin": "BTC", "walletBalance": "-0.25", "availableToWithdraw": "-0.25"}],
+                }],
+            },
+        },
+    })
+    adapter = BybitAdapter(transport, credentials=BybitCredentials("key", "secret"))
+    balances = adapter.fetch_balances()
+    assert balances[1].currency == "BTC"
+    assert balances[1].total == Decimal("-0.25")
+    assert balances[1].available == Decimal("-0.25")
+
+
 def test_private_ws_auth_and_duplicate_event_protection() -> None:
     ws = BybitDemoWebSocket(BybitCredentials("key", "secret"), clock_ms=lambda: 1_700_000_000_000)
     auth = ws.auth_message()
