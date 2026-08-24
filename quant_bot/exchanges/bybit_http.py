@@ -60,7 +60,7 @@ def bybit_websocket_signature(secret: str, expires_ms: int) -> str:
 class BybitDemoTransport:
     """V5 REST transport pinned to Bybit Demo Trading."""
 
-    def __init__(self, credentials: BybitCredentials, *, base_url: str = DEMO_REST_BASE_URL, recv_window: int = 5_000, timeout: float = 20.0, clock_ms: Any = lambda: int(time.time() * 1000)) -> None:
+    def __init__(self, credentials: BybitCredentials, *, base_url: str = DEMO_REST_BASE_URL, recv_window: int = 30_000, timeout: float = 20.0, clock_ms: Any = lambda: int(time.time() * 1000)) -> None:
         assert_demo_url(base_url)
         self.credentials = credentials
         self.base_url = base_url.rstrip("/")
@@ -68,21 +68,42 @@ class BybitDemoTransport:
         self.timeout = timeout
         self.clock_ms = clock_ms
         self.clock_offset_ms = 0
+        self.clock_synced_at_ms = 0
         self.last_rate_limit: dict[str, str] = {}
 
     def set_clock_offset_ms(self, offset_ms: int) -> None:
         """Apply a server-minus-local clock offset to signed requests."""
 
         self.clock_offset_ms = int(offset_ms)
+        self.clock_synced_at_ms = int(self.clock_ms())
+
+    def _sync_clock(self) -> None:
+        local_before_ms = int(self.clock_ms())
+        response = self.request("GET", "/v5/market/time")
+        local_after_ms = int(self.clock_ms())
+        if not isinstance(response, dict) or str(response.get("retCode", "0")) != "0":
+            raise AdapterError("bybit-demo", str(response.get("retCode", "SCHEMA")), str(response.get("retMsg", "invalid server time response")))
+        timestamp = response.get("time") or response.get("result", {}).get("timeNano", "")
+        if not timestamp:
+            raise AdapterError("bybit-demo", "SCHEMA", "Bybit Demo returned no server time")
+        server_ms = int(str(timestamp)[:13])
+        midpoint_ms = (local_before_ms + local_after_ms) // 2
+        self.clock_offset_ms = server_ms - midpoint_ms
+        self.clock_synced_at_ms = local_after_ms
+
+    def _clock_sync_stale(self) -> bool:
+        return self.clock_synced_at_ms <= 0 or abs(int(self.clock_ms()) - self.clock_synced_at_ms) > 30_000
 
     @staticmethod
     def _payload(body: dict[str, Any] | None) -> str:
         return json.dumps(body or {}, separators=(",", ":"), ensure_ascii=False) if body is not None else ""
 
-    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False) -> Any:
+    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False, _timestamp_retry: bool = False) -> Any:
         if not path.startswith("/v5/"):
             raise AdapterError("bybit-demo", "INVALID_PATH", "Bybit paths must be /v5/... paths")
         verb = method.upper()
+        if private and self._clock_sync_stale():
+            self._sync_clock()
         query = path.split("?", 1)[1] if "?" in path else ""
         payload = self._payload(body) if verb != "GET" else query
         url = self.base_url + path
@@ -124,7 +145,11 @@ class BybitDemoTransport:
                     raise AdapterError("bybit-demo", "NETWORK", "Bybit Demo REST request failed", retryable=True) from error
                 time.sleep(0.5 * (attempt + 1))
         try:
-            return json.loads(raw) if raw else {}
+            result = json.loads(raw) if raw else {}
+            if private and not _timestamp_retry and isinstance(result, dict) and str(result.get("retCode", "")) == "10002":
+                self._sync_clock()
+                return self.request(method, path, body=body, private=True, _timestamp_retry=True)
+            return result
         except json.JSONDecodeError as error:
             raise AdapterError("bybit-demo", "SCHEMA", "Bybit returned non-JSON data") from error
 

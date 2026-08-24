@@ -283,7 +283,10 @@ class BybitAdapter:
         server_ms = int(str(timestamp)[:13])
         if hasattr(self.transport, "set_clock_offset_ms"):
             midpoint_ms = (local_before_ms + local_after_ms) // 2
-            self.transport.set_clock_offset_ms(server_ms - midpoint_ms)
+            offset_ms = server_ms - midpoint_ms
+            self.transport.set_clock_offset_ms(offset_ms)
+            if self.websocket is not None and hasattr(self.websocket, "set_clock_offset_ms"):
+                self.websocket.set_clock_offset_ms(offset_ms)
         return datetime.fromtimestamp(server_ms / 1000, timezone.utc)
 
     def get_rate_limit_state(self) -> object:

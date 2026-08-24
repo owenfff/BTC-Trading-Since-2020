@@ -21,15 +21,19 @@ class BybitDemoWebSocket:
         self.url = url
         self.connect_factory = connect_factory
         self.clock_ms = clock_ms
+        self.clock_offset_ms = 0
         self.socket: Any = None
         self.connected = False
         self.seen_messages: set[str] = set()
         self.latest: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
     def auth_message(self) -> dict[str, Any]:
-        expires = int(self.clock_ms()) + 10_000
+        expires = int(self.clock_ms()) + self.clock_offset_ms + 10_000
         sign = bybit_websocket_signature(self.credentials.api_secret, expires)
         return {"op": "auth", "args": [self.credentials.api_key, expires, sign]}
+
+    def set_clock_offset_ms(self, offset_ms: int) -> None:
+        self.clock_offset_ms = int(offset_ms)
 
     @staticmethod
     def message_id(message: dict[str, Any]) -> str:
