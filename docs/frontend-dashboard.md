@@ -34,6 +34,19 @@ Linux:
 ./deploy/start-local-control-panel.sh
 ```
 
+To configure exactly one Demo/Testnet venue without putting credentials in the
+browser, run the local prompt on the trading node:
+
+```bash
+./deploy/configure-demo-credentials.sh okx-demo
+# or: binance-futures-testnet / binance-spot-testnet
+sudo systemctl restart quant-local-control-panel.service
+```
+
+The prompt writes only the selected venue to
+`~/.config/quant-bot/credentials.env` with mode `600`. It never prints or
+commits the values.
+
 If the panel is on a remote Shanghai server, access it through an SSH tunnel
 such as `ssh -L 8080:127.0.0.1:8080 user@server`; do not expose the control
 panel directly to the public internet. The US server remains frontend-only.
