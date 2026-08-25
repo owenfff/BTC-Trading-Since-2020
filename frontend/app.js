@@ -21,14 +21,70 @@ function appendCell(row, value, className = "") {
   row.append(cell);
 }
 
-function renderRows(selector, rows, emptyText, buildRow) {
+const strategyActionLabels = {
+  OPEN_LONG: "开多：策略预期上行，建立多仓",
+  OPEN_SHORT: "开空：策略预期下行，建立空仓",
+  ADD_LONG: "加多：策略目标多仓高于当前仓位",
+  ADD_SHORT: "加空：策略目标空仓高于当前仓位",
+  REDUCE_LONG: "减多：策略目标多仓低于当前仓位",
+  REDUCE_SHORT: "减空：策略目标空仓低于当前仓位",
+  CLOSE_LONG: "平多：策略目标回到空仓/无仓",
+  CLOSE_SHORT: "平空：策略目标回到多仓/无仓",
+  HOLD_LONG: "持有多仓：策略暂不改变目标",
+  HOLD_SHORT: "持有空仓：策略暂不改变目标",
+  NO_TRADE: "不交易：策略没有明确方向",
+};
+
+const executionReasonLabels = {
+  TARGET_DELTA: "当前仓位与策略目标不一致，执行差额调整",
+  FLIP_REDUCE_FIRST: "策略方向反转，先减掉原方向再开新方向",
+};
+
+const riskTagLabels = {
+  TRAIN_NUMPY_LOGISTIC: "历史行为模型判断",
+  MARK_INDEX_MISSING: "缺少标记价格，需谨慎解读",
+  LOW_ACCOUNTING_CONFIDENCE: "会计数据置信度较低",
+  HIGH_VOLATILITY: "当前波动较高",
+  UNKNOWN_MARKET_REGIME: "市场状态不明确",
+  INSUFFICIENT_HISTORY: "历史行情不足",
+  MISSING_MARKET_DATA: "行情数据不完整",
+};
+
+function strategyReasonParts(item) {
+  const action = String(item.strategy_action || "").toUpperCase();
+  const executionReason = String(item.strategy_reason || "").toUpperCase();
+  const actionLabel = strategyActionLabels[action] || (action ? `策略动作：${action}` : "策略暂未给出明确动作");
+  const executionLabel = executionReasonLabels[executionReason] || "根据策略目标仓位执行";
+  const target = item.strategy_target_exposure ? `目标暴露 ${displayNumber(item.strategy_target_exposure)}` : "目标暴露未知";
+  const confidence = item.strategy_confidence ? `置信度 ${displayNumber(item.strategy_confidence)}` : "置信度未知";
+  const tags = (Array.isArray(item.strategy_risk_tags) ? item.strategy_risk_tags : [])
+    .map((tag) => riskTagLabels[String(tag).toUpperCase()] || String(tag))
+    .filter((tag, index, all) => tag && all.indexOf(tag) === index);
+  return { actionLabel, executionLabel, detail: [target, confidence, ...tags].join(" · ") };
+}
+
+function appendStrategyReasonCell(row, item) {
+  const cell = document.createElement("td");
+  cell.className = "strategy-reason";
+  const parts = strategyReasonParts(item);
+  const action = document.createElement("strong");
+  action.textContent = parts.actionLabel;
+  const execution = document.createElement("span");
+  execution.textContent = parts.executionLabel;
+  const detail = document.createElement("small");
+  detail.textContent = parts.detail;
+  cell.append(action, execution, detail);
+  row.append(cell);
+}
+
+function renderRows(selector, rows, emptyText, buildRow, columnCount = 4) {
   const body = $(selector);
   body.replaceChildren();
   if (!rows?.length) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
     cell.className = "empty-cell";
-    cell.colSpan = 4;
+    cell.colSpan = columnCount;
     cell.textContent = emptyText;
     row.append(cell);
     body.append(row);
@@ -320,10 +376,9 @@ function renderAccount(payload) {
     appendCell(row, item.side);
     appendCell(row, displayNumber(item.quantity));
     appendCell(row, displayNumber(item.price, "市价"));
-    const reason = [item.strategy_action, item.strategy_reason, item.strategy_target_exposure ? `目标 ${displayNumber(item.strategy_target_exposure)}` : "", item.strategy_confidence ? `置信度 ${displayNumber(item.strategy_confidence)}` : ""].filter(Boolean).join(" · ") || "—";
-    appendCell(row, reason);
+    appendStrategyReasonCell(row, item);
     return row;
-  });
+  }, 5);
   renderRows("#fills-table", fills, "暂无成交记录", (item) => {
     const row = document.createElement("tr");
     const time = item.timestamp ? new Date(item.timestamp).toLocaleString("zh-CN", { hour12: false }) : "—";
