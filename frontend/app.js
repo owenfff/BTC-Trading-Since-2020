@@ -98,6 +98,43 @@ function renderAccount(payload) {
   });
 }
 
+function renderVenues(venues) {
+  const list = $("#venue-list");
+  list.replaceChildren();
+  if (!venues?.length) {
+    const empty = document.createElement("span");
+    empty.className = "empty-state";
+    empty.textContent = "等待交易节点状态";
+    list.append(empty);
+    return;
+  }
+  venues.forEach((venue) => {
+    const card = document.createElement("article");
+    const live = venue.runtime_status === "RUNNING" || venue.runtime_status === "RUNNING_READ_ONLY";
+    const connected = venue.market_connected;
+    card.className = `venue-card ${live ? "live" : ""}`;
+    const title = document.createElement("div");
+    title.className = "venue-title";
+    title.innerHTML = `<strong></strong><span class="venue-dot"></span>`;
+    title.querySelector("strong").textContent = venue.label || venue.venue;
+    const status = document.createElement("p");
+    status.className = "venue-status";
+    status.textContent = `${venue.runtime_status || "NOT_RUNNING"} · ${venue.market_connection || "NONE"}`;
+    const metrics = document.createElement("div");
+    metrics.className = "venue-metrics";
+    metrics.innerHTML = `<span><b></b><small>权益</small></span><span><b></b><small>仓位 / 订单</small></span><span><b></b><small>成交</small></span>`;
+    const values = metrics.querySelectorAll("b");
+    values[0].textContent = displayNumber(venue.equity);
+    values[1].textContent = `${venue.position_count || 0} / ${venue.open_order_count || 0}`;
+    values[2].textContent = venue.fill_count || 0;
+    const note = document.createElement("small");
+    note.className = "venue-note";
+    note.textContent = venue.order_submission_enabled ? "下单通道已确认（非生产环境）" : connected ? "私有流已连接 · 只读/等待确认" : "等待凭证或交易节点";
+    card.append(title, status, metrics, note);
+    list.append(card);
+  });
+}
+
 function render(payload) {
   const feed = payload.feed_status === "CONNECTED";
   const badge = $("#feed-badge");
@@ -107,6 +144,7 @@ function render(payload) {
 
   setText("#updated-at", feed ? `状态源 · ${payload.updated_at_utc}` : "等待状态源");
   setText("#model-version", payload.model?.version || "—");
+  renderVenues(payload.venues || []);
   setText("#allowed-count", payload.mapping?.allowed_count ?? 0);
   setText("#reconciliation", payload.preflight?.reconciliation_ok ? "PASS" : "WAITING");
   renderAccount(payload);

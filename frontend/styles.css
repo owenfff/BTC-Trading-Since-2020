@@ -108,6 +108,25 @@ h1 { margin-bottom: 0; font: 500 clamp(24px, 3vw, 37px)/1 var(--display); letter
 .equity-reading { display: flex; align-items: baseline; gap: 12px; padding: 25px 0 9px; }
 .equity-reading span { font: 500 clamp(44px, 7vw, 76px)/.9 var(--display); letter-spacing: -.07em; color: var(--teal); }
 .equity-reading small { color: var(--muted); font: 10px/1 var(--mono); letter-spacing: .08em; }
+
+.venue-panel { margin-top: 18px; }
+.venue-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.venue-card { border: 1px solid var(--line); background: rgba(255,255,255,.025); padding: 16px; min-height: 132px; }
+.venue-card.live { border-color: rgba(93, 214, 183, .55); }
+.venue-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 13px/1.2 var(--display); }
+.venue-title strong { font-weight: 500; }
+.venue-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 0 3px rgba(255,255,255,.04); }
+.venue-card.live .venue-dot { background: var(--teal); box-shadow: 0 0 0 3px rgba(93, 214, 183, .12); }
+.venue-status { margin: 9px 0 14px; color: var(--muted); font: 10px/1.2 var(--mono); letter-spacing: .05em; }
+.venue-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.venue-metrics span { display: grid; gap: 4px; }
+.venue-metrics b { color: var(--ink); font: 14px/1 var(--mono); font-weight: 500; }
+.venue-metrics small, .venue-note { color: var(--muted); font: 9px/1.2 var(--mono); }
+.venue-note { display: block; margin-top: 14px; }
+
+@media (max-width: 800px) {
+  .venue-list { grid-template-columns: 1fr; }
+}
 .account-note { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
 .balance-list { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 21px; }
 .balance-chip { padding: 8px 9px; border: 1px solid rgba(11,127,128,.28); color: var(--ink-soft); background: rgba(11,127,128,.06); font: 10px/1 var(--mono); }

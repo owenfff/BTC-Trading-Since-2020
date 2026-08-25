@@ -52,10 +52,58 @@ def _account_payload(runtime: dict[str, Any], preflight: dict[str, Any]) -> dict
     }
 
 
+VENUE_FILES = {
+    "bybit-demo": ("Bybit Demo", "bybit_demo_preflight.json", "bybit_demo_runtime_state.json", "bybit_demo_symbol_mapping.json"),
+    "okx-demo": ("OKX Demo", "okx_demo_preflight.json", "okx_demo_runtime_state.json", "okx_demo_symbol_mapping.json"),
+    "binance-spot-testnet": ("Binance Spot Testnet", "binance_spot_testnet_preflight.json", "binance_spot_testnet_runtime_state.json", "binance_spot_testnet_symbol_mapping.json"),
+}
+
+
+def _venue_payload(name: str, label: str, preflight: dict[str, Any], runtime: dict[str, Any], mapping: dict[str, Any]) -> dict[str, Any]:
+    account = _account_payload(runtime, preflight)
+    has_feed = bool(preflight or runtime or mapping)
+    return {
+        "venue": name,
+        "label": label,
+        "feed_status": "CONNECTED" if has_feed else "WAITING",
+        "preflight_status": preflight.get("status", "NOT_RECEIVED"),
+        "runtime_status": runtime.get("status", "NOT_RUNNING"),
+        "market_connection": runtime.get("market_connection", "NONE"),
+        "market_connected": runtime.get("market_connected", runtime.get("websocket_connected", False)),
+        "private_stream_seen": runtime.get("private_stream_seen", runtime.get("websocket_connected", False)),
+        "order_submission_enabled": bool(runtime.get("order_submission_enabled", False)),
+        "equity": account.get("equity"),
+        "equity_unit": account.get("equity_unit"),
+        "reconciliation_ok": account.get("reconciliation_ok", False),
+        "plans": runtime.get("plans", 0),
+        "submitted_orders": runtime.get("submitted", []),
+        "open_order_count": len(account.get("open_orders", [])),
+        "position_count": len(account.get("positions", [])),
+        "fill_count": len(account.get("recent_fills", [])),
+        "account": account,
+        "mapping": {
+            "allowed_count": mapping.get("allowed_count", 0),
+            "monitor_only_count": mapping.get("monitor_only_count", 0),
+            "blocked_count": mapping.get("blocked_count", 0),
+            "unavailable_count": mapping.get("unavailable_count", 0),
+        },
+    }
+
+
 def status_payload() -> dict[str, Any]:
-    preflight = _read_json(PROJECT_ROOT / "quant" / "outputs" / "bybit_demo_preflight.json")
-    runtime = _read_json(PROJECT_ROOT / "quant" / "outputs" / "bybit_demo_runtime_state.json")
-    mapping = _read_json(PROJECT_ROOT / "quant" / "reports" / "bybit_demo_symbol_mapping.json")
+    venue_states: list[dict[str, Any]] = []
+    raw_states: dict[str, tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = {}
+    for name, (label, preflight_name, runtime_name, mapping_name) in VENUE_FILES.items():
+        preflight = _read_json(PROJECT_ROOT / "quant" / "outputs" / preflight_name)
+        runtime = _read_json(PROJECT_ROOT / "quant" / "outputs" / runtime_name)
+        mapping = _read_json(PROJECT_ROOT / "quant" / "reports" / mapping_name)
+        raw_states[name] = (preflight, runtime, mapping)
+        venue_states.append(_venue_payload(name, label, preflight, runtime, mapping))
+    # Preserve the original single-venue dashboard fields by selecting the
+    # first venue with a runtime/preflight feed, while exposing every venue in
+    # the new `venues` collection.
+    active_name = next((item["venue"] for item in venue_states if item["runtime_status"] not in {"NOT_RUNNING", ""} or item["preflight_status"] not in {"NOT_RECEIVED", ""}), "bybit-demo")
+    preflight, runtime, mapping = raw_states[active_name]
     has_feed = bool(preflight or runtime or mapping)
     account = _account_payload(runtime, preflight)
     mapping_rows = mapping.get("symbols", []) if isinstance(mapping.get("symbols"), list) else []
@@ -84,8 +132,8 @@ def status_payload() -> dict[str, Any]:
             "unavailable_count": mapping.get("unavailable_count", 0),
             "symbols": [
                 {
-                    "symbol": row.get("symbol", ""),
-                    "venue_symbol": row.get("bybit_symbol", ""),
+                    "symbol": row.get("symbol", row.get("historical_symbol", "")),
+                    "venue_symbol": row.get("bybit_symbol", row.get("venue_symbol", "")),
                     "status": row.get("status", "UNKNOWN"),
                 }
                 for row in mapping_rows[:100]
@@ -97,6 +145,9 @@ def status_payload() -> dict[str, Any]:
             "selected_symbols": runtime.get("selected_symbols", []),
             "submitted_orders": runtime.get("submitted", []),
             "websocket_connected": runtime.get("websocket_connected", False),
+            "market_connection": runtime.get("market_connection", "NONE"),
+            "market_connected": runtime.get("market_connected", runtime.get("websocket_connected", False)),
+            "private_stream_seen": runtime.get("private_stream_seen", runtime.get("websocket_connected", False)),
             "order_submission_enabled": runtime.get("order_submission_enabled", False),
             "plans": runtime.get("plans", 0),
             "portfolio_target_scale": runtime.get("portfolio_target_scale", "1"),
@@ -110,6 +161,8 @@ def status_payload() -> dict[str, Any]:
             "open_order_count": len(account["open_orders"]),
             "recent_fill_count": len(account["recent_fills"]),
         },
+        "active_venue": active_name,
+        "venues": venue_states,
         "operator_note": (
             "美国服务器只托管这个只读面板。交易引擎必须运行在可访问目标交易所的本地或非美国节点。"
         ),
