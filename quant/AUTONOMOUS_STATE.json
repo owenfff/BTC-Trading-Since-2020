@@ -4,10 +4,10 @@
   "current_phase": "PHASE_14_MULTI_VENUE_DEMO_RUNTIME",
   "current_work_package": "M14-multivenue-nonproduction-runtime",
   "last_completed_phase": "PHASE_13_CROSS_ASSET_BEHAVIOR",
-  "last_code_commit": "79af72cf41c16cb32f8c19c1f2b1894e65da6733",
+  "last_code_commit": "cdbdc62d2e47003d2455a3e993ccbb099fc52c28",
   "last_report_commit": "c6580604fc2109706bd6d9892ab1b69f98e3d604",
   "test_count": 319,
-  "last_test_status": "FULL_SUITE_319_PASSED;BINANCE_FUTURES_TARGETED_5_PASSED;MULTIVENUE_TARGETED_16_PASSED;SUPERVISOR_TARGETED_4_PASSED;RUNTIME_LIFECYCLE_3_PASSED;POWERSHELL_PARSE_PASS_ALL_5_LAUNCHERS;SINGLE_VENUE_DEFAULT_OKX;BINANCE_FUTURES_SAFE_GATE_PASS;NO_CREDENTIALS_USED",
+  "last_test_status": "FULL_SUITE_319_PASSED;DASHBOARD_FUTURES_TARGETED_6_PASSED;BINANCE_FUTURES_TARGETED_5_PASSED;MULTIVENUE_TARGETED_16_PASSED;SUPERVISOR_TARGETED_4_PASSED;RUNTIME_LIFECYCLE_3_PASSED;POWERSHELL_PARSE_PASS_ALL_5_LAUNCHERS;SINGLE_VENUE_DEFAULT_OKX;BINANCE_FUTURES_SAFE_GATE_PASS;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -52,5 +52,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Select exactly one venue locally. For historical derivative semantics use deploy/start-binance-futures-testnet.ps1 when Binance Futures Testnet credentials are available in the Windows-user DPAPI cache; complete preflight, private-stream health and one real non-production order lifecycle. Keep the US server frontend-only and never copy credentials there.",
-  "updated_at_utc": "2026-08-25T02:53:16Z"
+  "updated_at_utc": "2026-08-25T03:03:00Z"
 }

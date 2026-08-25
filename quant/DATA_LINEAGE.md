@@ -164,6 +164,9 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
   endpoint or order was used. Credential-free Futures preflight and run both
   fail closed with `TESTNET_CREDENTIALS_REQUIRED`; root raw CSV/JSON inputs
   remain unchanged.
+- Dashboard follow-up code commit: `cdbdc62d2e47003d2455a3e993ccbb099fc52c28`;
+  the sanitized read-only status API now includes Futures state as a separate
+  venue without exposing credentials or authenticated payloads.
   confirmed with `git ls-remote`.
 
 ## One-command local stack artifact
