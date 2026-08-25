@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#102021" />
     <title>Quant Operator Console</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="shell">
       <header class="topbar">
-        <div class="brand"><span class="brand-mark">Q/01</span><div><p class="eyebrow">QUANT OPERATOR</p><h1>交易面板</h1></div></div>
+        <div class="brand"><span class="brand-mark">Q/01</span><div><p class="eyebrow">OKX DEMO · OBSERVER</p><h1>交易面板</h1></div></div>
         <div class="top-status"><span id="feed-badge" class="status-badge waiting"><i></i>等待交易节点</span><span id="updated-at" class="updated-at">等待状态源</span></div>
       </header>
 
-      <section class="intro">
-        <div><p class="eyebrow accent">BEHAVIORAL APPROXIMATION</p><h2>只看关键状态，<em>再决定是否运行。</em></h2><p class="intro-copy">这里显示策略运行所需的最少信息：账户、仓位、订单和安全边界。模型不会在线训练，也不会把网页当成密钥容器。</p></div>
+      <section class="intro intro-compact">
+        <div><p class="eyebrow accent">BEHAVIORAL APPROXIMATION</p><h2>账户状态，<em>一眼看清。</em></h2><p class="intro-copy">只显示账户、仓位、订单和安全边界。当前运行是 OKX Demo 只读模式。</p></div>
         <div class="intro-meta"><span>冻结模型</span><strong id="model-version">—</strong><span>账户对账</span><strong id="reconciliation" class="status-value">WAITING</strong></div>
       </section>
 
@@ -57,6 +57,6 @@
 
       <footer><span>Q/01 · DEMO / TESTNET ONLY</span><span>BEHAVIORAL_APPROXIMATION</span><span>UTC</span></footer>
     </main>
-    <script src="/app.js" defer></script>
+    <script src="app.js" defer></script>
   </body>
 </html>

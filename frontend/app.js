@@ -1,4 +1,6 @@
 const $ = (selector) => document.querySelector(selector);
+const PANEL_BASE = window.location.pathname === "/quant" || window.location.pathname.startsWith("/quant/") ? "/quant" : "";
+const panelPath = (path) => `${PANEL_BASE}${path}`;
 
 function setText(selector, value) {
   const element = $(selector);
@@ -244,7 +246,7 @@ async function loadReplay() {
   const status = $("#replay-status");
   try {
     const symbol = $("#replay-symbol")?.value || "XBTUSD";
-    const response = await fetch(`/api/replay?symbol=${encodeURIComponent(symbol)}&limit=1000`, { cache: "no-store" });
+    const response = await fetch(panelPath(`/api/replay?symbol=${encodeURIComponent(symbol)}&limit=1000`), { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     replayState.data = await response.json();
     replayState.cursor = 1000;
@@ -458,7 +460,7 @@ function renderControl(control) {
 }
 
 async function controlRequest(path, body = {}) {
-  const response = await fetch(path, {
+  const response = await fetch(panelPath(path), {
     method: "POST",
     headers: { "Content-Type": "application/json", "X-Local-Control": "1" },
     body: JSON.stringify(body),
@@ -552,7 +554,7 @@ $("#control-stop")?.addEventListener("click", async () => {
 
 async function refresh() {
   try {
-    const response = await fetch("/api/status", { cache: "no-store" });
+    const response = await fetch(panelPath("/api/status"), { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     render(await response.json());
   } catch (error) {
