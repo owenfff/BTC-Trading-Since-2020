@@ -8,7 +8,9 @@ credentials. It serves the dashboard plus sanitized local runtime artifacts.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import math
 import os
 import signal
 import subprocess
@@ -18,6 +20,7 @@ from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlsplit
 
 
 FRONTEND_ROOT = Path(__file__).resolve().parent
@@ -27,6 +30,8 @@ CONTROL_HOST = "127.0.0.1"
 CONTROL_LOCK = threading.RLock()
 CONTROL_PROCESS: subprocess.Popen[Any] | None = None
 CONTROL_META: dict[str, Any] = {}
+REPLAY_LOCK = threading.RLock()
+REPLAY_CACHE: dict[str, dict[str, Any]] = {}
 
 CONTROL_LAUNCHERS = {
     "okx-demo": "start-okx-demo.ps1",
@@ -74,6 +79,201 @@ VENUE_FILES = {
     "binance-spot-testnet": ("Binance Spot Testnet", "binance_spot_testnet_preflight.json", "binance_spot_testnet_runtime_state.json", "binance_spot_testnet_symbol_mapping.json"),
     "binance-futures-testnet": ("Binance USDⓈ-M Futures Testnet", "binance_futures_testnet_preflight.json", "binance_futures_testnet_runtime_state.json", "binance_futures_testnet_symbol_mapping.json"),
 }
+
+
+def _parse_time_ms(value: str | None) -> int | None:
+    if not value:
+        return None
+    try:
+        return int(datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp() * 1000)
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+
+def _number(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def _downsample(rows: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    """Uniformly downsample a time-ordered series without losing its endpoints."""
+
+    limit = max(2, min(limit, 1600))
+    if len(rows) <= limit:
+        return rows
+    indexes = {round(index * (len(rows) - 1) / (limit - 1)) for index in range(limit)}
+    return [rows[index] for index in sorted(indexes)]
+
+
+def _read_replay_dataset(symbol: str) -> dict[str, Any]:
+    """Load a compact historical replay view from local, already-derived outputs.
+
+    This intentionally reads no credentials and no exchange endpoint.  The panel
+    labels the lower series as analytical realised PnL because it is derived from
+    the repository's trade-cycle accounting, not from a live account equity curve.
+    """
+
+    output_root = PROJECT_ROOT / "quant" / "outputs"
+    bars: list[dict[str, Any]] = []
+    bars_path = output_root / "market_bars_1h.csv"
+    if bars_path.exists():
+        with bars_path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+            for row in csv.DictReader(handle):
+                if row.get("symbol") != symbol:
+                    continue
+                timestamp = _parse_time_ms(row.get("timestamp") or row.get("bar_end_time_utc"))
+                close = _number(row.get("close"))
+                if timestamp is None or close is None:
+                    continue
+                bars.append(
+                    {
+                        "ts": timestamp,
+                        "open": _number(row.get("open")),
+                        "high": _number(row.get("high")),
+                        "low": _number(row.get("low")),
+                        "close": close,
+                        "volume": _number(row.get("volume")) or 0.0,
+                    }
+                )
+
+    orders: list[dict[str, Any]] = []
+    orders_path = output_root / "order_episodes.csv"
+    if orders_path.exists():
+        with orders_path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+            for row in csv.DictReader(handle):
+                if row.get("symbol") != symbol:
+                    continue
+                start_ts = _parse_time_ms(row.get("first_event_time"))
+                end_ts = _parse_time_ms(row.get("last_event_time")) or start_ts
+                if start_ts is None or end_ts is None:
+                    continue
+                filled = _number(row.get("filled_qty")) or 0.0
+                leaves = _number(row.get("leavesQty_last"))
+                orders.append(
+                    {
+                        "start_ts": start_ts,
+                        "end_ts": end_ts,
+                        "side": row.get("side") or "UNKNOWN",
+                        "action": row.get("action") or "UNKNOWN",
+                        "status": row.get("ordStatus") or "UNKNOWN",
+                        "filled": filled,
+                        "order_qty": _number(row.get("orderQty")) or 0.0,
+                        "leaves": leaves,
+                        "price": _number(row.get("limit_price")) or _number(row.get("weighted_execution_price")),
+                        "position_before": _number(row.get("position_before")),
+                        "position_after": _number(row.get("position_after")),
+                        "order_id": row.get("orderID") or "",
+                        "is_filled": (row.get("ordStatus") or "").lower() == "filled" or (leaves == 0 and filled > 0),
+                    }
+                )
+
+    pnl: list[dict[str, Any]] = []
+    pnl_total = 0.0
+    pnl_currency = ""
+    pnl_scale: int | None = None
+    cycles_path = output_root / "trade_cycles.csv"
+    if cycles_path.exists():
+        cycle_rows: list[tuple[int, float]] = []
+        with cycles_path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+            for row in csv.DictReader(handle):
+                if row.get("symbol") != symbol:
+                    continue
+                pnl_currency = pnl_currency or (row.get("pnl_currency") or "")
+                timestamp = _parse_time_ms(row.get("close_time")) or _parse_time_ms(row.get("open_time"))
+                value = _number(row.get("gross_pnl_analytical"))
+                if timestamp is not None and value is not None:
+                    cycle_rows.append((timestamp, value))
+        scale_path = PROJECT_ROOT / "quant" / "reports" / "currency_scale_coverage.csv"
+        if scale_path.exists() and pnl_currency:
+            with scale_path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+                for row in csv.DictReader(handle):
+                    if row.get("currency") != pnl_currency:
+                        continue
+                    try:
+                        pnl_scale = int(row.get("asset_scale", ""))
+                    except ValueError:
+                        pnl_scale = None
+                    break
+        display_scale = 10**pnl_scale if pnl_scale is not None else 1
+        for timestamp, value in sorted(cycle_rows):
+            pnl_total += value / display_scale
+            pnl.append({"ts": timestamp, "value": pnl_total})
+
+    bars.sort(key=lambda item: item["ts"])
+    orders.sort(key=lambda item: (item["start_ts"], item["end_ts"], item["order_id"]))
+    pnl.sort(key=lambda item: item["ts"])
+    all_timestamps = [item["ts"] for item in bars]
+    all_timestamps.extend(item["start_ts"] for item in orders)
+    return {
+        "symbol": symbol,
+        "bars": bars,
+        "orders": orders,
+        "pnl": pnl,
+        "available": bool(bars or orders or pnl),
+        "start_ts": min(all_timestamps) if all_timestamps else None,
+        "end_ts": max(all_timestamps) if all_timestamps else None,
+        "pnl_unit": (
+            f"{pnl_currency} (scale {pnl_scale}) analytical realised PnL"
+            if pnl_currency and pnl_scale is not None
+            else "raw analytical realised PnL (scale unresolved)"
+        ),
+        "source": "local derived replay outputs",
+    }
+
+
+def _replay_dataset(symbol: str) -> dict[str, Any]:
+    with REPLAY_LOCK:
+        if symbol not in REPLAY_CACHE:
+            REPLAY_CACHE[symbol] = _read_replay_dataset(symbol)
+        return REPLAY_CACHE[symbol]
+
+
+def replay_payload(query: dict[str, list[str]]) -> dict[str, Any]:
+    symbol = (query.get("symbol") or ["XBTUSD"])[0].strip().upper() or "XBTUSD"
+    dataset = _replay_dataset(symbol)
+    try:
+        limit = int((query.get("limit") or ["900"])[0])
+    except ValueError:
+        limit = 900
+    start = _number((query.get("start") or [""])[0])
+    end = _number((query.get("end") or [""])[0])
+    if start is None:
+        start = dataset.get("start_ts")
+    if end is None:
+        end = dataset.get("end_ts")
+    if start is None or end is None:
+        return {
+            "status": "WAITING",
+            "symbol": symbol,
+            "available": False,
+            "bars": [],
+            "orders": [],
+            "pnl": [],
+            "source": dataset.get("source"),
+        }
+    if start > end:
+        start, end = end, start
+    bars = [row for row in dataset["bars"] if start <= row["ts"] <= end]
+    orders = [row for row in dataset["orders"] if row["end_ts"] >= start and row["start_ts"] <= end]
+    pnl = [row for row in dataset["pnl"] if start <= row["ts"] <= end]
+    return {
+        "status": "READY" if dataset["available"] else "WAITING",
+        "symbol": symbol,
+        "available": dataset["available"],
+        "start_ts": start,
+        "end_ts": end,
+        "full_start_ts": dataset.get("start_ts"),
+        "full_end_ts": dataset.get("end_ts"),
+        "bars": _downsample(bars, limit),
+        "orders": _downsample(orders, min(limit, 700)),
+        "pnl": _downsample(pnl, min(limit, 700)),
+        "counts": {"bars": len(bars), "orders": len(orders), "pnl_points": len(pnl)},
+        "pnl_unit": dataset["pnl_unit"],
+        "source": dataset["source"],
+    }
 
 
 def _venue_payload(name: str, label: str, preflight: dict[str, Any], runtime: dict[str, Any], mapping: dict[str, Any]) -> dict[str, Any]:
@@ -177,6 +377,12 @@ def status_payload() -> dict[str, Any]:
             "position_count": len(account["positions"]),
             "open_order_count": len(account["open_orders"]),
             "recent_fill_count": len(account["recent_fills"]),
+        },
+        "historical_replay": {
+            "available": (PROJECT_ROOT / "quant" / "outputs" / "market_bars_1h.csv").exists(),
+            "symbols": ["XBTUSD"],
+            "layers": ["market_and_orders", "position", "analytical_realised_pnl"],
+            "source": "local derived replay outputs",
         },
         "active_venue": active_name,
         "venues": venue_states,
@@ -302,8 +508,16 @@ class DashboardHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(FRONTEND_ROOT), **kwargs)
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path.split("?", 1)[0] == "/api/status":
-            body = json.dumps(status_payload(), ensure_ascii=False).encode("utf-8")
+        path = urlsplit(self.path)
+        if path.path == "/api/status":
+            response_payload = status_payload()
+        elif path.path == "/api/replay":
+            response_payload = replay_payload(parse_qs(path.query))
+        else:
+            super().do_GET()
+            return
+        if response_payload is not None:
+            body = json.dumps(response_payload, ensure_ascii=False).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
@@ -311,7 +525,6 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        super().do_GET()
 
     def do_POST(self) -> None:  # noqa: N802
         path = self.path.split("?", 1)[0]

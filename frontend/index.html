@@ -46,6 +46,72 @@
         </div>
       </section>
 
+      <section class="replay-panel panel" aria-label="历史交易回放">
+        <div class="panel-heading replay-heading">
+          <div>
+            <p class="eyebrow">HISTORICAL BEHAVIOR REPLAY</p>
+            <h3>把交易过程放回时间轴</h3>
+          </div>
+          <span id="replay-status" class="panel-code">加载历史数据…</span>
+        </div>
+        <div class="replay-toolbar">
+          <label>品种
+            <select id="replay-symbol">
+              <option value="XBTUSD">XBTUSD · BitMEX inverse perpetual</option>
+            </select>
+          </label>
+          <button id="replay-play" type="button">▶ 播放</button>
+          <button id="replay-latest" type="button" class="secondary">⏭ 最新</button>
+          <label>速度
+            <select id="replay-speed">
+              <option value="900">慢</option>
+              <option value="450" selected>标准</option>
+              <option value="180">快</option>
+            </select>
+          </label>
+          <span id="replay-range" class="replay-range">—</span>
+        </div>
+        <div class="replay-layout">
+          <div class="replay-charts">
+            <article class="chart-block">
+              <div class="chart-title"><strong>市场环境 · 订单生命周期</strong><span>实线=已成交 · 虚线=未完整成交</span></div>
+              <canvas id="price-chart" height="260" aria-label="价格、成交和订单生命周期图"></canvas>
+            </article>
+            <article class="chart-block compact-chart">
+              <div class="chart-title"><strong>仓位姿势 · 合约数量</strong><span>绿色=多仓 · 红色=空仓</span></div>
+              <canvas id="position-chart" height="150" aria-label="历史仓位图"></canvas>
+            </article>
+            <article class="chart-block compact-chart">
+              <div class="chart-title"><strong>累计已实现结果 · 分析值</strong><span id="replay-pnl-unit">—</span></div>
+              <canvas id="pnl-chart" height="150" aria-label="累计已实现结果图"></canvas>
+            </article>
+          </div>
+          <aside class="replay-inspector" aria-label="回放时间点详情">
+            <p class="eyebrow">TIME MACHINE</p>
+            <h4 id="replay-inspector-title">当前时间点</h4>
+            <dl>
+              <div><dt>时间</dt><dd id="replay-time">—</dd></div>
+              <div><dt>收盘价</dt><dd id="replay-price">—</dd></div>
+              <div><dt>当时仓位</dt><dd id="replay-position">—</dd></div>
+              <div><dt>活跃订单</dt><dd id="replay-orders">—</dd></div>
+              <div><dt>累计结果</dt><dd id="replay-pnl">—</dd></div>
+            </dl>
+            <p id="replay-note" class="replay-note">数据来自仓库内已审计的历史派生输出；这里只展示行为重放，不代表实时账户权益。</p>
+          </aside>
+        </div>
+        <div class="replay-scrubber">
+          <span>起点</span>
+          <input id="replay-slider" type="range" min="0" max="1000" value="1000" aria-label="历史回放时间点" />
+          <span>最新</span>
+        </div>
+        <div class="replay-legend">
+          <span><i class="legend-line teal"></i>价格</span>
+          <span><i class="legend-line copper"></i>订单/事件</span>
+          <span><i class="legend-line amber"></i>当前回放位置</span>
+          <span>行为标签：OPEN / ADD / REDUCE / FLIP / CLOSE</span>
+        </div>
+      </section>
+
       <section class="stat-grid" aria-label="核心状态">
         <article class="stat-card featured">
           <p class="card-label">MODEL VERSION</p>

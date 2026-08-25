@@ -89,3 +89,46 @@ def test_dashboard_control_requires_explicit_testnet_confirmation(monkeypatch) -
     status, payload = dashboard.start_control({"venue": "okx-demo", "mode": "testnet"})
     assert status == 400
     assert payload["error"] == "TESTNET_CONFIRMATION_REQUIRED"
+
+
+def test_replay_payload_keeps_endpoints_when_downsampling(monkeypatch) -> None:
+    dashboard.REPLAY_CACHE.clear()
+    monkeypatch.setitem(
+        dashboard.REPLAY_CACHE,
+        "XBTUSD",
+        {
+            "symbol": "XBTUSD",
+            "bars": [{"ts": index, "close": float(index)} for index in range(10)],
+            "orders": [],
+            "pnl": [],
+            "available": True,
+            "start_ts": 0,
+            "end_ts": 9,
+            "pnl_unit": "XBT (scale 8) analytical realised PnL",
+            "source": "test",
+        },
+    )
+    payload = dashboard.replay_payload({"symbol": ["XBTUSD"], "limit": ["4"]})
+    assert payload["status"] == "READY"
+    assert len(payload["bars"]) == 4
+    assert payload["bars"][0]["ts"] == 0
+    assert payload["bars"][-1]["ts"] == 9
+
+
+def test_replay_payload_is_waiting_for_missing_local_outputs(monkeypatch) -> None:
+    dashboard.REPLAY_CACHE.clear()
+    monkeypatch.setattr(dashboard, "_read_replay_dataset", lambda symbol: {
+        "symbol": symbol,
+        "bars": [],
+        "orders": [],
+        "pnl": [],
+        "available": False,
+        "start_ts": None,
+        "end_ts": None,
+        "pnl_unit": "raw analytical realised PnL (scale unresolved)",
+        "source": "test",
+    })
+    payload = dashboard.replay_payload({"symbol": ["XBTUSD"]})
+    assert payload["status"] == "WAITING"
+    assert payload["available"] is False
+    assert payload["bars"] == []
