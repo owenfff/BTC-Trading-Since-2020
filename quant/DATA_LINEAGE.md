@@ -157,3 +157,13 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The four PowerShell launchers parsed successfully; dashboard logs are
   ignored under `quant/outputs/`; no credential or raw account payload is
   served by the dashboard process.
+- The four PowerShell launchers parsed successfully; dashboard logs are
+  ignored under `quant/outputs/`; no credential or raw account payload is
+  served by the dashboard process.
+
+## Explicit single-venue selection
+
+- Code commit: `2e0e82b794f4412256b330dc4e4c4a04f4b27f0c`.
+- `start-quant-stack.ps1` now defaults to `okx-demo`; Binance is selected with
+  `-Venue binance-spot-testnet`, and simultaneous supervision requires the
+  explicit `-Venue both` opt-in.

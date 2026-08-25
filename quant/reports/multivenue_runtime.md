@@ -60,6 +60,9 @@ zero flip-recall limitation.
 
 - Code commit: `dcfc1033dde8f5361818e4620ec98dee9bba4540`.
 - Follow-up stack launcher commit: `ad7b8ec4f9ba603a7e08a8b6736244e3f56b1849`.
+- Single-venue selection commit: `2e0e82b794f4412256b330dc4e4c4a04f4b27f0c`.
+- The stack defaults to OKX; Binance or explicit simultaneous mode must be
+  selected by the operator.
 - Full repository test suite: `314 passed` in 127.77 seconds, zero warnings.
 - Adapter/runtime targeted suite: `16 passed`.
 - Unified supervisor targeted suite: `4 passed`.
