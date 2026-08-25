@@ -7,3 +7,4 @@ quant/reports/bybit_demo_symbol_mapping.json
 quant/reports/bybit_demo_symbol_mapping.md
 quant/outputs/bybit_demo_credentials.json
 quant/outputs/replay_dashboard_*.json
+quant/outputs/*_supervisor_state.json

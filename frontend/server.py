@@ -584,7 +584,7 @@ def _control_command(venue: str, mode: str, confirm: bool) -> tuple[list[str], d
         flags = getattr(subprocess, "CREATE_NEW_CONSOLE", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
         return ["powershell.exe", *arguments], {"creationflags": flags}
 
-    command = [sys.executable, "-m", "quant_bot", "run", "--venue", venue, "--mode", "testnet", "--symbols", "auto", "--poll-seconds", "60"]
+    command = [sys.executable, "-m", "quant_bot", "supervise", "--venue", venue, "--mode", "testnet", "--symbols", "auto", "--poll-seconds", "60"]
     if venue == "binance-spot-testnet":
         command.append("--allow-spot-approximation")
     if mode == "testnet":
