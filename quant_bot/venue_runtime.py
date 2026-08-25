@@ -345,7 +345,11 @@ class VenueRuntime:
         return self._result("RUNNING" if self.enable_orders else "RUNNING_READ_ONLY", equity, plans, blocked, submitted, order_errors)
 
     def _result(self, status: str, equity: Decimal, plans: list[TargetOrderPlan], blocked: dict[str, list[str]], submitted: list[str] | None = None, order_errors: dict[str, str] | None = None) -> dict[str, Any]:
-        result = {"status": status, "venue": self.venue, "equity": equity, "plans": len(plans), "submitted": submitted or [], "blocked": blocked, "market_connection": "PRIVATE_WEBSOCKET" if self.private_stream_available else "REST_POLLING", "market_connected": self.market_connected, "private_stream_seen": self.private_stream_seen, "private_stream_error": self.private_stream_error, "order_submission_enabled": self.enable_orders and self.confirm_testnet, "created_order_ids": sorted(self.created_order_ids), "account": self.account_snapshot, "stop_reason": self.stop_reason, "last_error": self.last_error, "portfolio_target_scale": self.portfolio_target_scale, "order_errors": order_errors or {}, "strategy_fidelity": "BEHAVIORAL_APPROXIMATION"}
+        if self.private_stream_available:
+            connection = "PRIVATE_WEBSOCKET" if self.private_stream_seen else "PRIVATE_WEBSOCKET_WAITING"
+        else:
+            connection = "REST_POLLING"
+        result = {"status": status, "venue": self.venue, "equity": equity, "plans": len(plans), "submitted": submitted or [], "blocked": blocked, "market_connection": connection, "market_connected": self.market_connected, "private_stream_seen": self.private_stream_seen, "private_stream_error": self.private_stream_error, "order_submission_enabled": self.enable_orders and self.confirm_testnet, "created_order_ids": sorted(self.created_order_ids), "account": self.account_snapshot, "stop_reason": self.stop_reason, "last_error": self.last_error, "portfolio_target_scale": self.portfolio_target_scale, "order_errors": order_errors or {}, "strategy_fidelity": "BEHAVIORAL_APPROXIMATION"}
         _write_json(self.output_path, result)
         return result
 
