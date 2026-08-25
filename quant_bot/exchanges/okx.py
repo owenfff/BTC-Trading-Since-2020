@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
+import re
 from typing import Any
 
 from quant_bot.domain.balance import Balance
@@ -50,7 +51,17 @@ class OKXAdapter:
     @staticmethod
     def _check(response: dict[str, Any]) -> None:
         if not isinstance(response, dict) or str(response.get("code", "0")) != "0":
-            raise AdapterError("okx-demo", str(response.get("code", "SCHEMA")) if isinstance(response, dict) else "SCHEMA", str(response.get("msg", "invalid response")) if isinstance(response, dict) else "invalid response")
+            if isinstance(response, dict):
+                code = str(response.get("code", "SCHEMA"))
+                message = str(response.get("msg", "invalid response"))
+                rows = response.get("data")
+                if isinstance(rows, list) and rows and isinstance(rows[0], dict):
+                    detail_code = rows[0].get("sCode")
+                    detail_message = rows[0].get("sMsg")
+                    if detail_code not in (None, "", "0") or detail_message:
+                        message = f"{message}; detail={detail_code or 'SCHEMA'}:{detail_message or 'missing detail'}"
+                raise AdapterError("okx-demo", code, message)
+            raise AdapterError("okx-demo", "SCHEMA", "invalid response")
 
     @staticmethod
     def _timestamp(value: Any) -> datetime:
@@ -63,6 +74,20 @@ class OKXAdapter:
     @staticmethod
     def _side(value: Any) -> OrderSide:
         return OrderSide.BUY if str(value).lower() == "buy" else OrderSide.SELL
+
+    @staticmethod
+    def _client_order_id(value: str) -> str:
+        """Return an OKX-compatible id while preserving planner uniqueness.
+
+        The shared planner uses separators for readability, while OKX accepts
+        only alphanumeric client order ids.  Removing separators keeps the
+        digest unique and makes the id safe for both submit and cancel calls.
+        """
+
+        normalized = re.sub(r"[^A-Za-z0-9]", "", str(value))
+        if not normalized or not normalized[0].isalpha():
+            normalized = f"qbot{normalized}"
+        return normalized[:32]
 
     def _instrument(self, item: dict[str, Any]) -> Instrument:
         inst_type = str(item.get("instType", ""))
@@ -183,7 +208,8 @@ class OKXAdapter:
     def place_order(self, order: Order) -> Order:
         self._private_guard()
         inst_type = self._instrument_types.get(order.symbol, "SPOT")
-        body: dict[str, Any] = {"instId": order.symbol, "tdMode": "cash" if inst_type == "SPOT" else "cross", "side": order.side.value.lower(), "ordType": "post_only" if order.post_only else "limit" if order.order_type == OrderType.LIMIT else "market", "sz": str(order.quantity), "clOrdId": order.client_order_id}
+        client_order_id = self._client_order_id(order.client_order_id)
+        body: dict[str, Any] = {"instId": order.symbol, "tdMode": "cash" if inst_type == "SPOT" else "cross", "side": order.side.value.lower(), "ordType": "post_only" if order.post_only else "limit" if order.order_type == OrderType.LIMIT else "market", "sz": str(order.quantity), "clOrdId": client_order_id}
         if order.price is not None:
             body["px"] = str(order.price)
         if order.reduce_only:
@@ -193,8 +219,8 @@ class OKXAdapter:
         rows = response.get("data", [])
         if not rows or not rows[0].get("ordId") or str(rows[0].get("sCode", "0")) != "0":
             raise AdapterError(self.name, str(rows[0].get("sCode", "SCHEMA")) if rows else "SCHEMA", str(rows[0].get("sMsg", "order response missing ordId")) if rows else "order response missing ordId")
-        self._order_symbols[order.client_order_id] = order.symbol
-        return Order(order.client_order_id, order.symbol, order.side, order.order_type, order.quantity, order.created_at, order.price, order.reduce_only, order.post_only, OrderStatus.OPEN, str(rows[0]["ordId"]), metadata={"raw": response})
+        self._order_symbols[client_order_id] = order.symbol
+        return Order(client_order_id, order.symbol, order.side, order.order_type, order.quantity, order.created_at, order.price, order.reduce_only, order.post_only, OrderStatus.OPEN, str(rows[0]["ordId"]), metadata={"raw": response})
 
     def cancel_order(self, client_order_id: str) -> Any:
         self._private_guard()

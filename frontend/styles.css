@@ -24,6 +24,20 @@ button, input, select { font: inherit; }
 button, select { cursor: pointer; }
 button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
 .shell { width: min(1160px, calc(100% - 40px)); margin: 0 auto; position: relative; }
+[hidden] { display: none !important; }
+.public-mode .shell { width: min(1180px, calc(100% - 28px)); }
+.public-mode .intro { padding: 20px 0 18px; }
+.public-mode .intro h2 { font-size: clamp(36px, 5vw, 58px); }
+.public-mode .main-grid { grid-template-columns: 1fr; }
+.public-mode .records-grid { margin-top: 12px; }
+.public-mode footer { margin-top: 24px; }
+[hidden] { display: none !important; }
+.public-mode .shell { width: min(1180px, calc(100% - 28px)); }
+.public-mode .intro { padding: 20px 0 18px; }
+.public-mode .intro h2 { font-size: clamp(36px, 5vw, 58px); }
+.public-mode .main-grid { grid-template-columns: 1fr; }
+.public-mode .records-grid { margin-top: 12px; }
+.public-mode footer { margin-top: 24px; }
 
 .topbar { min-height: 94px; display: flex; align-items: center; justify-content: space-between; gap: 22px; border-bottom: 1px solid var(--line-dark); }
 .brand { display: flex; align-items: center; gap: 15px; }

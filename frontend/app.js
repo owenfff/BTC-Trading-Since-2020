@@ -279,11 +279,11 @@ function renderAccount(payload) {
   const runtime = payload.runtime || {};
   const hasAccount = account.source && account.source !== "NONE";
 
-  setText("#account-source", hasAccount ? `${account.source} SNAPSHOT` : "等待快照");
+  setText("#account-source", hasAccount ? `${runtime.plans || 0} 个信号` : "等待快照");
   setText("#equity-value", hasAccount ? displayNumber(account.equity) : "—");
   setText("#equity-unit", account.equity_unit === "USD_EQUIVALENT" ? "USD 估值" : (account.equity_unit || "账户单位"));
   const diagnostic = runtime.last_error || runtime.stop_reason;
-  setText("#account-note", diagnostic ? `运行诊断 · ${diagnostic}` : hasAccount ? `账户对账 · ${account.reconciliation_ok ? "PASS" : "WAITING"} · ${account.captured_at_utc || "时间未知"}` : "机器人尚未启动；当前没有实时账户快照。");
+  setText("#account-note", diagnostic ? `运行诊断 · ${diagnostic}` : hasAccount ? `${runtime.plans || 0} 个目标信号 · 对账 ${account.reconciliation_ok ? "PASS" : "WAITING"}` : "等待实时账户快照。");
   setText("#position-count", positions.length);
   setText("#order-count", orders.length);
   setText("#fill-count", fills.length);
@@ -371,6 +371,10 @@ function renderVenues(venues) {
 }
 
 function render(payload) {
+  const localControl = Boolean(payload.control?.enabled && payload.control?.local_only);
+  document.body.classList.toggle("public-mode", !localControl);
+  document.querySelector(".control-panel")?.toggleAttribute("hidden", !localControl);
+  document.querySelectorAll("details.advanced").forEach((item) => item.toggleAttribute("hidden", !localControl));
   const feed = payload.feed_status === "CONNECTED";
   const badge = $("#feed-badge");
   badge.classList.toggle("live", feed);

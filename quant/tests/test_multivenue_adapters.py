@@ -68,6 +68,8 @@ def test_okx_adapter_maps_instruments_and_places_demo_order() -> None:
     assert instrument.instrument_type.value == "SPOT"
     accepted = adapter.place_order(_order("BTC-USDT"))
     assert accepted.exchange_order_id == "okx-order-1"
+    assert accepted.client_order_id == "clientvenue1"
+    assert transport.calls[-1][3]["clOrdId"] == "clientvenue1"
     assert transport.calls[-1][3]["tdMode"] == "cash"
 
 

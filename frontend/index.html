@@ -15,19 +15,19 @@
       </header>
 
       <section class="intro intro-compact">
-        <div><p class="eyebrow accent">BEHAVIORAL APPROXIMATION</p><h2>账户状态，<em>一眼看清。</em></h2><p class="intro-copy">只显示账户、仓位、订单和安全边界。当前运行是 OKX Demo 只读模式。</p></div>
-        <div class="intro-meta"><span>冻结模型</span><strong id="model-version">—</strong><span>账户对账</span><strong id="reconciliation" class="status-value">WAITING</strong></div>
+        <div><p class="eyebrow accent">OKX DEMO · PAPER EXECUTION</p><h2>账户状态，<em>一眼看清。</em></h2></div>
+        <div class="intro-meta"><span>模型</span><strong id="model-version">—</strong><span>对账</span><strong id="reconciliation" class="status-value">WAITING</strong></div>
       </section>
 
       <section class="summary-grid" aria-label="核心指标">
-        <article class="summary-card primary"><span class="card-label">TOTAL EQUITY</span><strong id="equity-value">—</strong><small id="equity-unit">USD 估值</small></article>
-        <article class="summary-card"><span class="card-label">POSITIONS</span><strong id="position-count">0</strong><small>当前持仓</small></article>
-        <article class="summary-card"><span class="card-label">OPEN ORDERS</span><strong id="order-count">0</strong><small>活动订单</small></article>
-        <article class="summary-card"><span class="card-label">RUNTIME</span><strong id="runtime-status" class="status-value">NOT RUNNING</strong><small id="account-source">等待快照</small></article>
+        <article class="summary-card primary"><span class="card-label">权益</span><strong id="equity-value">—</strong><small id="equity-unit">USD 估值</small></article>
+        <article class="summary-card"><span class="card-label">持仓</span><strong id="position-count">0</strong><small>当前数量</small></article>
+        <article class="summary-card"><span class="card-label">订单</span><strong id="order-count">0</strong><small>活动数量</small></article>
+        <article class="summary-card"><span class="card-label">状态</span><strong id="runtime-status" class="status-value">未运行</strong><small id="account-source">等待快照</small></article>
       </section>
 
       <section class="main-grid" aria-label="账户与控制">
-        <article class="panel account-panel"><div class="section-head"><div><p class="eyebrow">ACCOUNT</p><h3>账户资产</h3></div><span class="section-code">LIVE SAFE</span></div><p id="account-note" class="muted-copy">机器人尚未启动；当前没有实时账户快照。</p><div id="balance-list" class="balance-list"><span class="empty-state">运行后显示余额</span></div></article>
+        <article class="panel account-panel"><div class="section-head"><div><p class="eyebrow">ACCOUNT</p><h3>资产</h3></div><span class="section-code">LIVE</span></div><p id="account-note" class="muted-copy">等待账户快照。</p><div id="balance-list" class="balance-list"><span class="empty-state">暂无余额</span></div></article>
 
         <article class="panel control-panel"><div class="section-head"><div><p class="eyebrow">CONTROL</p><h3>启动交易节点</h3></div><span id="control-status" class="section-code">只读面板</span></div>
           <div class="control-fields"><label>交易所<select id="control-venue"><option value="okx-demo">OKX Demo</option><option value="binance-futures-testnet">Binance Futures Testnet</option><option value="binance-spot-testnet">Binance Spot Testnet（行为近似）</option></select></label><label>模式<select id="control-mode"><option value="readonly">只读监控</option><option value="testnet">Demo / Testnet 模拟下单</option></select></label></div>
@@ -37,9 +37,9 @@
       </section>
 
       <section class="records-grid" aria-label="交易记录">
-        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">POSITION</p><h3>当前持仓</h3></div></div><div class="table-wrap"><table><thead><tr><th>品种</th><th>数量</th><th>均价</th><th>已实现</th></tr></thead><tbody id="positions-table"><tr><td colspan="4" class="empty-cell">暂无持仓</td></tr></tbody></table></div></article>
-        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">ORDERS</p><h3>活动订单</h3></div></div><div class="table-wrap"><table><thead><tr><th>品种</th><th>方向</th><th>数量</th><th>价格</th></tr></thead><tbody id="orders-table"><tr><td colspan="4" class="empty-cell">暂无活动订单</td></tr></tbody></table></div></article>
-        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">FILLS</p><h3>最近成交</h3></div><span id="fill-count" class="section-code">0</span></div><div class="table-wrap"><table><thead><tr><th>时间</th><th>品种</th><th>方向</th><th>数量 / 价格</th></tr></thead><tbody id="fills-table"><tr><td colspan="4" class="empty-cell">暂无成交记录</td></tr></tbody></div></article>
+        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">POSITION</p><h3>持仓</h3></div></div><div class="table-wrap"><table><thead><tr><th>品种</th><th>数量</th><th>均价</th><th>已实现</th></tr></thead><tbody id="positions-table"><tr><td colspan="4" class="empty-cell">暂无持仓</td></tr></tbody></table></div></article>
+        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">ORDERS</p><h3>订单</h3></div></div><div class="table-wrap"><table><thead><tr><th>品种</th><th>方向</th><th>数量</th><th>价格</th></tr></thead><tbody id="orders-table"><tr><td colspan="4" class="empty-cell">暂无订单</td></tr></tbody></table></div></article>
+        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">FILLS</p><h3>成交</h3></div><span id="fill-count" class="section-code">0</span></div><div class="table-wrap"><table><thead><tr><th>时间</th><th>品种</th><th>方向</th><th>数量 / 价格</th></tr></thead><tbody id="fills-table"><tr><td colspan="4" class="empty-cell">暂无成交</td></tr></tbody></div></article>
       </section>
 
       <details class="advanced" data-advanced="replay"><summary><span>历史交易回放</span><small id="replay-status">加载历史数据…</small></summary><div class="advanced-body">

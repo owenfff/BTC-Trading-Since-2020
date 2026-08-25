@@ -210,6 +210,38 @@ class VenueRuntime:
     def _spot_quantity(self, instrument: Instrument) -> Decimal:
         return self.balances.get(instrument.base_currency.upper(), Decimal("0"))
 
+    def _available_collateral_scales(self, plans: list[TargetOrderPlan], equity: Decimal) -> dict[str, Decimal]:
+        """Keep each derivative bucket inside its available settle-currency margin.
+
+        ``totalEq`` can include BTC/ETH/OKB while a swap order may require
+        USDT margin.  The historical envelope is therefore not sufficient by
+        itself: cap each settlement-currency bucket at 80% of its available
+        balance before submitting any order.
+        """
+
+        if equity <= 0:
+            return {}
+        notional_by_currency: dict[str, Decimal] = {}
+        for plan in plans:
+            historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
+            instrument = self.instruments[historical_symbol]
+            if instrument.instrument_type == InstrumentType.SPOT:
+                continue
+            currency = instrument.settlement_currency.upper()
+            notional_by_currency[currency] = notional_by_currency.get(currency, Decimal("0")) + abs(plan.target_exposure) * equity
+        scales: dict[str, Decimal] = {}
+        for currency, target_notional in notional_by_currency.items():
+            available = self.balances.get(currency, Decimal("0"))
+            capacity = available * Decimal("0.80")
+            if target_notional <= 0:
+                scales[currency] = Decimal("1")
+                continue
+            if capacity <= 0:
+                scales[currency] = Decimal("0")
+                continue
+            scales[currency] = min(Decimal("1"), capacity / target_notional)
+        return scales
+
     def on_private_message(self, message: dict[str, Any]) -> None:
         self.private_stream_seen = True
         self.market_connected = not (message.get("success") is False or str(message.get("code", "0")) not in {"0", ""})
@@ -323,6 +355,31 @@ class VenueRuntime:
             plans = scaled
             total_target = sum((abs(item.target_exposure) for item in plans), Decimal("0"))
 
+        collateral_scales = self._available_collateral_scales(plans, equity)
+        if plans and any(scale < Decimal("1") for scale in collateral_scales.values()):
+            scaled = []
+            applied_scales: list[Decimal] = []
+            for plan in plans:
+                historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
+                instrument = self.instruments[historical_symbol]
+                collateral_scale = collateral_scales.get(instrument.settlement_currency.upper(), Decimal("0"))
+                if collateral_scale <= 0:
+                    continue
+                applied_scales.append(collateral_scale)
+                target = plan.target_exposure * collateral_scale
+                if instrument.instrument_type == InstrumentType.SPOT:
+                    rebuilt = plan_spot_order(instrument, current_base_quantity=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
+                else:
+                    rebuilt = plan_target_order(instrument, current_contracts=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
+                if rebuilt is not None:
+                    scaled.append(rebuilt)
+            plans = scaled
+            if applied_scales:
+                self.portfolio_target_scale *= min(applied_scales)
+            else:
+                self.portfolio_target_scale = Decimal("0")
+            total_target = sum((abs(item.target_exposure) for item in plans), Decimal("0"))
+
         submitted: list[str] = []
         order_errors: dict[str, str] = {}
         for plan in plans:
@@ -345,6 +402,16 @@ class VenueRuntime:
             self.consecutive_rejects = 0
             self.created_order_ids.add(accepted.client_order_id)
             submitted.append(accepted.client_order_id)
+        if submitted:
+            # Refresh immediately so the dashboard and the next idempotency
+            # decision see remote orders/fills created in this cycle.
+            try:
+                self.refresh()
+            except AdapterError as error:
+                self.last_error = f"{error.code}: {error}"
+                self.cancel_created_orders()
+                self.stop_reason = "ACCOUNT_REFRESH_FAILED_AFTER_ORDER"
+                self.stop_event.set()
         return self._result("RUNNING" if self.enable_orders else "RUNNING_READ_ONLY", equity, plans, blocked, submitted, order_errors)
 
     def _result(self, status: str, equity: Decimal, plans: list[TargetOrderPlan], blocked: dict[str, list[str]], submitted: list[str] | None = None, order_errors: dict[str, str] | None = None) -> dict[str, Any]:
