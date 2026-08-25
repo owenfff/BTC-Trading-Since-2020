@@ -69,7 +69,7 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 
 ## Multi-venue non-production runtime artifact
 
-- Code commits: `c58460f` (`Add unified OKX Demo and Binance Testnet runtime`), `d150aab` (`Add OKX and Binance private stream health`), `26bf900` (`Add local DPAPI launchers for OKX and Binance`), `54845f8` (`Show multi-venue runtime telemetry in dashboard`), and `0e2d33f` (`Test unified runtime lifecycle and restart safety`).
+- Code commits: `c58460f` (`Add unified OKX Demo and Binance Testnet runtime`), `d150aab` (`Add OKX and Binance private stream health`), `26bf900` (`Add local DPAPI launchers for OKX and Binance`), `54845f8` (`Show multi-venue runtime telemetry in dashboard`), `0e2d33f` (`Test unified runtime lifecycle and restart safety`), and `370cc7c` (`Make private stream readiness explicit`).
 - Report: `quant/reports/multivenue_runtime.md`.
 - Added artifacts: hard-pinned OKX Demo and Binance Spot Testnet transports,
   authenticated private WebSocket clients, normalized adapters, explicit
