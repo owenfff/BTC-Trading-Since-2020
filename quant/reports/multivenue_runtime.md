@@ -71,6 +71,8 @@ zero flip-recall limitation.
   submitted zero orders.
 - No exchange credentials were used during these tests.
 - Raw root CSV/JSON inputs were not modified.
+- Remote branch parity was confirmed after pushing the code, report and state
+  pointer commits.
 
 ## Commands
 

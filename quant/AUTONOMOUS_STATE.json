@@ -36,7 +36,7 @@
     "M13 public market coverage is 65 PASS and 1 INSUFFICIENT across 66 symbols; insufficient symbols remain auditable but are excluded from unified fitting.",
     "M13 has 12 symbols without a chronological TRAIN position scale; they are excluded rather than scaled from future observations.",
     "M13 unified model covers 10630 rows across 53 symbols; paper replay covers 1751 out-of-time rows across 5 symbols because other symbols end before the time-out window.",
-    "GitHub HTTPS push of dcfc1033dde8f5361818e4620ec98dee9bba4540 was temporarily unavailable; the local commit is present and must be pushed when connectivity returns."
+    "OKX Demo and Binance Spot Testnet credential caches are not present on this workstation; venue preflight and a real non-production order lifecycle remain pending local credentials."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -50,6 +50,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Retry pushing code commit dcfc1033dde8f5361818e4620ec98dee9bba4540 when GitHub HTTPS is reachable; then run deploy/start-multivenue.ps1 locally with encrypted Demo/Testnet credentials, complete venue preflight and a real non-production order lifecycle. Keep the US server frontend-only and never copy credentials there.",
+  "next_action": "Run deploy/start-multivenue.ps1 locally when OKX Demo and Binance Spot Testnet credentials are available in the Windows-user DPAPI cache; complete venue preflight, private-stream health and a real non-production order lifecycle. Keep the US server frontend-only and never copy credentials there.",
   "updated_at_utc": "2026-08-24T21:30:00Z"
 }

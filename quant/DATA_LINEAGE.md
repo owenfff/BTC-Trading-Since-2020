@@ -144,5 +144,6 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
   warnings; adapter/runtime targeted tests returned `16 passed`; supervisor
   tests returned `4 passed`; all PowerShell launchers parsed; no credentials
   were used; raw root CSV/JSON inputs were unchanged.
-- The code commit is currently local because the first GitHub HTTPS push
-  attempt failed at port 443; it must be pushed before claiming remote parity.
+- The code commit and report commits are present on
+  `origin/quant/autonomous-behavioral-quant-bot-v1`; remote parity was
+  confirmed with `git ls-remote`.
