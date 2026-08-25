@@ -104,6 +104,18 @@ h1 { margin-bottom: 0; font: 500 clamp(24px, 3vw, 37px)/1 var(--display); letter
 .stat-caption { margin-bottom: 0; color: var(--muted); font-size: 11px; line-height: 1.35; }
 
 .account-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; padding: 26px 0 0; }
+
+.operator-panel { margin-top: 18px; padding: 24px 28px 20px; border: 1px solid var(--line-dark); background: rgba(11,127,128,.05); }
+.control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; padding-top: 20px; }
+.control-grid label { display: grid; gap: 7px; color: var(--muted); font: 700 9px/1 var(--mono); letter-spacing: .1em; }
+.control-grid select { min-height: 38px; padding: 0 10px; border: 1px solid var(--line-dark); color: var(--ink); background: var(--paper); font: 11px/1 var(--mono); }
+.control-confirm { grid-column: 1 / -1; display: flex !important; grid-template-columns: auto 1fr !important; align-items: center; gap: 8px !important; color: var(--ink-soft) !important; letter-spacing: .02em !important; }
+.control-confirm input { accent-color: var(--teal); }
+.control-actions { display: flex; gap: 9px; align-items: end; }
+.control-actions button { min-height: 38px; padding: 0 16px; border: 1px solid var(--teal); color: var(--paper); background: var(--teal); cursor: pointer; font: 700 10px/1 var(--mono); letter-spacing: .06em; }
+.control-actions button.secondary { border-color: var(--line-dark); color: var(--ink-soft); background: transparent; }
+.control-actions button:disabled { opacity: .4; cursor: not-allowed; }
+.control-note { margin: 16px 0 0; color: var(--muted); font: 10px/1.6 var(--mono); }
 .account-grid .panel { min-height: 0; }
 .equity-reading { display: flex; align-items: baseline; gap: 12px; padding: 25px 0 9px; }
 .equity-reading span { font: 500 clamp(44px, 7vw, 76px)/.9 var(--display); letter-spacing: -.07em; color: var(--teal); }
@@ -183,6 +195,8 @@ td:first-child { color: var(--ink); font-weight: 700; }
   .stat-card:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   .account-grid, .content-grid { grid-template-columns: 1fr; }
   .records-grid { grid-template-columns: 1fr; }
+  .control-grid { grid-template-columns: 1fr; }
+  .control-confirm { grid-column: auto; }
 }
 
 @media (max-width: 560px) {

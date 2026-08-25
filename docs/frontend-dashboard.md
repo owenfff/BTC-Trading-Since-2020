@@ -4,7 +4,7 @@ The `frontend/` directory is a read-only monitoring surface. It does not
 import an exchange adapter, read API credentials, submit orders, or proxy
 private exchange requests.
 
-## Local run
+## Local read-only run
 
 From the repository root:
 
@@ -13,6 +13,30 @@ python frontend/server.py --host 127.0.0.1 --port 8080
 ```
 
 Open <http://127.0.0.1:8080>.
+
+## Local control panel
+
+The control panel can start exactly one OKX or Binance node, but it must be
+bound to loopback. The browser never accepts API keys. On Windows, the start
+button opens the existing local PowerShell credential flow; on Linux it starts
+the Python runner using credentials already supplied by the local service
+environment.
+
+Windows:
+
+```powershell
+.\deploy\start-local-control-panel.ps1
+```
+
+Linux:
+
+```bash
+./deploy/start-local-control-panel.sh
+```
+
+If the panel is on a remote Shanghai server, access it through an SSH tunnel
+such as `ssh -L 8080:127.0.0.1:8080 user@server`; do not expose the control
+panel directly to the public internet. The US server remains frontend-only.
 
 The dashboard reads only these optional, sanitized local artifacts:
 

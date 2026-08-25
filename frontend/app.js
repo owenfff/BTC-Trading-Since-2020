@@ -148,6 +148,7 @@ function render(payload) {
   setText("#allowed-count", payload.mapping?.allowed_count ?? 0);
   setText("#reconciliation", payload.preflight?.reconciliation_ok ? "PASS" : "WAITING");
   renderAccount(payload);
+  renderControl(payload.control || {});
 
   const mapping = payload.mapping || {};
   const total = (mapping.allowed_count || 0) + (mapping.monitor_only_count || 0) + (mapping.unavailable_count || 0);
@@ -177,6 +178,63 @@ function render(payload) {
     });
   }
 }
+
+function renderControl(control) {
+  const enabled = control.enabled && control.local_only;
+  const running = Boolean(control.running);
+  const status = $("#control-status");
+  const note = $("#control-note");
+  const start = $("#control-start");
+  const stop = $("#control-stop");
+  if (!status || !note || !start || !stop) return;
+  status.textContent = !enabled ? "只读面板" : running ? `运行中 · ${control.venue}` : "本机控制已就绪";
+  start.disabled = !enabled || running;
+  stop.disabled = !enabled || !running;
+  if (!enabled) {
+    note.textContent = "当前是远程/只读面板。请在交易节点本机启动 start-local-control-panel.ps1 或 start-local-control-panel.sh 后使用控制按钮。";
+  } else if (running) {
+    note.textContent = `本机节点已启动：${control.venue} · ${control.mode}。凭证不会进入网页。`;
+  } else {
+    note.textContent = "点击启动后，本机会使用本地安全凭证流程；网页不会接收或保存密钥。";
+  }
+}
+
+async function controlRequest(path, body = {}) {
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || payload.status || `HTTP ${response.status}`);
+  return payload;
+}
+
+$("#control-start")?.addEventListener("click", async () => {
+  const venue = $("#control-venue").value;
+  const mode = $("#control-mode").value;
+  const confirmed = $("#control-confirm").checked;
+  if (mode === "testnet" && !confirmed) {
+    setText("#control-note", "请先确认只使用 Demo/Testnet。" );
+    return;
+  }
+  try {
+    await controlRequest("/api/control/start", { venue, mode, confirm_testnet: confirmed });
+    await refresh();
+  } catch (error) {
+    setText("#control-note", `启动失败 · ${error.message}`);
+  }
+});
+
+$("#control-stop")?.addEventListener("click", async () => {
+  try {
+    await controlRequest("/api/control/stop");
+    await refresh();
+  } catch (error) {
+    setText("#control-note", `停止失败 · ${error.message}`);
+  }
+});
 
 async function refresh() {
   try {

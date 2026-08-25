@@ -114,7 +114,7 @@
             <div><strong id="order-count">0</strong><span>活动订单</span></div>
             <div><strong id="fill-count">0</strong><span>最近成交</span></div>
           </div>
-          <p class="account-note">面板只读取脱敏快照，不保存密钥，也不提供下单操作。</p>
+          <p class="account-note">远程面板只读取脱敏快照；本机控制模式也不会让网页接收密钥。</p>
         </article>
       </section>
 
@@ -218,6 +218,37 @@
             <span class="empty-state">等待交易节点同步品种清单</span>
           </div>
         </article>
+      </section>
+
+      <section class="operator-panel" aria-label="本机交易节点控制">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">LOCAL NODE CONTROL</p>
+            <h3>启动交易节点</h3>
+          </div>
+          <span id="control-status" class="panel-code">只读面板</span>
+        </div>
+        <div class="control-grid">
+          <label>交易所
+            <select id="control-venue">
+              <option value="okx-demo">OKX Demo</option>
+              <option value="binance-futures-testnet">Binance USDⓈ-M Futures Testnet</option>
+              <option value="binance-spot-testnet">Binance Spot Testnet（行为近似）</option>
+            </select>
+          </label>
+          <label>运行模式
+            <select id="control-mode">
+              <option value="readonly">只读监控</option>
+              <option value="testnet">Testnet / Demo 模拟下单</option>
+            </select>
+          </label>
+          <label class="control-confirm"><input id="control-confirm" type="checkbox" /> 我确认只使用 Demo/Testnet，不使用真实资金</label>
+          <div class="control-actions">
+            <button id="control-start" type="button">启动本机节点</button>
+            <button id="control-stop" type="button" class="secondary">停止节点</button>
+          </div>
+        </div>
+        <p id="control-note" class="control-note">密钥不会在网页填写。点击启动后，节点使用本机安全凭证流程；Windows 使用本机 DPAPI，Linux 使用服务环境凭证。</p>
       </section>
 
       <footer class="footer">
