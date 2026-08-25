@@ -44,11 +44,17 @@ The read-only dashboard API now aggregates all three venue state files under
 `venues`; the frontend server never imports exchange adapters and never reads
 credentials.
 
+The human-readable strategy summary is in
+`quant/reports/strategy_rules.md`. It distinguishes the deterministic rule
+baseline from the deployed cross-asset logistic artifact and lists the model's
+zero flip-recall limitation.
+
 ## Verification
 
-- Full repository test suite: `308 passed` (one pre-existing test-fixture
+- Full repository test suite: `311 passed` (one pre-existing test-fixture
   resource warning).
 - New adapter/runtime targeted suite: `15 passed`.
+- Unified runtime lifecycle/restart suite: `3 passed`.
 - `python -m compileall -q quant_bot`: passed.
 - `git diff --check`: passed.
 - No exchange credentials were used during these tests.
