@@ -5,7 +5,7 @@ import json
 import re
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -139,7 +139,9 @@ def build_venue_symbol_mapping(bundle: DeploymentBundle, venue: str, instruments
     }
 
 
-def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str) -> dict[str, Any]:
+def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str, order_context: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
+    context_by_order = order_context or {}
+
     def as_text(item: Any, name: str, default: Any = None) -> Any:
         value = getattr(item, name, default)
         if isinstance(value, Decimal):
@@ -148,6 +150,21 @@ def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str) -> di
             return value.isoformat()
         return value
 
+    def strategy_fields(item: Any) -> dict[str, Any]:
+        client_id = as_text(item, "client_order_id", "")
+        metadata = getattr(item, "metadata", {}) or {}
+        context = context_by_order.get(str(client_id), {}) or metadata.get("strategy_context", {}) or {}
+        return {
+            "strategy_action": context.get("strategy_action"),
+            "strategy_reason": context.get("strategy_reason"),
+            "strategy_confidence": context.get("strategy_confidence"),
+            "strategy_target_exposure": context.get("strategy_target_exposure"),
+            "strategy_current_contracts": context.get("strategy_current_contracts"),
+            "strategy_target_contracts": context.get("strategy_target_contracts"),
+            "strategy_signal_timestamp": context.get("strategy_signal_timestamp"),
+            "strategy_risk_tags": context.get("strategy_risk_tags", []),
+        }
+
     return {
         "equity": str(equity),
         "equity_unit": equity_unit,
@@ -155,8 +172,8 @@ def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str) -> di
         "captured_at_utc": datetime.now(timezone.utc).isoformat(),
         "balances": [{"currency": as_text(item, "currency", ""), "total": as_text(item, "total", "0"), "available": as_text(item, "available", "0")} for item in state.get("balances", [])],
         "positions": [{"symbol": as_text(item, "symbol", ""), "settlement_currency": as_text(item, "settlement_currency", ""), "quantity": as_text(item, "quantity", "0"), "average_entry_price": as_text(item, "average_entry_price"), "realized_pnl": as_text(item, "realized_pnl", "0")} for item in state.get("positions", [])],
-        "open_orders": [{"client_order_id": as_text(item, "client_order_id", ""), "exchange_order_id": as_text(item, "exchange_order_id"), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "status": as_text(item, "status", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price"), "reduce_only": bool(getattr(item, "reduce_only", False)), "post_only": bool(getattr(item, "post_only", False))} for item in state.get("open_orders", [])],
-        "recent_fills": [{"event_id": as_text(item, "event_id", ""), "exchange_fill_id": as_text(item, "exchange_fill_id"), "client_order_id": as_text(item, "client_order_id", ""), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price", "0"), "fee": as_text(item, "fee", "0"), "fee_currency": as_text(item, "fee_currency", ""), "timestamp": as_text(item, "timestamp")} for item in state.get("recent_fills", [])],
+        "open_orders": [{"client_order_id": as_text(item, "client_order_id", ""), "exchange_order_id": as_text(item, "exchange_order_id"), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "status": as_text(item, "status", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price"), "reduce_only": bool(getattr(item, "reduce_only", False)), "post_only": bool(getattr(item, "post_only", False)), **strategy_fields(item)} for item in state.get("open_orders", [])],
+        "recent_fills": [{"event_id": as_text(item, "event_id", ""), "exchange_fill_id": as_text(item, "exchange_fill_id"), "client_order_id": as_text(item, "client_order_id", ""), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price", "0"), "fee": as_text(item, "fee", "0"), "fee_currency": as_text(item, "fee_currency", ""), "timestamp": as_text(item, "timestamp"), **strategy_fields(item)} for item in state.get("recent_fills", [])],
     }
 
 
@@ -176,6 +193,7 @@ class VenueRuntime:
     positions: dict[str, Decimal] = field(default_factory=dict)
     balances: dict[str, Decimal] = field(default_factory=dict)
     active_orders: list[Order] = field(default_factory=list)
+    order_context: dict[str, dict[str, Any]] = field(default_factory=dict)
     account_snapshot: dict[str, Any] = field(default_factory=dict)
     reconciliation_ok: bool = False
     market_connected: bool = True
@@ -203,12 +221,22 @@ class VenueRuntime:
         self.active_orders = list(state.get("open_orders", []))
         self.balances = {str(item.currency).upper(): Decimal(str(item.available)) for item in state.get("balances", [])}
         equity = self.adapter.fetch_equity()
-        self.account_snapshot = _snapshot(state, equity, equity_unit=self.equity_unit)
+        self.account_snapshot = _snapshot(state, equity, equity_unit=self.equity_unit, order_context=self.order_context)
         self.last_error = None
         return equity
 
     def _spot_quantity(self, instrument: Instrument) -> Decimal:
         return self.balances.get(instrument.base_currency.upper(), Decimal("0"))
+
+    @staticmethod
+    def _carry_strategy_context(source: TargetOrderPlan, rebuilt: TargetOrderPlan) -> TargetOrderPlan:
+        return replace(
+            rebuilt,
+            strategy_action=source.strategy_action,
+            strategy_confidence=source.strategy_confidence,
+            strategy_signal_timestamp=source.strategy_signal_timestamp,
+            strategy_risk_tags=source.strategy_risk_tags,
+        )
 
     def _available_collateral_scales(self, plans: list[TargetOrderPlan], equity: Decimal) -> dict[str, Decimal]:
         """Keep each derivative bucket inside its available settle-currency margin.
@@ -306,8 +334,19 @@ class VenueRuntime:
         if instrument.instrument_type == InstrumentType.SPOT:
             if not self.allow_spot_approximation:
                 return None
-            return plan_spot_order(instrument, current_base_quantity=current, target_exposure=Decimal(str(signal.target_exposure)), equity=equity, reference_price=latest.close, bid=bid, ask=ask, decision_time=decision_time, active_orders=self.active_orders, max_target_exposure=limit)
-        return plan_target_order(instrument, current_contracts=current, target_exposure=Decimal(str(signal.target_exposure)), equity=equity, reference_price=latest.close, bid=bid, ask=ask, decision_time=decision_time, active_orders=self.active_orders, max_target_exposure=limit)
+            plan = plan_spot_order(instrument, current_base_quantity=current, target_exposure=Decimal(str(signal.target_exposure)), equity=equity, reference_price=latest.close, bid=bid, ask=ask, decision_time=decision_time, active_orders=self.active_orders, max_target_exposure=limit)
+        else:
+            plan = plan_target_order(instrument, current_contracts=current, target_exposure=Decimal(str(signal.target_exposure)), equity=equity, reference_price=latest.close, bid=bid, ask=ask, decision_time=decision_time, active_orders=self.active_orders, max_target_exposure=limit)
+        if plan is None:
+            return None
+        confidence = getattr(signal, "confidence", None)
+        return replace(
+            plan,
+            strategy_action=str(getattr(signal, "action", plan.reason)),
+            strategy_confidence=Decimal(str(confidence)) if confidence is not None else None,
+            strategy_signal_timestamp=str(getattr(signal, "signal_timestamp", "")),
+            strategy_risk_tags=tuple(str(item) for item in getattr(signal, "risk_tags", ())),
+        )
 
     def process_once(self) -> dict[str, Any]:
         self.last_loop_monotonic = time.monotonic()
@@ -351,7 +390,7 @@ class VenueRuntime:
                 else:
                     rebuilt = plan_target_order(instrument, current_contracts=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
                 if rebuilt is not None:
-                    scaled.append(rebuilt)
+                    scaled.append(self._carry_strategy_context(plan, rebuilt))
             plans = scaled
             total_target = sum((abs(item.target_exposure) for item in plans), Decimal("0"))
 
@@ -372,7 +411,7 @@ class VenueRuntime:
                 else:
                     rebuilt = plan_target_order(instrument, current_contracts=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
                 if rebuilt is not None:
-                    scaled.append(rebuilt)
+                    scaled.append(self._carry_strategy_context(plan, rebuilt))
             plans = scaled
             if applied_scales:
                 self.portfolio_target_scale *= min(applied_scales)
@@ -388,7 +427,17 @@ class VenueRuntime:
             if not decision.allowed:
                 blocked[historical_symbol] = list(decision.reasons)
                 continue
-            order = Order(plan.client_order_id, plan.symbol, plan.side, plan.order_type, plan.quantity, datetime.now(timezone.utc), price=plan.price, reduce_only=plan.reduce_only, post_only=plan.post_only)
+            strategy_context = {
+                "strategy_action": plan.strategy_action,
+                "strategy_reason": plan.reason,
+                "strategy_confidence": str(plan.strategy_confidence) if plan.strategy_confidence is not None else None,
+                "strategy_target_exposure": str(plan.target_exposure),
+                "strategy_current_contracts": str(plan.current_contracts),
+                "strategy_target_contracts": str(plan.target_contracts),
+                "strategy_signal_timestamp": plan.strategy_signal_timestamp,
+                "strategy_risk_tags": list(plan.strategy_risk_tags),
+            }
+            order = Order(plan.client_order_id, plan.symbol, plan.side, plan.order_type, plan.quantity, datetime.now(timezone.utc), price=plan.price, reduce_only=plan.reduce_only, post_only=plan.post_only, metadata={"strategy_context": strategy_context})
             try:
                 accepted = self.adapter.place_order(order)
             except AdapterError as error:
@@ -401,6 +450,7 @@ class VenueRuntime:
                 continue
             self.consecutive_rejects = 0
             self.created_order_ids.add(accepted.client_order_id)
+            self.order_context[accepted.client_order_id] = strategy_context
             submitted.append(accepted.client_order_id)
         if submitted:
             # Refresh immediately so the dashboard and the next idempotency

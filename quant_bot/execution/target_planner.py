@@ -27,6 +27,10 @@ class TargetOrderPlan:
     reference_price: Decimal | None = None
     bid: Decimal | None = None
     ask: Decimal | None = None
+    strategy_action: str = ""
+    strategy_confidence: Decimal | None = None
+    strategy_signal_timestamp: str = ""
+    strategy_risk_tags: tuple[str, ...] = ()
 
 
 def _signed_target_contracts(instrument: Instrument, target_exposure: Decimal, equity: Decimal, reference_price: Decimal) -> Decimal:

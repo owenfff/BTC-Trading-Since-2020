@@ -314,12 +314,14 @@ function renderAccount(payload) {
     appendCell(row, displayNumber(item.realized_pnl));
     return row;
   });
-  renderRows("#orders-table", orders, "暂无活动订单", (item) => {
+  renderRows("#orders-table", orders, "暂无订单", (item) => {
     const row = document.createElement("tr");
     appendCell(row, item.symbol);
     appendCell(row, item.side);
     appendCell(row, displayNumber(item.quantity));
     appendCell(row, displayNumber(item.price, "市价"));
+    const reason = [item.strategy_action, item.strategy_reason, item.strategy_target_exposure ? `目标 ${displayNumber(item.strategy_target_exposure)}` : "", item.strategy_confidence ? `置信度 ${displayNumber(item.strategy_confidence)}` : ""].filter(Boolean).join(" · ") || "—";
+    appendCell(row, reason);
     return row;
   });
   renderRows("#fills-table", fills, "暂无成交记录", (item) => {
