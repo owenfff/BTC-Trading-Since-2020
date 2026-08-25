@@ -637,6 +637,63 @@ def start_control(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
     return 202, {"status": "STARTING_LOCAL", "control": control_payload()}
 
 
+def preflight_control(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Run a credential-gated, order-free private venue preflight locally."""
+
+    if not CONTROL_ENABLED or CONTROL_HOST not in {"127.0.0.1", "localhost", "::1"}:
+        return _json_error("LOCAL_CONTROL_DISABLED", 403)
+    if not isinstance(payload, dict):
+        return _json_error("JSON_OBJECT_REQUIRED")
+    if any(key.lower() in {"api_key", "api_secret", "secret", "passphrase", "password", "key"} for key in payload):
+        return _json_error("CREDENTIALS_MUST_NOT_BE_SENT_TO_DASHBOARD")
+    venue = str(payload.get("venue", "")).strip().lower()
+    if venue not in CONTROL_LAUNCHERS:
+        return _json_error("UNSUPPORTED_SINGLE_VENUE")
+    if _file_credentials_supported() and _credential_status(venue) != "CONFIGURED":
+        return _json_error("LOCAL_CREDENTIALS_REQUIRED")
+
+    command = [sys.executable, "-m", "quant_bot", "preflight", "--venue", venue]
+    child_environment = os.environ.copy()
+    if _file_credentials_supported():
+        child_environment.update(_load_credentials_for_venue(venue))
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=str(PROJECT_ROOT),
+            env=child_environment,
+            capture_output=True,
+            text=True,
+            timeout=180,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return _json_error(f"PREFLIGHT_LAUNCH_FAILED:{type(error).__name__}", 502)
+
+    result: dict[str, Any] = {}
+    for line in reversed(completed.stdout.splitlines()):
+        try:
+            candidate = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(candidate, dict):
+            result = candidate
+            break
+    if completed.returncode != 0 or result.get("status") != "PASS":
+        code = str(result.get("error_code") or "PREFLIGHT_FAILED")
+        message = str(result.get("message") or result.get("error") or "private preflight failed")[:240]
+        return 502, {"status": "BLOCKED", "error_code": code, "message": message, "control": control_payload()}
+
+    return 200, {
+        "status": "PREFLIGHT_PASS",
+        "venue": venue,
+        "instrument_count": result.get("instrument_count", 0),
+        "reconciliation_ok": bool(result.get("reconciliation_ok")),
+        "equity_unit": result.get("equity_unit"),
+        "orders_submitted": bool(result.get("orders_submitted", False)),
+        "control": control_payload(),
+    }
+
+
 def stop_control() -> tuple[int, dict[str, Any]]:
     global CONTROL_PROCESS, CONTROL_META
     if not CONTROL_ENABLED or CONTROL_HOST not in {"127.0.0.1", "localhost", "::1"}:
@@ -689,7 +746,7 @@ class DashboardHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         path = self.path.split("?", 1)[0]
-        if path not in {"/api/control/start", "/api/control/stop", "/api/control/credentials"}:
+        if path not in {"/api/control/start", "/api/control/stop", "/api/control/preflight", "/api/control/credentials"}:
             self.send_error(404)
             return
         if path == "/api/control/credentials" and self.headers.get("X-Local-Control") != "1":
@@ -715,6 +772,8 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 status, response = start_control(payload)
             elif path.endswith("/stop"):
                 status, response = stop_control()
+            elif path.endswith("/preflight"):
+                status, response = preflight_control(payload)
             else:
                 status, response = configure_credentials(payload)
         body = json.dumps(response, ensure_ascii=False).encode("utf-8")

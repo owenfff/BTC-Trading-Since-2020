@@ -147,6 +147,38 @@ def test_testnet_control_requires_local_credentials(monkeypatch, tmp_path) -> No
     assert payload["error"] == "LOCAL_CREDENTIALS_REQUIRED"
 
 
+def test_loopback_preflight_is_order_free_and_keeps_credentials_out_of_response(monkeypatch) -> None:
+    _reset(monkeypatch)
+    monkeypatch.setattr(dashboard, "CONTROL_ENABLED", True)
+    monkeypatch.setattr(dashboard, "_file_credentials_supported", lambda: True)
+    monkeypatch.setattr(dashboard, "_credential_status", lambda venue: "CONFIGURED")
+    secret = "private-secret-not-returned"
+    monkeypatch.setattr(dashboard, "_load_credentials_for_venue", lambda venue: {"OKX_DEMO_API_SECRET": secret})
+
+    class Completed:
+        returncode = 0
+        stdout = '{"status":"PASS","instrument_count":12,"reconciliation_ok":true,"equity_unit":"USD_EQUIVALENT","orders_submitted":false}\n'
+        stderr = ""
+
+    captured: dict[str, object] = {}
+
+    def fake_run(args, **kwargs):
+        captured["args"] = args
+        captured["kwargs"] = kwargs
+        return Completed()
+
+    monkeypatch.setattr(dashboard.subprocess, "run", fake_run)
+    status, payload = dashboard.preflight_control({"venue": "okx-demo"})
+
+    assert status == 200
+    assert payload["status"] == "PREFLIGHT_PASS"
+    assert payload["instrument_count"] == 12
+    assert payload["orders_submitted"] is False
+    assert secret not in str(payload)
+    assert secret in captured["kwargs"]["env"]["OKX_DEMO_API_SECRET"]
+    assert "quant_bot" in " ".join(str(item) for item in captured["args"])
+
+
 def test_replay_payload_keeps_endpoints_when_downsampling(monkeypatch) -> None:
     dashboard.REPLAY_CACHE.clear()
     monkeypatch.setitem(

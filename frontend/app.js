@@ -429,6 +429,7 @@ function renderControl(control) {
   const note = $("#control-note");
   const start = $("#control-start");
   const stop = $("#control-stop");
+  const preflight = $("#control-preflight");
   const form = $("#credential-form");
   const credentialStatus = $("#credential-status");
   if (!status || !note || !start || !stop) return;
@@ -442,6 +443,7 @@ function renderControl(control) {
   if (credentialStatus) credentialStatus.textContent = configured ? "已配置" : "未配置";
   start.disabled = !enabled || running || (testnetMode && !configured);
   stop.disabled = !enabled || !running;
+  if (preflight) preflight.disabled = !enabled || running || !configured;
   if (!enabled) {
     note.textContent = "当前是远程/只读面板。请在交易节点本机启动 start-local-control-panel.ps1 或 start-local-control-panel.sh 后使用控制按钮。";
   } else if (!credentialSetupAvailable) {
@@ -449,7 +451,7 @@ function renderControl(control) {
   } else if (running) {
     note.textContent = `本机节点已启动：${control.venue} · ${control.mode}。凭证不会进入网页。`;
   } else if (testnetMode && !configured) {
-    note.textContent = "先在上方本机凭证区保存当前交易所的 Demo/Testnet 凭证，才能启用模拟下单。";
+    note.textContent = "先在上方本机凭证区保存当前交易所凭证，再运行预检。";
   } else {
     note.textContent = "凭证只保存到本机权限 600 文件；网页不会回显或保存密钥。";
   }
@@ -501,6 +503,25 @@ $("#credential-save")?.addEventListener("click", async () => {
     setText("#control-note", `凭证保存失败 · ${error.message}`);
   } finally {
     button.disabled = false;
+  }
+});
+
+$("#control-preflight")?.addEventListener("click", async () => {
+  if (!(controlState.enabled && controlState.local_only)) {
+    setText("#control-note", "预检仅允许在交易节点本机的 loopback 面板中使用。" );
+    return;
+  }
+  const button = $("#control-preflight");
+  button.disabled = true;
+  setText("#control-note", "预检中 · 只读取账户、品种和对账状态，不提交订单…");
+  try {
+    const result = await controlRequest("/api/control/preflight", { venue: $("#control-venue").value });
+    setText("#control-note", `预检通过 · ${result.instrument_count || 0} 个品种 · 对账 ${result.reconciliation_ok ? "PASS" : "WAITING"} · 未提交订单`);
+    await refresh();
+  } catch (error) {
+    setText("#control-note", `预检失败 · ${error.message}`);
+  } finally {
+    renderControl(controlState);
   }
 });
 
