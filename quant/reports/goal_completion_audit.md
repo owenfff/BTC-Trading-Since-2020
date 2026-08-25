@@ -22,9 +22,10 @@ before any consideration of real capital.
 | Support OKX Demo | IMPLEMENTED / NOT PRIVATELY VERIFIED | `quant_bot/exchanges/okx.py`, `okx_http.py`, `okx_ws.py` |
 | Support Binance Spot Testnet | IMPLEMENTED / NOT PRIVATELY VERIFIED | `quant_bot/exchanges/binance.py`, `binance_http.py`, `binance_ws.py` |
 | Support Binance USDⓈ-M Futures Testnet | IMPLEMENTED / NOT PRIVATELY VERIFIED | `quant_bot/exchanges/binance_futures.py`, `binance_futures_http.py`, `binance_futures_ws.py` |
-| Position sizing, reduce-only, idempotency and reconciliation | PASS IN LOCAL TESTS | `quant/tests`, 331 tests passed |
+| Position sizing, reduce-only, idempotency and reconciliation | PASS IN LOCAL TESTS | `quant/tests`, 333 tests passed |
 | Loopback panel can save one local venue credential set | IMPLEMENTED / SHANGHAI REMOTELY VERIFIED | `frontend/server.py`, `frontend/app.js`, `deploy/sync-shanghai-panel.ps1`; service active and homepage verified on `111.231.25.250` |
 | One-click private venue preflight | IMPLEMENTED / SHANGHAI REMOTELY VERIFIED | `POST /api/control/preflight`; order-free local subprocess; service endpoint deployed and control enabled |
+| Bounded runtime restart supervision | IMPLEMENTED / SHANGHAI REMOTELY VERIFIED | `quant_bot/supervisor.py`; recoverable disconnect/timeout only, maximum three restarts, unsafe stops remain blocked |
 | Real private preflight against OKX/Binance | PENDING CREDENTIALS | No local or Shanghai OKX/Binance secrets are configured |
 | Real Demo/Testnet order lifecycle | PENDING PRIVATE PREFLIGHT | Requires account permission, one minimal order and reconciliation |
 | Mainnet and real-money trading | DISABLED BY DESIGN | No mainnet URL or live mode is enabled in this phase |
@@ -32,8 +33,8 @@ before any consideration of real capital.
 ## Current verified state
 
 - Branch: `quant/autonomous-behavioral-quant-bot-v1`
-- Latest pushed commit: `bbedab2`
-- Full local test suite: `331 passed`
+- Latest pushed commit: `01ba473`
+- Full local test suite: `333 passed`
 - No exchange credentials used in testing
 - No real order submitted
 - No original CSV/JSON modified

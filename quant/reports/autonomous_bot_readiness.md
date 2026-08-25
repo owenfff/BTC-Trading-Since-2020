@@ -43,9 +43,15 @@ values only to the local child runtime. The status API exposes only
 Windows keeps the existing DPAPI launcher path. The public/US frontend cannot
 use the credential endpoint because the control server is loopback-only.
 
+The Shanghai panel starts the selected Linux venue through a bounded supervisor.
+Recoverable private-WebSocket disconnects and watchdog timeouts are re-entered
+only after the runtime has cancelled its own orders and reconciled again; the
+supervisor stops after three attempts and never retries consecutive order
+rejections or account/risk failures.
+
 ## Verified locally
 
-- Full test suite: `330 passed`.
+- Full test suite: `333 passed`.
 - Model loading and feature contract: passed.
 - Target planning, Decimal quantity/price conversion and reduce-only logic:
   passed.
@@ -84,6 +90,8 @@ python -m quant_bot run --venue okx-demo --mode testnet --symbols auto --once
 
 python -m quant_bot preflight --venue binance-futures-testnet
 python -m quant_bot run --venue binance-futures-testnet --mode testnet --symbols auto --once
+
+python -m quant_bot supervise --venue okx-demo --mode testnet --symbols auto
 ```
 
 For the browser dashboard, expose only the Shanghai loopback control panel

@@ -47,7 +47,7 @@ credentials.
 
 The loopback-only control panel can now select exactly one OKX Demo, Binance
 Spot Testnet, or Binance USDⓈ-M Futures Testnet node and start/stop its local
-launcher. The browser sends only venue, mode and explicit testnet confirmation;
+bounded supervisor. The browser sends only venue, mode and explicit testnet confirmation;
 credentials never enter the browser. This panel is suitable for a Shanghai
 trading node reached through an SSH tunnel, while the US dashboard remains
 frontend-only.
