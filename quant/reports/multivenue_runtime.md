@@ -18,6 +18,8 @@ exact recovery of the original trader's strategy.
 ## Safety boundary
 
 - Credentials are read from local environment variables only.
+- PowerShell launchers can cache credentials encrypted with the current
+  Windows user's DPAPI; the encrypted files are ignored and never logged.
 - Mainnet and untrusted endpoints are rejected by the transport constructors.
 - Preflight performs no order submission.
 - Every decision uses closed 1-hour bars and current reconciled account state.
@@ -46,6 +48,7 @@ readiness.
 - `python -m compileall -q quant_bot`: passed.
 - `git diff --check`: passed.
 - No exchange credentials were used during these tests.
+- PowerShell launcher syntax: parsed successfully for both venues.
 
 ## Commands
 
