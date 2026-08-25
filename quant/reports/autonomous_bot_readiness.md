@@ -97,6 +97,15 @@ python -m quant_bot supervise --venue okx-demo --mode testnet --symbols auto
 For the browser dashboard, expose only the Shanghai loopback control panel
 through an SSH tunnel. The frontend never receives or reads credentials.
 
+On Windows, the reusable tunnel entrypoint is:
+
+```powershell
+.\deploy\open-shanghai-panel.ps1
+```
+
+It opens `http://127.0.0.1:18080/` and keeps the Shanghai panel bound to
+loopback on the remote node.
+
 To synchronize the panel from a normal SSH login, use
 `.\deploy\sync-shanghai-panel.ps1` in PowerShell (or
 `./deploy/sync-shanghai-panel.sh` in Git Bash). It uploads only the four panel files,
