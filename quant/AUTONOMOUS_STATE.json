@@ -1,13 +1,13 @@
 {
   "program_version": "4.0",
   "program_status": "RUNNING",
-  "current_phase": "PHASE_13_CROSS_ASSET_BEHAVIOR",
-  "current_work_package": "M13-cross-asset-behavioral-model",
+  "current_phase": "PHASE_14_MULTI_VENUE_DEMO_RUNTIME",
+  "current_work_package": "M14-multivenue-nonproduction-runtime",
   "last_completed_phase": "PHASE_13_CROSS_ASSET_BEHAVIOR",
-  "last_code_commit": "a744a6dfbb9db684a122155241e42d3deb9cec92",
+  "last_code_commit": "c58460f",
   "last_report_commit": "78d4ad6",
-  "test_count": 7,
-  "last_test_status": "TARGETED_BYBIT_FRONTEND_7_PASSED;FULL_SUITE_NOT_RERUN_AFTER_FRONTEND_ADD",
+  "test_count": 307,
+  "last_test_status": "FULL_SUITE_307_PASSED;MULTIVENUE_TARGETED_14_PASSED;ONE_PREEXISTING_FIXTURE_WARNING",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -18,8 +18,8 @@
   "backtest_status": "RESEARCH_ONLY",
   "shadow_status": "SHADOW_SMOKE_PASS",
   "paper_status": "PAPER_REPLAY_PASS;PAPER_SMOKE_PASS",
-  "demo_status": "DEMO_CREDENTIALS_REQUIRED",
-  "bot_status": "FRONTEND_ONLY;BYBIT_REGION_BLOCKED_ON_US_HOST",
+  "demo_status": "BYBIT_ACTIVE_LOCALLY;OKX_AND_BINANCE_CREDENTIAL_GATED",
+  "bot_status": "NONPRODUCTION_MULTI_VENUE_REST_POLLING_RUNTIME",
   "frontend_status": "READ_ONLY_DASHBOARD_DEPLOYED",
   "frontend_url": "http://198.44.46.229:8080/",
   "trading_node_status": "SEPARATE_LOCAL_OR_NON_US_NODE_REQUIRED",
@@ -29,7 +29,8 @@
     "Execution ordering has 780 ambiguous chains and 371 cross-order ties.",
     "Historical mark/index context is unavailable from the current public instrument snapshot endpoint; all 653630 context rows retain MARK_INDEX_MISSING and no current snapshot was backfilled.",
     "Full research outputs under quant/outputs are intentionally ignored and must be rehydrated before a clean clone can run the full research command.",
-    "Real private exchange endpoints remain blocked at the credential boundary; no credentials are requested.",
+    "OKX Demo and Binance Spot Testnet private endpoints remain blocked at the local credential boundary; no credentials were used in autonomous tests.",
+    "OKX/Binance unified runtime currently uses REST polling; private WebSocket parity and long-duration soak tests remain open.",
     "The US frontend host is blocked by Bybit Demo CloudFront country policy; it must never be used as the trading node.",
     "The offline Docker paper image passed build and read-only tmpfs cold-start smoke; no exchange connectivity is claimed.",
     "M13 public market coverage is 65 PASS and 1 INSUFFICIENT across 66 symbols; insufficient symbols remain auditable but are excluded from unified fitting.",
@@ -48,6 +49,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the US server frontend-only. Run any Demo trading node locally or on a non-US host that can legally reach the selected exchange, then sync only sanitized status artifacts to the dashboard; never copy API credentials to the frontend host.",
-  "updated_at_utc": "2026-08-21T09:37:00Z"
+  "next_action": "Run local OKX Demo or Binance Spot Testnet preflight with local credentials when available; then complete private-stream adapters, soak tests, and sanitized dashboard synchronization. Keep the US server frontend-only and never copy credentials there.",
+  "updated_at_utc": "2026-08-24T00:00:00Z"
 }

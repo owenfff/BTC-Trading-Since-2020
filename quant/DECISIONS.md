@@ -113,6 +113,23 @@
 - Require zero leakage violations, per-symbol traceability, three time-out windows, sensitivity diagnostics, and repeatable local paper replay before considering the phase complete.
 - No API key, private endpoint, demo account, testnet account, or real capital is needed for this phase.
 
+## 2026-08-24 — Add multi-venue non-production runtime boundary
+
+- Keep historical strategy learning exchange-neutral; venue symbol mapping is
+  a runtime eligibility/crosswalk layer only and never rewrites teacher data or
+  model features.
+- Add native, hard-pinned OKX Demo and Binance Spot Testnet REST adapters with
+  local-only credential gates and deterministic injected-transport tests.
+- Use the existing Bybit private-WebSocket runner unchanged. The first shared
+  OKX/Binance runner uses REST polling, records that fact in runtime state, and
+  remains non-production only.
+- Treat Binance Spot as wallet-balance semantics. It cannot short or use
+  `reduceOnly`; derivative-trained targets require an explicit behavioral
+  approximation flag and negative targets flatten rather than short.
+- Do not call this phase complete for production readiness until private
+  streams, long-run soak tests, and a human-approved non-production order
+  lifecycle have been verified.
+
 ## 2026-08-21 — Freeze clean-room release evidence
 
 - Lock the release dependencies to the versions installed in the fresh Python 3.11.9 environment: NumPy 2.3.5, Polars 1.43.2, PyArrow 24.0.0, and Pytest 8.4.2.

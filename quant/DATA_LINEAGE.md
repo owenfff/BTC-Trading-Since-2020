@@ -67,6 +67,18 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Coverage result: 66 symbols inventoried; 65 market `PASS`, 1 `INSUFFICIENT`; 10,630 model-eligible rows across 53 symbols after train-only position-scale and derivative filters.
 - Analysis commit in the generated model and paper reports: `07f5304e0101852538d52914927f11ef7e8d01ee`.
 
+## Multi-venue non-production runtime artifact
+
+- Code commit: `c58460f` (`Add unified OKX Demo and Binance Testnet runtime`).
+- Report: `quant/reports/multivenue_runtime.md`.
+- Added artifacts: hard-pinned OKX Demo and Binance Spot Testnet transports,
+  normalized adapters, explicit cross-venue mapping report generation, Spot
+  balance-aware planning, and a unified REST-polling runtime.
+- Verification: full suite `307 passed`; new targeted suite `14 passed`; no
+  exchange credentials used; raw root CSV/JSON inputs unchanged.
+- Runtime outputs are ignored under `quant/outputs/`; only code, tests and the
+  small report are tracked.
+
 ## Leakage-safe feature and label artifact
 
 - Code/analysis commit: `83d636a2e5d8c20afe23bb20f52954baccb0f6e5`.

@@ -40,6 +40,17 @@ No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, p
 - Public endpoint timeout recovery is bounded and fail-closed. A missing public window produces an explicit coverage failure and never triggers synthetic market data.
 - Real private exchange endpoints remain `DEMO_CREDENTIALS_REQUIRED`; no credentials are requested in this phase.
 
+## Multi-venue runtime boundary
+
+- OKX Demo and Binance Spot Testnet preflight still require the user's local
+  credentials; no keys were requested or used by autonomous tests.
+- The unified OKX/Binance runner is REST-polling only at this stage; private
+  WebSocket parity and a long-duration soak test remain open.
+- Binance Spot is a cash-market behavioral approximation, not a derivative
+  position replica; it cannot short and must be explicitly enabled.
+- A real account, mainnet endpoint, and live funds remain outside the allowed
+  autonomous boundary.
+
 ## Current work package
 
 Phases 1 and 2 are complete. Wallet reconciliation is `READY_WITH_WARNINGS`; the residuals are preserved as flags and do not block BTC-first behavior episode construction.
