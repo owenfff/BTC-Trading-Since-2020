@@ -31,9 +31,21 @@ The bot supports one selected venue by default. Multi-venue supervision is
 explicit opt-in and keeps each venue's state, reconciliation and failures
 separate.
 
+## One-time local credential setup
+
+The Shanghai Linux loopback control panel now has a local credential form. It
+accepts only the selected venue's Demo/Testnet fields, requires the explicit
+local-control header, clears the browser fields after saving, atomically writes
+`~/.config/quant-bot/credentials.env` with mode `600`, and passes the selected
+values only to the local child runtime. The status API exposes only
+`CONFIGURED`/`NOT_CONFIGURED`, never credential values.
+
+Windows keeps the existing DPAPI launcher path. The public/US frontend cannot
+use the credential endpoint because the control server is loopback-only.
+
 ## Verified locally
 
-- Full test suite: `327 passed`.
+- Full test suite: `330 passed`.
 - Model loading and feature contract: passed.
 - Target planning, Decimal quantity/price conversion and reduce-only logic:
   passed.

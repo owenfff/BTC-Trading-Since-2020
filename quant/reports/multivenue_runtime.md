@@ -90,6 +90,8 @@ zero flip-recall limitation.
 - Full repository test suite: `324 passed` in 137.84 seconds, zero warnings.
 - Current follow-up full repository test suite: `327 passed`; this includes the
   external public-source behavior-profile test.
+- Latest full repository test suite: `330 passed`; this includes the loopback
+  credential setup and platform-boundary tests.
 - Binance Futures targeted suite: `5 passed`; adapter/runtime targeted suite: `16 passed`.
 - Read-only dashboard venue coverage targeted suite: `6 passed`; the
   dashboard now exposes Binance USDⓈ-M Futures state alongside OKX, Binance
