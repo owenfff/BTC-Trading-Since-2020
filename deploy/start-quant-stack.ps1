@@ -1,6 +1,8 @@
 param(
     [ValidateSet("readonly", "testnet")]
     [string]$Mode = "readonly",
+    [ValidateSet("okx-demo", "binance-spot-testnet", "both")]
+    [string]$Venue = "okx-demo",
     [switch]$Once,
     [switch]$ConfirmTestnet,
     [switch]$AllowSpotApproximation,
@@ -34,8 +36,16 @@ try {
     Write-Host ("[quant] dashboard: http://{0}:{1}" -f $DashboardHost, $DashboardPort)
     Write-Host "[quant] dashboard role: FRONTEND_ONLY"
 
-    $launcher = Join-Path $repo "deploy\start-multivenue.ps1"
-    & $launcher -Mode $Mode -Once:$Once -ConfirmTestnet:$ConfirmTestnet -AllowSpotApproximation:$AllowSpotApproximation -PythonPath $PythonPath -ForgetCredentials:$ForgetCredentials
+    if ($Venue -eq "both") {
+        $launcher = Join-Path $repo "deploy\start-multivenue.ps1"
+        & $launcher -Mode $Mode -Once:$Once -ConfirmTestnet:$ConfirmTestnet -AllowSpotApproximation:$AllowSpotApproximation -PythonPath $PythonPath -ForgetCredentials:$ForgetCredentials
+    } elseif ($Venue -eq "okx-demo") {
+        $launcher = Join-Path $repo "deploy\start-okx-demo.ps1"
+        & $launcher -Mode $Mode -Once:$Once -ConfirmTestnet:$ConfirmTestnet -PythonPath $PythonPath -ForgetCredentials:$ForgetCredentials
+    } else {
+        $launcher = Join-Path $repo "deploy\start-binance-testnet.ps1"
+        & $launcher -Mode $Mode -Once:$Once -ConfirmTestnet:$ConfirmTestnet -AllowSpotApproximation:$AllowSpotApproximation -PythonPath $PythonPath -ForgetCredentials:$ForgetCredentials
+    }
     $exitCode = $LASTEXITCODE
 } catch {
     Write-Error $_
