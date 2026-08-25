@@ -23,6 +23,17 @@ $env:BINANCE_TESTNET_API_SECRET="..."
 
 The values are never written to Git, reports, dashboard state, or chat.
 
+The PowerShell launchers cache them encrypted with Windows-user DPAPI after
+the first prompt, so later starts do not require retyping them:
+
+```powershell
+.\deploy\start-okx-demo.ps1 -Mode readonly
+.\deploy\start-binance-testnet.ps1 -Mode readonly
+```
+
+Use `-ForgetCredentials` to remove the local cache. The cache is tied to the
+same Windows user and cannot be decrypted by another account.
+
 ## Preflight
 
 From the repository root, using the project's Python runtime:

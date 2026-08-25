@@ -28,6 +28,8 @@ outputs/cross_asset_deployment_model.json
 outputs/bybit_demo_*.json
 outputs/bybit_demo_*.log
 outputs/bybit_demo_runtime_state.json
+outputs/okx_demo_credentials.json
+outputs/binance_testnet_credentials.json
 outputs/okx_demo_runtime_state.json
 outputs/binance_spot_testnet_runtime_state.json
 outputs/okx_demo_*.log
