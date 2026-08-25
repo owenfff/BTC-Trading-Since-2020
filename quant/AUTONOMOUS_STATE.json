@@ -4,10 +4,10 @@
   "current_phase": "PHASE_14_MULTI_VENUE_DEMO_RUNTIME",
   "current_work_package": "M14-multivenue-nonproduction-runtime",
   "last_completed_phase": "PHASE_13_CROSS_ASSET_BEHAVIOR",
-  "last_code_commit": "7eab7a98730d0c7a0f91f7653646dd072a77c8fc",
-  "last_report_commit": "7eab7a98730d0c7a0f91f7653646dd072a77c8fc",
-  "test_count": 324,
-  "last_test_status": "FULL_SUITE_326_PASSED;DASHBOARD_FUTURES_TARGETED_6_PASSED;LOCAL_CONTROL_TARGETED_7_PASSED;BINANCE_FUTURES_TARGETED_5_PASSED;MULTIVENUE_TARGETED_16_PASSED;SUPERVISOR_TARGETED_4_PASSED;RUNTIME_LIFECYCLE_3_PASSED;POWERSHELL_PARSE_PASS_ALL_7_LAUNCHERS;CREDENTIAL_SETUP_HELPER_BASH_N_PASS;EXTERNAL_HYPERLIQUID_AUDIT_13_CHECKS_PASS;SHANGHAI_PANEL_DEPLOYED;SINGLE_VENUE_DEFAULT_OKX;BINANCE_FUTURES_SAFE_GATE_PASS;NO_CREDENTIALS_USED",
+  "last_code_commit": "276ee95",
+  "last_report_commit": "276ee95",
+  "test_count": 327,
+  "last_test_status": "FULL_SUITE_327_PASSED;EXTERNAL_HYPERLIQUID_AUDIT_13_CHECKS_PASS;EXTERNAL_HYPERLIQUID_BEHAVIOR_PROFILE_TARGETED_1_PASSED;DASHBOARD_FUTURES_TARGETED_6_PASSED;LOCAL_CONTROL_TARGETED_7_PASSED;BINANCE_FUTURES_TARGETED_5_PASSED;MULTIVENUE_TARGETED_16_PASSED;SUPERVISOR_TARGETED_4_PASSED;RUNTIME_LIFECYCLE_3_PASSED;POWERSHELL_PARSE_PASS_ALL_7_LAUNCHERS;CREDENTIAL_SETUP_HELPER_BASH_N_PASS;SHANGHAI_PANEL_DEPLOYED;SINGLE_VENUE_DEFAULT_OKX;BINANCE_FUTURES_SAFE_GATE_PASS;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -55,5 +55,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep the external Hyperliquid source as an audit-only reference; on the Shanghai node configure exactly one OKX Demo or Binance Testnet venue, restart quant-local-control-panel.service, then run a read-only preflight and one non-production order lifecycle. Do not place credentials in chat or on the US frontend host.",
-  "updated_at_utc": "2026-08-25T05:35:50Z"
+  "updated_at_utc": "2026-08-25T06:05:00Z"
 }
