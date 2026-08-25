@@ -167,3 +167,8 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - `start-quant-stack.ps1` now defaults to `okx-demo`; Binance is selected with
   `-Venue binance-spot-testnet`, and simultaneous supervision requires the
   explicit `-Venue both` opt-in.
+- `start-quant-stack.ps1` now defaults to `okx-demo`; Binance is selected with
+  `-Venue binance-spot-testnet`, and simultaneous supervision requires the
+  explicit `-Venue both` opt-in.
+- Credential-free individual runs returned venue-specific structured BLOCKED
+  results with zero submissions; adapter/runtime tests returned `16 passed`.

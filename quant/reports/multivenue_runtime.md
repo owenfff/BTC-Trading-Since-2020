@@ -95,3 +95,8 @@ credential variables are absent. The order-enabled form additionally requires
 `--enable-orders --confirm-testnet`.
 - Remote branch parity was confirmed after pushing the code, report and state
   pointer commits.
+- The stack defaults to OKX; Binance or explicit simultaneous mode must be
+  selected by the operator.
+- With all local credentials absent, individual OKX and Binance runs returned
+  their own structured credential errors and submitted no orders.
+- The single-venue gate and adapter/runtime tests returned `16 passed`.
