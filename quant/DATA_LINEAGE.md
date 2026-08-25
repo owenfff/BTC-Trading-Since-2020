@@ -147,3 +147,13 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The code commit and report commits are present on
   `origin/quant/autonomous-behavioral-quant-bot-v1`; remote parity was
   confirmed with `git ls-remote`.
+  confirmed with `git ls-remote`.
+
+## One-command local stack artifact
+
+- Code commit: `ad7b8ec4f9ba603a7e08a8b6736244e3f56b1849`.
+- Added `deploy/start-quant-stack.ps1` to start the sanitized frontend-only
+  dashboard and delegate OKX/Binance supervision to the unified launcher.
+- The four PowerShell launchers parsed successfully; dashboard logs are
+  ignored under `quant/outputs/`; no credential or raw account payload is
+  served by the dashboard process.

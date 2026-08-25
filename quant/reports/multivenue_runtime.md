@@ -59,6 +59,7 @@ zero flip-recall limitation.
 ## Verification
 
 - Code commit: `dcfc1033dde8f5361818e4620ec98dee9bba4540`.
+- Follow-up stack launcher commit: `ad7b8ec4f9ba603a7e08a8b6736244e3f56b1849`.
 - Full repository test suite: `314 passed` in 127.77 seconds, zero warnings.
 - Adapter/runtime targeted suite: `16 passed`.
 - Unified supervisor targeted suite: `4 passed`.
@@ -89,3 +90,5 @@ python -m quant_bot run --venue binance-spot-testnet --mode testnet --symbols au
 The commands fail closed with a structured credential error when the local
 credential variables are absent. The order-enabled form additionally requires
 `--enable-orders --confirm-testnet`.
+- Remote branch parity was confirmed after pushing the code, report and state
+  pointer commits.
