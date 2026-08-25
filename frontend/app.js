@@ -263,6 +263,9 @@ $("#replay-play")?.addEventListener("click", startReplay);
 $("#replay-latest")?.addEventListener("click", () => { stopReplay(); replayState.cursor = 1000; const slider = $("#replay-slider"); if (slider) slider.value = "1000"; drawReplay(); });
 $("#replay-slider")?.addEventListener("input", (event) => { stopReplay(); replayState.cursor = Number(event.target.value); drawReplay(); });
 $("#replay-symbol")?.addEventListener("change", () => { stopReplay(); loadReplay(); });
+document.querySelector("[data-advanced='replay']")?.addEventListener("toggle", (event) => {
+  if (event.target.open) window.requestAnimationFrame(drawReplay);
+});
 window.addEventListener("resize", () => { if (replayState.data) drawReplay(); });
 
 function renderAccount(payload) {
