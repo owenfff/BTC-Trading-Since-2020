@@ -23,7 +23,7 @@ before any consideration of real capital.
 | Support Binance Spot Testnet | IMPLEMENTED / NOT PRIVATELY VERIFIED | `quant_bot/exchanges/binance.py`, `binance_http.py`, `binance_ws.py` |
 | Support Binance USDⓈ-M Futures Testnet | IMPLEMENTED / NOT PRIVATELY VERIFIED | `quant_bot/exchanges/binance_futures.py`, `binance_futures_http.py`, `binance_futures_ws.py` |
 | Position sizing, reduce-only, idempotency and reconciliation | PASS IN LOCAL TESTS | `quant/tests`, 330 tests passed |
-| Loopback panel can save one local venue credential set | IMPLEMENTED / NOT REMOTELY DEPLOYED | `frontend/server.py`, `frontend/app.js`, `deploy/sync-shanghai-panel.ps1` |
+| Loopback panel can save one local venue credential set | IMPLEMENTED / SHANGHAI REMOTELY VERIFIED | `frontend/server.py`, `frontend/app.js`, `deploy/sync-shanghai-panel.ps1`; service active and homepage verified on `111.231.25.250` |
 | Real private preflight against OKX/Binance | PENDING CREDENTIALS | No local or Shanghai OKX/Binance secrets are configured |
 | Real Demo/Testnet order lifecycle | PENDING PRIVATE PREFLIGHT | Requires account permission, one minimal order and reconciliation |
 | Mainnet and real-money trading | DISABLED BY DESIGN | No mainnet URL or live mode is enabled in this phase |
@@ -31,7 +31,7 @@ before any consideration of real capital.
 ## Current verified state
 
 - Branch: `quant/autonomous-behavioral-quant-bot-v1`
-- Latest pushed commit: `bc4161f`
+- Latest pushed commit: `b71cb1f`
 - Full local test suite: `330 passed`
 - No exchange credentials used in testing
 - No real order submitted
@@ -40,11 +40,9 @@ before any consideration of real capital.
 
 ## Only external gates remaining
 
-1. Authenticate an SSH session to the Shanghai node and run
-   `deploy/sync-shanghai-panel.ps1` from the local repository.
-2. In the Shanghai loopback panel, save exactly one OKX Demo or Binance
+1. In the Shanghai loopback panel, save exactly one OKX Demo or Binance
    Testnet credential set. Values stay on that node and are never sent here.
-3. Run read-only preflight, then one explicitly confirmed non-production order
+2. Run read-only preflight, then one explicitly confirmed non-production order
    lifecycle and verify fills, reconciliation, restart recovery and shutdown
    cancellation.
 
