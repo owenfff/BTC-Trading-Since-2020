@@ -117,6 +117,21 @@ def _read_replay_dataset(symbol: str) -> dict[str, Any]:
     """
 
     output_root = PROJECT_ROOT / "quant" / "outputs"
+    compact_path = output_root / f"replay_dashboard_{symbol.lower()}.json"
+    if compact_path.exists():
+        compact = _read_json(compact_path)
+        if isinstance(compact.get("bars"), list) and isinstance(compact.get("orders"), list) and isinstance(compact.get("pnl"), list):
+            return {
+                "symbol": symbol,
+                "bars": compact["bars"],
+                "orders": compact["orders"],
+                "pnl": compact["pnl"],
+                "available": bool(compact.get("available", True)),
+                "start_ts": compact.get("full_start_ts") or compact.get("start_ts"),
+                "end_ts": compact.get("full_end_ts") or compact.get("end_ts"),
+                "pnl_unit": compact.get("pnl_unit", "analytical realised PnL"),
+                "source": compact.get("source", "local compact replay snapshot"),
+            }
     bars: list[dict[str, Any]] = []
     bars_path = output_root / "market_bars_1h.csv"
     if bars_path.exists():
