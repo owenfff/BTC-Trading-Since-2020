@@ -52,6 +52,18 @@ credentials never enter the browser. This panel is suitable for a Shanghai
 trading node reached through an SSH tunnel, while the US dashboard remains
 frontend-only.
 
+## Shanghai node deployment
+
+The verified runtime bundle from code commit `0ef2df42e9b1817c636df70c8656fdc142924eb6`
+is deployed at `/home/ubuntu/apps/btc-current` on the Shanghai Ubuntu 24.04
+node. The `quant-local-control-panel.service` system service is enabled and
+active, listens only on `127.0.0.1:8080`, and is reachable through an SSH
+tunnel. Python 3.12.3, NumPy 2.3.5 and WebSockets 15.0.1 are installed; the
+frozen model loads successfully with 66 symbols. The local credential helper
+uses hidden terminal input and writes only mode-600 credentials; no credential
+has been installed and no order has been submitted. Current state is therefore
+`WAITING_FOR_TRADING_NODE` until one Demo/Testnet venue is configured locally.
+
 The OKX/Binance launchers now resolve the repository-relative paths
 correctly, and `deploy/start-multivenue.ps1` supervises both non-production
 Spot/OKX venues from one local process. Binance USDⓈ-M Futures is selected as a
@@ -69,6 +81,8 @@ zero flip-recall limitation.
 
 - Code commit: `cdbdc62d2e47003d2455a3e993ccbb099fc52c28`.
 - Loopback dashboard control commit: `75e0bf8`.
+- Local credential setup helper commit: `195d3d9`; shell line-ending fix:
+  `0ef2df4`.
 - Follow-up stack launcher commit: `ad7b8ec4f9ba603a7e08a8b6736244e3f56b1849`.
 - Single-venue selection commit: `2e0e82b794f4412256b330dc4e4c4a04f4b27f0c`.
 - The stack defaults to OKX; Binance Spot or Binance Futures is selected by the
@@ -86,6 +100,8 @@ zero flip-recall limitation.
 - `python -m compileall -q frontend quant_bot`: passed.
 - `git diff --check`: passed.
 - All seven PowerShell launchers: parsed successfully.
+- Shanghai deployment checks: Bash syntax passed, model load passed, systemd
+  panel service `active` and `enabled`, loopback status API returned 200.
 - Credential-gated `run-all --once` without credentials returned structured
   `DEMO_CREDENTIALS_REQUIRED` / `TESTNET_CREDENTIALS_REQUIRED` results and
   submitted zero orders. Individual Binance Futures preflight and run also
