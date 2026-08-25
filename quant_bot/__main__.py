@@ -16,7 +16,7 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
     run = subparsers.add_parser("run")
     run.add_argument("--mode", choices=("shadow", "paper", "testnet"), required=True)
-    run.add_argument("--venue", choices=("bybit-demo", "okx-demo", "binance-spot-testnet"), default=None)
+    run.add_argument("--venue", choices=("bybit-demo", "okx-demo", "binance-spot-testnet", "binance-futures-testnet"), default=None)
     run.add_argument("--input", default="quant/outputs/model_dataset.csv")
     run.add_argument("--state", default="quant/outputs/runtime_state.json")
     run.add_argument("--limit", type=int, default=100)
@@ -38,13 +38,13 @@ def main() -> None:
     run_all.add_argument("--once", action="store_true")
     run_all.add_argument("--poll-seconds", type=int, default=60)
     pre = subparsers.add_parser("preflight")
-    pre.add_argument("--venue", choices=("bybit-demo", "okx-demo", "binance-spot-testnet"), required=True)
+    pre.add_argument("--venue", choices=("bybit-demo", "okx-demo", "binance-spot-testnet", "binance-futures-testnet"), required=True)
     pre.add_argument("--model", default=str(DEFAULT_ARTIFACT))
     args = parser.parse_args()
     if args.command == "run":
         if args.mode == "testnet":
             try:
-                if args.venue in {"okx-demo", "binance-spot-testnet"}:
+                if args.venue in {"okx-demo", "binance-spot-testnet", "binance-futures-testnet"}:
                     result = run_foreground_venue(venue=args.venue, artifact_path=Path(args.model), enable_orders=args.enable_orders, confirm_testnet=args.confirm_testnet, symbols=args.symbols, once=args.once, poll_seconds=args.poll_seconds, allow_spot_approximation=args.allow_spot_approximation)
                 else:
                     result = run_foreground(artifact_path=Path(args.model), enable_orders=args.enable_orders, confirm_testnet=args.confirm_testnet, symbols=args.symbols, once=args.once, poll_seconds=args.poll_seconds)

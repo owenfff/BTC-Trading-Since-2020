@@ -7,7 +7,7 @@ Checked against official documentation on 2026-08-21. This is a documentation an
 | BitMEX | documented | documented | documented | documented | Testnet REST `https://testnet.bitmex.com/api/v1`, WS `wss://ws.testnet.bitmex.com/realtime` | mock adapter + public normalization; real credentials required |
 | Bybit | documented | documented | documented in API family | documented in API family | Official API intro documents testnet endpoint `https://api-testnet.bybit.com` | mock adapter + public normalization; real credentials required |
 | OKX | documented | documented | documented | documented | Official V5 docs document Demo Trading and `x-simulated-trading: 1` | interface only |
-| Binance | documented | documented | product-specific | product-specific | Official developer docs state testnet/demo support varies by product | interface only |
+| Binance | documented | documented | product-specific | product-specific | Spot Testnet and USDⓈ-M Futures Testnet documented separately | native Spot Testnet + native USDⓈ-M Futures Testnet adapters |
 
 ## Official sources
 

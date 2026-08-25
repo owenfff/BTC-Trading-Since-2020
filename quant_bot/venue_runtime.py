@@ -14,6 +14,7 @@ from typing import Any
 from quant_bot.domain.instrument import Instrument, InstrumentType
 from quant_bot.domain.order import Order
 from quant_bot.exchanges.binance import BinanceSpotAdapter
+from quant_bot.exchanges.binance_futures import BinanceFuturesAdapter
 from quant_bot.exchanges.http import AdapterError
 from quant_bot.exchanges.okx import OKXAdapter
 from quant_bot.execution.target_planner import TargetOrderPlan, plan_spot_order, plan_target_order
@@ -75,6 +76,8 @@ def _candidate_symbols(venue: str, historical_symbol: str, requested_class: str)
         return (f"{base}-USDT-SWAP", f"{base}-USDC-SWAP", f"{base}-USD-SWAP")
     if venue == "binance-spot-testnet":
         return (f"{base}USDT", f"{base}USDC", f"{base}USD")
+    if venue == "binance-futures-testnet":
+        return (f"{base}USDT",)
     return ()
 
 
@@ -191,7 +194,7 @@ class VenueRuntime:
 
     @property
     def equity_unit(self) -> str:
-        return "USDT_EQUIVALENT" if self.venue == "binance-spot-testnet" else "USD_EQUIVALENT"
+        return "USDT_EQUIVALENT" if self.venue in {"binance-spot-testnet", "binance-futures-testnet"} else "USD_EQUIVALENT"
 
     def refresh(self) -> Decimal:
         state = self.adapter.reconcile_state()
@@ -377,6 +380,8 @@ def _adapter_for(venue: str) -> tuple[Any, Path]:
         return OKXAdapter.from_environment(), ROOT / "quant" / "outputs" / "okx_demo_runtime_state.json"
     if venue == "binance-spot-testnet":
         return BinanceSpotAdapter.from_environment(), ROOT / "quant" / "outputs" / "binance_spot_testnet_runtime_state.json"
+    if venue == "binance-futures-testnet":
+        return BinanceFuturesAdapter.from_environment(), ROOT / "quant" / "outputs" / "binance_futures_testnet_runtime_state.json"
     raise AdapterError(venue, "UNSUPPORTED_VENUE", f"unsupported unified runtime venue: {venue}")
 
 

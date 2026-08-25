@@ -10,6 +10,7 @@ non-production runtimes:
 | Bybit Demo | existing REST + private WebSocket runner | supported | linear/inverse derivatives |
 | OKX Demo | unified REST-polling runner | supported after explicit confirmation | SWAP derivatives |
 | Binance Spot Testnet | unified REST-polling runner | supported after explicit confirmation and Spot flag | wallet balances only |
+| Binance USDⓈ-M Futures Testnet | unified REST-polling runner | supported after explicit confirmation | linear USDT perpetual positions |
 
 The runtime loads the frozen `behavioral-distillation-v2-cross-asset-deploy`
 artifact. It does not train online, connect to a mainnet endpoint, or claim
@@ -40,13 +41,14 @@ Reconnects fail closed for order submission. A long-run soak test and a real
 Demo/Testnet order lifecycle remain open before any claim of production
 readiness.
 
-The read-only dashboard API now aggregates all three venue state files under
+The read-only dashboard API now aggregates the venue state files under
 `venues`; the frontend server never imports exchange adapters and never reads
 credentials.
 
-The two OKX/Binance launchers now resolve the repository-relative paths
+The OKX/Binance launchers now resolve the repository-relative paths
 correctly, and `deploy/start-multivenue.ps1` supervises both non-production
-venues from one local process. Each venue retains an independent account
+Spot/OKX venues from one local process. Binance USDⓈ-M Futures is selected as a
+separate single-venue launcher. Each venue retains an independent account
 snapshot, mapping report, runtime state and BLOCKED result. A missing
 credential or venue-specific failure is not converted into a successful
 multi-venue status.
@@ -61,15 +63,15 @@ zero flip-recall limitation.
 - Code commit: `dcfc1033dde8f5361818e4620ec98dee9bba4540`.
 - Follow-up stack launcher commit: `ad7b8ec4f9ba603a7e08a8b6736244e3f56b1849`.
 - Single-venue selection commit: `2e0e82b794f4412256b330dc4e4c4a04f4b27f0c`.
-- The stack defaults to OKX; Binance or explicit simultaneous mode must be
-  selected by the operator.
+- The stack defaults to OKX; Binance Spot or Binance Futures is selected by the
+  operator. Simultaneous supervision remains an explicit opt-in only.
 - Full repository test suite: `314 passed` in 127.77 seconds, zero warnings.
 - Adapter/runtime targeted suite: `16 passed`.
 - Unified supervisor targeted suite: `4 passed`.
 - Unified runtime lifecycle/restart suite: `3 passed`.
 - `python -m compileall -q quant_bot`: passed.
 - `git diff --check`: passed.
-- All three PowerShell launchers: parsed successfully.
+- All five PowerShell launchers: parsed successfully.
 - Credential-gated `run-all --once` without credentials returned structured
   `DEMO_CREDENTIALS_REQUIRED` / `TESTNET_CREDENTIALS_REQUIRED` results and
   submitted zero orders.
@@ -86,6 +88,11 @@ python -m quant_bot run --venue okx-demo --mode testnet --symbols auto --once
 
 python -m quant_bot preflight --venue binance-spot-testnet
 python -m quant_bot run --venue binance-spot-testnet --mode testnet --symbols auto --once --allow-spot-approximation
+
+python -m quant_bot preflight --venue binance-futures-testnet
+python -m quant_bot run --venue binance-futures-testnet --mode testnet --symbols auto --once
+
+.\deploy\start-binance-futures-testnet.ps1 -Mode readonly
 
 .\deploy\start-multivenue.ps1 -Mode readonly
 ```

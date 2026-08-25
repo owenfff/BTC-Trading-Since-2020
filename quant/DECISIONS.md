@@ -130,6 +130,22 @@
   private streams survive long-run soak tests and a human-approved
   non-production order lifecycle has been verified.
 
+## 2026-08-24 — Keep venue selection single by default and add futures semantics
+
+- Supporting multiple exchanges does not mean running them simultaneously.
+  Every normal launch selects exactly one venue; the existing supervisor is an
+  explicit opt-in diagnostic path and is not the default.
+- Binance Spot remains available only as an explicitly acknowledged cash-market
+  behavioral approximation. Historical derivative behavior is mapped natively
+  to a separate Binance USDⓈ-M Futures Testnet adapter when that venue is
+  selected.
+- The Binance Futures adapter is restricted to the official demo-fapi and
+  demo-fstream hosts, USDT-margined perpetuals, `positionSide=BOTH`, Decimal
+  quantity/price normalization, `GTX` post-only and `reduceOnly` risk-reduction
+  orders.
+- No credential, private endpoint, or order lifecycle was used in autonomous
+  tests; real Demo/Testnet preflight remains an external local step.
+
 ## 2026-08-21 — Freeze clean-room release evidence
 
 - Lock the release dependencies to the versions installed in the fresh Python 3.11.9 environment: NumPy 2.3.5, Polars 1.43.2, PyArrow 24.0.0, and Pytest 8.4.2.

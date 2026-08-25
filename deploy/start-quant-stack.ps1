@@ -1,7 +1,7 @@
 param(
     [ValidateSet("readonly", "testnet")]
     [string]$Mode = "readonly",
-    [ValidateSet("okx-demo", "binance-spot-testnet", "both")]
+    [ValidateSet("okx-demo", "binance-spot-testnet", "binance-futures-testnet", "both")]
     [string]$Venue = "okx-demo",
     [switch]$Once,
     [switch]$ConfirmTestnet,
@@ -42,9 +42,12 @@ try {
     } elseif ($Venue -eq "okx-demo") {
         $launcher = Join-Path $repo "deploy\start-okx-demo.ps1"
         & $launcher -Mode $Mode -Once:$Once -ConfirmTestnet:$ConfirmTestnet -PythonPath $PythonPath -ForgetCredentials:$ForgetCredentials
-    } else {
+    } elseif ($Venue -eq "binance-spot-testnet") {
         $launcher = Join-Path $repo "deploy\start-binance-testnet.ps1"
         & $launcher -Mode $Mode -Once:$Once -ConfirmTestnet:$ConfirmTestnet -AllowSpotApproximation:$AllowSpotApproximation -PythonPath $PythonPath -ForgetCredentials:$ForgetCredentials
+    } else {
+        $launcher = Join-Path $repo "deploy\start-binance-futures-testnet.ps1"
+        & $launcher -Mode $Mode -Once:$Once -ConfirmTestnet:$ConfirmTestnet -PythonPath $PythonPath -ForgetCredentials:$ForgetCredentials
     }
     $exitCode = $LASTEXITCODE
 } catch {

@@ -44,6 +44,9 @@ No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, p
 
 - OKX Demo and Binance Spot Testnet preflight still require the user's local
   credentials; no keys were requested or used by autonomous tests.
+- Binance USDⓈ-M Futures Testnet is now implemented as a separate single-venue
+  path, but its private preflight and order lifecycle remain unverified until
+  local credentials are available.
 - The unified OKX/Binance runner now has authenticated private WebSocket
   clients, but long-duration reconnect/soak tests and a real Demo/Testnet
   lifecycle remain open.

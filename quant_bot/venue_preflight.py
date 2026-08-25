@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from .exchanges.binance import BinanceSpotAdapter
+from .exchanges.binance_futures import BinanceFuturesAdapter
 from .exchanges.http import AdapterError
 from .exchanges.okx import OKXAdapter
 from .strategy.deployment import load_deployment_bundle
@@ -25,6 +26,8 @@ def preflight_venue(venue: str, *, artifact_path: str | None = None) -> dict[str
         adapter = OKXAdapter.from_environment()
     elif key == "binance-spot-testnet":
         adapter = BinanceSpotAdapter.from_environment()
+    elif key == "binance-futures-testnet":
+        adapter = BinanceFuturesAdapter.from_environment()
     else:
         raise AdapterError(key, "UNSUPPORTED_VENUE", f"unsupported venue: {venue}")
     instruments = adapter.load_all_instruments()
@@ -45,7 +48,7 @@ def preflight_venue(venue: str, *, artifact_path: str | None = None) -> dict[str
         "server_time": server_time.isoformat(),
         "reconciliation_ok": bool(state.get("ok")),
         "equity": str(equity),
-        "equity_unit": "USDT_EQUIVALENT" if adapter.name == "binance-spot-testnet" else "USD_EQUIVALENT",
+        "equity_unit": "USDT_EQUIVALENT" if adapter.name in {"binance-spot-testnet", "binance-futures-testnet"} else "USD_EQUIVALENT",
         "balances": [{"currency": item.currency, "total": str(item.total), "available": str(item.available)} for item in state.get("balances", [])],
         "positions": len(state.get("positions", [])),
         "open_orders": len(state.get("open_orders", [])),
