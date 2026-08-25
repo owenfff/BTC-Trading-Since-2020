@@ -88,6 +88,8 @@ zero flip-recall limitation.
 - The stack defaults to OKX; Binance Spot or Binance Futures is selected by the
   operator. Simultaneous supervision remains an explicit opt-in only.
 - Full repository test suite: `324 passed` in 137.84 seconds, zero warnings.
+- Current follow-up full repository test suite: `327 passed`; this includes the
+  external public-source behavior-profile test.
 - Binance Futures targeted suite: `5 passed`; adapter/runtime targeted suite: `16 passed`.
 - Read-only dashboard venue coverage targeted suite: `6 passed`; the
   dashboard now exposes Binance USDⓈ-M Futures state alongside OKX, Binance
