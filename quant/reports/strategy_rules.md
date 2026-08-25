@@ -81,6 +81,8 @@ therefore be described as a behavioral approximation, not a precise replica.
 - Binance Spot uses available base-asset balances, cannot short, and requires
   an explicit Spot behavioral-approximation flag. Negative targets flatten the
   balance instead of creating a short.
+- Binance USDⓈ-M Futures uses signed USDT-margined linear-perpetual positions,
+  with `reduceOnly` risk-reduction orders and no Spot substitution.
 
 ## What the model does not know
 
@@ -92,8 +94,9 @@ market coverage remain visible in the research reports.
 
 ## Operational status
 
-The code can run in OKX Demo and Binance Spot Testnet modes after local
-credential-gated preflight. No mainnet URL, live credential, or real order is
-enabled by this report. Actual Testnet order lifecycle and long-duration
-reconnect tests must be verified on the user's local Demo/Testnet account
-before any claim beyond non-production readiness.
+The code can run in OKX Demo, Binance Spot Testnet, or Binance USDⓈ-M Futures
+Testnet modes after local credential-gated preflight. Normal operation selects
+one venue; simultaneous supervision is explicit opt-in only. No mainnet URL,
+live credential, or real order is enabled by this report. Actual Testnet order
+lifecycle and long-duration reconnect tests must be verified on the user's
+local Demo/Testnet account before any claim beyond non-production readiness.

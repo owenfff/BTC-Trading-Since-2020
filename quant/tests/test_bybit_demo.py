@@ -136,6 +136,7 @@ def test_frontend_dashboard_is_read_only_and_never_exposes_credentials() -> None
     assert payload["trading_enabled_here"] is False
     assert "BYBIT_DEMO_API_KEY" not in serialized
     assert "BYBIT_DEMO_API_SECRET" not in serialized
+    assert {item["venue"] for item in payload["venues"]} >= {"okx-demo", "binance-spot-testnet", "binance-futures-testnet"}
 
 
 def test_account_snapshot_is_sanitized_for_dashboard() -> None:

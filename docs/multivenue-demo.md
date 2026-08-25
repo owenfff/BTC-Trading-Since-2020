@@ -21,6 +21,13 @@ $env:BINANCE_TESTNET_API_KEY="..."
 $env:BINANCE_TESTNET_API_SECRET="..."
 ```
 
+Binance USDⓈ-M Futures Testnet uses separate credentials:
+
+```powershell
+$env:BINANCE_FUTURES_TESTNET_API_KEY="..."
+$env:BINANCE_FUTURES_TESTNET_API_SECRET="..."
+```
+
 The values are never written to Git, reports, dashboard state, or chat.
 
 The PowerShell launchers cache them encrypted with Windows-user DPAPI after
@@ -29,6 +36,7 @@ the first prompt, so later starts do not require retyping them:
 ```powershell
 .\deploy\start-okx-demo.ps1 -Mode readonly
 .\deploy\start-binance-testnet.ps1 -Mode readonly
+.\deploy\start-binance-futures-testnet.ps1 -Mode readonly
 ```
 
 Use `-ForgetCredentials` to remove the local cache. The cache is tied to the
@@ -41,6 +49,7 @@ From the repository root, using the project's Python runtime:
 ```powershell
 python -m quant_bot preflight --venue okx-demo
 python -m quant_bot preflight --venue binance-spot-testnet
+python -m quant_bot preflight --venue binance-futures-testnet
 ```
 
 Preflight does not submit orders. It verifies credentials, server time,
@@ -52,6 +61,7 @@ mapping.
 ```powershell
 python -m quant_bot run --venue okx-demo --mode testnet --symbols auto --once
 python -m quant_bot run --venue binance-spot-testnet --mode testnet --symbols auto --once --allow-spot-approximation
+python -m quant_bot run --venue binance-futures-testnet --mode testnet --symbols auto --once
 ```
 
 The long-running form replaces `--once` with `--poll-seconds 60`. State is
@@ -79,8 +89,8 @@ To start the read-only dashboard and one selected venue:
  .\deploy\start-quant-stack.ps1 -Venue okx-demo -Mode readonly
 ```
 
-Use `-Venue binance-spot-testnet` to select Binance. `-Venue both` is an
-explicit optional supervisor mode; it is never the default. The dashboard is
+Use `-Venue binance-spot-testnet` or `-Venue binance-futures-testnet` to select
+one Binance runtime. `-Venue both` is an explicit optional supervisor mode; it is never the default. The dashboard is
 intentionally frontend-only and is stopped when the stack process exits. Use
 `-DashboardHost 0.0.0.0` only on a private/local network; do not put exchange
 credentials on a public frontend host.
@@ -92,6 +102,7 @@ Only after preflight and a read-only run are understood:
 ```powershell
 python -m quant_bot run --venue okx-demo --mode testnet --symbols auto --enable-orders --confirm-testnet --poll-seconds 60
 python -m quant_bot run --venue binance-spot-testnet --mode testnet --symbols auto --enable-orders --confirm-testnet --allow-spot-approximation --poll-seconds 60
+python -m quant_bot run --venue binance-futures-testnet --mode testnet --symbols auto --enable-orders --confirm-testnet --poll-seconds 60
 ```
 
 The equivalent unified testnet command is:
@@ -104,5 +115,5 @@ The commands are hard-pinned to non-production endpoints. A mainnet URL is
 rejected by the connector. The runtime reconciles by REST and also starts the
 venue's private WebSocket; order submission is blocked until that stream is
 healthy. Binance Spot is not a leveraged short venue, so the explicit
-approximation flag is required and negative targets are treated as a request
-to flatten the base-asset balance.
+approximation flag is required there. Binance USDⓈ-M Futures uses signed
+linear-perpetual positions and `reduceOnly` for risk-reduction orders.

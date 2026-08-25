@@ -56,6 +56,7 @@ VENUE_FILES = {
     "bybit-demo": ("Bybit Demo", "bybit_demo_preflight.json", "bybit_demo_runtime_state.json", "bybit_demo_symbol_mapping.json"),
     "okx-demo": ("OKX Demo", "okx_demo_preflight.json", "okx_demo_runtime_state.json", "okx_demo_symbol_mapping.json"),
     "binance-spot-testnet": ("Binance Spot Testnet", "binance_spot_testnet_preflight.json", "binance_spot_testnet_runtime_state.json", "binance_spot_testnet_symbol_mapping.json"),
+    "binance-futures-testnet": ("Binance USDⓈ-M Futures Testnet", "binance_futures_testnet_preflight.json", "binance_futures_testnet_runtime_state.json", "binance_futures_testnet_symbol_mapping.json"),
 }
 
 
