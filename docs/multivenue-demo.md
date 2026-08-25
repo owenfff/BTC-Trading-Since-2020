@@ -73,6 +73,16 @@ reported under that venue and never silently treated as a successful order.
 The first run asks for each credential locally and stores an encrypted
 Windows-user DPAPI cache under ignored `quant/outputs/`; later runs reuse it.
 
+To start the read-only dashboard and both venue workers together:
+
+```powershell
+.\deploy\start-quant-stack.ps1 -Mode readonly
+```
+
+The dashboard is intentionally frontend-only and is stopped when the stack
+process exits. Use `-DashboardHost 0.0.0.0` only on a private/local network;
+do not put exchange credentials on a public frontend host.
+
 ## Explicit Demo/Testnet orders
 
 Only after preflight and a read-only run are understood:

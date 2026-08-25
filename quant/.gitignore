@@ -34,6 +34,8 @@ outputs/okx_demo_runtime_state.json
 outputs/binance_spot_testnet_runtime_state.json
 outputs/okx_demo_*.log
 outputs/binance_spot_testnet_*.log
+outputs/frontend_dashboard.log
+outputs/frontend_dashboard.error.log
 outputs/cross_asset_market_coverage.json
 data/market/raw/
 data/market/cache/
