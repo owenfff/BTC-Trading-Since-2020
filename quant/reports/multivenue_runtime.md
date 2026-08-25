@@ -40,6 +40,10 @@ Reconnects fail closed for order submission. A long-run soak test and a real
 Demo/Testnet order lifecycle remain open before any claim of production
 readiness.
 
+The read-only dashboard API now aggregates all three venue state files under
+`venues`; the frontend server never imports exchange adapters and never reads
+credentials.
+
 ## Verification
 
 - Full repository test suite: `308 passed` (one pre-existing test-fixture

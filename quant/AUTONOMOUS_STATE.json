@@ -4,7 +4,7 @@
   "current_phase": "PHASE_14_MULTI_VENUE_DEMO_RUNTIME",
   "current_work_package": "M14-multivenue-nonproduction-runtime",
   "last_completed_phase": "PHASE_13_CROSS_ASSET_BEHAVIOR",
-  "last_code_commit": "26bf900",
+  "last_code_commit": "54845f8",
   "last_report_commit": "5e1b7f9",
   "test_count": 308,
   "last_test_status": "FULL_SUITE_308_PASSED;MULTIVENUE_TARGETED_15_PASSED;ONE_PREEXISTING_FIXTURE_WARNING",
@@ -20,7 +20,7 @@
   "paper_status": "PAPER_REPLAY_PASS;PAPER_SMOKE_PASS",
   "demo_status": "BYBIT_ACTIVE_LOCALLY;OKX_AND_BINANCE_CREDENTIAL_GATED",
   "bot_status": "NONPRODUCTION_MULTI_VENUE_REST_POLLING_RUNTIME",
-  "frontend_status": "READ_ONLY_DASHBOARD_DEPLOYED",
+  "frontend_status": "MULTI_VENUE_READ_ONLY_DASHBOARD_CODE_READY",
   "frontend_url": "http://198.44.46.229:8080/",
   "trading_node_status": "SEPARATE_LOCAL_OR_NON_US_NODE_REQUIRED",
   "blockers": [
