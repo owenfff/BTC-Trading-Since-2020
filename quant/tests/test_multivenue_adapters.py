@@ -30,6 +30,13 @@ def test_okx_signature_and_demo_endpoint_guard() -> None:
     assert error.value.code == "MAINNET_OR_UNTRUSTED_ENDPOINT"
 
 
+def test_okx_demo_uses_global_demo_rest_and_websocket_hosts() -> None:
+    from quant_bot.exchanges.okx_http import OKX_DEMO_PRIVATE_WS_URL, OKX_DEMO_REST_BASE_URL
+
+    assert OKX_DEMO_REST_BASE_URL == "https://openapi.okx.com"
+    assert OKX_DEMO_PRIVATE_WS_URL == "wss://wspap.okx.com:8443/ws/v5/private"
+
+
 def test_binance_hmac_and_testnet_endpoint_guard() -> None:
     assert binance_signature("secret", "symbol=BTCUSDT&timestamp=1700000000000") == "6244d11c958f45ac56733152cb3cb1831d23a2b3709b3a88b8b42a072aceb410"
     assert_binance_spot_testnet_url()

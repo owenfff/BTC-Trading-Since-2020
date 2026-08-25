@@ -12,7 +12,7 @@ exchanges:
     credentials_env: DISABLED
   okx:
     environment: demo
-    rest_base_url: https://us.okx.com
+    rest_base_url: https://openapi.okx.com
     simulated_trading_header: x-simulated-trading: 1
     credentials_env: DISABLED
   binance:

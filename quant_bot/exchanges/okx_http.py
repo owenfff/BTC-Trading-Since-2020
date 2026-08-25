@@ -16,9 +16,13 @@ from urllib.parse import urlsplit
 from .http import AdapterError
 
 
-OKX_DEMO_REST_BASE_URL = "https://us.okx.com"
-OKX_DEMO_PUBLIC_WS_URL = "wss://wsuspap.okx.com:8443/ws/v5/public"
-OKX_DEMO_PRIVATE_WS_URL = "wss://wsuspap.okx.com:8443/ws/v5/private"
+# The account is not assumed to be US/AU. OKX uses regional API domains for
+# production accounts, while the global Demo Trading API uses openapi.okx.com
+# and wspap.okx.com. Using the US production-region hostname with a global
+# Demo key returns 50119 (API key doesn't exist).
+OKX_DEMO_REST_BASE_URL = "https://openapi.okx.com"
+OKX_DEMO_PUBLIC_WS_URL = "wss://wspap.okx.com:8443/ws/v5/public"
+OKX_DEMO_PRIVATE_WS_URL = "wss://wspap.okx.com:8443/ws/v5/private"
 
 
 @dataclass(frozen=True, repr=False)
@@ -46,14 +50,14 @@ class OKXDemoCredentials:
 
 def assert_okx_demo_url(url: str = OKX_DEMO_REST_BASE_URL) -> None:
     parsed = urlsplit(url)
-    if parsed.scheme != "https" or parsed.netloc.lower() != "us.okx.com":
-        raise AdapterError("okx-demo", "MAINNET_OR_UNTRUSTED_ENDPOINT", "only https://us.okx.com is allowed for OKX Demo")
+    if parsed.scheme != "https" or parsed.netloc.lower() != "openapi.okx.com":
+        raise AdapterError("okx-demo", "MAINNET_OR_UNTRUSTED_ENDPOINT", "only https://openapi.okx.com is allowed for global OKX Demo")
 
 
 def assert_okx_demo_ws_url(url: str = OKX_DEMO_PRIVATE_WS_URL) -> None:
     parsed = urlsplit(url)
-    if parsed.scheme != "wss" or parsed.netloc.lower() != "wsuspap.okx.com:8443":
-        raise AdapterError("okx-demo", "MAINNET_OR_UNTRUSTED_ENDPOINT", "only OKX Demo WebSocket endpoints are allowed")
+    if parsed.scheme != "wss" or parsed.netloc.lower() != "wspap.okx.com:8443":
+        raise AdapterError("okx-demo", "MAINNET_OR_UNTRUSTED_ENDPOINT", "only wss://wspap.okx.com:8443 is allowed for global OKX Demo")
 
 
 def okx_signature(secret: str, timestamp: str, method: str, request_path: str, body: str = "") -> str:
