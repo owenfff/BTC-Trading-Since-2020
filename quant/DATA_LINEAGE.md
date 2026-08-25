@@ -130,3 +130,19 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Phase 10 offline runtime: code `0594629...`, reports `dc7b87e...`; shadow and paper smoke paths pass without credentials or network access.
 - Phase 11 exchange capability matrix: `61aa22f...`; injected-transport BitMEX/Bybit adapter tests are recorded in code commit `f2c64da...`. Real private endpoints remain credential-gated.
 - Phase 12 release safeguards: code commit `9c8cf24...` includes the release audit and the pinned runtime-only dependency split; the fresh clean-room clone passed 273 tests with 2 output-dependent skips, compile validation, controlled research preflight, and the intentional full-research rehydration boundary. Docker Compose parsed successfully; `btc-trading-clean-room:9c8cf24` built and returned `PAPER_SMOKE_PASS` under a read-only filesystem with temporary `/tmp`.
+
+## Unified multi-venue supervisor artifact
+
+- Code commit: `dcfc1033dde8f5361818e4620ec98dee9bba4540`.
+- Added `quant_bot/multivenue_runtime.py`, the `run-all` CLI command, and
+  `deploy/start-multivenue.ps1` for local OKX Demo plus Binance Spot Testnet
+  supervision.
+- The supervisor preserves independent venue adapters, mappings, runtime state,
+  private-stream health and sanitized BLOCKED results. It does not merge
+  historical teacher symbols or account semantics.
+- Verification: full `pytest quant/tests -q` returned `314 passed` with zero
+  warnings; adapter/runtime targeted tests returned `16 passed`; supervisor
+  tests returned `4 passed`; all PowerShell launchers parsed; no credentials
+  were used; raw root CSV/JSON inputs were unchanged.
+- The code commit is currently local because the first GitHub HTTPS push
+  attempt failed at port 443; it must be pushed before claiming remote parity.

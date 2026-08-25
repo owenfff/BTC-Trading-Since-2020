@@ -136,3 +136,18 @@
 - The full research command fails closed with structured `BLOCKED_INPUTS_MISSING` when ignored market/behavior outputs are absent. It must never substitute synthetic market history for a release smoke test.
 - Repeated fixture shadow and paper runs are reproducible. This proves framework smoke behavior only; it does not prove long-running stability or profitability.
 - Keep full research/test dependencies in `quant/requirements.txt` and use the smaller pinned `quant/runtime-requirements.txt` for the paper/shadow Docker image. The image was built and run successfully as `btc-trading-clean-room:9c8cf24` with read-only storage and temporary `/tmp`; this validates packaging and fixture smoke only, not exchange connectivity or profitability.
+
+## 2026-08-24 — Add one-command multi-venue supervision
+
+- Keep the Strategy Core exchange-neutral and supervise OKX Demo and Binance
+  Spot Testnet as separate venue workers; never merge their balances,
+  positions, contract units or Spot/derivative semantics.
+- Treat a missing credential, region restriction, mapping failure or private
+  stream failure as a venue-scoped `BLOCKED` result. It must not be converted
+  into a successful overall run or an order submission.
+- Preserve explicit testnet confirmation and the Binance Spot behavioral
+  approximation flag. No mainnet endpoint, live credential or real capital is
+  enabled by the unified launcher.
+- Record code commit `dcfc1033dde8f5361818e4620ec98dee9bba4540`; full local
+  verification is `314 passed` with no credentials. Remote push remains an
+  external retry after the first GitHub HTTPS attempt failed.

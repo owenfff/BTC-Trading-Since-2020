@@ -44,6 +44,13 @@ The read-only dashboard API now aggregates all three venue state files under
 `venues`; the frontend server never imports exchange adapters and never reads
 credentials.
 
+The two OKX/Binance launchers now resolve the repository-relative paths
+correctly, and `deploy/start-multivenue.ps1` supervises both non-production
+venues from one local process. Each venue retains an independent account
+snapshot, mapping report, runtime state and BLOCKED result. A missing
+credential or venue-specific failure is not converted into a successful
+multi-venue status.
+
 The human-readable strategy summary is in
 `quant/reports/strategy_rules.md`. It distinguishes the deterministic rule
 baseline from the deployed cross-asset logistic artifact and lists the model's
@@ -51,14 +58,19 @@ zero flip-recall limitation.
 
 ## Verification
 
-- Full repository test suite: `311 passed` (one pre-existing test-fixture
-  resource warning).
-- New adapter/runtime targeted suite: `15 passed`.
+- Code commit: `dcfc1033dde8f5361818e4620ec98dee9bba4540`.
+- Full repository test suite: `314 passed` in 127.77 seconds, zero warnings.
+- Adapter/runtime targeted suite: `16 passed`.
+- Unified supervisor targeted suite: `4 passed`.
 - Unified runtime lifecycle/restart suite: `3 passed`.
 - `python -m compileall -q quant_bot`: passed.
 - `git diff --check`: passed.
+- All three PowerShell launchers: parsed successfully.
+- Credential-gated `run-all --once` without credentials returned structured
+  `DEMO_CREDENTIALS_REQUIRED` / `TESTNET_CREDENTIALS_REQUIRED` results and
+  submitted zero orders.
 - No exchange credentials were used during these tests.
-- PowerShell launcher syntax: parsed successfully for both venues.
+- Raw root CSV/JSON inputs were not modified.
 
 ## Commands
 
@@ -68,6 +80,8 @@ python -m quant_bot run --venue okx-demo --mode testnet --symbols auto --once
 
 python -m quant_bot preflight --venue binance-spot-testnet
 python -m quant_bot run --venue binance-spot-testnet --mode testnet --symbols auto --once --allow-spot-approximation
+
+.\deploy\start-multivenue.ps1 -Mode readonly
 ```
 
 The commands fail closed with a structured credential error when the local
