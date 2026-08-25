@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at_utc": "2026-08-25T05:34:55.717994+00:00",
+  "generated_at_utc": "2026-08-25T05:40:18.831648+00:00",
   "scope": {
     "venue": "Hyperliquid",
     "target_user": "0xdae4df7207feb3b350e4284c8efe5f7dac37f637",
@@ -45,6 +45,151 @@
     "current_order_sides": {
       "B": 14
     }
+  },
+  "behavior_profile": {
+    "orders": {
+      "unique_order_ids": 1343,
+      "orders_with_filled_event": 203,
+      "orders_with_canceled_event": 1126,
+      "ever_filled_fraction": "0.15115413",
+      "ever_canceled_fraction": "0.83842144",
+      "all_limit_orders": true,
+      "all_gtc_orders": true,
+      "reduce_only_event_count": 0,
+      "lifetime_ms_median": "34217187",
+      "lifetime_ms_p90": "731958204",
+      "lifetime_ms_max": "4507194070"
+    },
+    "execution": {
+      "fill_count": 341,
+      "crossed_fill_count": 55,
+      "non_crossed_fill_count": 286,
+      "crossed_fill_fraction": "0.16129032",
+      "gross_size_btc": "17.46305",
+      "gross_notional_usdc": "1349380.273090",
+      "fee_total_usdc": "268.845116",
+      "fee_bps_on_gross_notional": "1.99235991",
+      "fill_latency_ms_median": "50008004",
+      "fill_latency_ms_p90": "642635108",
+      "fill_latency_ms_max": "2474916638",
+      "fills_per_order_median": "1"
+    },
+    "position_episodes": {
+      "episode_count": 11,
+      "closed_episode_count": 10,
+      "open_at_end_count": 1,
+      "long_episode_count": 6,
+      "short_episode_count": 5,
+      "duration_ms_median": "903551733",
+      "duration_ms_max": "8243746527",
+      "fills_per_episode_median": "12",
+      "episodes": [
+        {
+          "start_time_ms": 1763228044580,
+          "side": "LONG",
+          "fills": 74,
+          "maximum_abs_position": "0.99353",
+          "end_time_ms": 1764687798595,
+          "duration_ms": 1459754015,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1764687798595,
+          "side": "SHORT",
+          "fills": 4,
+          "maximum_abs_position": "0.89486",
+          "end_time_ms": 1764689322560,
+          "duration_ms": 1523965,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1764689322560,
+          "side": "LONG",
+          "fills": 62,
+          "maximum_abs_position": "0.40336",
+          "end_time_ms": 1767734136754,
+          "duration_ms": 3044814194,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1767734136754,
+          "side": "SHORT",
+          "fills": 3,
+          "maximum_abs_position": "0.02141",
+          "end_time_ms": 1767853034079,
+          "duration_ms": 118897325,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1767853034079,
+          "side": "LONG",
+          "fills": 7,
+          "maximum_abs_position": "0.05736",
+          "end_time_ms": 1768315385423,
+          "duration_ms": 462351344,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1768315385423,
+          "side": "SHORT",
+          "fills": 12,
+          "maximum_abs_position": "0.05901",
+          "end_time_ms": 1768780969761,
+          "duration_ms": 465584338,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1768780969761,
+          "side": "LONG",
+          "fills": 86,
+          "maximum_abs_position": "2.07997",
+          "end_time_ms": 1776438730674,
+          "duration_ms": 7657760913,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1776438730674,
+          "side": "SHORT",
+          "fills": 22,
+          "maximum_abs_position": "1.39973",
+          "end_time_ms": 1776445881185,
+          "duration_ms": 7150511,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1776445881185,
+          "side": "LONG",
+          "fills": 6,
+          "maximum_abs_position": "0.09706",
+          "end_time_ms": 1778012014340,
+          "duration_ms": 1566133155,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1778012014340,
+          "side": "SHORT",
+          "fills": 2,
+          "maximum_abs_position": "0.03294",
+          "end_time_ms": 1778915566073,
+          "duration_ms": 903551733,
+          "open_at_end": false
+        },
+        {
+          "start_time_ms": 1778915566073,
+          "side": "LONG",
+          "fills": 73,
+          "maximum_abs_position": "1.60557",
+          "end_time_ms": 1787159312600,
+          "duration_ms": 8243746527,
+          "open_at_end": true
+        }
+      ]
+    },
+    "interpretation_boundary": [
+      "This profile describes public order, fill and account events; it does not recover private intent or a guaranteed trading rule.",
+      "crossed is reported from the public fill field and is not independently reclassified as maker or taker.",
+      "The profile is an external Hyperliquid reference and is excluded from the BitMEX teacher-model training set."
+    ]
   },
   "latest_snapshot": {
     "captured_at": "2026-08-25T01:57:07.822958+00:00",
@@ -142,10 +287,7 @@
           "bytes": 913349,
           "sha256": "40d26a416562c60adb189243d915738971c8621e68f5b91f82c30e6d671a0acd"
         },
-        "comparison_directory": {
-          "bytes": 1387523,
-          "sha256": "f9594eec1369554e1e0007bc48a1bf068c21c78220c42b47146efc5766f758fc"
-        },
+        "comparison_directory": {},
         "same": false
       },
       "userFillsByTime.json": {
@@ -153,10 +295,7 @@
           "bytes": 114584,
           "sha256": "440c076de00abb95a9273636188bf789b7237fb5ea12a5d5ebeb847944e6251f"
         },
-        "comparison_directory": {
-          "bytes": 154600,
-          "sha256": "d6ade127b9762af6139e877d7081270fc33d10bdcabcbec04a1ed307f9a7d68b"
-        },
+        "comparison_directory": {},
         "same": false
       },
       "userFunding.json": {
@@ -164,10 +303,7 @@
           "bytes": 602620,
           "sha256": "afbb095fdcf3f0758ab78b7ec60102c605189654a01ce0bdd18a67a75d2432f0"
         },
-        "comparison_directory": {
-          "bytes": 849064,
-          "sha256": "94e3428123c898c6f6c34331e7464914c1383afd00a293f0b85bc9e51c299c19"
-        },
+        "comparison_directory": {},
         "same": false
       },
       "userNonFundingLedgerUpdates.json": {
@@ -175,10 +311,7 @@
           "bytes": 289,
           "sha256": "d8975bd3736b22e0bb16c6c990504d77cc87451fa5d2a4c22621bea540add78c"
         },
-        "comparison_directory": {
-          "bytes": 398,
-          "sha256": "f61b3ad3155c6b44e77546df5dffe6bad59c36907084e05d92d17dc8a1c19e8f"
-        },
+        "comparison_directory": {},
         "same": false
       },
       "frontendOpenOrders.json": {
@@ -186,10 +319,7 @@
           "bytes": 106439,
           "sha256": "5222f6bae3a68fdd7dc65b4ba2800b5a7d030eb60ca7a1b575843a51804243de"
         },
-        "comparison_directory": {
-          "bytes": 191525,
-          "sha256": "9379c690d79c3510889b5887162d115ea1b9aac3f3e39d0f46f34276b85f97a2"
-        },
+        "comparison_directory": {},
         "same": false
       },
       "clearinghouseState.json": {
@@ -197,10 +327,7 @@
           "bytes": 29110,
           "sha256": "63341d14825e755c643928f628765af1b8933dee808748a7e7ed20233ff80aea"
         },
-        "comparison_directory": {
-          "bytes": 50536,
-          "sha256": "cbcd87b447be0384a7af11c6e6f60d494c25cdd4d94e7b23119a88a3f117157c"
-        },
+        "comparison_directory": {},
         "same": false
       },
       "spotClearinghouseState.json": {
@@ -208,10 +335,7 @@
           "bytes": 15498,
           "sha256": "9a0bc07ab0d174615397e8ed0432aba281d11f8b78a15ee8bd0c447042cdec17"
         },
-        "comparison_directory": {
-          "bytes": 33949,
-          "sha256": "d55bfb230fd1aa83455e279b04a3adf1235a3fa15b8c8c4c6ca67bbf3504d4b0"
-        },
+        "comparison_directory": {},
         "same": false
       }
     },

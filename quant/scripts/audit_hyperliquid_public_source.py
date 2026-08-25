@@ -80,6 +80,175 @@ def classify_action(before: Decimal, after: Decimal) -> str:
     return "NO_POSITION_CHANGE"
 
 
+def _ratio(numerator: int | Decimal, denominator: int | Decimal) -> str:
+    if denominator == 0:
+        return "0"
+    return str((Decimal(numerator) / Decimal(denominator)).quantize(Decimal("0.00000001")))
+
+
+def _median(values: list[int | Decimal]) -> str | None:
+    if not values:
+        return None
+    ordered = sorted(Decimal(value) for value in values)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        return str(ordered[middle])
+    return str((ordered[middle - 1] + ordered[middle]) / Decimal("2"))
+
+
+def _percentile(values: list[int | Decimal], fraction: Decimal) -> str | None:
+    if not values:
+        return None
+    ordered = sorted(Decimal(value) for value in values)
+    index = min(len(ordered) - 1, int((len(ordered) - 1) * fraction))
+    return str(ordered[index])
+
+
+def build_behavior_profile(
+    orders: list[dict[str, Any]],
+    fills: list[dict[str, Any]],
+    replay_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Build descriptive behavior metrics from public events only.
+
+    The profile intentionally contains no predictive labels. It describes what was
+    publicly observed, including the fact that an order was cancelled or crossed.
+    """
+    orders_by_id: dict[str, list[dict[str, Any]]] = {}
+    for row in orders:
+        order = row.get("order", {})
+        orders_by_id.setdefault(str(order.get("oid")), []).append(row)
+
+    order_lifetimes: list[int] = []
+    for events in orders_by_id.values():
+        timestamps = [
+            int(row.get("statusTimestamp", row.get("order", {}).get("timestamp", 0)))
+            for row in events
+        ]
+        if len(timestamps) > 1:
+            order_lifetimes.append(max(timestamps) - min(timestamps))
+
+    order_creation_times = {
+        oid: min(
+            int(row.get("statusTimestamp", row.get("order", {}).get("timestamp", 0)))
+            for row in events
+        )
+        for oid, events in orders_by_id.items()
+    }
+    fill_latencies: list[int] = []
+    for fill in fills:
+        created = order_creation_times.get(str(fill.get("oid")))
+        if created is not None:
+            fill_latencies.append(max(0, int(fill.get("time", 0)) - created))
+
+    crossed = sum(1 for row in fills if bool(row.get("crossed")))
+    gross_notional = sum((decimal(row.get("px", "0")) * decimal(row.get("sz", "0")) for row in fills), Decimal("0"))
+    gross_size = sum((decimal(row.get("sz", "0")) for row in fills), Decimal("0"))
+    fees = sum((decimal(row.get("fee", "0")) for row in fills), Decimal("0"))
+
+    episodes: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for row in replay_rows:
+        before = decimal(row["before"])
+        after = decimal(row["after"])
+        timestamp = int(row["time"])
+        if before == 0 and after != 0:
+            current = {
+                "start_time_ms": timestamp,
+                "side": "LONG" if after > 0 else "SHORT",
+                "fills": 0,
+                "maximum_abs_position": Decimal("0"),
+            }
+        if current is None:
+            continue
+        current["fills"] += 1
+        current["maximum_abs_position"] = max(current["maximum_abs_position"], abs(after))
+        flipped = before != 0 and after != 0 and ((before > 0) != (after > 0))
+        closed = before != 0 and after == 0
+        if flipped or closed:
+            current["end_time_ms"] = timestamp
+            current["duration_ms"] = timestamp - int(current["start_time_ms"])
+            current["open_at_end"] = False
+            episodes.append(current)
+            if flipped:
+                current = {
+                    "start_time_ms": timestamp,
+                    "side": "LONG" if after > 0 else "SHORT",
+                    "fills": 1,
+                    "maximum_abs_position": abs(after),
+                }
+            else:
+                current = None
+    if current is not None:
+        last_time = int(replay_rows[-1]["time"])
+        current["end_time_ms"] = last_time
+        current["duration_ms"] = last_time - int(current["start_time_ms"])
+        current["open_at_end"] = True
+        episodes.append(current)
+
+    durations = [int(row["duration_ms"]) for row in episodes]
+    return {
+        "orders": {
+            "unique_order_ids": len(orders_by_id),
+            "orders_with_filled_event": len({str(row.get("order", {}).get("oid")) for row in orders if row.get("status") == "filled"}),
+            "orders_with_canceled_event": len({str(row.get("order", {}).get("oid")) for row in orders if row.get("status") == "canceled"}),
+            "ever_filled_fraction": _ratio(
+                len({str(row.get("order", {}).get("oid")) for row in orders if row.get("status") == "filled"}),
+                len(orders_by_id),
+            ),
+            "ever_canceled_fraction": _ratio(
+                len({str(row.get("order", {}).get("oid")) for row in orders if row.get("status") == "canceled"}),
+                len(orders_by_id),
+            ),
+            "all_limit_orders": all(row.get("order", {}).get("orderType") == "Limit" for row in orders),
+            "all_gtc_orders": all(row.get("order", {}).get("tif") == "Gtc" for row in orders),
+            "reduce_only_event_count": sum(bool(row.get("order", {}).get("reduceOnly")) for row in orders),
+            "lifetime_ms_median": _median(order_lifetimes),
+            "lifetime_ms_p90": _percentile(order_lifetimes, Decimal("0.90")),
+            "lifetime_ms_max": str(max(order_lifetimes)) if order_lifetimes else None,
+        },
+        "execution": {
+            "fill_count": len(fills),
+            "crossed_fill_count": crossed,
+            "non_crossed_fill_count": len(fills) - crossed,
+            "crossed_fill_fraction": _ratio(crossed, len(fills)),
+            "gross_size_btc": str(gross_size),
+            "gross_notional_usdc": str(gross_notional),
+            "fee_total_usdc": str(fees),
+            "fee_bps_on_gross_notional": _ratio(fees * Decimal("10000"), gross_notional),
+            "fill_latency_ms_median": _median(fill_latencies),
+            "fill_latency_ms_p90": _percentile(fill_latencies, Decimal("0.90")),
+            "fill_latency_ms_max": str(max(fill_latencies)) if fill_latencies else None,
+            "fills_per_order_median": _median([
+                sum(1 for fill in fills if str(fill.get("oid")) == oid)
+                for oid in {str(fill.get("oid")) for fill in fills}
+            ]),
+        },
+        "position_episodes": {
+            "episode_count": len(episodes),
+            "closed_episode_count": sum(not row.get("open_at_end") for row in episodes),
+            "open_at_end_count": sum(bool(row.get("open_at_end")) for row in episodes),
+            "long_episode_count": sum(row.get("side") == "LONG" for row in episodes),
+            "short_episode_count": sum(row.get("side") == "SHORT" for row in episodes),
+            "duration_ms_median": _median(durations),
+            "duration_ms_max": str(max(durations)) if durations else None,
+            "fills_per_episode_median": _median([int(row["fills"]) for row in episodes]),
+            "episodes": [
+                {
+                    **row,
+                    "maximum_abs_position": str(row["maximum_abs_position"]),
+                }
+                for row in episodes
+            ],
+        },
+        "interpretation_boundary": [
+            "This profile describes public order, fill and account events; it does not recover private intent or a guaranteed trading rule.",
+            "crossed is reported from the public fill field and is not independently reclassified as maker or taker.",
+            "The profile is an external Hyperliquid reference and is excluded from the BitMEX teacher-model training set.",
+        ],
+    }
+
+
 def audit(data_dir: Path, manifest_path: Path | None = None, comparison_dir: Path | None = None) -> dict[str, Any]:
     files = {name: data_dir / name for name in SOURCE_FILES}
     payloads = {Path(name).stem: read_json(path) for name, path in files.items() if path.exists()}
@@ -160,6 +329,7 @@ def audit(data_dir: Path, manifest_path: Path | None = None, comparison_dir: Pat
     position_value = decimal(latest_margin.get("totalNtlPos", "0"))
     account_value = decimal(latest_margin.get("accountValue", "0"))
     leverage = position_value / account_value if account_value else Decimal("0")
+    behavior_profile = build_behavior_profile(orders, fills, replay_rows)
 
     result = {
         "status": "PASS" if all(item["passed"] for item in checks) else "WARNING",
@@ -191,6 +361,7 @@ def audit(data_dir: Path, manifest_path: Path | None = None, comparison_dir: Pat
             "historical_order_status_counts": dict(order_statuses),
             "current_order_sides": dict(Counter(str(row.get("side", "UNKNOWN")) for row in current_orders)),
         },
+        "behavior_profile": behavior_profile,
         "latest_snapshot": {
             "captured_at": latest_snapshot(state_document).get("capturedAt"),
             "account_value_usdc": str(account_value),
@@ -224,6 +395,10 @@ def write_outputs(result: dict[str, Any], markdown_path: Path, json_path: Path) 
     scope = result["scope"]
     coverage = result["coverage"]
     behavior = result["behavior"]
+    profile = result["behavior_profile"]
+    order_profile = profile["orders"]
+    execution_profile = profile["execution"]
+    episode_profile = profile["position_episodes"]
     latest = result["latest_snapshot"]
     comparison = result.get("version_boundary", {}).get("comparison", {})
     differing_files = [name for name, item in comparison.items() if not item.get("same")]
@@ -251,6 +426,23 @@ def write_outputs(result: dict[str, Any], markdown_path: Path, json_path: Path) 
         f"- Terminal position: `{behavior['terminal_position']} BTC`",
         f"- Maximum absolute position: `{behavior['maximum_abs_position']} BTC`",
         f"- Action counts: `{behavior['action_counts']}`",
+        "",
+        "## Independent behavior profile",
+        "",
+        "The following metrics are derived from the public order and fill events. They are descriptive observations, not recovered private rules and not training labels.",
+        "",
+        f"- Orders ever observed with a filled event: `{order_profile['orders_with_filled_event']}` / `{order_profile['unique_order_ids']}` (`{order_profile['ever_filled_fraction']}`)",
+        f"- Orders ever observed with a canceled event: `{order_profile['orders_with_canceled_event']}` / `{order_profile['unique_order_ids']}` (`{order_profile['ever_canceled_fraction']}`)",
+        f"- Order shape: all Limit=`{order_profile['all_limit_orders']}`, all GTC=`{order_profile['all_gtc_orders']}`, reduce-only events=`{order_profile['reduce_only_event_count']}`",
+        f"- Order lifetime median / P90 / max: `{order_profile['lifetime_ms_median']}` / `{order_profile['lifetime_ms_p90']}` / `{order_profile['lifetime_ms_max']}` ms",
+        f"- Fill crossed fraction: `{execution_profile['crossed_fill_fraction']}` ({execution_profile['crossed_fill_count']} / {execution_profile['fill_count']})",
+        f"- Gross fill size / notional: `{execution_profile['gross_size_btc']} BTC` / `{execution_profile['gross_notional_usdc']} USDC`",
+        f"- Reported fees / fee rate on gross notional: `{execution_profile['fee_total_usdc']} USDC` / `{execution_profile['fee_bps_on_gross_notional']} bps`",
+        f"- Fill latency median / P90 / max: `{execution_profile['fill_latency_ms_median']}` / `{execution_profile['fill_latency_ms_p90']}` / `{execution_profile['fill_latency_ms_max']}` ms",
+        f"- Position episodes: `{episode_profile['episode_count']}` total, `{episode_profile['closed_episode_count']}` closed, `{episode_profile['open_at_end_count']}` open at end",
+        f"- Episode sides: `{episode_profile['long_episode_count']}` long / `{episode_profile['short_episode_count']}` short",
+        f"- Episode duration median / max: `{episode_profile['duration_ms_median']}` / `{episode_profile['duration_ms_max']}` ms",
+        f"- Fills per episode median: `{episode_profile['fills_per_episode_median']}`",
         "",
         "## Latest state",
         "",

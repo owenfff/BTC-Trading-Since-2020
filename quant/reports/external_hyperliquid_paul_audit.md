@@ -22,6 +22,23 @@
 - Maximum absolute position: `2.07997 BTC`
 - Action counts: `{'OPEN_LONG': 1, 'ADD_LONG': 137, 'REDUCE_LONG': 160, 'FLIP_SHORT': 5, 'REDUCE_SHORT': 19, 'FLIP_LONG': 5, 'ADD_SHORT': 14}`
 
+## Independent behavior profile
+
+The following metrics are derived from the public order and fill events. They are descriptive observations, not recovered private rules and not training labels.
+
+- Orders ever observed with a filled event: `203` / `1343` (`0.15115413`)
+- Orders ever observed with a canceled event: `1126` / `1343` (`0.83842144`)
+- Order shape: all Limit=`True`, all GTC=`True`, reduce-only events=`0`
+- Order lifetime median / P90 / max: `34217187` / `731958204` / `4507194070` ms
+- Fill crossed fraction: `0.16129032` (55 / 341)
+- Gross fill size / notional: `17.46305 BTC` / `1349380.273090 USDC`
+- Reported fees / fee rate on gross notional: `268.845116 USDC` / `1.99235991 bps`
+- Fill latency median / P90 / max: `50008004` / `642635108` / `2474916638` ms
+- Position episodes: `11` total, `10` closed, `1` open at end
+- Episode sides: `6` long / `5` short
+- Episode duration median / max: `903551733` / `8243746527` ms
+- Fills per episode median: `12`
+
 ## Latest state
 
 - Perpetual account value: `66434.994411 USDC`
