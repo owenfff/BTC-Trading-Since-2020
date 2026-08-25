@@ -144,6 +144,16 @@ h1 { margin-bottom: 0; font: 500 clamp(24px, 3vw, 37px)/1 var(--display); letter
 .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; padding-top: 20px; }
 .control-grid label { display: grid; gap: 7px; color: var(--muted); font: 700 9px/1 var(--mono); letter-spacing: .1em; }
 .control-grid select { min-height: 38px; padding: 0 10px; border: 1px solid var(--line-dark); color: var(--ink); background: var(--paper); font: 11px/1 var(--mono); }
+.control-credentials { grid-column: 1 / -1; padding: 14px; border: 1px solid rgba(11,127,128,.32); background: rgba(11,127,128,.045); }
+.credential-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: var(--ink); font: 700 10px/1 var(--mono); letter-spacing: .08em; }
+.credential-heading small { color: var(--teal); font: 10px/1 var(--mono); letter-spacing: .04em; }
+.credential-warning { margin: 9px 0 13px; color: var(--muted); font: 10px/1.55 var(--mono); letter-spacing: .01em; }
+.credential-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; }
+.credential-fields label { letter-spacing: .05em; }
+.credential-fields input { width: 100%; min-height: 36px; box-sizing: border-box; padding: 0 9px; border: 1px solid var(--line-dark); color: var(--ink); background: var(--paper); font: 11px/1 var(--mono); }
+.credential-fields input:focus, .control-grid select:focus, .credential-save:focus, .control-actions button:focus { outline: 2px solid rgba(11,127,128,.42); outline-offset: 2px; }
+.credential-save { min-height: 36px; padding: 0 13px; border: 1px solid var(--copper); color: var(--paper); background: var(--copper); cursor: pointer; font: 700 10px/1 var(--mono); letter-spacing: .05em; }
+.credential-save:disabled { opacity: .45; cursor: not-allowed; }
 .control-confirm { grid-column: 1 / -1; display: flex !important; grid-template-columns: auto 1fr !important; align-items: center; gap: 8px !important; color: var(--ink-soft) !important; letter-spacing: .02em !important; }
 .control-confirm input { accent-color: var(--teal); }
 .control-actions { display: flex; gap: 9px; align-items: end; }
@@ -237,6 +247,8 @@ td:first-child { color: var(--ink); font-weight: 700; }
   .records-grid { grid-template-columns: 1fr; }
   .control-grid { grid-template-columns: 1fr; }
   .control-confirm { grid-column: auto; }
+  .control-credentials { grid-column: auto; }
+  .credential-fields { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 560px) {

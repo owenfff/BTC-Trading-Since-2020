@@ -409,30 +409,53 @@ function render(payload) {
   }
 }
 
+let controlState = {};
+
+function updateCredentialFields() {
+  const venue = $("#control-venue")?.value;
+  const passphraseField = $("#credential-passphrase-field");
+  if (passphraseField) passphraseField.hidden = venue !== "okx-demo";
+}
+
 function renderControl(control) {
+  control = control || {};
+  controlState = control;
   const enabled = control.enabled && control.local_only;
   const running = Boolean(control.running);
   const status = $("#control-status");
   const note = $("#control-note");
   const start = $("#control-start");
   const stop = $("#control-stop");
+  const form = $("#credential-form");
+  const credentialStatus = $("#credential-status");
   if (!status || !note || !start || !stop) return;
+  updateCredentialFields();
+  const selectedVenue = $("#control-venue")?.value || "okx-demo";
+  const testnetMode = $("#control-mode")?.value === "testnet";
+  const credentialSetupAvailable = control.credential_setup_available !== false;
+  const configured = !credentialSetupAvailable || control.credential_statuses?.[selectedVenue] === "CONFIGURED";
   status.textContent = !enabled ? "只读面板" : running ? `运行中 · ${control.venue}` : "本机控制已就绪";
-  start.disabled = !enabled || running;
+  if (form) form.hidden = !enabled || !credentialSetupAvailable;
+  if (credentialStatus) credentialStatus.textContent = configured ? "已配置" : "未配置";
+  start.disabled = !enabled || running || (testnetMode && !configured);
   stop.disabled = !enabled || !running;
   if (!enabled) {
     note.textContent = "当前是远程/只读面板。请在交易节点本机启动 start-local-control-panel.ps1 或 start-local-control-panel.sh 后使用控制按钮。";
+  } else if (!credentialSetupAvailable) {
+    note.textContent = "Windows 节点请使用启动器的 DPAPI 凭证流程；Linux 交易节点可在本区配置凭证。";
   } else if (running) {
     note.textContent = `本机节点已启动：${control.venue} · ${control.mode}。凭证不会进入网页。`;
+  } else if (testnetMode && !configured) {
+    note.textContent = "先在上方本机凭证区保存当前交易所的 Demo/Testnet 凭证，才能启用模拟下单。";
   } else {
-    note.textContent = "点击启动后，本机会使用本地安全凭证流程；网页不会接收或保存密钥。";
+    note.textContent = "凭证只保存到本机权限 600 文件；网页不会回显或保存密钥。";
   }
 }
 
 async function controlRequest(path, body = {}) {
   const response = await fetch(path, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-Local-Control": "1" },
     body: JSON.stringify(body),
     cache: "no-store",
   });
@@ -440,6 +463,43 @@ async function controlRequest(path, body = {}) {
   if (!response.ok) throw new Error(payload.error || payload.status || `HTTP ${response.status}`);
   return payload;
 }
+
+$("#control-venue")?.addEventListener("change", () => {
+  updateCredentialFields();
+  renderControl(controlState);
+});
+
+$("#control-mode")?.addEventListener("change", () => renderControl(controlState));
+
+$("#credential-save")?.addEventListener("click", async () => {
+  if (!(controlState.enabled && controlState.local_only)) {
+    setText("#control-note", "凭证配置仅允许在交易节点本机的 loopback 面板中使用。" );
+    return;
+  }
+  const venue = $("#control-venue").value;
+  const apiKey = $("#credential-key").value;
+  const apiSecret = $("#credential-secret").value;
+  const passphrase = $("#credential-passphrase").value;
+  if (!apiKey || !apiSecret || (venue === "okx-demo" && !passphrase)) {
+    setText("#control-note", "请填写当前交易所要求的全部凭证字段。" );
+    return;
+  }
+  if (!window.confirm("凭证只会保存到本机 Demo/Testnet 配置文件，确认保存吗？")) return;
+  const button = $("#credential-save");
+  button.disabled = true;
+  try {
+    await controlRequest("/api/control/credentials", { venue, api_key: apiKey, api_secret: apiSecret, passphrase });
+    $("#credential-key").value = "";
+    $("#credential-secret").value = "";
+    $("#credential-passphrase").value = "";
+    setText("#control-note", "凭证已保存到本机。现在可以启动只读监控或 Demo/Testnet 模拟下单。" );
+    await refresh();
+  } catch (error) {
+    setText("#control-note", `凭证保存失败 · ${error.message}`);
+  } finally {
+    button.disabled = false;
+  }
+});
 
 $("#control-start")?.addEventListener("click", async () => {
   const venue = $("#control-venue").value;

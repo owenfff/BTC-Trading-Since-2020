@@ -28,6 +28,7 @@ def _reset(monkeypatch) -> None:
     monkeypatch.setattr(dashboard, "CONTROL_HOST", "127.0.0.1")
     monkeypatch.setattr(dashboard, "CONTROL_PROCESS", None)
     monkeypatch.setattr(dashboard, "CONTROL_META", {})
+    monkeypatch.setattr(dashboard, "CONTROL_CREDENTIALS_PATH", None)
 
 
 def test_dashboard_control_is_disabled_by_default(monkeypatch) -> None:
@@ -89,6 +90,61 @@ def test_dashboard_control_requires_explicit_testnet_confirmation(monkeypatch) -
     status, payload = dashboard.start_control({"venue": "okx-demo", "mode": "testnet"})
     assert status == 400
     assert payload["error"] == "TESTNET_CONFIRMATION_REQUIRED"
+
+
+def test_loopback_credentials_are_saved_without_returning_values(monkeypatch, tmp_path) -> None:
+    _reset(monkeypatch)
+    monkeypatch.setattr(dashboard, "CONTROL_ENABLED", True)
+    monkeypatch.setattr(dashboard, "_file_credentials_supported", lambda: True)
+    credential_path = tmp_path / "quant-bot" / "credentials.env"
+    monkeypatch.setattr(dashboard, "CONTROL_CREDENTIALS_PATH", credential_path)
+    secret = "secret-value-should-not-be-in-response"
+
+    status, payload = dashboard.configure_credentials(
+        {
+            "venue": "okx-demo",
+            "api_key": "demo-key",
+            "api_secret": secret,
+            "passphrase": "demo-passphrase",
+        }
+    )
+
+    assert status == 200
+    assert payload["status"] == "CREDENTIALS_SAVED"
+    assert payload["credential_status"] == "CONFIGURED"
+    assert secret not in str(payload)
+    assert credential_path.exists()
+    assert dashboard._credential_status("okx-demo") == "CONFIGURED"
+    assert dashboard._load_credentials_for_venue("okx-demo")["OKX_DEMO_API_SECRET"] == secret
+    assert "OKX_DEMO_API_KEY=demo-key" in credential_path.read_text(encoding="utf-8")
+
+
+def test_loopback_credentials_reject_unicode_and_wrong_venue(monkeypatch, tmp_path) -> None:
+    _reset(monkeypatch)
+    monkeypatch.setattr(dashboard, "CONTROL_ENABLED", True)
+    monkeypatch.setattr(dashboard, "_file_credentials_supported", lambda: True)
+    monkeypatch.setattr(dashboard, "CONTROL_CREDENTIALS_PATH", tmp_path / "credentials.env")
+    status, payload = dashboard.configure_credentials(
+        {"venue": "okx-demo", "api_key": "key", "api_secret": "secret", "passphrase": "’"}
+    )
+    assert status == 400
+    assert payload["error"] == "passphrase_MUST_BE_ASCII"
+
+    status, payload = dashboard.configure_credentials(
+        {"venue": "unsupported", "api_key": "key", "api_secret": "secret"}
+    )
+    assert status == 400
+    assert payload["error"] == "UNSUPPORTED_CREDENTIAL_VENUE"
+
+
+def test_testnet_control_requires_local_credentials(monkeypatch, tmp_path) -> None:
+    _reset(monkeypatch)
+    monkeypatch.setattr(dashboard, "CONTROL_ENABLED", True)
+    monkeypatch.setattr(dashboard, "_file_credentials_supported", lambda: True)
+    monkeypatch.setattr(dashboard, "CONTROL_CREDENTIALS_PATH", tmp_path / "credentials.env")
+    status, payload = dashboard.start_control({"venue": "okx-demo", "mode": "testnet", "confirm_testnet": True})
+    assert status == 400
+    assert payload["error"] == "LOCAL_CREDENTIALS_REQUIRED"
 
 
 def test_replay_payload_keeps_endpoints_when_downsampling(monkeypatch) -> None:

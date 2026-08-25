@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Read-only operator dashboard server.
+"""Operator dashboard server with loopback-only local control.
 
-This process never imports an exchange adapter and never reads exchange
-credentials. It serves the dashboard plus sanitized local runtime artifacts.
+This process never imports an exchange adapter. The public/read-only surface
+serves sanitized runtime artifacts; the optional loopback control surface may
+write one selected Demo/Testnet credential set to a mode-600 local file and
+pass it only to a local child process.
 """
 
 from __future__ import annotations
@@ -13,8 +15,10 @@ import json
 import math
 import os
 import signal
+import shlex
 import subprocess
 import sys
+import tempfile
 import threading
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -30,6 +34,7 @@ CONTROL_HOST = "127.0.0.1"
 CONTROL_LOCK = threading.RLock()
 CONTROL_PROCESS: subprocess.Popen[Any] | None = None
 CONTROL_META: dict[str, Any] = {}
+CONTROL_CREDENTIALS_PATH: Path | None = None
 REPLAY_LOCK = threading.RLock()
 REPLAY_CACHE: dict[str, dict[str, Any]] = {}
 
@@ -409,7 +414,7 @@ def status_payload() -> dict[str, Any]:
 
 
 def control_payload() -> dict[str, Any]:
-    """Expose only local controller state; never expose command credentials."""
+    """Expose only local controller state; never expose credential values."""
 
     with CONTROL_LOCK:
         process = CONTROL_PROCESS
@@ -423,11 +428,146 @@ def control_payload() -> dict[str, Any]:
             "mode": CONTROL_META.get("mode") if running else None,
             "exit_code": None if running or process is None else process.poll(),
             "credentials_in_browser": False,
+            "credential_setup_available": _file_credentials_supported(),
+            "credential_status": _credential_status(CONTROL_META.get("venue") or "okx-demo"),
+            "credential_statuses": {venue: _credential_status(venue) for venue in CREDENTIAL_NAMES},
         }
 
 
 def _json_error(message: str, status: int = 400) -> tuple[int, dict[str, Any]]:
     return status, {"status": "BLOCKED", "error": message, "control": control_payload()}
+
+
+CREDENTIAL_NAMES = {
+    "okx-demo": ("OKX_DEMO_API_KEY", "OKX_DEMO_API_SECRET", "OKX_DEMO_API_PASSPHRASE"),
+    "binance-spot-testnet": ("BINANCE_TESTNET_API_KEY", "BINANCE_TESTNET_API_SECRET"),
+    "binance-futures-testnet": ("BINANCE_FUTURES_TESTNET_API_KEY", "BINANCE_FUTURES_TESTNET_API_SECRET"),
+}
+
+
+def _file_credentials_supported() -> bool:
+    return os.name != "nt"
+
+
+def _credential_file_path() -> Path:
+    if CONTROL_CREDENTIALS_PATH is not None:
+        return CONTROL_CREDENTIALS_PATH
+    config_home = os.environ.get("XDG_CONFIG_HOME")
+    if config_home:
+        return Path(config_home) / "quant-bot" / "credentials.env"
+    return Path.home() / ".config" / "quant-bot" / "credentials.env"
+
+
+def _parse_credential_file(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (FileNotFoundError, OSError, UnicodeDecodeError):
+        return values
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        name, raw = stripped.split("=", 1)
+        name = name.strip()
+        if name not in {item for group in CREDENTIAL_NAMES.values() for item in group}:
+            continue
+        try:
+            parsed = shlex.split(raw, posix=True)
+        except ValueError:
+            parsed = []
+        values[name] = parsed[0] if parsed else raw.strip().strip("\"'")
+    return values
+
+
+def _credential_status(venue: str) -> str:
+    if not _file_credentials_supported() or not CONTROL_ENABLED or CONTROL_HOST not in {"127.0.0.1", "localhost", "::1"}:
+        return "UNAVAILABLE"
+    names = CREDENTIAL_NAMES.get(venue, ())
+    values = _parse_credential_file(_credential_file_path())
+    return "CONFIGURED" if names and all(values.get(name) for name in names) else "NOT_CONFIGURED"
+
+
+def _load_credentials_for_venue(venue: str) -> dict[str, str]:
+    """Load only the selected venue's local credentials into a child environment."""
+
+    names = CREDENTIAL_NAMES.get(venue, ())
+    values = _parse_credential_file(_credential_file_path())
+    if not names or not all(values.get(name) for name in names):
+        return {}
+    return {name: values[name] for name in names}
+
+
+def _credential_value(payload: dict[str, Any], name: str, *, required: bool = True) -> str | None:
+    value = payload.get(name)
+    if value is None and not required:
+        return None
+    if not isinstance(value, str) or not value or len(value) > 512:
+        raise ValueError(f"{name}_INVALID")
+    if any(character in value for character in ("\x00", "\r", "\n")):
+        raise ValueError(f"{name}_INVALID")
+    try:
+        value.encode("ascii")
+    except UnicodeEncodeError as error:
+        raise ValueError(f"{name}_MUST_BE_ASCII") from error
+    return value
+
+
+def configure_credentials(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Save one selected venue's credentials locally, never returning values."""
+
+    if not _file_credentials_supported():
+        return _json_error("WINDOWS_USE_DPAPI_LAUNCHER")
+    if not CONTROL_ENABLED or CONTROL_HOST not in {"127.0.0.1", "localhost", "::1"}:
+        return _json_error("LOCAL_CONTROL_DISABLED", 403)
+    if not isinstance(payload, dict):
+        return _json_error("JSON_OBJECT_REQUIRED")
+    venue = str(payload.get("venue", "")).strip().lower()
+    if venue not in CREDENTIAL_NAMES:
+        return _json_error("UNSUPPORTED_CREDENTIAL_VENUE")
+    allowed = {"venue", "api_key", "api_secret", "passphrase"}
+    if set(payload) - allowed:
+        return _json_error("UNSUPPORTED_CREDENTIAL_FIELDS")
+    try:
+        api_key = _credential_value(payload, "api_key")
+        api_secret = _credential_value(payload, "api_secret")
+        passphrase = _credential_value(payload, "passphrase", required=venue == "okx-demo")
+    except ValueError as error:
+        return _json_error(str(error))
+
+    selected = {
+        "okx-demo": {
+            "OKX_DEMO_API_KEY": api_key,
+            "OKX_DEMO_API_SECRET": api_secret,
+            "OKX_DEMO_API_PASSPHRASE": passphrase,
+        },
+        "binance-spot-testnet": {
+            "BINANCE_TESTNET_API_KEY": api_key,
+            "BINANCE_TESTNET_API_SECRET": api_secret,
+        },
+        "binance-futures-testnet": {
+            "BINANCE_FUTURES_TESTNET_API_KEY": api_key,
+            "BINANCE_FUTURES_TESTNET_API_SECRET": api_secret,
+        },
+    }[venue]
+    path = _credential_file_path()
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        os.chmod(path.parent, 0o700)
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, prefix="credentials.", delete=False) as handle:
+            temporary_path = Path(handle.name)
+            handle.write("# Local Demo/Testnet credentials only. Never commit or paste this file.\n")
+            for name in CREDENTIAL_NAMES[venue]:
+                handle.write(f"{name}={shlex.quote(selected[name] or '')}\n")
+        os.chmod(temporary_path, 0o600)
+        temporary_path.replace(path)
+    except OSError:
+        try:
+            temporary_path.unlink(missing_ok=True)
+        except UnboundLocalError:
+            pass
+        return _json_error("CREDENTIAL_FILE_WRITE_FAILED", 500)
+    return 200, {"status": "CREDENTIALS_SAVED", "venue": venue, "credential_status": "CONFIGURED", "control": control_payload()}
 
 
 def _control_command(venue: str, mode: str, confirm: bool) -> tuple[list[str], dict[str, Any]]:
@@ -471,6 +611,8 @@ def start_control(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         return _json_error("MODE_MUST_BE_READONLY_OR_TESTNET")
     if mode == "testnet" and not confirm:
         return _json_error("TESTNET_CONFIRMATION_REQUIRED")
+    if _file_credentials_supported() and mode == "testnet" and _credential_status(venue) != "CONFIGURED":
+        return _json_error("LOCAL_CREDENTIALS_REQUIRED")
     with CONTROL_LOCK:
         if CONTROL_PROCESS is not None and CONTROL_PROCESS.poll() is None:
             return _json_error("LOCAL_VENUE_ALREADY_RUNNING", 409)
@@ -478,6 +620,10 @@ def start_control(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         if os.name == "nt" and not launcher.exists():
             return _json_error("LAUNCHER_NOT_FOUND", 500)
         command, popen_options = _control_command(venue, mode, confirm)
+        if os.name != "nt":
+            child_environment = os.environ.copy()
+            child_environment.update(_load_credentials_for_venue(venue))
+            popen_options["env"] = child_environment
         try:
             CONTROL_PROCESS = subprocess.Popen(
                 command,
@@ -543,17 +689,34 @@ class DashboardHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         path = self.path.split("?", 1)[0]
-        if path not in {"/api/control/start", "/api/control/stop"}:
+        if path not in {"/api/control/start", "/api/control/stop", "/api/control/credentials"}:
             self.send_error(404)
+            return
+        if path == "/api/control/credentials" and self.headers.get("X-Local-Control") != "1":
+            status, response = _json_error("LOCAL_CONTROL_HEADER_REQUIRED", 403)
+            body = json.dumps(response, ensure_ascii=False).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
             return
         try:
             length = int(self.headers.get("Content-Length", "0"))
+            if length > 8192:
+                raise ValueError("REQUEST_TOO_LARGE")
             raw = self.rfile.read(length) if length else b"{}"
             payload = json.loads(raw.decode("utf-8"))
         except (ValueError, UnicodeDecodeError, json.JSONDecodeError):
             status, response = _json_error("INVALID_JSON")
         else:
-            status, response = start_control(payload) if path.endswith("/start") else stop_control()
+            if path.endswith("/start"):
+                status, response = start_control(payload)
+            elif path.endswith("/stop"):
+                status, response = stop_control()
+            else:
+                status, response = configure_credentials(payload)
         body = json.dumps(response, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -571,7 +734,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Serve the read-only operator dashboard")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8080)
-    parser.add_argument("--control", action="store_true", help="enable local-only start/stop controls; credentials are entered by the launcher, never by the browser")
+    parser.add_argument("--control", action="store_true", help="enable loopback-only controls and local Demo/Testnet credential setup")
     args = parser.parse_args()
     CONTROL_HOST = str(args.host).lower()
     if args.control and CONTROL_HOST not in {"127.0.0.1", "localhost", "::1"}:

@@ -308,13 +308,32 @@
               <option value="testnet">Testnet / Demo 模拟下单</option>
             </select>
           </label>
+          <div id="credential-form" class="control-credentials" hidden>
+            <div class="credential-heading">
+              <span>本机凭证</span>
+              <small id="credential-status">未配置</small>
+            </div>
+            <p class="credential-warning">仅限上海节点的 loopback/SSH 面板。密钥只保存到本机权限 600 文件，不会上传到美国前端、Git 或日志。</p>
+            <div class="credential-fields">
+              <label>API Key
+                <input id="credential-key" type="password" autocomplete="off" spellcheck="false" />
+              </label>
+              <label>API Secret
+                <input id="credential-secret" type="password" autocomplete="new-password" spellcheck="false" />
+              </label>
+              <label id="credential-passphrase-field">Passphrase
+                <input id="credential-passphrase" type="password" autocomplete="new-password" spellcheck="false" />
+              </label>
+              <button id="credential-save" type="button" class="credential-save">保存到本机</button>
+            </div>
+          </div>
           <label class="control-confirm"><input id="control-confirm" type="checkbox" /> 我确认只使用 Demo/Testnet，不使用真实资金</label>
           <div class="control-actions">
             <button id="control-start" type="button">启动本机节点</button>
             <button id="control-stop" type="button" class="secondary">停止节点</button>
           </div>
         </div>
-        <p id="control-note" class="control-note">密钥不会在网页填写。点击启动后，节点使用本机安全凭证流程；Windows 使用本机 DPAPI，Linux 使用服务环境凭证。</p>
+        <p id="control-note" class="control-note">本机控制开启后，可在此保存一次 Demo/Testnet 凭证；未保存凭证时不会启动模拟下单。</p>
       </section>
 
       <footer class="footer">
