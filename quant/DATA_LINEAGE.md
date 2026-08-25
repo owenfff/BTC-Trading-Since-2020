@@ -147,6 +147,23 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The code commit and report commits are present on
   `origin/quant/autonomous-behavioral-quant-bot-v1`; remote parity was
   confirmed with `git ls-remote`.
+
+## Binance Futures single-venue artifact
+
+- Code commit: `79af72cf41c16cb32f8c19c1f2b1894e65da6733`.
+- Added a native Binance USDⓈ-M Futures Testnet adapter restricted to
+  `https://demo-fapi.binance.com` and
+  `wss://demo-fstream.binance.com/ws`.
+- The adapter maps USDT-margined perpetual instruments, account margin,
+  signed positions, open orders, user trades, closed 1h bars, book quotes,
+  `GTX` PostOnly orders, `reduceOnly` orders and REST listenKey private WS
+  health. Binance Spot remains a separate cash-market approximation.
+- Normal operation selects one venue. The existing multi-venue supervisor is
+  opt-in and is not used by the default stack.
+- Offline verification: full suite `319 passed`; no credentials, private
+  endpoint or order was used. Credential-free Futures preflight and run both
+  fail closed with `TESTNET_CREDENTIALS_REQUIRED`; root raw CSV/JSON inputs
+  remain unchanged.
   confirmed with `git ls-remote`.
 
 ## One-command local stack artifact

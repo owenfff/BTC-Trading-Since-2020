@@ -60,13 +60,13 @@ zero flip-recall limitation.
 
 ## Verification
 
-- Code commit: `dcfc1033dde8f5361818e4620ec98dee9bba4540`.
+- Code commit: `79af72cf41c16cb32f8c19c1f2b1894e65da6733`.
 - Follow-up stack launcher commit: `ad7b8ec4f9ba603a7e08a8b6736244e3f56b1849`.
 - Single-venue selection commit: `2e0e82b794f4412256b330dc4e4c4a04f4b27f0c`.
 - The stack defaults to OKX; Binance Spot or Binance Futures is selected by the
   operator. Simultaneous supervision remains an explicit opt-in only.
-- Full repository test suite: `314 passed` in 127.77 seconds, zero warnings.
-- Adapter/runtime targeted suite: `16 passed`.
+- Full repository test suite: `319 passed` in 132.78 seconds, zero warnings.
+- Binance Futures targeted suite: `5 passed`; adapter/runtime targeted suite: `16 passed`.
 - Unified supervisor targeted suite: `4 passed`.
 - Unified runtime lifecycle/restart suite: `3 passed`.
 - `python -m compileall -q quant_bot`: passed.
@@ -74,7 +74,8 @@ zero flip-recall limitation.
 - All five PowerShell launchers: parsed successfully.
 - Credential-gated `run-all --once` without credentials returned structured
   `DEMO_CREDENTIALS_REQUIRED` / `TESTNET_CREDENTIALS_REQUIRED` results and
-  submitted zero orders.
+  submitted zero orders. Individual Binance Futures preflight and run also
+  failed closed with `TESTNET_CREDENTIALS_REQUIRED` and submitted zero orders.
 - No exchange credentials were used during these tests.
 - Raw root CSV/JSON inputs were not modified.
 - Remote branch parity was confirmed after pushing the code, report and state
