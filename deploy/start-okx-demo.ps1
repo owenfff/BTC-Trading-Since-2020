@@ -13,7 +13,7 @@ $oldPythonPath = $env:PYTHONPATH
 $oldKey = [Environment]::GetEnvironmentVariable("OKX_DEMO_API_KEY", "Process")
 $oldSecret = [Environment]::GetEnvironmentVariable("OKX_DEMO_API_SECRET", "Process")
 $oldPassphrase = [Environment]::GetEnvironmentVariable("OKX_DEMO_API_PASSPHRASE", "Process")
-$credentialStorePath = Join-Path $repo "quantoutputsokx_demo_credentials.json"
+$credentialStorePath = Join-Path $repo "quant\outputs\okx_demo_credentials.json"
 $exitCode = 1
 
 function Read-LocalSecret([string]$Prompt) {
@@ -60,7 +60,7 @@ function Save-DpapiCredentials([string]$Path, [string]$ApiKey, [string]$ApiSecre
 
 try {
     if (-not $PythonPath) {
-        $candidates = @((Join-Path $env:USERPROFILE ".cachecodex-runtimescodex-primary-runtimedependenciespythonpython.exe"), (Join-Path $env:LOCALAPPDATA "ProgramsPythonPython311python.exe"), (Join-Path $env:LOCALAPPDATA "ProgramsPythonPython313python.exe"))
+        $candidates = @((Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"), (Join-Path $env:LOCALAPPDATA "Programs\Python\Python311\python.exe"), (Join-Path $env:LOCALAPPDATA "Programs\Python\Python313\python.exe"))
         $PythonPath = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
     }
     if (-not $PythonPath) { $PythonPath = (Get-Command python.exe -ErrorAction Stop).Source }

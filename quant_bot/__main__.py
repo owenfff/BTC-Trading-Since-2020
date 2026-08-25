@@ -8,6 +8,7 @@ from .runtime import run_local
 from .testnet_runtime import DEFAULT_ARTIFACT, preflight, run_foreground
 from .venue_preflight import preflight_venue
 from .venue_runtime import run_foreground_venue
+from .multivenue_runtime import SUPPORTED_MULTI_VENUES, run_foreground_multivenue
 
 
 def main() -> None:
@@ -26,6 +27,16 @@ def main() -> None:
     run.add_argument("--allow-spot-approximation", action="store_true", help="allow derivative-trained behavior to be adapted to cash Spot balances")
     run.add_argument("--once", action="store_true")
     run.add_argument("--poll-seconds", type=int, default=60)
+    run_all = subparsers.add_parser("run-all", help="run OKX Demo and Binance Spot Testnet under one supervisor")
+    run_all.add_argument("--mode", choices=("testnet",), default="testnet")
+    run_all.add_argument("--venues", default=",".join(SUPPORTED_MULTI_VENUES))
+    run_all.add_argument("--model", default=str(DEFAULT_ARTIFACT))
+    run_all.add_argument("--symbols", default="auto")
+    run_all.add_argument("--enable-orders", action="store_true")
+    run_all.add_argument("--confirm-testnet", action="store_true", help="explicitly allow non-production orders; never enables mainnet")
+    run_all.add_argument("--allow-spot-approximation", action="store_true", help="allow derivative-trained behavior to be adapted to cash Spot balances")
+    run_all.add_argument("--once", action="store_true")
+    run_all.add_argument("--poll-seconds", type=int, default=60)
     pre = subparsers.add_parser("preflight")
     pre.add_argument("--venue", choices=("bybit-demo", "okx-demo", "binance-spot-testnet"), required=True)
     pre.add_argument("--model", default=str(DEFAULT_ARTIFACT))
@@ -43,6 +54,24 @@ def main() -> None:
                 raise SystemExit(2)
         else:
             print(json.dumps(run_local(args.mode, Path(args.input), Path(args.state), args.limit), ensure_ascii=False))
+    elif args.command == "run-all":
+        try:
+            result = run_foreground_multivenue(
+                venues=args.venues,
+                artifact_path=Path(args.model),
+                enable_orders=args.enable_orders,
+                confirm_testnet=args.confirm_testnet,
+                symbols=args.symbols,
+                once=args.once,
+                poll_seconds=args.poll_seconds,
+                allow_spot_approximation=args.allow_spot_approximation,
+            )
+            print(json.dumps(result, ensure_ascii=False, default=str))
+            if result["status"] == "BLOCKED":
+                raise SystemExit(2)
+        except Exception as error:
+            print(json.dumps({"status": "BLOCKED", "error_code": getattr(error, "code", "RUNTIME_FAILED"), "message": str(error)}, ensure_ascii=False))
+            raise SystemExit(2)
     elif args.command == "preflight":
         try:
             result = preflight(artifact_path=Path(args.model)) if args.venue == "bybit-demo" else preflight_venue(args.venue, artifact_path=args.model)

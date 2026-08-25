@@ -48,6 +48,9 @@ def test_bybit_region_block_is_explicit(monkeypatch: pytest.MonkeyPatch) -> None
         def read(self) -> bytes:
             return b'{"error":"The Amazon CloudFront distribution is configured to block access from your country."}'
 
+        def close(self) -> None:
+            return None
+
     class BlockedHttpError(Exception):
         code = 403
 

@@ -58,6 +58,21 @@ The long-running form replaces `--once` with `--poll-seconds 60`. State is
 written under `quant/outputs/` and is intended for the dashboard, not for
 source control.
 
+## Unified launcher
+
+When both local credential caches are available, one PowerShell process can
+supervise both non-production venues:
+
+```powershell
+.\deploy\start-multivenue.ps1 -Mode readonly
+```
+
+It keeps separate REST reconciliation, private WebSocket health, symbol
+mapping and runtime state for OKX and Binance. A failure on one venue is
+reported under that venue and never silently treated as a successful order.
+The first run asks for each credential locally and stores an encrypted
+Windows-user DPAPI cache under ignored `quant/outputs/`; later runs reuse it.
+
 ## Explicit Demo/Testnet orders
 
 Only after preflight and a read-only run are understood:
@@ -65,6 +80,12 @@ Only after preflight and a read-only run are understood:
 ```powershell
 python -m quant_bot run --venue okx-demo --mode testnet --symbols auto --enable-orders --confirm-testnet --poll-seconds 60
 python -m quant_bot run --venue binance-spot-testnet --mode testnet --symbols auto --enable-orders --confirm-testnet --allow-spot-approximation --poll-seconds 60
+```
+
+The equivalent unified testnet command is:
+
+```powershell
+.\deploy\start-multivenue.ps1 -Mode testnet -ConfirmTestnet -AllowSpotApproximation
 ```
 
 The commands are hard-pinned to non-production endpoints. A mainnet URL is

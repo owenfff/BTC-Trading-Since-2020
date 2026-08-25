@@ -380,7 +380,7 @@ def _adapter_for(venue: str) -> tuple[Any, Path]:
     raise AdapterError(venue, "UNSUPPORTED_VENUE", f"unsupported unified runtime venue: {venue}")
 
 
-def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: bool = False, confirm_testnet: bool = False, symbols: str = "auto", once: bool = False, poll_seconds: int = 60, allow_spot_approximation: bool = False) -> dict[str, Any]:
+def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: bool = False, confirm_testnet: bool = False, symbols: str = "auto", once: bool = False, poll_seconds: int = 60, allow_spot_approximation: bool = False, external_stop_event: threading.Event | None = None) -> dict[str, Any]:
     bundle = load_deployment_bundle(artifact_path)
     adapter, output_path = _adapter_for(venue)
     live_instruments = adapter.load_all_instruments()
@@ -402,6 +402,17 @@ def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, 
         adapter.set_tracked_symbols(tuple(item.canonical_symbol for item in selected.values()))
     adapter.get_server_time()
     runtime = VenueRuntime(adapter, venue, bundle, enable_orders, confirm_testnet, allow_spot_approximation, selected, output_path, max(5, poll_seconds))
+    bridge_stop = threading.Event()
+    bridge_thread: threading.Thread | None = None
+    if external_stop_event is not None:
+        def bridge_external_stop() -> None:
+            while not bridge_stop.wait(0.2):
+                if external_stop_event.is_set():
+                    runtime.stop_event.set()
+                    return
+
+        bridge_thread = threading.Thread(target=bridge_external_stop, name=f"{venue}-supervisor-stop", daemon=True)
+        bridge_thread.start()
     runtime.start_private_stream()
     watchdog = threading.Thread(target=runtime._watchdog, name=f"{venue}-watchdog", daemon=True)
     watchdog.start()
@@ -417,6 +428,9 @@ def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, 
         last = {"status": "STOPPING", **last}
     finally:
         runtime.shutdown()
+        bridge_stop.set()
+        if bridge_thread is not None and bridge_thread.is_alive():
+            bridge_thread.join(timeout=1)
     if last.get("status") == "RUNNING_READ_ONLY":
         last["status"] = "STOPPED_READ_ONLY"
     elif last.get("status") == "RUNNING":
