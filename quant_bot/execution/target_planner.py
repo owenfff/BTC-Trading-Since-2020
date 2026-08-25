@@ -99,4 +99,68 @@ def plan_target_order(
     )
 
 
-__all__ = ["TargetOrderPlan", "plan_target_order"]
+def plan_spot_order(
+    instrument: Instrument,
+    *,
+    current_base_quantity: Decimal,
+    target_exposure: Decimal,
+    equity: Decimal,
+    reference_price: Decimal,
+    bid: Decimal,
+    ask: Decimal,
+    decision_time: datetime,
+    active_orders: Iterable[Any] = (),
+    max_target_exposure: Decimal | None = None,
+) -> TargetOrderPlan | None:
+    """Plan a cash-market order from the reconciled base-asset balance.
+
+    Spot has no short position and no ``reduceOnly`` flag.  A negative
+    behavioral target is therefore flattened to zero exposure rather than
+    turned into an invalid short order.
+    """
+
+    if instrument.instrument_type != InstrumentType.SPOT or not instrument.terms_complete:
+        return None
+    if equity <= 0 or reference_price <= 0:
+        return None
+    if max_target_exposure is not None:
+        limit = abs(max_target_exposure)
+        if limit <= 0:
+            return None
+        target_exposure = max(Decimal("0"), min(limit, target_exposure))
+    else:
+        target_exposure = max(Decimal("0"), target_exposure)
+    if any(str(getattr(item, "symbol", "")).upper() == instrument.canonical_symbol for item in active_orders):
+        return None
+
+    target_quantity = instrument.normalize_quantity((equity * target_exposure) / reference_price)
+    current_quantity = max(Decimal("0"), current_base_quantity)
+    delta = target_quantity - current_quantity
+    quantity = instrument.normalize_quantity(delta)
+    if quantity <= 0:
+        return None
+    side = OrderSide.BUY if delta > 0 else OrderSide.SELL
+    quote = bid if side == OrderSide.BUY else ask
+    price = instrument.normalize_price(quote)
+    if price <= 0 or (instrument.minimum_notional > 0 and price * quantity < instrument.minimum_notional):
+        return None
+    return TargetOrderPlan(
+        _client_id(instrument.canonical_symbol, target_quantity, current_quantity, decision_time),
+        instrument.canonical_symbol,
+        side,
+        OrderType.LIMIT,
+        quantity,
+        price,
+        False,
+        True,
+        target_exposure,
+        target_quantity,
+        current_quantity,
+        "SPOT_TARGET_DELTA",
+        reference_price,
+        bid,
+        ask,
+    )
+
+
+__all__ = ["TargetOrderPlan", "plan_spot_order", "plan_target_order"]
