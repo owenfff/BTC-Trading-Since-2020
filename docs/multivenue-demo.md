@@ -57,6 +57,8 @@ python -m quant_bot run --venue binance-spot-testnet --mode testnet --symbols au
 ```
 
 The commands are hard-pinned to non-production endpoints. A mainnet URL is
-rejected by the connector. Binance Spot is not a leveraged short venue, so
-the explicit approximation flag is required and negative targets are treated
-as a request to flatten the base-asset balance.
+rejected by the connector. The runtime reconciles by REST and also starts the
+venue's private WebSocket; order submission is blocked until that stream is
+healthy. Binance Spot is not a leveraged short venue, so the explicit
+approximation flag is required and negative targets are treated as a request
+to flatten the base-asset balance.

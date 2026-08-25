@@ -30,17 +30,19 @@ exact recovery of the original trader's strategy.
 
 ## Operational limitation
 
-OKX and Binance currently use bounded REST polling for this first unified
-runtime. The output state records `market_connection=REST_POLLING`; it does
-not imply the private WebSocket parity already present in the Bybit Demo
-runner. A private-stream implementation and long-run soak test remain the
-next engineering work package before any claim of production readiness.
+OKX and Binance use bounded REST polling as the authoritative reconciliation
+path and now also start authenticated private WebSocket streams for event
+health and low-latency visibility. The output state records
+`market_connection=PRIVATE_WEBSOCKET` only after a private message is seen.
+Reconnects fail closed for order submission. A long-run soak test and a real
+Demo/Testnet order lifecycle remain open before any claim of production
+readiness.
 
 ## Verification
 
-- Full repository test suite: `307 passed` (one pre-existing test-fixture
+- Full repository test suite: `308 passed` (one pre-existing test-fixture
   resource warning).
-- New adapter/runtime targeted suite: `14 passed`.
+- New adapter/runtime targeted suite: `15 passed`.
 - `python -m compileall -q quant_bot`: passed.
 - `git diff --check`: passed.
 - No exchange credentials were used during these tests.

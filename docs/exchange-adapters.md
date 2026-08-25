@@ -12,4 +12,4 @@ Current non-production connector status:
 
 All non-production endpoints are hard-pinned. A production URL or an untrusted endpoint is rejected before any request is made. Credentials are read locally only and are never placed in reports or source control.
 
-The unified OKX/Binance runner uses REST polling for account reconciliation and closed-bar decisions. It does not claim private WebSocket parity with the existing Bybit Demo runner; the runtime state records `market_connection=REST_POLLING` so this operational boundary remains visible.
+The unified OKX/Binance runner uses REST polling for account reconciliation and closed-bar decisions, plus private WebSocket login/event health. The runtime state records `market_connection=PRIVATE_WEBSOCKET` when that stream is active; REST remains the authoritative reconciliation path after reconnects.

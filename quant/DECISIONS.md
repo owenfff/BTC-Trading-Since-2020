@@ -126,9 +126,9 @@
 - Treat Binance Spot as wallet-balance semantics. It cannot short or use
   `reduceOnly`; derivative-trained targets require an explicit behavioral
   approximation flag and negative targets flatten rather than short.
-- Do not call this phase complete for production readiness until private
-  streams, long-run soak tests, and a human-approved non-production order
-  lifecycle have been verified.
+- Do not call this phase complete for production readiness until the new
+  private streams survive long-run soak tests and a human-approved
+  non-production order lifecycle has been verified.
 
 ## 2026-08-21 — Freeze clean-room release evidence
 

@@ -44,8 +44,9 @@ No current item is a HARD_STOP. A HARD_STOP is reserved for credentials/funds, p
 
 - OKX Demo and Binance Spot Testnet preflight still require the user's local
   credentials; no keys were requested or used by autonomous tests.
-- The unified OKX/Binance runner is REST-polling only at this stage; private
-  WebSocket parity and a long-duration soak test remain open.
+- The unified OKX/Binance runner now has authenticated private WebSocket
+  clients, but long-duration reconnect/soak tests and a real Demo/Testnet
+  lifecycle remain open.
 - Binance Spot is a cash-market behavioral approximation, not a derivative
   position replica; it cannot short and must be explicitly enabled.
 - A real account, mainnet endpoint, and live funds remain outside the allowed
