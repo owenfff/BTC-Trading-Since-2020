@@ -46,6 +46,12 @@ def assert_binance_spot_testnet_url(url: str = BINANCE_SPOT_TESTNET_REST_BASE_UR
         raise AdapterError("binance-spot-testnet", "MAINNET_OR_UNTRUSTED_ENDPOINT", "only https://testnet.binance.vision is allowed")
 
 
+def assert_binance_spot_testnet_ws_url(url: str = BINANCE_SPOT_TESTNET_WS_URL) -> None:
+    parsed = urlsplit(url)
+    if parsed.scheme != "wss" or parsed.netloc.lower() != "stream.testnet.binance.vision":
+        raise AdapterError("binance-spot-testnet", "MAINNET_OR_UNTRUSTED_ENDPOINT", "only wss://stream.testnet.binance.vision is allowed")
+
+
 def binance_signature(secret: str, query_string: str) -> str:
     return hmac.new(secret.encode("utf-8"), query_string.encode("utf-8"), hashlib.sha256).hexdigest()
 
@@ -75,14 +81,14 @@ class BinanceSpotTestnetTransport:
         query = urlencode(pairs)
         return query + "&signature=" + binance_signature(self.credentials.api_secret, query)
 
-    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False) -> Any:
+    def request(self, method: str, path: str, *, body: dict[str, Any] | None = None, private: bool = False, api_key_only: bool = False) -> Any:
         if not path.startswith("/api/v3/"):
             raise AdapterError("binance-spot-testnet", "INVALID_PATH", "Binance Spot Testnet paths must be /api/v3/... paths")
         parsed = urlsplit(path)
         query = self._signed_query(path, body) if private else parsed.query
         url = self.base_url + parsed.path + (f"?{query}" if query else "")
         headers = {"Accept": "application/json", "User-Agent": "btc-trading-since-2020-binance-testnet"}
-        if private:
+        if private or api_key_only:
             headers["X-MBX-APIKEY"] = self.credentials.api_key
         request = urllib.request.Request(url, headers=headers, method=method.upper())
         attempts = 3 if method.upper() == "GET" else 1
@@ -108,5 +114,10 @@ class BinanceSpotTestnetTransport:
         except json.JSONDecodeError as error:
             raise AdapterError("binance-spot-testnet", "SCHEMA", "Binance Spot Testnet returned non-JSON data") from error
 
+    def request_api_key(self, method: str, path: str) -> Any:
+        """Call a user-data endpoint with the API key but without HMAC signing."""
 
-__all__ = ["BinanceTestnetCredentials", "BinanceSpotTestnetTransport", "BINANCE_SPOT_TESTNET_REST_BASE_URL", "BINANCE_SPOT_TESTNET_WS_URL", "assert_binance_spot_testnet_url", "binance_signature"]
+        return self.request(method, path, api_key_only=True)
+
+
+__all__ = ["BinanceTestnetCredentials", "BinanceSpotTestnetTransport", "BINANCE_SPOT_TESTNET_REST_BASE_URL", "BINANCE_SPOT_TESTNET_WS_URL", "assert_binance_spot_testnet_url", "assert_binance_spot_testnet_ws_url", "binance_signature"]

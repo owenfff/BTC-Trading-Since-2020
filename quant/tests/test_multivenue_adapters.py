@@ -8,10 +8,12 @@ import pytest
 from quant_bot.domain.order import Order, OrderSide, OrderType
 from quant_bot.domain.instrument import Instrument, InstrumentType
 from quant_bot.exchanges.binance import BinanceSpotAdapter
-from quant_bot.exchanges.binance_http import BinanceSpotTestnetTransport, BinanceTestnetCredentials, assert_binance_spot_testnet_url, binance_signature
+from quant_bot.exchanges.binance_http import BinanceSpotTestnetTransport, BinanceTestnetCredentials, assert_binance_spot_testnet_url, assert_binance_spot_testnet_ws_url, binance_signature
+from quant_bot.exchanges.binance_ws import BinanceSpotTestnetWebSocket
 from quant_bot.exchanges.http import AdapterError, FakeTransport
 from quant_bot.exchanges.okx import OKXAdapter
 from quant_bot.exchanges.okx_http import OKXDemoCredentials, assert_okx_demo_url, okx_signature
+from quant_bot.exchanges.okx_ws import OKXDemoWebSocket
 from quant_bot.execution.target_planner import plan_spot_order
 from quant_bot.venue_runtime import build_venue_symbol_mapping
 
@@ -80,6 +82,22 @@ def test_binance_transport_never_accepts_mainnet_base_url() -> None:
     with pytest.raises(AdapterError) as error:
         BinanceSpotTestnetTransport(BinanceTestnetCredentials("key", "secret"), base_url="https://api.binance.com")
     assert error.value.code == "MAINNET_OR_UNTRUSTED_ENDPOINT"
+
+
+def test_private_websocket_guards_auth_and_deduplication() -> None:
+    okx = OKXDemoWebSocket(OKXDemoCredentials("key", "secret", "pass"), clock_seconds=lambda: 1700000000)
+    assert okx.login_message()["op"] == "login"
+    message = {"event": "login", "code": "0"}
+    assert okx.accept_message(message) is True
+    assert okx.accept_message(message) is False
+
+    assert_binance_spot_testnet_ws_url()
+    with pytest.raises(AdapterError) as error:
+        assert_binance_spot_testnet_ws_url("wss://stream.binance.com/ws")
+    assert error.value.code == "MAINNET_OR_UNTRUSTED_ENDPOINT"
+    binance = BinanceSpotTestnetWebSocket(BinanceSpotTestnetTransport(BinanceTestnetCredentials("key", "secret")))
+    assert binance.accept_message({"e": "executionReport", "i": 1}) is True
+    assert binance.accept_message({"e": "executionReport", "i": 1}) is False
 
 
 def test_binance_region_block_is_explicit(monkeypatch: pytest.MonkeyPatch) -> None:

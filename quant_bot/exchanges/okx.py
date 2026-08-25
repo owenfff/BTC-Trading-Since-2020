@@ -14,22 +14,24 @@ from quant_bot.domain.position import Position
 from .capabilities import ExchangeCapabilities
 from .http import AdapterError, Transport
 from .okx_http import OKXDemoCredentials, OKXDemoTransport
+from .okx_ws import OKXDemoWebSocket
 
 
 class OKXAdapter:
     name = "okx-demo"
     capabilities = ExchangeCapabilities("okx-demo", True, True, True, True, "DEMO", True, True, False, "x-simulated-trading=1 and OKX Demo REST/WS endpoints")
 
-    def __init__(self, transport: Transport, *, credentials: object | None = None) -> None:
+    def __init__(self, transport: Transport, *, credentials: object | None = None, websocket: OKXDemoWebSocket | None = None) -> None:
         self.transport = transport
         self.credentials = credentials
+        self.websocket = websocket
         self._order_symbols: dict[str, str] = {}
         self._instrument_types: dict[str, str] = {}
 
     @classmethod
     def from_environment(cls) -> "OKXAdapter":
         credentials = OKXDemoCredentials.from_environment()
-        return cls(OKXDemoTransport(credentials), credentials=credentials)
+        return cls(OKXDemoTransport(credentials), credentials=credentials, websocket=OKXDemoWebSocket(credentials))
 
     def _private_guard(self) -> None:
         if self.credentials is None:
@@ -219,11 +221,19 @@ class OKXAdapter:
         server = self._timestamp(rows[0]["ts"])
         if hasattr(self.transport, "set_clock_offset_ms"):
             midpoint = before + (after - before) / 2
-            self.transport.set_clock_offset_ms(int((server - midpoint).total_seconds() * 1000))
+            offset_ms = int((server - midpoint).total_seconds() * 1000)
+            self.transport.set_clock_offset_ms(offset_ms)
+            if self.websocket is not None:
+                self.websocket.set_clock_offset_ms(offset_ms)
         return server
 
     def load_all_instruments_for_preflight(self) -> list[Instrument]:
         return self.load_all_instruments()
+
+    async def stream_messages(self, stop: Any, on_message: Any, on_error: Any | None = None) -> None:
+        if self.websocket is None:
+            raise AdapterError(self.name, "WEBSOCKET_NOT_CONFIGURED", "OKX Demo private WebSocket is not configured")
+        await self.websocket.run(on_message, stop, ["account", "positions", "orders", "fills"], on_error=on_error)
 
 
 __all__ = ["OKXAdapter"]

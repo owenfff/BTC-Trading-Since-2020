@@ -12,6 +12,7 @@ from quant_bot.domain.order import Order, OrderSide, OrderStatus, OrderType
 from quant_bot.domain.position import Position
 
 from .binance_http import BinanceSpotTestnetTransport, BinanceTestnetCredentials
+from .binance_ws import BinanceSpotTestnetWebSocket
 from .capabilities import ExchangeCapabilities
 from .http import AdapterError, Transport
 
@@ -20,16 +21,18 @@ class BinanceSpotAdapter:
     name = "binance-spot-testnet"
     capabilities = ExchangeCapabilities("binance-spot-testnet", True, True, True, True, "TESTNET", True, False, False, "native Spot Testnet REST; reduce-only is not a Spot capability")
 
-    def __init__(self, transport: Transport, *, credentials: object | None = None) -> None:
+    def __init__(self, transport: Transport, *, credentials: object | None = None, websocket: BinanceSpotTestnetWebSocket | None = None) -> None:
         self.transport = transport
         self.credentials = credentials
+        self.websocket = websocket
         self._order_symbols: dict[str, str] = {}
         self._tracked_symbols: tuple[str, ...] = ()
 
     @classmethod
     def from_environment(cls) -> "BinanceSpotAdapter":
         credentials = BinanceTestnetCredentials.from_environment()
-        return cls(BinanceSpotTestnetTransport(credentials), credentials=credentials)
+        transport = BinanceSpotTestnetTransport(credentials)
+        return cls(transport, credentials=credentials, websocket=BinanceSpotTestnetWebSocket(transport))
 
     def _private_guard(self) -> None:
         if self.credentials is None:
@@ -188,6 +191,11 @@ class BinanceSpotAdapter:
 
     def set_tracked_symbols(self, symbols: list[str] | tuple[str, ...]) -> None:
         self._tracked_symbols = tuple(str(symbol).upper() for symbol in symbols)
+
+    async def stream_messages(self, stop: Any, on_message: Any, on_error: Any | None = None) -> None:
+        if self.websocket is None:
+            raise AdapterError(self.name, "WEBSOCKET_NOT_CONFIGURED", "Binance Spot Testnet private WebSocket is not configured")
+        await self.websocket.run(on_message, stop, on_error=on_error)
 
 
 __all__ = ["BinanceSpotAdapter"]

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 import threading
@@ -175,6 +176,12 @@ class VenueRuntime:
     account_snapshot: dict[str, Any] = field(default_factory=dict)
     reconciliation_ok: bool = False
     market_connected: bool = True
+    private_stream_available: bool = False
+    private_stream_seen: bool = False
+    private_stream_error: str | None = None
+    ws_thread: threading.Thread | None = None
+    _async_stop: asyncio.Event | None = field(default=None, init=False, repr=False)
+    _async_loop: asyncio.AbstractEventLoop | None = field(default=None, init=False, repr=False)
     consecutive_rejects: int = 0
     last_error: str | None = None
     stop_reason: str | None = None
@@ -199,6 +206,53 @@ class VenueRuntime:
 
     def _spot_quantity(self, instrument: Instrument) -> Decimal:
         return self.balances.get(instrument.base_currency.upper(), Decimal("0"))
+
+    def on_private_message(self, message: dict[str, Any]) -> None:
+        self.private_stream_seen = True
+        self.market_connected = not (message.get("success") is False or str(message.get("code", "0")) not in {"0", ""})
+
+    def on_private_error(self, error: BaseException) -> None:
+        self.market_connected = False
+        self.private_stream_error = f"{type(error).__name__}: {str(error)[:160]}"
+
+    def start_private_stream(self) -> None:
+        if not hasattr(self.adapter, "stream_messages"):
+            self.private_stream_available = False
+            return
+        self.private_stream_available = True
+        if self.enable_orders:
+            self.market_connected = False
+
+        async def runner() -> None:
+            stop = asyncio.Event()
+            self._async_stop = stop
+            self._async_loop = asyncio.get_running_loop()
+            try:
+                await self.adapter.stream_messages(stop, self.on_private_message, self.on_private_error)
+            finally:
+                self.market_connected = False if self.enable_orders else self.market_connected
+
+        def target() -> None:
+            try:
+                asyncio.run(runner())
+            except Exception as error:  # noqa: BLE001 - preserve a safe runtime diagnostic
+                self.on_private_error(error)
+
+        self.ws_thread = threading.Thread(target=target, name=f"{self.venue}-private-ws", daemon=True)
+        self.ws_thread.start()
+
+    def _watchdog(self) -> None:
+        while not self.stop_event.wait(15):
+            if self.enable_orders and self.private_stream_available and self.private_stream_seen and not self.market_connected:
+                self.cancel_created_orders()
+                self.stop_reason = "PRIVATE_WEBSOCKET_DISCONNECTED"
+                self.stop_event.set()
+                break
+            if time.monotonic() - self.last_loop_monotonic > max(90, self.poll_seconds * 2 + 30):
+                self.cancel_created_orders()
+                self.stop_reason = "WATCHDOG_TIMEOUT"
+                self.stop_event.set()
+                break
 
     def _plan_symbol(self, historical_symbol: str, instrument: Instrument, equity: Decimal) -> TargetOrderPlan | None:
         venue_symbol = instrument.canonical_symbol
@@ -291,7 +345,7 @@ class VenueRuntime:
         return self._result("RUNNING" if self.enable_orders else "RUNNING_READ_ONLY", equity, plans, blocked, submitted, order_errors)
 
     def _result(self, status: str, equity: Decimal, plans: list[TargetOrderPlan], blocked: dict[str, list[str]], submitted: list[str] | None = None, order_errors: dict[str, str] | None = None) -> dict[str, Any]:
-        result = {"status": status, "venue": self.venue, "equity": equity, "plans": len(plans), "submitted": submitted or [], "blocked": blocked, "market_connection": "REST_POLLING", "market_connected": self.market_connected, "order_submission_enabled": self.enable_orders and self.confirm_testnet, "created_order_ids": sorted(self.created_order_ids), "account": self.account_snapshot, "stop_reason": self.stop_reason, "last_error": self.last_error, "portfolio_target_scale": self.portfolio_target_scale, "order_errors": order_errors or {}, "strategy_fidelity": "BEHAVIORAL_APPROXIMATION"}
+        result = {"status": status, "venue": self.venue, "equity": equity, "plans": len(plans), "submitted": submitted or [], "blocked": blocked, "market_connection": "PRIVATE_WEBSOCKET" if self.private_stream_available else "REST_POLLING", "market_connected": self.market_connected, "private_stream_seen": self.private_stream_seen, "private_stream_error": self.private_stream_error, "order_submission_enabled": self.enable_orders and self.confirm_testnet, "created_order_ids": sorted(self.created_order_ids), "account": self.account_snapshot, "stop_reason": self.stop_reason, "last_error": self.last_error, "portfolio_target_scale": self.portfolio_target_scale, "order_errors": order_errors or {}, "strategy_fidelity": "BEHAVIORAL_APPROXIMATION"}
         _write_json(self.output_path, result)
         return result
 
@@ -305,6 +359,10 @@ class VenueRuntime:
 
     def shutdown(self) -> None:
         self.stop_event.set()
+        if self._async_stop is not None and self._async_loop is not None:
+            self._async_loop.call_soon_threadsafe(self._async_stop.set)
+        if self.ws_thread is not None and self.ws_thread.is_alive():
+            self.ws_thread.join(timeout=2)
         self.cancel_created_orders()
         if hasattr(self.adapter, "disconnect"):
             self.adapter.disconnect()
@@ -340,6 +398,9 @@ def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, 
         adapter.set_tracked_symbols(tuple(item.canonical_symbol for item in selected.values()))
     adapter.get_server_time()
     runtime = VenueRuntime(adapter, venue, bundle, enable_orders, confirm_testnet, allow_spot_approximation, selected, output_path, max(5, poll_seconds))
+    runtime.start_private_stream()
+    watchdog = threading.Thread(target=runtime._watchdog, name=f"{venue}-watchdog", daemon=True)
+    watchdog.start()
     equity = runtime.refresh()
     last = runtime._result("STARTED", equity, [], {}, [])
     try:
