@@ -88,3 +88,8 @@ python -m quant_bot run --venue binance-futures-testnet --mode testnet --symbols
 
 For the browser dashboard, expose only the Shanghai loopback control panel
 through an SSH tunnel. The frontend never receives or reads credentials.
+
+To synchronize the panel from a normal SSH login, use
+`./deploy/sync-shanghai-panel.sh`. It uploads only the four panel files,
+verifies SHA256 and Python compilation remotely, then restarts the loopback
+service; it never handles exchange credentials.
