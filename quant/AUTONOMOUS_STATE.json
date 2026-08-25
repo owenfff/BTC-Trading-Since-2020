@@ -4,10 +4,10 @@
   "current_phase": "PHASE_14_MULTI_VENUE_DEMO_RUNTIME",
   "current_work_package": "M14-multivenue-nonproduction-runtime",
   "last_completed_phase": "PHASE_13_CROSS_ASSET_BEHAVIOR",
-  "last_code_commit": "cdbdc62d2e47003d2455a3e993ccbb099fc52c28",
+  "last_code_commit": "75e0bf8",
   "last_report_commit": "a05bb4234a7f0d5bba368c4a9226b3acdad54292",
-  "test_count": 319,
-  "last_test_status": "FULL_SUITE_319_PASSED;DASHBOARD_FUTURES_TARGETED_6_PASSED;BINANCE_FUTURES_TARGETED_5_PASSED;MULTIVENUE_TARGETED_16_PASSED;SUPERVISOR_TARGETED_4_PASSED;RUNTIME_LIFECYCLE_3_PASSED;POWERSHELL_PARSE_PASS_ALL_5_LAUNCHERS;SINGLE_VENUE_DEFAULT_OKX;BINANCE_FUTURES_SAFE_GATE_PASS;NO_CREDENTIALS_USED",
+  "test_count": 324,
+  "last_test_status": "FULL_SUITE_324_PASSED;DASHBOARD_FUTURES_TARGETED_6_PASSED;LOCAL_CONTROL_TARGETED_6_PASSED;BINANCE_FUTURES_TARGETED_5_PASSED;MULTIVENUE_TARGETED_16_PASSED;SUPERVISOR_TARGETED_4_PASSED;RUNTIME_LIFECYCLE_3_PASSED;POWERSHELL_PARSE_PASS_ALL_7_LAUNCHERS;SINGLE_VENUE_DEFAULT_OKX;BINANCE_FUTURES_SAFE_GATE_PASS;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -19,8 +19,8 @@
   "shadow_status": "SHADOW_SMOKE_PASS",
   "paper_status": "PAPER_REPLAY_PASS;PAPER_SMOKE_PASS",
   "demo_status": "BYBIT_ACTIVE_LOCALLY;OKX_BINANCE_SPOT_AND_BINANCE_FUTURES_CREDENTIAL_GATED",
-  "bot_status": "NONPRODUCTION_SINGLE_VENUE_SELECTABLE;MULTIVENUE_SUPERVISOR_OPT_IN",
-  "frontend_status": "MULTI_VENUE_READ_ONLY_DASHBOARD_CODE_READY",
+  "bot_status": "NONPRODUCTION_SINGLE_VENUE_SELECTABLE;MULTIVENUE_SUPERVISOR_OPT_IN;LOOPBACK_CONTROL_READY",
+  "frontend_status": "MULTI_VENUE_READ_ONLY_AND_LOOPBACK_LOCAL_CONTROL_READY",
   "frontend_url": "http://198.44.46.229:8080/",
   "trading_node_status": "SEPARATE_LOCAL_OR_NON_US_NODE_REQUIRED",
   "blockers": [
@@ -31,13 +31,14 @@
     "Full research outputs under quant/outputs are intentionally ignored and must be rehydrated before a clean clone can run the full research command.",
     "OKX Demo, Binance Spot Testnet and Binance USDⓈ-M Futures Testnet private endpoints remain blocked at the local credential boundary; no credentials were used in autonomous tests.",
     "OKX/Binance unified runtime has authenticated private WebSocket clients; long-duration reconnect/soak tests and a real Demo/Testnet lifecycle remain open.",
-    "The US frontend host is blocked by Bybit Demo CloudFront country policy; it must never be used as the trading node.",
+    "The US frontend host is blocked by Bybit Demo CloudFront country policy; it remains frontend-only and must never be used as the trading node.",
     "The offline Docker paper image passed build and read-only tmpfs cold-start smoke; no exchange connectivity is claimed.",
     "M13 public market coverage is 65 PASS and 1 INSUFFICIENT across 66 symbols; insufficient symbols remain auditable but are excluded from unified fitting.",
     "M13 has 12 symbols without a chronological TRAIN position scale; they are excluded rather than scaled from future observations.",
     "M13 unified model covers 10630 rows across 53 symbols; paper replay covers 1751 out-of-time rows across 5 symbols because other symbols end before the time-out window.",
     "OKX Demo, Binance Spot Testnet and Binance USDⓈ-M Futures Testnet credential caches are not present on this workstation; venue preflight and a real non-production order lifecycle remain pending local credentials.",
-    "Binance Spot remains a cash-market approximation; Binance USDⓈ-M Futures is available as a separate single-venue path for linear USDT perpetual semantics."
+    "Binance Spot remains a cash-market approximation; Binance USDⓈ-M Futures is available as a separate single-venue path for linear USDT perpetual semantics.",
+    "The loopback control panel intentionally rejects browser credentials and cannot start a node from a public dashboard; a Shanghai node still needs local credential provisioning and external Demo/Testnet lifecycle verification."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -51,6 +52,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Select exactly one venue locally. For historical derivative semantics use deploy/start-binance-futures-testnet.ps1 when Binance Futures Testnet credentials are available in the Windows-user DPAPI cache; complete preflight, private-stream health and one real non-production order lifecycle. Keep the US server frontend-only and never copy credentials there.",
-  "updated_at_utc": "2026-08-25T03:03:00Z"
+  "next_action": "On the Shanghai trading node, run deploy/start-local-control-panel.ps1 or deploy/start-local-control-panel.sh, select exactly one OKX Demo or Binance Testnet venue, and complete preflight, private-stream health and one real non-production order lifecycle. Use an SSH tunnel for the loopback panel. Keep the US server frontend-only and never copy credentials there.",
+  "updated_at_utc": "2026-08-25T03:09:09Z"
 }

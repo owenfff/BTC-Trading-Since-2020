@@ -192,3 +192,13 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
   explicit `-Venue both` opt-in.
 - Credential-free individual runs returned venue-specific structured BLOCKED
   results with zero submissions; adapter/runtime tests returned `16 passed`.
+
+## 2026-08-25 — Loopback control artifact
+
+- Code commit `75e0bf8` adds `frontend/server.py` loopback-only start/stop
+  controls and the local Windows/Linux launchers.
+- The control API accepts only venue, mode, and explicit Testnet confirmation;
+  it rejects credential-shaped fields and exposes only sanitized process state.
+- The panel can run on a Shanghai trading node through an SSH tunnel. It does
+  not change the exchange-neutral model, raw-input lineage, or single-venue
+  default, and it does not claim a completed external order lifecycle.

@@ -45,6 +45,13 @@ The read-only dashboard API now aggregates the venue state files under
 `venues`; the frontend server never imports exchange adapters and never reads
 credentials.
 
+The loopback-only control panel can now select exactly one OKX Demo, Binance
+Spot Testnet, or Binance USDⓈ-M Futures Testnet node and start/stop its local
+launcher. The browser sends only venue, mode and explicit testnet confirmation;
+credentials never enter the browser. This panel is suitable for a Shanghai
+trading node reached through an SSH tunnel, while the US dashboard remains
+frontend-only.
+
 The OKX/Binance launchers now resolve the repository-relative paths
 correctly, and `deploy/start-multivenue.ps1` supervises both non-production
 Spot/OKX venues from one local process. Binance USDⓈ-M Futures is selected as a
@@ -61,20 +68,24 @@ zero flip-recall limitation.
 ## Verification
 
 - Code commit: `cdbdc62d2e47003d2455a3e993ccbb099fc52c28`.
+- Loopback dashboard control commit: `75e0bf8`.
 - Follow-up stack launcher commit: `ad7b8ec4f9ba603a7e08a8b6736244e3f56b1849`.
 - Single-venue selection commit: `2e0e82b794f4412256b330dc4e4c4a04f4b27f0c`.
 - The stack defaults to OKX; Binance Spot or Binance Futures is selected by the
   operator. Simultaneous supervision remains an explicit opt-in only.
-- Full repository test suite: `319 passed` in 150.84 seconds, zero warnings.
+- Full repository test suite: `324 passed` in 137.84 seconds, zero warnings.
 - Binance Futures targeted suite: `5 passed`; adapter/runtime targeted suite: `16 passed`.
 - Read-only dashboard venue coverage targeted suite: `6 passed`; the
   dashboard now exposes Binance USDⓈ-M Futures state alongside OKX, Binance
   Spot and Bybit without importing adapters or credentials.
+- Local control-panel targeted suite: `6 passed`; credential-shaped fields are
+  rejected, non-loopback control is rejected, only one local venue can run,
+  and Testnet confirmation is mandatory.
 - Unified supervisor targeted suite: `4 passed`.
 - Unified runtime lifecycle/restart suite: `3 passed`.
-- `python -m compileall -q quant_bot`: passed.
+- `python -m compileall -q frontend quant_bot`: passed.
 - `git diff --check`: passed.
-- All five PowerShell launchers: parsed successfully.
+- All seven PowerShell launchers: parsed successfully.
 - Credential-gated `run-all --once` without credentials returned structured
   `DEMO_CREDENTIALS_REQUIRED` / `TESTNET_CREDENTIALS_REQUIRED` results and
   submitted zero orders. Individual Binance Futures preflight and run also
@@ -99,7 +110,13 @@ python -m quant_bot run --venue binance-futures-testnet --mode testnet --symbols
 .\deploy\start-binance-futures-testnet.ps1 -Mode readonly
 
 .\deploy\start-multivenue.ps1 -Mode readonly
+
+.\deploy\start-local-control-panel.ps1
 ```
+
+On Linux trading nodes, use `./deploy/start-local-control-panel.sh`. The
+control panel is deliberately loopback-only; expose it through an SSH tunnel,
+not a public listener.
 
 The commands fail closed with a structured credential error when the local
 credential variables are absent. The order-enabled form additionally requires

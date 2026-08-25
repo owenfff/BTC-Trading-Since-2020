@@ -167,3 +167,19 @@
 - Record code commit `dcfc1033dde8f5361818e4620ec98dee9bba4540`; full local
   verification is `314 passed` with no credentials. Remote push remains an
   external retry after the first GitHub HTTPS attempt failed.
+
+## 2026-08-25 — Add loopback local control, keep public dashboard read-only
+
+- The operator dashboard may start exactly one selectable OKX Demo, Binance
+  Spot Testnet, or Binance USDⓈ-M Futures Testnet node only when the server is
+  bound to loopback. A public or US-hosted dashboard cannot start a trading
+  process.
+- The browser sends no API key, secret, passphrase, password, or credential
+  field. Windows launchers keep the existing local DPAPI credential flow;
+  Linux nodes use credentials already provisioned in the local service
+  environment.
+- A Shanghai node is an acceptable trading/panel host if it can reach the
+  selected official Demo/Testnet endpoints. The US host may remain a sanitized
+  frontend-only observability surface.
+- Normal operation still selects one venue. OKX/Binance support means
+  selectable adapters, not a requirement to run them simultaneously.

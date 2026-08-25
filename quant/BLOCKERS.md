@@ -89,3 +89,14 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - `quant/reports/quant_research_summary.json` is `RESEARCH_ONLY`, not an engineering block. It records 54 chronological validation/test rows and 22 robustness rows.
 - All required families are present: fees +50% and ×2, 1/2/5 tick slippage, one-bar delay, ±10%/±20% exposure perturbations, top-cycle removal, bull/bear/sideways subsets, long-only, short-only, and multiple exposure limits.
 - Results are a normalized exposure-return proxy, not BitMEX wallet/account PnL. Buy & Hold, teacher trajectory, and random controls are retained for context; teacher trajectory is descriptive only.
+
+## 2026-08-25 — Shanghai node deployment boundary
+
+- The loopback control panel is implemented and tested, but it is intentionally
+  not a public credential form. A real Shanghai deployment still requires the
+  user to provision Demo/Testnet credentials locally on that server and run
+  the first preflight/lifecycle there; credentials must not be sent in chat or
+  copied to the US frontend host.
+- No real exchange credential, private endpoint, or order lifecycle was used
+  during autonomous verification. Until that external local step is complete,
+  the bot remains non-production code with a fail-closed credential boundary.
