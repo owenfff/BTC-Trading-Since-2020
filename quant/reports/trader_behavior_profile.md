@@ -1,7 +1,7 @@
 # Trader Behavior Profile
 
 - status: **READY_WITH_WARNINGS**
-- analysis commit: `8866448fc183929078caf418b09de7307c16d02b`
+- analysis commit: `edf07a5445d38fc54083920fbcf57d3b466be41e`
 - source commit: `f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6`
 - teacher data: `TRADE_RECORDS_ONLY`
 - strategy fidelity: `BEHAVIORAL_APPROXIMATION`
@@ -37,10 +37,10 @@ Every action, decision, and cycle carries ordering, action, accounting, price, w
 
 ## Output format
 
-- `trade_actions`: `csv_fallback_no_parquet_engine` at `quant\outputs\trade_actions.csv` (`160302` rows).
-- `order_episodes`: `csv_fallback_no_parquet_engine` at `quant\outputs\order_episodes.csv` (`31702` rows).
-- `decision_episodes`: `csv_fallback_no_parquet_engine` at `quant\outputs\decision_episodes.csv` (`32231` rows).
-- `trade_cycles`: `csv_fallback_no_parquet_engine` at `quant\outputs\trade_cycles.csv` (`1401` rows).
+- `trade_actions`: `parquet_with_csv_mirror` at `quant\outputs\trade_actions.parquet` (`160302` rows).
+- `order_episodes`: `csv_fallback_parquet_schema_error` at `quant\outputs\order_episodes.csv` (`31702` rows).
+- `decision_episodes`: `parquet_with_csv_mirror` at `quant\outputs\decision_episodes.parquet` (`32231` rows).
+- `trade_cycles`: `parquet_with_csv_mirror` at `quant\outputs\trade_cycles.parquet` (`1401` rows).
 
 The requested Parquet outputs are ignored by Git. If the local runtime lacks the pinned Parquet engine, the script writes a clearly labeled ignored CSV fallback and keeps the same schema; installing `quant/requirements.txt` restores Parquet output.
 

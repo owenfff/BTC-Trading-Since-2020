@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15-v3.7-two-stage-action-target-audit",
+  "current_work_package": "M15.8-label-timing-repair-and-v3.7-reaudit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "852175f",
-  "last_report_commit": "221b338",
-  "test_count": 369,
-  "last_test_status": "FULL_SUITE_369_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_CAUSAL_AUDIT_PASS;TWO_STAGE_ACTION_TIMING_TARGET_SIZE;PROBABILITY_CALIBRATION_TRAIN_ONLY;PER_SYMBOL_STABILITY_AUDIT;CROSS_VENUE_COVERAGE_BLOCKED;TWO_STAGE_CANDIDATE_PROMOTION_BLOCKED;NO_CREDENTIALS_USED",
+  "last_code_commit": "db8369c",
+  "last_report_commit": "UNCOMMITTED",
+  "test_count": 374,
+  "last_test_status": "FULL_SUITE_374_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_LABEL_AUDIT_PASS_WITH_WARNINGS;ACTION_TARGET_CONSISTENCY_PASS;V3.7_REAUDIT_BLOCKED;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -49,7 +49,11 @@
     "The calibrated action-target candidate enforces that NO_TRADE/HOLD cannot secretly reposition and uses sqrt-balanced action weighting; WF2/WF3 remain negative after costs and the all-window promotion gates fail, so the active Demo model remains unchanged.",
     "The v3.5 train-only cost-calibrated threshold candidate selects WF1/WF2/WF3 thresholds 0.18/0.16/0.00, but strict autonomous costed returns remain +0.018150/-0.135907/-0.002102 and the all-window promotion gates fail; no promotion is authorized.",
     "The v3.6 train-only probability-calibrated stability candidate passes causal checks and calibration holdout NLL, but produces zero strict autonomous adjustments in all three global test windows; Hyperliquid has 5796 rows but zero model-eligible global test rows because no pre-2025 training scale is available. Its 1160-row native holdout is diagnostic-only and cannot establish cross-venue generalization.",
-    "The v3.7 two-stage action-timing/target-size candidate separates exposure-change timing from non-idle action type and target size, but strict autonomous WF1/WF3 make zero adjustments and WF2 is negative after costs (-0.048936, PF 0.933678); global cross-venue coverage remains unavailable, so it is not promoted."
+    "The v3.7 two-stage action-timing/target-size candidate separates exposure-change timing from non-idle action type and target size, but strict autonomous WF1/WF3 make zero adjustments and WF2 is negative after costs (-0.048936, PF 0.933678); global cross-venue coverage remains unavailable, so it is not promoted.",
+    "Event-target label contamination was repaired by preferring isolated order-episode local_position_after targets; action/target consistency now passes, but this does not establish exact strategy recovery or profitability.",
+    "Temporal label audit is PASS_WITH_WARNINGS: 373 same-timestamp event ties and 70 same-hour net-zero labels can hide offsetting source actions; both are retained as explicit warnings.",
+    "The v3.7 strict autonomous re-audit remains blocked after repair: WF1/WF3 make zero adjustments and WF2 remains negative after costs; the active Demo model is unchanged and no new Demo orders are authorized.",
+    "PyArrow dataset writes now refresh the downstream CSV mirror; ignored generated outputs were rebuilt without changing raw CSV/JSON inputs."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -63,6 +67,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model; do not promote temporal, balanced, calibrated, threshold, v3.6, or v3.7 candidates. The next research task is to obtain a verified pre-2025 Hyperliquid behavior/scale window or explicitly define a venue-native evaluation protocol, then audit event-label quality and execution timing before any further model family. No candidate promotion or new Demo orders are authorized by this phase.",
-  "updated_at_utc": "2026-08-26T09:56:27Z"
+  "next_action": "Keep the current Demo model unchanged; do not promote v3.7 or add Demo orders. Labels are causally and action-target consistent after repair, but strict autonomous WF1/WF3 make zero adjustments and WF2 is negative; Hyperliquid global coverage remains unavailable. Next research: model a short action sequence or acquire verified pre-2025 Hyperliquid behavior/scale, then re-evaluate without live credentials.",
+  "updated_at_utc": "2026-08-26T11:07:49Z"
 }

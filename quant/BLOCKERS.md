@@ -135,3 +135,10 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - Candidate `behavioral-distillation-v3.7-two-stage-action-target` improves model decomposition but does not pass strict autonomous costed replay: WF1/WF2/WF3 net returns are `0.000000`, `-0.048936`, and `0.000000`, with WF2 PF `0.933678`.
 - WF1 and WF3 predicted no-trade rates are `100%`; the candidate still cannot produce a stable autonomous action policy across time. Hyperliquid remains excluded from the global test because its model-eligible global test coverage is zero.
 - This is a model-quality, label-timing, and cross-venue-coverage blocker. Do not promote v3.7, switch the active Demo model, or add Demo orders.
+
+## 2026-08-26 — Corrected labels do not clear promotion blocker
+
+- Event action/target consistency and temporal causal ordering now pass after repairing isolated order-episode targets and same-timestamp Hyperliquid next-label handling; the temporal audit has warnings only (`373` same-time ties and `70` net-zero hourly labels hiding offsetting source actions).
+- The v3.7 strict autonomous re-audit remains blocked: WF1/WF3 make no adjustments, while WF2 remains negative after costs (`-0.048939`, PF `0.933658`).
+- Keep the active Demo model unchanged; do not switch the Demo deployment or add new Demo orders.
+- Remaining research options are a short action-sequence/memory protocol or verified pre-2025 Hyperliquid behavior/scale coverage. Hourly offsetting actions should become an explicit sequence target if they are needed for fidelity, rather than being silently relabeled.

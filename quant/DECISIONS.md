@@ -245,3 +245,12 @@
 - Candidate `behavioral-distillation-v3.7-two-stage-action-target` separates the timing decision (`ACTION` versus idle) from action type and target exposure. The timing head is trained on every causal hourly row; the action head is trained only on non-idle rows.
 - Train-only threshold selection yields predicted action rates near the observed training-tail rates, but strict autonomous test results are `0.000000`, `-0.048936`, and `0.000000` for WF1/WF2/WF3; WF2 profit factor is `0.933678`.
 - Keep the active Demo model unchanged. The two-stage structure improves diagnosis of timing versus sizing, but does not establish that the original trader's strategy has been learned or that a deployable signal exists.
+
+## 2026-08-26 — Repair event-target label contamination and re-audit timing
+
+- Decision targets now prefer the isolated order-episode position (`local_position_after`) produced by `build_order_episodes`; the global position fallback remains only for legacy callers. This prevents interleaved orders from contaminating an order's action/target label.
+- Successful PyArrow dataset writes now also refresh the CSV mirror used by downstream scripts, preventing stale derived inputs after a Parquet build.
+- Hyperliquid next-event labels now skip same-timestamp fills and use the next strictly later event, while preserving same-time ties for explicit audit reporting.
+- The temporal label audit is `PASS_WITH_WARNINGS`: `32552` event rows, `264609` temporal rows, `264288` eligible rows, zero hard failures, `373` same-timestamp event ties, and `70` same-hour net-zero labels that can hide offsetting source actions.
+- The repaired data was re-run through v3.7 strict autonomous replay. The promotion result is unchanged: WF1/WF3 make zero adjustments, WF2 net return is approximately `-0.048939` with PF approximately `0.933658`; the active Demo model remains unchanged.
+- These repairs establish causal/action-target consistency, not exact strategy recovery, full learning, or a profitability claim.

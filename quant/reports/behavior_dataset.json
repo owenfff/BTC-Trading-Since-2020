@@ -1,7 +1,7 @@
 {
   "report_version": "M2-BEHAVIOR-1.0",
   "source_commit": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
-  "analysis_commit": "8866448fc183929078caf418b09de7307c16d02b",
+  "analysis_commit": "edf07a5445d38fc54083920fbcf57d3b466be41e",
   "analysis_branch": "quant/autonomous-behavioral-quant-bot-v1",
   "teacher_data_type": "TRADE_RECORDS_ONLY",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
@@ -70,27 +70,28 @@
   },
   "large_outputs": {
     "trade_actions": {
-      "format": "csv_fallback_no_parquet_engine",
-      "path": "quant\\outputs\\trade_actions.csv",
-      "requested_path": "quant\\outputs\\trade_actions.parquet",
+      "format": "parquet_with_csv_mirror",
+      "path": "quant\\outputs\\trade_actions.parquet",
+      "csv_mirror": "quant\\outputs\\trade_actions.csv",
       "row_count": 160302
     },
     "order_episodes": {
-      "format": "csv_fallback_no_parquet_engine",
+      "format": "csv_fallback_parquet_schema_error",
       "path": "quant\\outputs\\order_episodes.csv",
       "requested_path": "quant\\outputs\\order_episodes.parquet",
-      "row_count": 31702
+      "row_count": 31702,
+      "fallback_reason": "Expected bytes, got a 'int' object"
     },
     "decision_episodes": {
-      "format": "csv_fallback_no_parquet_engine",
-      "path": "quant\\outputs\\decision_episodes.csv",
-      "requested_path": "quant\\outputs\\decision_episodes.parquet",
+      "format": "parquet_with_csv_mirror",
+      "path": "quant\\outputs\\decision_episodes.parquet",
+      "csv_mirror": "quant\\outputs\\decision_episodes.csv",
       "row_count": 32231
     },
     "trade_cycles": {
-      "format": "csv_fallback_no_parquet_engine",
-      "path": "quant\\outputs\\trade_cycles.csv",
-      "requested_path": "quant\\outputs\\trade_cycles.parquet",
+      "format": "parquet_with_csv_mirror",
+      "path": "quant\\outputs\\trade_cycles.parquet",
+      "csv_mirror": "quant\\outputs\\trade_cycles.csv",
       "row_count": 1401
     }
   },

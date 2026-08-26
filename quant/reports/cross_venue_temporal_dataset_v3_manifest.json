@@ -4,7 +4,7 @@
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
   "clock_contract": "one row per available closed 1h market bar; label is the next hourly state transition",
   "input_dataset": "quant\\outputs\\cross_venue_model_dataset_v3.csv",
-  "input_dataset_sha256": "e131e08e45883664242f9443b2d4847341792a5df020aa31cb65eea05ade02e9",
+  "input_dataset_sha256": "3db0b050ec3f4c5602cf3c682e1a5bd8a2c8bbff0a21c5f304e0bebfafbafc69",
   "market_context": "quant\\outputs\\cross_asset_market_context.csv",
   "market_context_sha256": "976cb1bb83d72012f3753585bbc3f969587ced3127d5430f02d6ff7c27ddb807",
   "hyperliquid_revision": "ace13c7a675a20d4932b430508a750d7ad7867e9",
@@ -13,8 +13,8 @@
   "market_groups": 66,
   "temporal_rows": 264609,
   "model_eligible_rows": 264288,
-  "no_trade_rows": 251702,
-  "no_trade_rate": 0.9512223696094994,
+  "no_trade_rows": 251701,
+  "no_trade_rate": 0.9512185904485486,
   "coverage_status_counts": {
     "PASS": 66
   },
@@ -146,7 +146,7 @@
       "market_bars": 54468,
       "temporal_rows": 54466,
       "eligible_rows": 54395,
-      "no_trade_rows": 47190,
+      "no_trade_rows": 47189,
       "first_decision_time": "2020-05-01T11:00:00.000Z",
       "last_decision_time": "2026-07-18T20:00:00.000Z",
       "status": "PASS"
@@ -377,7 +377,7 @@
       "market_bars": 32854,
       "temporal_rows": 32756,
       "eligible_rows": 32756,
-      "no_trade_rows": 31325,
+      "no_trade_rows": 31324,
       "first_decision_time": "2020-06-01T23:00:00.000Z",
       "last_decision_time": "2024-02-26T18:00:00.000Z",
       "status": "PASS"
@@ -608,7 +608,7 @@
       "market_bars": 1588,
       "temporal_rows": 1490,
       "eligible_rows": 1490,
-      "no_trade_rows": 1410,
+      "no_trade_rows": 1411,
       "first_decision_time": "2021-03-19T18:00:00.000Z",
       "last_decision_time": "2021-05-20T19:00:00.000Z",
       "status": "PASS"
@@ -755,5 +755,5 @@
   "output_order": "deterministic state-key order, then chronological market-clock order within each state key",
   "output": "quant\\outputs\\cross_venue_temporal_dataset_v3.csv",
   "large_output": true,
-  "analysis_commit": "0d8022cfc35c212d00550e600a2c5a5efa2033c5"
+  "analysis_commit": "edf07a5445d38fc54083920fbcf57d3b466be41e"
 }

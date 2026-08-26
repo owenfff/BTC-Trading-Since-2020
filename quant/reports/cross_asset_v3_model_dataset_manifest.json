@@ -1,6 +1,6 @@
 {
   "report_version": "M13-CROSS-ASSET-DATASET-1.0",
-  "analysis_commit": "461cb9462ee8492d07aa9a7728f8fc314d630216",
+  "analysis_commit": "edf07a5445d38fc54083920fbcf57d3b466be41e",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
   "row_count": 32231,
   "symbol_count": 66,
@@ -102,7 +102,7 @@
     "AAVEUSDT": 9677.0,
     "ADAUSDT": 544.0,
     "LTCU21": 1000.0,
-    "AXSUSDT": 24473.0,
+    "AXSUSDT": 24949.0,
     "DOGEUSD": 37884.0,
     "ETHZ21": 40711000000.0,
     "LUNAUSD": 3000.0,

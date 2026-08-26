@@ -282,3 +282,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The timing head is trained on idle and non-idle rows; the action head is trained only on non-idle rows. Train-only timing thresholds are `WF1=0.57`, `WF2=0.19`, `WF3=0.26`.
 - Strict autonomous costed returns are `0.000000`, `-0.048936`, and `0.000000` for WF1/WF2/WF3; the candidate is blocked. Full suite after the change: `369 passed`.
 - Global model-eligible test coverage remains BitMEX-only (`HYPERLIQUID=0` in WF1/WF2/WF3). No raw CSV/JSON was modified; no credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.
+
+## M15.8 label/timing audit and repair
+
+- Code paths: `quant/src/behavior/decision_episodes.py` now uses isolated order-episode position targets; `quant/src/cross_asset/hyperliquid.py` skips same-timestamp fills when selecting the next label; `quant/scripts/build_behavior_dataset.py` refreshes the CSV mirror after successful Parquet output; `quant/scripts/audit_cross_venue_temporal_labels.py` audits event and temporal labels.
+- Audit outputs: `quant/reports/cross_venue_temporal_label_audit.md`, `.json`, and `cross_venue_temporal_label_audit_by_symbol.csv`.
+- Final audit: `PASS_WITH_WARNINGS`; `32552` event rows across `66` state keys; `264609` temporal rows with `264288` eligible rows; zero hard failures; `373` same-timestamp event ties and `70` same-hour net-zero labels retained as explicit warnings.
+- Rebuilt source-derived inputs: behavior dataset counts remain `173434` raw executions, `160302` derivative fills, `62388` execution batches, `31702` order episodes, `32231` decision episodes, and `1401` trade cycles. The cross-venue temporal dataset remains `264609` rows.
+- The repaired inputs were re-audited by `cross_venue_two_stage_autonomous_audit.py`; v3.7 remains `DEMO_CONTINUE_LIVE_BLOCKED` and the active Demo model is unchanged. Raw account CSV/JSON hashes remain unchanged; generated large outputs remain ignored and were rebuilt locally; no credentials or private endpoints were used.

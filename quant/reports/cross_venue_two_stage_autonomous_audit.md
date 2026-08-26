@@ -17,8 +17,8 @@ The timing head predicts whether exposure changes. The action/target head is tra
 
 | window | net return | profit factor | target MAE | observed action rate | predicted action rate |
 |---|---:|---:|---:|---:|---:|
-| WF1 | 0.000000 | — | 0.090124 | 7.21% | 0.00% |
-| WF2 | -0.048936 | 0.933678 | 0.266797 | 11.43% | 22.36% |
+| WF1 | 0.000000 | — | 0.090151 | 7.21% | 0.00% |
+| WF2 | -0.048939 | 0.933658 | 0.266388 | 11.43% | 22.36% |
 | WF3 | 0.000000 | — | 0.138184 | 2.35% | 0.00% |
 
 ## Gates
