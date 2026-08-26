@@ -1,0 +1,3224 @@
+{
+  "report_version": "M15-STATE-ROBUST-AUTONOMOUS-THRESHOLD-AUDIT-1.0",
+  "status": "DEMO_CONTINUE_LIVE_BLOCKED",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "active_model_unchanged": true,
+  "candidate_model_version": "behavioral-distillation-v3.9-state-robust-autonomous-threshold",
+  "dataset": "quant\\outputs\\cross_venue_temporal_dataset_v3.csv",
+  "dataset_rows": 264288,
+  "causal_audit": {
+    "status": "PASS",
+    "checks": {
+      "invalid_decision_time": 0,
+      "future_market_bar": 0,
+      "future_funding": 0,
+      "non_strict_clock_order": 0,
+      "non_future_label": 0
+    }
+  },
+  "augmentation_contract": "Training-only non-idle rows receive deterministic ZERO_START and HALF_TEACHER_STATE variants; test rows are untouched; synthetic targets use the original next target and actions are recomputed from the synthetic current state. Threshold selection also uses autonomous zero-start state probabilities from a training-only chronological segment.",
+  "windows": [
+    {
+      "window": "WF1",
+      "status": "TEST_DATA_AVAILABLE",
+      "train_rows": 174053,
+      "test_rows": 17561,
+      "nested_stages": {
+        "fit_rows_original": 104431,
+        "fit_rows_augmented": 113787,
+        "synthetic_rows_added": 9356,
+        "calibration_rows": 34811,
+        "threshold_rows": 34811,
+        "probability_calibration": {
+          "calibration_rows": 34811,
+          "unseen_label_rows": 0,
+          "nll_before": 2.098397710497399,
+          "nll_after": 2.098397710497399,
+          "temperature": 1.0,
+          "bias_l1": 0.0
+        },
+        "threshold_selection": {
+          "selection_rows": 34811,
+          "selection_contract": "train-only chronological threshold selection using autonomous zero-start state probabilities; action Macro-F1 minus action-rate mismatch and fee turnover proxy",
+          "selected": {
+            "threshold": 0.88,
+            "score": 0.007373246042148837,
+            "action_macro_f1": 0.01225957576689843,
+            "target_exposure_mae": 0.8581185473824762,
+            "observed_action_rate": 0.029358536094912527,
+            "predicted_action_rate": 0.04889259142225159,
+            "turnover_proxy": 0.0005475242696847579
+          },
+          "candidates": [
+            {
+              "threshold": 0.0,
+              "score": -0.23467869932070415,
+              "action_macro_f1": 0.008001549905931205,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 1.0,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.01,
+              "score": -0.07446988875334885,
+              "action_macro_f1": 0.008404551964481843,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.36077676596478125,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.02,
+              "score": -0.07028770938522966,
+              "action_macro_f1": 0.008787644836953096,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.3455804199821895,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.03,
+              "score": -0.06667610086576267,
+              "action_macro_f1": 0.009454781781343244,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.3338025336818822,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.04,
+              "score": -0.06424823541102749,
+              "action_macro_f1": 0.00985742532346461,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.3257016460314269,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.05,
+              "score": -0.061909075345708525,
+              "action_macro_f1": 0.010429902443737454,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.3186349142512424,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.06,
+              "score": -0.060607277831215445,
+              "action_macro_f1": 0.010640090984055701,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.3142684783545431,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.07,
+              "score": -0.059273060383739466,
+              "action_macro_f1": 0.010803701439488939,
+              "target_exposure_mae": 0.8582775582960516,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.3095860503863721,
+              "turnover_proxy": 0.0038661136852582412
+            },
+            {
+              "threshold": 0.08,
+              "score": -0.058156898003205885,
+              "action_macro_f1": 0.011007784906912184,
+              "target_exposure_mae": 0.8582766693887407,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.305937778288472,
+              "turnover_proxy": 0.0038639964910763677
+            },
+            {
+              "threshold": 0.09,
+              "score": -0.0572923382190634,
+              "action_macro_f1": 0.011118254708093552,
+              "target_exposure_mae": 0.8582771330644399,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.3029214903335153,
+              "turnover_proxy": 0.0038604976814540014
+            },
+            {
+              "threshold": 0.1,
+              "score": -0.05636691122139954,
+              "action_macro_f1": 0.011282426067836006,
+              "target_exposure_mae": 0.8582771725994738,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.29987647582660654,
+              "turnover_proxy": 0.0038601066233865037
+            },
+            {
+              "threshold": 0.11,
+              "score": -0.0562781241055547,
+              "action_macro_f1": 0.010602722956852427,
+              "target_exposure_mae": 0.8582840203245394,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2968027347677458,
+              "turnover_proxy": 0.0038494197500488826
+            },
+            {
+              "threshold": 0.12,
+              "score": -0.05516947766388634,
+              "action_macro_f1": 0.010885356014274915,
+              "target_exposure_mae": 0.8582804402678265,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.29349918129326935,
+              "turnover_proxy": 0.0038251116205111975
+            },
+            {
+              "threshold": 0.13,
+              "score": -0.05403893225037165,
+              "action_macro_f1": 0.011211454537900881,
+              "target_exposure_mae": 0.8582928488386378,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2902818074746488,
+              "turnover_proxy": 0.0038049995983396125
+            },
+            {
+              "threshold": 0.14,
+              "score": -0.05326200739834054,
+              "action_macro_f1": 0.011435351436723704,
+              "target_exposure_mae": 0.8582954267878586,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.28806986297434717,
+              "turnover_proxy": 0.0037968665057128157
+            },
+            {
+              "threshold": 0.15,
+              "score": -0.05246900670620533,
+              "action_macro_f1": 0.011546043897602122,
+              "target_exposure_mae": 0.8582965703932655,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2853408405389101,
+              "turnover_proxy": 0.003786634568403652
+            },
+            {
+              "threshold": 0.16,
+              "score": -0.051873132575838025,
+              "action_macro_f1": 0.011581580352307545,
+              "target_exposure_mae": 0.8583000209752571,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2831001694866565,
+              "turnover_proxy": 0.0037535966389768203
+            },
+            {
+              "threshold": 0.17,
+              "score": -0.0513296214298153,
+              "action_macro_f1": 0.011629413752112273,
+              "target_exposure_mae": 0.858306541578309,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.28111803740197067,
+              "turnover_proxy": 0.0037254561954985477
+            },
+            {
+              "threshold": 0.18,
+              "score": -0.05082169734409376,
+              "action_macro_f1": 0.011727872743767461,
+              "target_exposure_mae": 0.8583066680101739,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2794806239407084,
+              "turnover_proxy": 0.0037037315758055266
+            },
+            {
+              "threshold": 0.19,
+              "score": -0.05021012056000634,
+              "action_macro_f1": 0.011843736026512256,
+              "target_exposure_mae": 0.8582939913855663,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.27749849185602254,
+              "turnover_proxy": 0.0036686388798463144
+            },
+            {
+              "threshold": 0.2,
+              "score": -0.04959670932721812,
+              "action_macro_f1": 0.011975795733350982,
+              "target_exposure_mae": 0.8582953126762486,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2755738128752406,
+              "turnover_proxy": 0.0036332932976153166
+            },
+            {
+              "threshold": 0.21,
+              "score": -0.04913613885295512,
+              "action_macro_f1": 0.012026841572339068,
+              "target_exposure_mae": 0.8582987343223264,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.27393639941397835,
+              "turnover_proxy": 0.0035999914419501435
+            },
+            {
+              "threshold": 0.22,
+              "score": -0.048561672377960746,
+              "action_macro_f1": 0.012163145628226076,
+              "target_exposure_mae": 0.8582965527140264,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2721840797449082,
+              "turnover_proxy": 0.003583949724111805
+            },
+            {
+              "threshold": 0.23,
+              "score": -0.04785871467719487,
+              "action_macro_f1": 0.012348830403055615,
+              "target_exposure_mae": 0.858308748222509,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.27011576800436643,
+              "turnover_proxy": 0.00354603557073991
+            },
+            {
+              "threshold": 0.24,
+              "score": -0.04731969733336545,
+              "action_macro_f1": 0.012464040266489765,
+              "target_exposure_mae": 0.8583071074085008,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2684209014392003,
+              "turnover_proxy": 0.003528372749234184
+            },
+            {
+              "threshold": 0.25,
+              "score": -0.04666023951752803,
+              "action_macro_f1": 0.012570322620536117,
+              "target_exposure_mae": 0.858300877293513,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2662089569388986,
+              "turnover_proxy": 0.0034915579803143043
+            },
+            {
+              "threshold": 0.26,
+              "score": -0.045976535147815155,
+              "action_macro_f1": 0.012679294123857657,
+              "target_exposure_mae": 0.8582825274716441,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2639108327827411,
+              "turnover_proxy": 0.003452314522974493
+            },
+            {
+              "threshold": 0.27,
+              "score": -0.04550663842834757,
+              "action_macro_f1": 0.012754105234351686,
+              "target_exposure_mae": 0.8582795580366848,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2623308724253828,
+              "turnover_proxy": 0.003433741615759518
+            },
+            {
+              "threshold": 0.28,
+              "score": -0.044928714764756884,
+              "action_macro_f1": 0.012944118525199349,
+              "target_exposure_mae": 0.8582816937301184,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.26077963861997644,
+              "turnover_proxy": 0.0034139239461600883
+            },
+            {
+              "threshold": 0.29,
+              "score": -0.044345312527198644,
+              "action_macro_f1": 0.01318991852741344,
+              "target_exposure_mae": 0.8582844381515328,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2594294906782339,
+              "turnover_proxy": 0.0034012367064163843
+            },
+            {
+              "threshold": 0.3,
+              "score": -0.043790781874919214,
+              "action_macro_f1": 0.013378100582482389,
+              "target_exposure_mae": 0.8582828837175743,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.25796443652868345,
+              "turnover_proxy": 0.0033846976124919715
+            },
+            {
+              "threshold": 0.31,
+              "score": -0.043312311677855465,
+              "action_macro_f1": 0.01351891201972009,
+              "target_exposure_mae": 0.8582849434971475,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2566142885869409,
+              "turnover_proxy": 0.003361019711309241
+            },
+            {
+              "threshold": 0.32,
+              "score": -0.042677584437046175,
+              "action_macro_f1": 0.01372264614113421,
+              "target_exposure_mae": 0.8582839400676033,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.25489069546982274,
+              "turnover_proxy": 0.003342578930138001
+            },
+            {
+              "threshold": 0.33,
+              "score": -0.04233372383593706,
+              "action_macro_f1": 0.013635511382564034,
+              "target_exposure_mae": 0.8582876984934483,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2531671023527046,
+              "turnover_proxy": 0.003323702546487013
+            },
+            {
+              "threshold": 0.34,
+              "score": -0.04189854543781715,
+              "action_macro_f1": 0.013797719260545491,
+              "target_exposure_mae": 0.8582820050262043,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2520754933785298,
+              "turnover_proxy": 0.0033104267956658158
+            },
+            {
+              "threshold": 0.35,
+              "score": -0.04134583972502971,
+              "action_macro_f1": 0.014027183690289435,
+              "target_exposure_mae": 0.8582857181123021,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2507827985406912,
+              "turnover_proxy": 0.0032972877387990717
+            },
+            {
+              "threshold": 0.36,
+              "score": -0.04075970537523134,
+              "action_macro_f1": 0.014182274722103412,
+              "target_exposure_mae": 0.8582906707144335,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.24905920542357302,
+              "turnover_proxy": 0.0032690863073697347
+            },
+            {
+              "threshold": 0.37,
+              "score": -0.04020676070088847,
+              "action_macro_f1": 0.01429694083096978,
+              "target_exposure_mae": 0.8582846792466062,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.24730688575450288,
+              "turnover_proxy": 0.003230461004906863
+            },
+            {
+              "threshold": 0.38,
+              "score": -0.039869808455183134,
+              "action_macro_f1": 0.014324951280823466,
+              "target_exposure_mae": 0.8582792707209055,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.24607164402056822,
+              "turnover_proxy": 0.0032049188103811326
+            },
+            {
+              "threshold": 0.39,
+              "score": -0.03924539550778693,
+              "action_macro_f1": 0.014489596375070789,
+              "target_exposure_mae": 0.8582754789562279,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2442331446956422,
+              "turnover_proxy": 0.003177109524578673
+            },
+            {
+              "threshold": 0.4,
+              "score": -0.038812852098184525,
+              "action_macro_f1": 0.014541418520583006,
+              "target_exposure_mae": 0.8582752072509648,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.24271063744218782,
+              "turnover_proxy": 0.0031587444564931664
+            },
+            {
+              "threshold": 0.41,
+              "score": -0.03842107833516579,
+              "action_macro_f1": 0.014617101883394176,
+              "target_exposure_mae": 0.8582742691532612,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.24144666915630117,
+              "turnover_proxy": 0.0031396253454540565
+            },
+            {
+              "threshold": 0.42,
+              "score": -0.03795149659469618,
+              "action_macro_f1": 0.01474182498423217,
+              "target_exposure_mae": 0.8582731684046391,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.24006779466260664,
+              "turnover_proxy": 0.003112400491973418
+            },
+            {
+              "threshold": 0.43,
+              "score": -0.03746299752487081,
+              "action_macro_f1": 0.014799335957432165,
+              "target_exposure_mae": 0.8582677391843102,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2383442015454885,
+              "turnover_proxy": 0.003094936341819088
+            },
+            {
+              "threshold": 0.44,
+              "score": -0.03699194987037164,
+              "action_macro_f1": 0.014904045472735867,
+              "target_exposure_mae": 0.858267607188807,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.23687914739593807,
+              "turnover_proxy": 0.003080430711950857
+            },
+            {
+              "threshold": 0.45,
+              "score": -0.03652320582074535,
+              "action_macro_f1": 0.014963325633731199,
+              "target_exposure_mae": 0.8582710903706571,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.23524173393467582,
+              "turnover_proxy": 0.003058940477992289
+            },
+            {
+              "threshold": 0.46,
+              "score": -0.03604158248519153,
+              "action_macro_f1": 0.014820004718792955,
+              "target_exposure_mae": 0.8582649434126466,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2327425239148545,
+              "turnover_proxy": 0.0030313793725690523
+            },
+            {
+              "threshold": 0.47,
+              "score": -0.03562235520391113,
+              "action_macro_f1": 0.014880072397330545,
+              "target_exposure_mae": 0.8582690326033982,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.23130619631725605,
+              "turnover_proxy": 0.0030162706779154314
+            },
+            {
+              "threshold": 0.48,
+              "score": -0.03503724256911958,
+              "action_macro_f1": 0.01501266578517521,
+              "target_exposure_mae": 0.8582669146974302,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.22949642354428199,
+              "turnover_proxy": 0.0030014827404283326
+            },
+            {
+              "threshold": 0.49,
+              "score": -0.034810511072193864,
+              "action_macro_f1": 0.01477963973279803,
+              "target_exposure_mae": 0.8582620566638364,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.22765792421935596,
+              "turnover_proxy": 0.002975676941943948
+            },
+            {
+              "threshold": 0.5,
+              "score": -0.03416305523946315,
+              "action_macro_f1": 0.01494577677599817,
+              "target_exposure_mae": 0.8582539067705593,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.22573324523857402,
+              "turnover_proxy": 0.002946696652851988
+            },
+            {
+              "threshold": 0.51,
+              "score": -0.033624754975754644,
+              "action_macro_f1": 0.015088981595641522,
+              "target_exposure_mae": 0.85825570480889,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.22415328488121572,
+              "turnover_proxy": 0.002926211403261846
+            },
+            {
+              "threshold": 0.52,
+              "score": -0.03304763858512905,
+              "action_macro_f1": 0.015213561965044978,
+              "target_exposure_mae": 0.8582527789354144,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.22234351210824166,
+              "turnover_proxy": 0.0029081618634729306
+            },
+            {
+              "threshold": 0.53,
+              "score": -0.032660816727909284,
+              "action_macro_f1": 0.015226832461072525,
+              "target_exposure_mae": 0.8582561973843267,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.22084973140673925,
+              "turnover_proxy": 0.0028875150159366142
+            },
+            {
+              "threshold": 0.54,
+              "score": -0.03218714529612559,
+              "action_macro_f1": 0.01534852561609835,
+              "target_exposure_mae": 0.8582536218407721,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.21944213036109275,
+              "turnover_proxy": 0.002872345655181664
+            },
+            {
+              "threshold": 0.55,
+              "score": -0.03168452259614647,
+              "action_macro_f1": 0.015448870626118568,
+              "target_exposure_mae": 0.8582429923124443,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2178334434517825,
+              "turnover_proxy": 0.002851742203953596
+            },
+            {
+              "threshold": 0.56,
+              "score": -0.03109591723198677,
+              "action_macro_f1": 0.015635214246949393,
+              "target_exposure_mae": 0.8582387814610022,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2162247565424722,
+              "turnover_proxy": 0.0028342394270838814
+            },
+            {
+              "threshold": 0.57,
+              "score": -0.030343464556310904,
+              "action_macro_f1": 0.015971006853983262,
+              "target_exposure_mae": 0.8582396742418724,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.214558616529258,
+              "turnover_proxy": 0.002809921631567965
+            },
+            {
+              "threshold": 0.58,
+              "score": -0.02999143352776673,
+              "action_macro_f1": 0.015820185437434117,
+              "target_exposure_mae": 0.8582434277849408,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.21254775789262015,
+              "turnover_proxy": 0.0027831304342147214
+            },
+            {
+              "threshold": 0.59,
+              "score": -0.029346982526920088,
+              "action_macro_f1": 0.01593304173855747,
+              "target_exposure_mae": 0.8582328647771986,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.21042199304817444,
+              "turnover_proxy": 0.002753285996710971
+            },
+            {
+              "threshold": 0.6,
+              "score": -0.028709603065165724,
+              "action_macro_f1": 0.016081950761264972,
+              "target_exposure_mae": 0.8582278906647396,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.20846858751544053,
+              "turnover_proxy": 0.0027301366879051913
+            },
+            {
+              "threshold": 0.61,
+              "score": -0.027722416570964054,
+              "action_macro_f1": 0.016286156240887577,
+              "target_exposure_mae": 0.8582296065062762,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.20533739335267587,
+              "turnover_proxy": 0.0026946563322120753
+            },
+            {
+              "threshold": 0.62,
+              "score": -0.026915466518429323,
+              "action_macro_f1": 0.016389144777647417,
+              "target_exposure_mae": 0.858232621922709,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.2025221912613829,
+              "turnover_proxy": 0.0026633527454142944
+            },
+            {
+              "threshold": 0.63,
+              "score": -0.026073922103377126,
+              "action_macro_f1": 0.016426192458434855,
+              "target_exposure_mae": 0.8582197988334542,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.19930481744276235,
+              "turnover_proxy": 0.0026335489464573048
+            },
+            {
+              "threshold": 0.64,
+              "score": -0.02502814339518884,
+              "action_macro_f1": 0.016466321326477868,
+              "target_exposure_mae": 0.8582022261635707,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.19528310016948666,
+              "turnover_proxy": 0.002590670521896687
+            },
+            {
+              "threshold": 0.65,
+              "score": -0.023779812481477345,
+              "action_macro_f1": 0.016615643828130418,
+              "target_exposure_mae": 0.8582078783245657,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.19088793772083537,
+              "turnover_proxy": 0.002548321351431616
+            },
+            {
+              "threshold": 0.66,
+              "score": -0.022870708982555037,
+              "action_macro_f1": 0.016440071288247364,
+              "target_exposure_mae": 0.8582113789268866,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.186550228376088,
+              "turnover_proxy": 0.0024999634331112565
+            },
+            {
+              "threshold": 0.67,
+              "score": -0.022167191550234926,
+              "action_macro_f1": 0.016066151235554563,
+              "target_exposure_mae": 0.8582014818539957,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.18224124558329263,
+              "turnover_proxy": 0.0024626722652689404
+            },
+            {
+              "threshold": 0.68,
+              "score": -0.021497759271074054,
+              "action_macro_f1": 0.015765849550186825,
+              "target_exposure_mae": 0.8582099092778549,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.1783631610697768,
+              "turnover_proxy": 0.0024212882492840953
+            },
+            {
+              "threshold": 0.69,
+              "score": -0.020452352226415754,
+              "action_macro_f1": 0.015784013622884955,
+              "target_exposure_mae": 0.8582115657085334,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.1742552641406452,
+              "turnover_proxy": 0.002369034310663996
+            },
+            {
+              "threshold": 0.7,
+              "score": -0.020085758562416067,
+              "action_macro_f1": 0.015159371367019088,
+              "target_exposure_mae": 0.8582149802075689,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.17029099997127345,
+              "turnover_proxy": 0.0023360032014130175
+            },
+            {
+              "threshold": 0.71,
+              "score": -0.018626084089822227,
+              "action_macro_f1": 0.01541947578815205,
+              "target_exposure_mae": 0.858203507560652,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.1654936657952946,
+              "turnover_proxy": 0.0022900165174025732
+            },
+            {
+              "threshold": 0.72,
+              "score": -0.017193822185663336,
+              "action_macro_f1": 0.01573830082996549,
+              "target_exposure_mae": 0.8581828119753772,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.16104105024273938,
+              "turnover_proxy": 0.0022349948065206048
+            },
+            {
+              "threshold": 0.73,
+              "score": -0.015950461044882448,
+              "action_macro_f1": 0.015896910440007583,
+              "target_exposure_mae": 0.8581683814605958,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.156703340897992,
+              "turnover_proxy": 0.0021719581816690234
+            },
+            {
+              "threshold": 0.74,
+              "score": -0.014692145029288544,
+              "action_macro_f1": 0.01598434891903508,
+              "target_exposure_mae": 0.8581618014490726,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.15202091292982103,
+              "turnover_proxy": 0.0021193533074005165
+            },
+            {
+              "threshold": 0.75,
+              "score": -0.013539823856780294,
+              "action_macro_f1": 0.016130963774805926,
+              "target_exposure_mae": 0.8581727889422256,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.14799919565654535,
+              "turnover_proxy": 0.0020654935331226674
+            },
+            {
+              "threshold": 0.76,
+              "score": -0.012529754150073902,
+              "action_macro_f1": 0.01614245123462011,
+              "target_exposure_mae": 0.858164273459258,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.14400620493522162,
+              "turnover_proxy": 0.002000440167222685
+            },
+            {
+              "threshold": 0.77,
+              "score": -0.011305749366980712,
+              "action_macro_f1": 0.016288884063648458,
+              "target_exposure_mae": 0.8581962406725605,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.13969722214242625,
+              "turnover_proxy": 0.0019370027389663338
+            },
+            {
+              "threshold": 0.78,
+              "score": -0.010216278815427275,
+              "action_macro_f1": 0.016128376403844843,
+              "target_exposure_mae": 0.858203595696049,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.1346988021027836,
+              "turnover_proxy": 0.0018644371778602292
+            },
+            {
+              "threshold": 0.79,
+              "score": -0.009019242661264748,
+              "action_macro_f1": 0.016247838478133138,
+              "target_exposure_mae": 0.8582096269478873,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.13038981930998822,
+              "turnover_proxy": 0.00180058640567768
+            },
+            {
+              "threshold": 0.8,
+              "score": -0.007505377550354873,
+              "action_macro_f1": 0.016346497782273282,
+              "target_exposure_mae": 0.8582053523770894,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.12473068857545029,
+              "turnover_proxy": 0.001718314035022927
+            },
+            {
+              "threshold": 0.81,
+              "score": -0.005662048905460774,
+              "action_macro_f1": 0.016472748954951086,
+              "target_exposure_mae": 0.8582056010099619,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.11786504265892965,
+              "turnover_proxy": 0.0015888178541910826
+            },
+            {
+              "threshold": 0.82,
+              "score": -0.002973879723791327,
+              "action_macro_f1": 0.016811703746352154,
+              "target_exposure_mae": 0.8582138014539876,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.10847146017063572,
+              "turnover_proxy": 0.0014296159699180818
+            },
+            {
+              "threshold": 0.83,
+              "score": -0.0005100316582527216,
+              "action_macro_f1": 0.016660409749128493,
+              "target_exposure_mae": 0.8582045294757421,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.09801499526011893,
+              "turnover_proxy": 0.0012301518393420825
+            },
+            {
+              "threshold": 0.84,
+              "score": 0.0018119418562507815,
+              "action_macro_f1": 0.016252381750223647,
+              "target_exposure_mae": 0.858211860191362,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.08709890551837063,
+              "turnover_proxy": 0.0010397792053676858
+            },
+            {
+              "threshold": 0.85,
+              "score": 0.0038208869712888947,
+              "action_macro_f1": 0.015172255179377305,
+              "target_exposure_mae": 0.8581682189385968,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.07474648817902386,
+              "turnover_proxy": 0.0008516867629432712
+            },
+            {
+              "threshold": 0.86,
+              "score": 0.006361949498040111,
+              "action_macro_f1": 0.01544324710958549,
+              "target_exposure_mae": 0.8581485959789991,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.0656688977622016,
+              "turnover_proxy": 0.0007208296425841247
+            },
+            {
+              "threshold": 0.87,
+              "score": 0.007241571898313637,
+              "action_macro_f1": 0.01402425648707799,
+              "target_exposure_mae": 0.8581332439385508,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.05647640113757146,
+              "turnover_proxy": 0.0006257740601823834
+            },
+            {
+              "threshold": 0.88,
+              "score": 0.007373246042148837,
+              "action_macro_f1": 0.01225957576689843,
+              "target_exposure_mae": 0.8581185473824762,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.04889259142225159,
+              "turnover_proxy": 0.0005475242696847579
+            },
+            {
+              "threshold": 0.89,
+              "score": 0.007192493908954027,
+              "action_macro_f1": 0.010225619892628022,
+              "target_exposure_mae": 0.8581055024386238,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.04148114101864353,
+              "turnover_proxy": 0.0004811927258188706
+            },
+            {
+              "threshold": 0.9,
+              "score": 0.007182741245673848,
+              "action_macro_f1": 0.008290810659423971,
+              "target_exposure_mae": 0.8580765030480264,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.03378242509551579,
+              "turnover_proxy": 0.0004077740179941191
+            },
+            {
+              "threshold": 0.91,
+              "score": 0.003476727057148475,
+              "action_macro_f1": 0.004411985666516865,
+              "target_exposure_mae": 0.8580696788272856,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.025624084341156532,
+              "turnover_proxy": 0.00031998545435162594
+            },
+            {
+              "threshold": 0.92,
+              "score": -0.002215909820415633,
+              "action_macro_f1": 0.0007584626119076837,
+              "target_exposure_mae": 0.8580551286593713,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.017465743586797276,
+              "turnover_proxy": 0.000228332776922962
+            },
+            {
+              "threshold": 0.93,
+              "score": -0.004675423112831506,
+              "action_macro_f1": 3.641652308693762e-05,
+              "target_exposure_mae": 0.8580468559430572,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.010513918014420729,
+              "turnover_proxy": 0.00013321441436991267
+            },
+            {
+              "threshold": 0.94,
+              "score": -0.005817002254471009,
+              "action_macro_f1": 3.641652308693762e-05,
+              "target_exposure_mae": 0.8580422943957964,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.005946396254057625,
+              "turnover_proxy": 7.46297240141662e-05
+            },
+            {
+              "threshold": 0.95,
+              "score": -0.006549346082642947,
+              "action_macro_f1": 3.641652308693762e-05,
+              "target_exposure_mae": 0.85804510342498,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.0030162879549567667,
+              "turnover_proxy": 3.8999120981400174e-05
+            },
+            {
+              "threshold": 0.96,
+              "score": -0.007119163034190962,
+              "action_macro_f1": 4.096737631266301e-05,
+              "target_exposure_mae": 0.8580356812696186,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.0007181637987992302,
+              "turnover_proxy": 7.259731456395159e-06
+            },
+            {
+              "threshold": 0.97,
+              "score": -0.007298666647415469,
+              "action_macro_f1": 4.096737631266301e-05,
+              "target_exposure_mae": 0.8580383865358809,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.98,
+              "score": -0.007298666647415469,
+              "action_macro_f1": 4.096737631266301e-05,
+              "target_exposure_mae": 0.8580383865358809,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.99,
+              "score": -0.007298666647415469,
+              "action_macro_f1": 4.096737631266301e-05,
+              "target_exposure_mae": 0.8580383865358809,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 1.0,
+              "score": -0.007298666647415469,
+              "action_macro_f1": 4.096737631266301e-05,
+              "target_exposure_mae": 0.8580383865358809,
+              "observed_action_rate": 0.029358536094912527,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            }
+          ]
+        }
+      },
+      "per_symbol_stability": {
+        "window": "WF1",
+        "stable_symbol_count": 3,
+        "venue_count": 1,
+        "venues": [
+          "BITMEX"
+        ],
+        "positive_net_fraction": 0.3333333333333333,
+        "profit_factor_gt_one_fraction": 0.3333333333333333,
+        "median_net_return": -0.17637040359392175,
+        "minimum_net_return": -0.6334628623837799,
+        "maximum_net_return": 0.021786011910538416
+      }
+    },
+    {
+      "window": "WF2",
+      "status": "TEST_DATA_AVAILABLE",
+      "train_rows": 220288,
+      "test_rows": 8760,
+      "nested_stages": {
+        "fit_rows_original": 132172,
+        "fit_rows_augmented": 144791,
+        "synthetic_rows_added": 12619,
+        "calibration_rows": 44058,
+        "threshold_rows": 44058,
+        "probability_calibration": {
+          "calibration_rows": 44058,
+          "unseen_label_rows": 0,
+          "nll_before": 0.17853441791112118,
+          "nll_after": 0.12420663399080817,
+          "temperature": 0.9070176315595574,
+          "bias_l1": 1.2327248334928234
+        },
+        "threshold_selection": {
+          "selection_rows": 44058,
+          "selection_contract": "train-only chronological threshold selection using autonomous zero-start state probabilities; action Macro-F1 minus action-rate mismatch and fee turnover proxy",
+          "selected": {
+            "threshold": 0.9,
+            "score": 0.0010587901352895218,
+            "action_macro_f1": 0.0017592911548440975,
+            "target_exposure_mae": 0.9303646925570662,
+            "observed_action_rate": 0.03456806936311226,
+            "predicted_action_rate": 0.03177629488401652,
+            "turnover_proxy": 0.000497262676366003
+          },
+          "candidates": [
+            {
+              "threshold": 0.0,
+              "score": -0.23467710528205085,
+              "action_macro_f1": 0.006697862942932733,
+              "target_exposure_mae": 0.930558028922541,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 1.0,
+              "turnover_proxy": 0.0033026857803668645
+            },
+            {
+              "threshold": 0.01,
+              "score": -0.0661608317129731,
+              "action_macro_f1": 0.005908902502296041,
+              "target_exposure_mae": 0.930558028922541,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.32277906396114214,
+              "turnover_proxy": 0.0033026857803668645
+            },
+            {
+              "threshold": 0.02,
+              "score": -0.06366339735029726,
+              "action_macro_f1": 0.0056542827544811755,
+              "target_exposure_mae": 0.930558028922541,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.3117708475191793,
+              "turnover_proxy": 0.0033026857803668645
+            },
+            {
+              "threshold": 0.03,
+              "score": -0.06203887554188993,
+              "action_macro_f1": 0.005746733202409127,
+              "target_exposure_mae": 0.930558028922541,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.3056425620772618,
+              "turnover_proxy": 0.0033026857803668645
+            },
+            {
+              "threshold": 0.04,
+              "score": -0.06076854489104385,
+              "action_macro_f1": 0.005825452795104577,
+              "target_exposure_mae": 0.930558028922541,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.3008761178446593,
+              "turnover_proxy": 0.0033026857803668645
+            },
+            {
+              "threshold": 0.05,
+              "score": -0.05993130722170167,
+              "action_macro_f1": 0.005851260077229914,
+              "target_exposure_mae": 0.930558028922541,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.2976303962957919,
+              "turnover_proxy": 0.0033026857803668645
+            },
+            {
+              "threshold": 0.06,
+              "score": -0.059519229304713456,
+              "action_macro_f1": 0.005446186236657969,
+              "target_exposure_mae": 0.9305512414060803,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.29436197739343595,
+              "turnover_proxy": 0.00329354084963217
+            },
+            {
+              "threshold": 0.07,
+              "score": -0.058627717268046615,
+              "action_macro_f1": 0.005497896194247233,
+              "target_exposure_mae": 0.9305512414060803,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.29100276907712563,
+              "turnover_proxy": 0.00329354084963217
+            },
+            {
+              "threshold": 0.08,
+              "score": -0.057922541718044826,
+              "action_macro_f1": 0.005539174154707954,
+              "target_exposure_mae": 0.9305512414060803,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.28834717871896137,
+              "turnover_proxy": 0.00329354084963217
+            },
+            {
+              "threshold": 0.09,
+              "score": -0.05743633154178335,
+              "action_macro_f1": 0.005582785937942056,
+              "target_exposure_mae": 0.9305512414060803,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.28657678514685186,
+              "turnover_proxy": 0.00329354084963217
+            },
+            {
+              "threshold": 0.1,
+              "score": -0.05688981945731802,
+              "action_macro_f1": 0.005635581940004839,
+              "target_exposure_mae": 0.9305573714495028,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.2846021153933451,
+              "turnover_proxy": 0.0032840824698059006
+            },
+            {
+              "threshold": 0.11,
+              "score": -0.05630470424979169,
+              "action_macro_f1": 0.005579426953588659,
+              "target_exposure_mae": 0.930563561480752,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.2820373144491352,
+              "turnover_proxy": 0.0032704798067068643
+            },
+            {
+              "threshold": 0.12,
+              "score": -0.05545327633722763,
+              "action_macro_f1": 0.005607978740640955,
+              "target_exposure_mae": 0.9305734961614913,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.27874619819329066,
+              "turnover_proxy": 0.0032516070880966932
+            },
+            {
+              "threshold": 0.13,
+              "score": -0.05455974614892237,
+              "action_macro_f1": 0.005650278773539422,
+              "target_exposure_mae": 0.9305817595758812,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.2753415951700032,
+              "turnover_proxy": 0.0032361685749616688
+            },
+            {
+              "threshold": 0.14,
+              "score": -0.05350068641262805,
+              "action_macro_f1": 0.005682152785531412,
+              "target_exposure_mae": 0.9305999789880176,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.27123337418856963,
+              "turnover_proxy": 0.0032107981540503414
+            },
+            {
+              "threshold": 0.15,
+              "score": -0.052515622334337625,
+              "action_macro_f1": 0.005702436033607648,
+              "target_exposure_mae": 0.9306135821549162,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.26737482409551044,
+              "turnover_proxy": 0.003182933446415412
+            },
+            {
+              "threshold": 0.16,
+              "score": -0.05129541503782711,
+              "action_macro_f1": 0.0057478806899709765,
+              "target_exposure_mae": 0.930637053319206,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.26267647192337373,
+              "turnover_proxy": 0.0031489846565706447
+            },
+            {
+              "threshold": 0.17,
+              "score": -0.05014477979521815,
+              "action_macro_f1": 0.005820240390699126,
+              "target_exposure_mae": 0.9306490497902645,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.2583639747605429,
+              "turnover_proxy": 0.003119575268287872
+            },
+            {
+              "threshold": 0.18,
+              "score": -0.048902600798739884,
+              "action_macro_f1": 0.005904676138224942,
+              "target_exposure_mae": 0.9306493341951184,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.25373371464887196,
+              "turnover_proxy": 0.0030849218404687614
+            },
+            {
+              "threshold": 0.19,
+              "score": -0.047804379960273265,
+              "action_macro_f1": 0.005896215723281226,
+              "target_exposure_mae": 0.9306683417876572,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.24930773071859821,
+              "turnover_proxy": 0.0030488976430027024
+            },
+            {
+              "threshold": 0.2,
+              "score": -0.04648827746501032,
+              "action_macro_f1": 0.0059467380908881365,
+              "target_exposure_mae": 0.9306891834953306,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.24424622089064416,
+              "turnover_proxy": 0.0030094902107688647
+            },
+            {
+              "threshold": 0.21,
+              "score": -0.04545622494525113,
+              "action_macro_f1": 0.005792652183335504,
+              "target_exposure_mae": 0.9307036289149978,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.23950247401153024,
+              "turnover_proxy": 0.0029702700510452792
+            },
+            {
+              "threshold": 0.22,
+              "score": -0.04417537172275281,
+              "action_macro_f1": 0.005807863292669773,
+              "target_exposure_mae": 0.9307380287512601,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.23444096418357618,
+              "turnover_proxy": 0.002918810111475747
+            },
+            {
+              "threshold": 0.23,
+              "score": -0.043014535479758115,
+              "action_macro_f1": 0.005759821232722644,
+              "target_exposure_mae": 0.9307764302498416,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.22960642789050797,
+              "turnover_proxy": 0.002871321915596929
+            },
+            {
+              "threshold": 0.24,
+              "score": -0.04178660853023425,
+              "action_macro_f1": 0.00573349475202598,
+              "target_exposure_mae": 0.9307878808715401,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.22459031276953106,
+              "turnover_proxy": 0.002827640810552237
+            },
+            {
+              "threshold": 0.25,
+              "score": -0.040320971100197105,
+              "action_macro_f1": 0.005751902617471101,
+              "target_exposure_mae": 0.9308144751780113,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.21880248762994234,
+              "turnover_proxy": 0.0027745041076062335
+            },
+            {
+              "threshold": 0.26,
+              "score": -0.03947821636001625,
+              "action_macro_f1": 0.005510669804667079,
+              "target_exposure_mae": 0.930833636073388,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.21446729311362295,
+              "turnover_proxy": 0.002737769605885797
+            },
+            {
+              "threshold": 0.27,
+              "score": -0.038329555027805454,
+              "action_macro_f1": 0.005564058902810563,
+              "target_exposure_mae": 0.9308427237187721,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.21008670389032638,
+              "turnover_proxy": 0.0027134784672754983
+            },
+            {
+              "threshold": 0.28,
+              "score": -0.03728491487181716,
+              "action_macro_f1": 0.005609864965155593,
+              "target_exposure_mae": 0.9308642323444708,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.20609196967633575,
+              "turnover_proxy": 0.0026842073316988685
+            },
+            {
+              "threshold": 0.29,
+              "score": -0.03591030951001817,
+              "action_macro_f1": 0.005696182894451519,
+              "target_exposure_mae": 0.9308972851777856,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.20093967043442734,
+              "turnover_proxy": 0.002642864950080085
+            },
+            {
+              "threshold": 0.3,
+              "score": -0.03455958266810101,
+              "action_macro_f1": 0.005684826004278503,
+              "target_exposure_mae": 0.9309281925248171,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.19549230559716738,
+              "turnover_proxy": 0.0025957086449992354
+            },
+            {
+              "threshold": 0.31,
+              "score": -0.033060599767675086,
+              "action_macro_f1": 0.00571964792111338,
+              "target_exposure_mae": 0.9309506218296112,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1896363883971129,
+              "turnover_proxy": 0.002560381957851328
+            },
+            {
+              "threshold": 0.32,
+              "score": -0.031635825691217805,
+              "action_macro_f1": 0.005759705828907797,
+              "target_exposure_mae": 0.9309575300403186,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1840982341458986,
+              "turnover_proxy": 0.0025258481451887493
+            },
+            {
+              "threshold": 0.33,
+              "score": -0.03019466434793616,
+              "action_macro_f1": 0.005821806099783106,
+              "target_exposure_mae": 0.9309681508857621,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.17858277724817287,
+              "turnover_proxy": 0.0024875728815471313
+            },
+            {
+              "threshold": 0.34,
+              "score": -0.02902345760198233,
+              "action_macro_f1": 0.005721752770895142,
+              "target_exposure_mae": 0.9309787924735771,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.17349857006673022,
+              "turnover_proxy": 0.0024470748675090312
+            },
+            {
+              "threshold": 0.35,
+              "score": -0.027593075644099664,
+              "action_macro_f1": 0.00570493397620064,
+              "target_exposure_mae": 0.9309957986024914,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1677107449271415,
+              "turnover_proxy": 0.0023995403937222917
+            },
+            {
+              "threshold": 0.36,
+              "score": -0.026362451798068263,
+              "action_macro_f1": 0.005533795710279759,
+              "target_exposure_mae": 0.9310079096855424,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.16210449861546145,
+              "turnover_proxy": 0.0023605484104025605
+            },
+            {
+              "threshold": 0.37,
+              "score": -0.02508498200656986,
+              "action_macro_f1": 0.005574057306583318,
+              "target_exposure_mae": 0.9310015219569602,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1571564755549503,
+              "turnover_proxy": 0.0023211877606975407
+            },
+            {
+              "threshold": 0.38,
+              "score": -0.02395443104735474,
+              "action_macro_f1": 0.0053822609480601215,
+              "target_exposure_mae": 0.9309978361141121,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1518679921921104,
+              "turnover_proxy": 0.0022771514023228133
+            },
+            {
+              "threshold": 0.39,
+              "score": -0.022453316556851118,
+              "action_macro_f1": 0.005277194796040945,
+              "target_exposure_mae": 0.9309860919518753,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.14544464115484135,
+              "turnover_proxy": 0.002210480942053736
+            },
+            {
+              "threshold": 0.4,
+              "score": -0.020960222089798076,
+              "action_macro_f1": 0.00531167580691561,
+              "target_exposure_mae": 0.9309882635968808,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.13961142130827545,
+              "turnover_proxy": 0.0021504970395661905
+            },
+            {
+              "threshold": 0.41,
+              "score": -0.019667272737089965,
+              "action_macro_f1": 0.005384426696080606,
+              "target_exposure_mae": 0.9309909763342153,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.13473149030823006,
+              "turnover_proxy": 0.002108553543306166
+            },
+            {
+              "threshold": 0.42,
+              "score": -0.01854213535065695,
+              "action_macro_f1": 0.005442521510002875,
+              "target_exposure_mae": 0.9309831325596473,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1304643878523764,
+              "turnover_proxy": 0.002056645928887878
+            },
+            {
+              "threshold": 0.43,
+              "score": -0.017115281394728888,
+              "action_macro_f1": 0.005592356804488932,
+              "target_exposure_mae": 0.9309812852939761,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.12535748331744517,
+              "turnover_proxy": 0.0019997666280115595
+            },
+            {
+              "threshold": 0.44,
+              "score": -0.015679943472083412,
+              "action_macro_f1": 0.005705347107559147,
+              "target_exposure_mae": 0.9309716422921473,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1200689999546053,
+              "turnover_proxy": 0.001955671580239752
+            },
+            {
+              "threshold": 0.45,
+              "score": -0.014581964190589018,
+              "action_macro_f1": 0.005770327374116919,
+              "target_exposure_mae": 0.9309519501128481,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.11593808161968315,
+              "turnover_proxy": 0.0019032831802520476
+            },
+            {
+              "threshold": 0.46,
+              "score": -0.013541926164555363,
+              "action_macro_f1": 0.0057433705618478124,
+              "target_exposure_mae": 0.930935993215433,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.1116709791638295,
+              "turnover_proxy": 0.0018606570400084073
+            },
+            {
+              "threshold": 0.47,
+              "score": -0.012526236045480288,
+              "action_macro_f1": 0.005782803543525914,
+              "target_exposure_mae": 0.9309250411914985,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.10776703436379319,
+              "turnover_proxy": 0.001807975776932851
+            },
+            {
+              "threshold": 0.48,
+              "score": -0.011898080611911959,
+              "action_macro_f1": 0.005548145190114785,
+              "target_exposure_mae": 0.9308795769208514,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.10431703663352854,
+              "turnover_proxy": 0.001746852475810902
+            },
+            {
+              "threshold": 0.49,
+              "score": -0.010956077127514594,
+              "action_macro_f1": 0.0055591568171204095,
+              "target_exposure_mae": 0.9308273792324575,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.10059467066140088,
+              "turnover_proxy": 0.0016690053380284617
+            },
+            {
+              "threshold": 0.5,
+              "score": -0.010100766816769087,
+              "action_macro_f1": 0.005500568802443136,
+              "target_exposure_mae": 0.9307760355192816,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.09694039674973898,
+              "turnover_proxy": 0.001604869548419714
+            },
+            {
+              "threshold": 0.51,
+              "score": -0.009677922711232016,
+              "action_macro_f1": 0.0050662742416654975,
+              "target_exposure_mae": 0.9307198802167838,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.09351309637296291,
+              "turnover_proxy": 0.0015438983568407268
+            },
+            {
+              "threshold": 0.52,
+              "score": -0.008796727454994073,
+              "action_macro_f1": 0.005169749195935775,
+              "target_exposure_mae": 0.9306622103240855,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.09040355894502701,
+              "turnover_proxy": 0.0014785769694821295
+            },
+            {
+              "threshold": 0.53,
+              "score": -0.008264947004745954,
+              "action_macro_f1": 0.0050770652570506745,
+              "target_exposure_mae": 0.9306184032159401,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.08790685006128285,
+              "turnover_proxy": 0.0014227397760261057
+            },
+            {
+              "threshold": 0.54,
+              "score": -0.008048712336425628,
+              "action_macro_f1": 0.004782342809458238,
+              "target_exposure_mae": 0.9305851334186278,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.08586408824731036,
+              "turnover_proxy": 0.001370889740892621
+            },
+            {
+              "threshold": 0.55,
+              "score": -0.007477825709284637,
+              "action_macro_f1": 0.004808235551026981,
+              "target_exposure_mae": 0.9305465821718769,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.08368514231240637,
+              "turnover_proxy": 0.0013208403383954408
+            },
+            {
+              "threshold": 0.56,
+              "score": -0.007414407472327951,
+              "action_macro_f1": 0.004417496661113906,
+              "target_exposure_mae": 0.9305337252851622,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.08186935403331971,
+              "turnover_proxy": 0.0012799966832185339
+            },
+            {
+              "threshold": 0.57,
+              "score": -0.007218007400173043,
+              "action_macro_f1": 0.004227947697882636,
+              "target_exposure_mae": 0.9305180477586004,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.08032593399609606,
+              "turnover_proxy": 0.0012617141836761905
+            },
+            {
+              "threshold": 0.58,
+              "score": -0.006823812335796884,
+              "action_macro_f1": 0.004292921323774255,
+              "target_exposure_mae": 0.9305041521333696,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07900948749375823,
+              "turnover_proxy": 0.001240362083386974
+            },
+            {
+              "threshold": 0.59,
+              "score": -0.006552794144920877,
+              "action_macro_f1": 0.004274455485053134,
+              "target_exposure_mae": 0.9304936764158916,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07785192246584048,
+              "turnover_proxy": 0.001222323308020141
+            },
+            {
+              "threshold": 0.6,
+              "score": -0.006395284385357339,
+              "action_macro_f1": 0.004176571667644402,
+              "target_exposure_mae": 0.9304911697088273,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07683054155885424,
+              "turnover_proxy": 0.001212922054910834
+            },
+            {
+              "threshold": 0.61,
+              "score": -0.006128263592462775,
+              "action_macro_f1": 0.004227901011316561,
+              "target_exposure_mae": 0.930486542836501,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07596804212628808,
+              "turnover_proxy": 0.001199974036637359
+            },
+            {
+              "threshold": 0.62,
+              "score": -0.005876756328780686,
+              "action_macro_f1": 0.00426940927198859,
+              "target_exposure_mae": 0.9304842865541195,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0751282400472105,
+              "turnover_proxy": 0.0011905469200032756
+            },
+            {
+              "threshold": 0.63,
+              "score": -0.005672744303551127,
+              "action_macro_f1": 0.0043088296305242085,
+              "target_exposure_mae": 0.9304861281150608,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07447001679604158,
+              "turnover_proxy": 0.0011835754612356721
+            },
+            {
+              "threshold": 0.64,
+              "score": -0.005613305038425081,
+              "action_macro_f1": 0.004180976183599751,
+              "target_exposure_mae": 0.9304881032399358,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07372100413091834,
+              "turnover_proxy": 0.0011758861529682346
+            },
+            {
+              "threshold": 0.65,
+              "score": -0.005638766175485676,
+              "action_macro_f1": 0.003939847048277343,
+              "target_exposure_mae": 0.9304934723082727,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07285850469835217,
+              "turnover_proxy": 0.0011674979565559347
+            },
+            {
+              "threshold": 0.66,
+              "score": -0.005232710981229298,
+              "action_macro_f1": 0.0040110432995305164,
+              "target_exposure_mae": 0.9304871387532058,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.07151936084252576,
+              "turnover_proxy": 0.0011533078575706394
+            },
+            {
+              "threshold": 0.67,
+              "score": -0.004884633806864852,
+              "action_macro_f1": 0.00407533717966831,
+              "target_exposure_mae": 0.9304820265657728,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0703844931680966,
+              "turnover_proxy": 0.0011404017337885207
+            },
+            {
+              "threshold": 0.68,
+              "score": -0.004906847620091393,
+              "action_macro_f1": 0.0038090585855962904,
+              "target_exposure_mae": 0.9304780354789909,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.06940850696808752,
+              "turnover_proxy": 0.0011271348789300508
+            },
+            {
+              "threshold": 0.69,
+              "score": -0.004578495002458143,
+              "action_macro_f1": 0.0038592705561526167,
+              "target_exposure_mae": 0.9304683917523138,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.06829633664714695,
+              "turnover_proxy": 0.0011080666907745933
+            },
+            {
+              "threshold": 0.7,
+              "score": -0.004204387314770403,
+              "action_macro_f1": 0.003921231370684352,
+              "target_exposure_mae": 0.9304584908374284,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.06704798220527486,
+              "turnover_proxy": 0.001096738051279779
+            },
+            {
+              "threshold": 0.71,
+              "score": -0.004229708650012295,
+              "action_macro_f1": 0.0036461854627068612,
+              "target_exposure_mae": 0.9304542231515771,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.06604929865177721,
+              "turnover_proxy": 0.001086299624982771
+            },
+            {
+              "threshold": 0.72,
+              "score": -0.0041045658783896025,
+              "action_macro_f1": 0.0033967354027787384,
+              "target_exposure_mae": 0.9304535194627318,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.06455127332153071,
+              "turnover_proxy": 0.0010694806985115707
+            },
+            {
+              "threshold": 0.73,
+              "score": -0.0043639828416525955,
+              "action_macro_f1": 0.002768413917457405,
+              "target_exposure_mae": 0.9304538118518049,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0630759453447728,
+              "turnover_proxy": 0.0010553783268546343
+            },
+            {
+              "threshold": 0.74,
+              "score": -0.0041720258405211,
+              "action_macro_f1": 0.0026084615927992184,
+              "target_exposure_mae": 0.930446395517616,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.06166870942848064,
+              "turnover_proxy": 0.0010358668381701187
+            },
+            {
+              "threshold": 0.75,
+              "score": -0.003908659468934228,
+              "action_macro_f1": 0.0026334649076326243,
+              "target_exposure_mae": 0.9304443636969082,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.060715420581960146,
+              "turnover_proxy": 0.0010279248826324326
+            },
+            {
+              "threshold": 0.76,
+              "score": -0.0036012772197000615,
+              "action_macro_f1": 0.002662751182016288,
+              "target_exposure_mae": 0.9304484241952519,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.059603250261019564,
+              "turnover_proxy": 0.0010175427947253922
+            },
+            {
+              "threshold": 0.77,
+              "score": -0.0034702427417786052,
+              "action_macro_f1": 0.002498670549373329,
+              "target_exposure_mae": 0.9304502873598354,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.05842298787961324,
+              "turnover_proxy": 0.0010079150206710257
+            },
+            {
+              "threshold": 0.78,
+              "score": -0.0032577007207797923,
+              "action_macro_f1": 0.0023309658341440424,
+              "target_exposure_mae": 0.9304500435056634,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.05690226519587816,
+              "turnover_proxy": 0.0009950692367141267
+            },
+            {
+              "threshold": 0.79,
+              "score": -0.0030553747767910924,
+              "action_macro_f1": 0.0021587106657064356,
+              "target_exposure_mae": 0.9304506589162377,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.055404239865631665,
+              "turnover_proxy": 0.0009805289853495212
+            },
+            {
+              "threshold": 0.8,
+              "score": -0.0028981341101381487,
+              "action_macro_f1": 0.001975370430697117,
+              "target_exposure_mae": 0.9304484703034649,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.05404239865631667,
+              "turnover_proxy": 0.000957079563086662
+            },
+            {
+              "threshold": 0.81,
+              "score": -0.0028033386902371507,
+              "action_macro_f1": 0.0017807010861044107,
+              "target_exposure_mae": 0.9304457623060743,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.05288483362839893,
+              "turnover_proxy": 0.0009427867084634577
+            },
+            {
+              "threshold": 0.82,
+              "score": -0.0027289518903791093,
+              "action_macro_f1": 0.0015712749624388054,
+              "target_exposure_mae": 0.9304382157966056,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.051749965953969766,
+              "turnover_proxy": 0.0009241194425893833
+            },
+            {
+              "threshold": 0.83,
+              "score": -0.002445160850384258,
+              "action_macro_f1": 0.0015939489920051718,
+              "target_exposure_mae": 0.9304341606161801,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.05070588769349494,
+              "turnover_proxy": 0.000905172105569013
+            },
+            {
+              "threshold": 0.84,
+              "score": -0.002209555262107998,
+              "action_macro_f1": 0.0016138419646151614,
+              "target_exposure_mae": 0.9304213868850042,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.049843388260928774,
+              "turnover_proxy": 0.0008881084685309252
+            },
+            {
+              "threshold": 0.85,
+              "score": -0.0019045164917390791,
+              "action_macro_f1": 0.0016463764576796888,
+              "target_exposure_mae": 0.9304033208684891,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.04875391529347678,
+              "turnover_proxy": 0.0008616576382072426
+            },
+            {
+              "threshold": 0.86,
+              "score": -0.0014957260224837362,
+              "action_macro_f1": 0.0016861707555753068,
+              "target_exposure_mae": 0.93038125837514,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.04727858731671887,
+              "turnover_proxy": 0.0008297349096242811
+            },
+            {
+              "threshold": 0.87,
+              "score": -0.001285965408347483,
+              "action_macro_f1": 0.0014531339855736304,
+              "target_exposure_mae": 0.9303790796964982,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.045508193744609376,
+              "turnover_proxy": 0.0007910429331264288
+            },
+            {
+              "threshold": 0.88,
+              "score": -0.0005586490404791226,
+              "action_macro_f1": 0.0015048956023691541,
+              "target_exposure_mae": 0.9303927132979941,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.042807208679467974,
+              "turnover_proxy": 0.000731060926322182
+            },
+            {
+              "threshold": 0.89,
+              "score": 0.0006870547412657273,
+              "action_macro_f1": 0.0015868230640055114,
+              "target_exposure_mae": 0.9303800231782927,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.03815425121430841,
+              "turnover_proxy": 0.0006266552346723521
+            },
+            {
+              "threshold": 0.9,
+              "score": 0.0010587901352895218,
+              "action_macro_f1": 0.0017592911548440975,
+              "target_exposure_mae": 0.9303646925570662,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.03177629488401652,
+              "turnover_proxy": 0.000497262676366003
+            },
+            {
+              "threshold": 0.91,
+              "score": -0.0002873237673746581,
+              "action_macro_f1": 0.001819873044338856,
+              "target_exposure_mae": 0.9303698576793015,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.026147351218847883,
+              "turnover_proxy": 0.00039224054643202905
+            },
+            {
+              "threshold": 0.92,
+              "score": -0.0012944908986828162,
+              "action_macro_f1": 0.002015262615209561,
+              "target_exposure_mae": 0.9303901077801394,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.021335512279268238,
+              "turnover_proxy": 0.00031387457152178114
+            },
+            {
+              "threshold": 0.93,
+              "score": -0.0022888202939214987,
+              "action_macro_f1": 0.0020986918073528766,
+              "target_exposure_mae": 0.9303867222166902,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.017023015116437425,
+              "turnover_proxy": 0.00024276695046354763
+            },
+            {
+              "threshold": 0.94,
+              "score": -0.003815025556987521,
+              "action_macro_f1": 0.0019055446061508067,
+              "target_exposure_mae": 0.9303956756152943,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.011689137046620364,
+              "turnover_proxy": 0.0001627632257453175
+            },
+            {
+              "threshold": 0.95,
+              "score": -0.006166294731740287,
+              "action_macro_f1": 0.0012900815261916978,
+              "target_exposure_mae": 0.93041035252728,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0047437468791138955,
+              "turnover_proxy": 5.7483860500640285e-05
+            },
+            {
+              "threshold": 0.96,
+              "score": -0.008393911364102112,
+              "action_macro_f1": 3.254472639829321e-05,
+              "target_exposure_mae": 0.9304134225796651,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0008624994325661628,
+              "turnover_proxy": 1.2367959390243593e-05
+            },
+            {
+              "threshold": 0.97,
+              "score": -0.008609472614379773,
+              "action_macro_f1": 3.254472639829321e-05,
+              "target_exposure_mae": 0.9304071510696343,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.98,
+              "score": -0.008609472614379773,
+              "action_macro_f1": 3.254472639829321e-05,
+              "target_exposure_mae": 0.9304071510696343,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.99,
+              "score": -0.008609472614379773,
+              "action_macro_f1": 3.254472639829321e-05,
+              "target_exposure_mae": 0.9304071510696343,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 1.0,
+              "score": -0.008609472614379773,
+              "action_macro_f1": 3.254472639829321e-05,
+              "target_exposure_mae": 0.9304071510696343,
+              "observed_action_rate": 0.03456806936311226,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            }
+          ]
+        }
+      },
+      "per_symbol_stability": {
+        "window": "WF2",
+        "stable_symbol_count": 1,
+        "venue_count": 1,
+        "venues": [
+          "BITMEX"
+        ],
+        "positive_net_fraction": 1.0,
+        "profit_factor_gt_one_fraction": 1.0,
+        "median_net_return": 0.0017478746874817208,
+        "minimum_net_return": 0.0017478746874817208,
+        "maximum_net_return": 0.0017478746874817208
+      }
+    },
+    {
+      "window": "WF3",
+      "status": "TEST_DATA_AVAILABLE",
+      "train_rows": 244959,
+      "test_rows": 4773,
+      "nested_stages": {
+        "fit_rows_original": 146975,
+        "fit_rows_augmented": 160553,
+        "synthetic_rows_added": 13578,
+        "calibration_rows": 48992,
+        "threshold_rows": 48992,
+        "probability_calibration": {
+          "calibration_rows": 48992,
+          "unseen_label_rows": 0,
+          "nll_before": 0.16560240478512314,
+          "nll_after": 0.12158183255374196,
+          "temperature": 0.8295820797595765,
+          "bias_l1": 0.8757951497004451
+        },
+        "threshold_selection": {
+          "selection_rows": 48992,
+          "selection_contract": "train-only chronological threshold selection using autonomous zero-start state probabilities; action Macro-F1 minus action-rate mismatch and fee turnover proxy",
+          "selected": {
+            "threshold": 0.81,
+            "score": 0.00025240718977427394,
+            "action_macro_f1": 0.0002814593632886528,
+            "target_exposure_mae": 0.9026548983002829,
+            "observed_action_rate": 0.04633409536250816,
+            "predicted_action_rate": 0.04623203788373612,
+            "turnover_proxy": 0.0006878931522513417
+          },
+          "candidates": [
+            {
+              "threshold": 0.0,
+              "score": -0.23563821862556295,
+              "action_macro_f1": 0.0027952166967716353,
+              "target_exposure_mae": 0.9028634291897347,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 1.0,
+              "turnover_proxy": 0.0032975520006910206
+            },
+            {
+              "threshold": 0.01,
+              "score": -0.07244132645808402,
+              "action_macro_f1": 0.0024807192496196,
+              "target_exposure_mae": 0.9028634291897347,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.34595444154147614,
+              "turnover_proxy": 0.0032975520006910206
+            },
+            {
+              "threshold": 0.02,
+              "score": -0.07073176891685934,
+              "action_macro_f1": 0.002429785282026497,
+              "target_exposure_mae": 0.9028634291897347,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.33891247550620507,
+              "turnover_proxy": 0.0032975520006910206
+            },
+            {
+              "threshold": 0.03,
+              "score": -0.06952036657735726,
+              "action_macro_f1": 0.0024522179938342675,
+              "target_exposure_mae": 0.9028634291897347,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3341565969954278,
+              "turnover_proxy": 0.0032975520006910206
+            },
+            {
+              "threshold": 0.04,
+              "score": -0.06874610849771114,
+              "action_macro_f1": 0.002476353604505865,
+              "target_exposure_mae": 0.9028634291897347,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3311561071195297,
+              "turnover_proxy": 0.0032975520006910206
+            },
+            {
+              "threshold": 0.05,
+              "score": -0.06817423887374036,
+              "action_macro_f1": 0.0024920099691690136,
+              "target_exposure_mae": 0.9028634291897347,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3289312540822992,
+              "turnover_proxy": 0.0032975520006910206
+            },
+            {
+              "threshold": 0.06,
+              "score": -0.06786862510642912,
+              "action_macro_f1": 0.002312813697060048,
+              "target_exposure_mae": 0.9028614155636737,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3269921619856303,
+              "turnover_proxy": 0.0032903547279360787
+            },
+            {
+              "threshold": 0.07,
+              "score": -0.06742938931794423,
+              "action_macro_f1": 0.002323408074702334,
+              "target_exposure_mae": 0.9028614155636737,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.32527759634225994,
+              "turnover_proxy": 0.0032903547279360787
+            },
+            {
+              "threshold": 0.08,
+              "score": -0.06703632422555654,
+              "action_macro_f1": 0.0022419058908000364,
+              "target_exposure_mae": 0.9028614155636737,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.32337932723709994,
+              "turnover_proxy": 0.0032903547279360787
+            },
+            {
+              "threshold": 0.09,
+              "score": -0.06674694536306269,
+              "action_macro_f1": 0.0022506254108681767,
+              "target_exposure_mae": 0.9028616636316561,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.32225669497060744,
+              "turnover_proxy": 0.003290106659953737
+            },
+            {
+              "threshold": 0.1,
+              "score": -0.06630045181604989,
+              "action_macro_f1": 0.002263366398904143,
+              "target_exposure_mae": 0.9028632200623332,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3205217178314827,
+              "turnover_proxy": 0.0032884978193236055
+            },
+            {
+              "threshold": 0.11,
+              "score": -0.06578640878312539,
+              "action_macro_f1": 0.002287503304837437,
+              "target_exposure_mae": 0.9028660483957813,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.31856221423905945,
+              "turnover_proxy": 0.0032826200928265615
+            },
+            {
+              "threshold": 0.12,
+              "score": -0.06512907013547792,
+              "action_macro_f1": 0.002255870623416088,
+              "target_exposure_mae": 0.9028752657196784,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3158066623122142,
+              "turnover_proxy": 0.003266413971914993
+            },
+            {
+              "threshold": 0.13,
+              "score": -0.06429422816239899,
+              "action_macro_f1": 0.002294538790334554,
+              "target_exposure_mae": 0.9028846108936834,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.31262246897452645,
+              "turnover_proxy": 0.003242017155673997
+            },
+            {
+              "threshold": 0.14,
+              "score": -0.06362063264547935,
+              "action_macro_f1": 0.002325097175390866,
+              "target_exposure_mae": 0.9028884180131762,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3100506205094709,
+              "turnover_proxy": 0.003227431067868069
+            },
+            {
+              "threshold": 0.15,
+              "score": -0.06293117777329549,
+              "action_macro_f1": 0.002249044334423988,
+              "target_exposure_mae": 0.9028977486508505,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3069888961463096,
+              "turnover_proxy": 0.003212532560293704
+            },
+            {
+              "threshold": 0.16,
+              "score": -0.06168790686199878,
+              "action_macro_f1": 0.002308333246995221,
+              "target_exposure_mae": 0.9029003282704398,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.3022534291312867,
+              "turnover_proxy": 0.003190124244417985
+            },
+            {
+              "threshold": 0.17,
+              "score": -0.060914039096698264,
+              "action_macro_f1": 0.0023064706971275615,
+              "target_exposure_mae": 0.902913681090607,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2991508817766166,
+              "turnover_proxy": 0.00317194860553914
+            },
+            {
+              "threshold": 0.18,
+              "score": -0.06001934709490811,
+              "action_macro_f1": 0.0023131385135058387,
+              "target_exposure_mae": 0.9029265097161989,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2955992815153494,
+              "turnover_proxy": 0.0031478146038310902
+            },
+            {
+              "threshold": 0.19,
+              "score": -0.05897217309322966,
+              "action_macro_f1": 0.002370258048036043,
+              "target_exposure_mae": 0.9029307335266786,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2916394513389941,
+              "turnover_proxy": 0.003128968813550683
+            },
+            {
+              "threshold": 0.2,
+              "score": -0.05807052580062244,
+              "action_macro_f1": 0.0024196199445337017,
+              "target_exposure_mae": 0.9029421662932491,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2882307315480078,
+              "turnover_proxy": 0.003108465357033309
+            },
+            {
+              "threshold": 0.21,
+              "score": -0.05716533038838879,
+              "action_macro_f1": 0.0023857423360204417,
+              "target_exposure_mae": 0.9029434083078179,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2844750163291966,
+              "turnover_proxy": 0.00308042388436008
+            },
+            {
+              "threshold": 0.22,
+              "score": -0.05630556266395849,
+              "action_macro_f1": 0.0023524505551561254,
+              "target_exposure_mae": 0.9029439497687497,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.28090300457217504,
+              "turnover_proxy": 0.0030694251424859273
+            },
+            {
+              "threshold": 0.23,
+              "score": -0.055195101315637644,
+              "action_macro_f1": 0.0023248620385572347,
+              "target_exposure_mae": 0.902943933202601,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2763512410189419,
+              "turnover_proxy": 0.0030482356507690956
+            },
+            {
+              "threshold": 0.24,
+              "score": -0.054244230720537315,
+              "action_macro_f1": 0.002367331621287758,
+              "target_exposure_mae": 0.9029463951904841,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2727179947746571,
+              "turnover_proxy": 0.0030308426751038836
+            },
+            {
+              "threshold": 0.25,
+              "score": -0.05337665321351584,
+              "action_macro_f1": 0.0023622174987504,
+              "target_exposure_mae": 0.9029539669839975,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.26922762900065317,
+              "turnover_proxy": 0.003011362425030789
+            },
+            {
+              "threshold": 0.26,
+              "score": -0.05242482666711947,
+              "action_macro_f1": 0.0024005169747744006,
+              "target_exposure_mae": 0.9029629640288539,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.265573971260614,
+              "turnover_proxy": 0.0029894615230779027
+            },
+            {
+              "threshold": 0.27,
+              "score": -0.05170146511535975,
+              "action_macro_f1": 0.002383862388887629,
+              "target_exposure_mae": 0.9029675633819043,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2626143043762247,
+              "turnover_proxy": 0.002970130896837246
+            },
+            {
+              "threshold": 0.28,
+              "score": -0.05092118243840159,
+              "action_macro_f1": 0.0023782221524315905,
+              "target_exposure_mae": 0.9029707453324632,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.25947093403004573,
+              "turnover_proxy": 0.002954512081821251
+            },
+            {
+              "threshold": 0.29,
+              "score": -0.05014041837837229,
+              "action_macro_f1": 0.002327144512507653,
+              "target_exposure_mae": 0.9029673657729875,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2561438602220771,
+              "turnover_proxy": 0.0029402696949094973
+            },
+            {
+              "threshold": 0.3,
+              "score": -0.0492959400032237,
+              "action_macro_f1": 0.0022682788690674494,
+              "target_exposure_mae": 0.9029766829621887,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2525310254735467,
+              "turnover_proxy": 0.002913955747979341
+            },
+            {
+              "threshold": 0.31,
+              "score": -0.04904695004631488,
+              "action_macro_f1": 0.0017057573556825702,
+              "target_exposure_mae": 0.9029694905981377,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2492855976485957,
+              "turnover_proxy": 0.0028839119223814003
+            },
+            {
+              "threshold": 0.32,
+              "score": -0.04822689015493247,
+              "action_macro_f1": 0.0016837700695968886,
+              "target_exposure_mae": 0.9029654173546591,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.24591770084911824,
+              "turnover_proxy": 0.0028697221049225653
+            },
+            {
+              "threshold": 0.33,
+              "score": -0.04750654559341307,
+              "action_macro_f1": 0.0016538971706336779,
+              "target_exposure_mae": 0.9029693105963342,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2429172109732201,
+              "turnover_proxy": 0.0028512518868921135
+            },
+            {
+              "threshold": 0.34,
+              "score": -0.04679225232011535,
+              "action_macro_f1": 0.001679196273969887,
+              "target_exposure_mae": 0.9029737782471753,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.24016165904637493,
+              "turnover_proxy": 0.002830604566163908
+            },
+            {
+              "threshold": 0.35,
+              "score": -0.04596274061312657,
+              "action_macro_f1": 0.001656430212983879,
+              "target_exposure_mae": 0.9029803515229787,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.23675293925538862,
+              "turnover_proxy": 0.0028115843297312365
+            },
+            {
+              "threshold": 0.36,
+              "score": -0.045017809496292874,
+              "action_macro_f1": 0.0016317079501319434,
+              "target_exposure_mae": 0.9029896614936646,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.23287475506205094,
+              "turnover_proxy": 0.002790714743611061
+            },
+            {
+              "threshold": 0.37,
+              "score": -0.04427545846832961,
+              "action_macro_f1": 0.0016595706420137056,
+              "target_exposure_mae": 0.9029929857438965,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2300171456564337,
+              "turnover_proxy": 0.0027739958203404766
+            },
+            {
+              "threshold": 0.38,
+              "score": -0.043574987732773775,
+              "action_macro_f1": 0.0016812695084674643,
+              "target_exposure_mae": 0.9029936380959809,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.22730241672109733,
+              "turnover_proxy": 0.0027565670735354873
+            },
+            {
+              "threshold": 0.39,
+              "score": -0.04271945924588336,
+              "action_macro_f1": 0.0017151286247335936,
+              "target_exposure_mae": 0.9029910440306248,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.2240161659046375,
+              "turnover_proxy": 0.0027358267597570184
+            },
+            {
+              "threshold": 0.4,
+              "score": -0.041854982760041626,
+              "action_macro_f1": 0.0017476922244143412,
+              "target_exposure_mae": 0.9029862025402404,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.22068909209666884,
+              "turnover_proxy": 0.002707742874754756
+            },
+            {
+              "threshold": 0.41,
+              "score": -0.041109523472962706,
+              "action_macro_f1": 0.0017530814965367068,
+              "target_exposure_mae": 0.9029826673355169,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.21772942521227956,
+              "turnover_proxy": 0.002677936305093001
+            },
+            {
+              "threshold": 0.42,
+              "score": -0.04032847524659261,
+              "action_macro_f1": 0.0016665177101106965,
+              "target_exposure_mae": 0.90297781025955,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.21425947093403006,
+              "turnover_proxy": 0.002653933912800319
+            },
+            {
+              "threshold": 0.43,
+              "score": -0.03942728226980136,
+              "action_macro_f1": 0.0017051247665815976,
+              "target_exposure_mae": 0.9029577337415622,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.21080992815153493,
+              "turnover_proxy": 0.0026150020769408096
+            },
+            {
+              "threshold": 0.44,
+              "score": -0.03824781017190014,
+              "action_macro_f1": 0.0016852269762575882,
+              "target_exposure_mae": 0.9029489560701836,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.20601322664924887,
+              "turnover_proxy": 0.0025771808948531648
+            },
+            {
+              "threshold": 0.45,
+              "score": -0.037313840374681745,
+              "action_macro_f1": 0.001715804422901115,
+              "target_exposure_mae": 0.9029299552776137,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.20240039190071848,
+              "turnover_proxy": 0.002541469241343322
+            },
+            {
+              "threshold": 0.46,
+              "score": -0.03650520484753966,
+              "action_macro_f1": 0.0016516175278420652,
+              "target_exposure_mae": 0.9029133844687014,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.19891002612671457,
+              "turnover_proxy": 0.0024965575746202996
+            },
+            {
+              "threshold": 0.47,
+              "score": -0.03563287648639525,
+              "action_macro_f1": 0.0016103436567274508,
+              "target_exposure_mae": 0.902902707789863,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.19525636838667537,
+              "turnover_proxy": 0.0024600421406747067
+            },
+            {
+              "threshold": 0.48,
+              "score": -0.034782580186569025,
+              "action_macro_f1": 0.001562346214031859,
+              "target_exposure_mae": 0.9028966388397257,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.19166394513389942,
+              "turnover_proxy": 0.0024235010252675764
+            },
+            {
+              "threshold": 0.49,
+              "score": -0.03374357743783162,
+              "action_macro_f1": 0.0015958680205411017,
+              "target_exposure_mae": 0.9028879870522543,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.18764288047028085,
+              "turnover_proxy": 0.002381739760462744
+            },
+            {
+              "threshold": 0.5,
+              "score": -0.03260330595162316,
+              "action_macro_f1": 0.00164904917356502,
+              "target_exposure_mae": 0.9028811342763983,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.18329523187459176,
+              "turnover_proxy": 0.0023470934827038233
+            },
+            {
+              "threshold": 0.51,
+              "score": -0.031543852789602665,
+              "action_macro_f1": 0.001616290762951819,
+              "target_exposure_mae": 0.9028773656439946,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.17892717178314826,
+              "turnover_proxy": 0.002308876201691834
+            },
+            {
+              "threshold": 0.52,
+              "score": -0.030341389124607796,
+              "action_macro_f1": 0.0016601822412638508,
+              "target_exposure_mae": 0.9028771898226882,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.17429376224689747,
+              "turnover_proxy": 0.00226613762011085
+            },
+            {
+              "threshold": 0.53,
+              "score": -0.029396607145025157,
+              "action_macro_f1": 0.001589275087769169,
+              "target_exposure_mae": 0.9028751934582189,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.17023187459177008,
+              "turnover_proxy": 0.0022239013420582484
+            },
+            {
+              "threshold": 0.54,
+              "score": -0.028362395062181727,
+              "action_macro_f1": 0.001602718818427388,
+              "target_exposure_mae": 0.9028771216465875,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.16614957544088832,
+              "turnover_proxy": 0.0021862645265204057
+            },
+            {
+              "threshold": 0.55,
+              "score": -0.027136061401583186,
+              "action_macro_f1": 0.001578632518407776,
+              "target_exposure_mae": 0.9028680643509852,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.16114875898105813,
+              "turnover_proxy": 0.002144295339032734
+            },
+            {
+              "threshold": 0.56,
+              "score": -0.02586202364349685,
+              "action_macro_f1": 0.0015919940784849317,
+              "target_exposure_mae": 0.902865520036065,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.15610711952971915,
+              "turnover_proxy": 0.0020925089336954095
+            },
+            {
+              "threshold": 0.57,
+              "score": -0.024473754357425458,
+              "action_macro_f1": 0.0015563074615598045,
+              "target_exposure_mae": 0.902859893744716,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.15041231221423906,
+              "turnover_proxy": 0.0020431065754502814
+            },
+            {
+              "threshold": 0.58,
+              "score": -0.02313129231416855,
+              "action_macro_f1": 0.001607572795913603,
+              "target_exposure_mae": 0.9028598145139953,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.1452482037883736,
+              "turnover_proxy": 0.0020101289540975383
+            },
+            {
+              "threshold": 0.59,
+              "score": -0.02196029872093905,
+              "action_macro_f1": 0.001553648059457189,
+              "target_exposure_mae": 0.9028556354853241,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.14034944480731548,
+              "turnover_proxy": 0.00196568283268479
+            },
+            {
+              "threshold": 0.6,
+              "score": -0.02076822867172455,
+              "action_macro_f1": 0.0015463567494547145,
+              "target_exposure_mae": 0.9028672881481979,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.1355527433050294,
+              "turnover_proxy": 0.0019295200371777057
+            },
+            {
+              "threshold": 0.61,
+              "score": -0.019455447213901265,
+              "action_macro_f1": 0.0016036130766771779,
+              "target_exposure_mae": 0.9028771031305496,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.13053151534944482,
+              "turnover_proxy": 0.001887104405207328
+            },
+            {
+              "threshold": 0.62,
+              "score": -0.017962474061338572,
+              "action_macro_f1": 0.0016777019092444718,
+              "target_exposure_mae": 0.9028577625391443,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.12485711952971913,
+              "turnover_proxy": 0.0018316178142850918
+            },
+            {
+              "threshold": 0.63,
+              "score": -0.016585857861792633,
+              "action_macro_f1": 0.0016813565892899523,
+              "target_exposure_mae": 0.902840691694466,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.11936642717178315,
+              "turnover_proxy": 0.0017755352717678634
+            },
+            {
+              "threshold": 0.64,
+              "score": -0.01524841730170696,
+              "action_macro_f1": 0.001513105319091527,
+              "target_exposure_mae": 0.9028261662467814,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.11334503592423253,
+              "turnover_proxy": 0.0017086440841517895
+            },
+            {
+              "threshold": 0.65,
+              "score": -0.01367135486805169,
+              "action_macro_f1": 0.0015793614682555837,
+              "target_exposure_mae": 0.9028173766980464,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.1073032331809275,
+              "turnover_proxy": 0.0016395012206915696
+            },
+            {
+              "threshold": 0.66,
+              "score": -0.01216610280013503,
+              "action_macro_f1": 0.0014819106347164271,
+              "target_exposure_mae": 0.9028013158898931,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.10089402351404311,
+              "turnover_proxy": 0.0015616306771265062
+            },
+            {
+              "threshold": 0.67,
+              "score": -0.010467144246225002,
+              "action_macro_f1": 0.0015781657858073275,
+              "target_exposure_mae": 0.9027875841573239,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.09448481384715872,
+              "turnover_proxy": 0.0014836626481148638
+            },
+            {
+              "threshold": 0.68,
+              "score": -0.008895628692035822,
+              "action_macro_f1": 0.0016490973119522205,
+              "target_exposure_mae": 0.902784527341292,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.0884838340953625,
+              "turnover_proxy": 0.00141772972297716
+            },
+            {
+              "threshold": 0.69,
+              "score": -0.007449868500893835,
+              "action_macro_f1": 0.0017320673939212614,
+              "target_exposure_mae": 0.9027863601448072,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.08303396472893533,
+              "turnover_proxy": 0.0013549705622841524
+            },
+            {
+              "threshold": 0.7,
+              "score": -0.006411576544075823,
+              "action_macro_f1": 0.0017494537398379335,
+              "target_exposure_mae": 0.902764895547433,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.07895166557805355,
+              "turnover_proxy": 0.0012906450619921625
+            },
+            {
+              "threshold": 0.71,
+              "score": -0.005198678631164319,
+              "action_macro_f1": 0.001747552426539563,
+              "target_exposure_mae": 0.902743002898613,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.07409372958850424,
+              "turnover_proxy": 0.0012293517400979326
+            },
+            {
+              "threshold": 0.72,
+              "score": -0.0043700077543950624,
+              "action_macro_f1": 0.0015143581926914838,
+              "target_exposure_mae": 0.9027526155116464,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.0698481384715872,
+              "turnover_proxy": 0.0011384834845582117
+            },
+            {
+              "threshold": 0.73,
+              "score": -0.003658688719025092,
+              "action_macro_f1": 0.0013374753114364151,
+              "target_exposure_mae": 0.902755398861908,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.06629653821032006,
+              "turnover_proxy": 0.0010797912962885313
+            },
+            {
+              "threshold": 0.74,
+              "score": -0.0026573140912220547,
+              "action_macro_f1": 0.0013943732965829602,
+              "target_exposure_mae": 0.9027443162596215,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.06252041149575441,
+              "turnover_proxy": 0.0009932721690483733
+            },
+            {
+              "threshold": 0.75,
+              "score": -0.0018554223486391957,
+              "action_macro_f1": 0.001445902933524697,
+              "target_exposure_mae": 0.9027547763364011,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.0595199216198563,
+              "turnover_proxy": 0.0009466770410246003
+            },
+            {
+              "threshold": 0.76,
+              "score": -0.0012716233613122199,
+              "action_macro_f1": 0.0012332803472308678,
+              "target_exposure_mae": 0.9027411336425641,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.05633572828216852,
+              "turnover_proxy": 0.0008741041393005646
+            },
+            {
+              "threshold": 0.77,
+              "score": -0.0008215916314705369,
+              "action_macro_f1": 0.0010809178579838173,
+              "target_exposure_mae": 0.9027376751205711,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.05392717178314827,
+              "turnover_proxy": 0.0008245034112299701
+            },
+            {
+              "threshold": 0.78,
+              "score": -0.0009367823091097412,
+              "action_macro_f1": 0.0004706041829920985,
+              "target_exposure_mae": 0.9027298746254241,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.051947256694970606,
+              "turnover_proxy": 0.000796460137257919
+            },
+            {
+              "threshold": 0.79,
+              "score": -0.00045431616908901977,
+              "action_macro_f1": 0.0002639197657813655,
+              "target_exposure_mae": 0.902693236568842,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.049191704768125406,
+              "turnover_proxy": 0.0007454047618376993
+            },
+            {
+              "threshold": 0.8,
+              "score": -7.851379816228643e-05,
+              "action_macro_f1": 0.0002721826045263193,
+              "target_exposure_mae": 0.9026744225657698,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.04772207707380797,
+              "turnover_proxy": 0.0007196202485802447
+            },
+            {
+              "threshold": 0.81,
+              "score": 0.00025240718977427394,
+              "action_macro_f1": 0.0002814593632886528,
+              "target_exposure_mae": 0.9026548983002829,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.04623203788373612,
+              "turnover_proxy": 0.0006878931522513417
+            },
+            {
+              "threshold": 0.82,
+              "score": -0.0001217579881900211,
+              "action_macro_f1": 0.000295008382900647,
+              "target_exposure_mae": 0.9026484199155749,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.04468076420640105,
+              "turnover_proxy": 0.0006676281978033693
+            },
+            {
+              "threshold": 0.83,
+              "score": -0.000466243252174013,
+              "action_macro_f1": 0.00030764480950640915,
+              "target_exposure_mae": 0.90264072612136,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.043251959503592424,
+              "turnover_proxy": 0.000652173054644573
+            },
+            {
+              "threshold": 0.84,
+              "score": -0.0008341387618153672,
+              "action_macro_f1": 0.00031729320177957044,
+              "target_exposure_mae": 0.90263469969975,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.041741508817766164,
+              "turnover_proxy": 0.0006388014547911276
+            },
+            {
+              "threshold": 0.85,
+              "score": -0.0011740604833840938,
+              "action_macro_f1": 0.00032429482615642586,
+              "target_exposure_mae": 0.9026335222670603,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.040353527106466364,
+              "turnover_proxy": 0.0006247858016565061
+            },
+            {
+              "threshold": 0.86,
+              "score": -0.0014439325147768659,
+              "action_macro_f1": 0.0003299198317814315,
+              "target_exposure_mae": 0.9026365021573957,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.039251306335728285,
+              "turnover_proxy": 0.0006134779714498845
+            },
+            {
+              "threshold": 0.87,
+              "score": -0.0016703730758046258,
+              "action_macro_f1": 0.00033816984003143973,
+              "target_exposure_mae": 0.9026311843493278,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.038312377531025475,
+              "turnover_proxy": 0.0006053830348874498
+            },
+            {
+              "threshold": 0.88,
+              "score": -0.0018994871577895469,
+              "action_macro_f1": 0.0003437198455814453,
+              "target_exposure_mae": 0.9026226685386735,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.037373448726322665,
+              "turnover_proxy": 0.0005921389689554679
+            },
+            {
+              "threshold": 0.89,
+              "score": -0.0021907535450454447,
+              "action_macro_f1": 0.0003534316509067766,
+              "target_exposure_mae": 0.9026156204141942,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.03616917047681254,
+              "turnover_proxy": 0.0005743729592013693
+            },
+            {
+              "threshold": 0.9,
+              "score": -0.0024996958327052794,
+              "action_macro_f1": 0.00036591916339428907,
+              "target_exposure_mae": 0.902612050128586,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.03488324624428478,
+              "turnover_proxy": 0.0005644063193365296
+            },
+            {
+              "threshold": 0.91,
+              "score": -0.002959415060937776,
+              "action_macro_f1": 0.00037556059842547914,
+              "target_exposure_mae": 0.9026014901056244,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.03300538863487917,
+              "turnover_proxy": 0.0005442352155489478
+            },
+            {
+              "threshold": 0.92,
+              "score": -0.003700144620669808,
+              "action_macro_f1": 0.0003898704634476773,
+              "target_exposure_mae": 0.9025994169761754,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.02998448726322665,
+              "turnover_proxy": 0.0005080851532947178
+            },
+            {
+              "threshold": 0.93,
+              "score": -0.004367210688320261,
+              "action_macro_f1": 0.0004165750743993273,
+              "target_exposure_mae": 0.9025838777196142,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.027208523840627042,
+              "turnover_proxy": 0.0004652737677257997
+            },
+            {
+              "threshold": 0.94,
+              "score": -0.005285629940565189,
+              "action_macro_f1": 0.00043671450978018664,
+              "target_exposure_mae": 0.902573602968135,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.023452808621815806,
+              "turnover_proxy": 0.0003933079336461519
+            },
+            {
+              "threshold": 0.95,
+              "score": -0.007025849105888765,
+              "action_macro_f1": 3.2918830393956104e-05,
+              "target_exposure_mae": 0.9025639884153914,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.01810499673416068,
+              "turnover_proxy": 0.0002903542946671545
+            },
+            {
+              "threshold": 0.96,
+              "score": -0.008693909158439943,
+              "action_macro_f1": 3.2918830393956104e-05,
+              "target_exposure_mae": 0.9025691666050655,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.011430437622468974,
+              "turnover_proxy": 0.00017763207106564414
+            },
+            {
+              "threshold": 0.97,
+              "score": -0.010525238301794608,
+              "action_macro_f1": 3.2918830393956104e-05,
+              "target_exposure_mae": 0.9025860835574113,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.004102710646636185,
+              "turnover_proxy": 6.046197073137954e-05
+            },
+            {
+              "threshold": 0.98,
+              "score": -0.011489387454971415,
+              "action_macro_f1": 3.2918830393956104e-05,
+              "target_exposure_mae": 0.9025972649771902,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.0002449379490529066,
+              "turnover_proxy": 3.2922707174297775e-06
+            },
+            {
+              "threshold": 0.99,
+              "score": -0.011550605010233084,
+              "action_macro_f1": 3.2918830393956104e-05,
+              "target_exposure_mae": 0.9025969054793673,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 1.0,
+              "score": -0.011550605010233084,
+              "action_macro_f1": 3.2918830393956104e-05,
+              "target_exposure_mae": 0.9025969054793673,
+              "observed_action_rate": 0.04633409536250816,
+              "predicted_action_rate": 0.0,
+              "turnover_proxy": 0.0
+            }
+          ]
+        }
+      },
+      "per_symbol_stability": {
+        "window": "WF3",
+        "stable_symbol_count": 1,
+        "venue_count": 1,
+        "venues": [
+          "BITMEX"
+        ],
+        "positive_net_fraction": 1.0,
+        "profit_factor_gt_one_fraction": 1.0,
+        "median_net_return": 0.2531747246372349,
+        "minimum_net_return": 0.2531747246372349,
+        "maximum_net_return": 0.2531747246372349
+      }
+    }
+  ],
+  "behavior_results": [
+    {
+      "window": "WF1",
+      "model": "V3.9",
+      "track": "CONDITIONAL_BEHAVIOR",
+      "rows_seen": 17561,
+      "labeled_rows": 17561,
+      "action_macro_f1": 0.02041503258415792,
+      "target_exposure_mae": 0.0011707997164034545,
+      "target_exposure_correlation": 0.9978705820248008,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.0029239766081871343,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 16294,
+      "predicted_no_trade_rows": 2439,
+      "observed_no_trade_rate": 0.927851489095154,
+      "predicted_no_trade_rate": 0.13888730710096236
+    },
+    {
+      "window": "WF1",
+      "model": "V3.9",
+      "track": "STRICT_AUTONOMOUS",
+      "rows_seen": 17561,
+      "labeled_rows": 17561,
+      "action_macro_f1": 0.006970830249309479,
+      "target_exposure_mae": 0.4984133513400632,
+      "target_exposure_correlation": 0.7407544418939159,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.0043859649122807015,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 16294,
+      "predicted_no_trade_rows": 750,
+      "observed_no_trade_rate": 0.927851489095154,
+      "predicted_no_trade_rate": 0.04270827401628609,
+      "teacher_state_fields_consumed": 0
+    },
+    {
+      "window": "WF2",
+      "model": "V3.9",
+      "track": "CONDITIONAL_BEHAVIOR",
+      "rows_seen": 8760,
+      "labeled_rows": 8760,
+      "action_macro_f1": 9.36724275209592e-05,
+      "target_exposure_mae": 0.0012742003231686857,
+      "target_exposure_correlation": 0.9961840981260309,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.0,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 7759,
+      "predicted_no_trade_rows": 5,
+      "observed_no_trade_rate": 0.8857305936073059,
+      "predicted_no_trade_rate": 0.0005707762557077625
+    },
+    {
+      "window": "WF2",
+      "model": "V3.9",
+      "track": "STRICT_AUTONOMOUS",
+      "rows_seen": 8760,
+      "labeled_rows": 8760,
+      "action_macro_f1": 4.685431821110214e-05,
+      "target_exposure_mae": 0.28026990464571583,
+      "target_exposure_correlation": -0.01943343416039681,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.0,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 7759,
+      "predicted_no_trade_rows": 2,
+      "observed_no_trade_rate": 0.8857305936073059,
+      "predicted_no_trade_rate": 0.00022831050228310502,
+      "teacher_state_fields_consumed": 0
+    },
+    {
+      "window": "WF3",
+      "model": "V3.9",
+      "track": "CONDITIONAL_BEHAVIOR",
+      "rows_seen": 4773,
+      "labeled_rows": 4773,
+      "action_macro_f1": 0.013581332891387582,
+      "target_exposure_mae": 0.0006216968600655727,
+      "target_exposure_correlation": 0.9961274781829041,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.018867924528301886,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 4661,
+      "predicted_no_trade_rows": 93,
+      "observed_no_trade_rate": 0.9765346742090928,
+      "predicted_no_trade_rate": 0.01948460087994972
+    },
+    {
+      "window": "WF3",
+      "model": "V3.9",
+      "track": "STRICT_AUTONOMOUS",
+      "rows_seen": 4773,
+      "labeled_rows": 4773,
+      "action_macro_f1": 0.004101161995898838,
+      "target_exposure_mae": 0.8483013979070866,
+      "target_exposure_correlation": 0.02523880448669036,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.05660377358490566,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 4661,
+      "predicted_no_trade_rows": 0,
+      "observed_no_trade_rate": 0.9765346742090928,
+      "predicted_no_trade_rate": 0.0,
+      "teacher_state_fields_consumed": 0
+    }
+  ],
+  "performance_results": [
+    {
+      "window": "WF1",
+      "model": "V3.9",
+      "track": "STRICT_AUTONOMOUS",
+      "cost_profile": "BASE",
+      "target_coefficient_max_abs": 0.5900088590739899,
+      "status": "PASS",
+      "active_symbols": 3,
+      "net_return": -0.26268241802238773,
+      "gross_profit": 20.816018670772454,
+      "gross_loss": 21.799521953072848,
+      "profit_factor": 0.9548841812028012,
+      "fees": 0.0007857178063289161,
+      "funding": 0.0992987732635776,
+      "slippage": 0.24308660568583343,
+      "turnover": 1.5277554264340745,
+      "executed_adjustments": 33,
+      "signal_count": 17560,
+      "funding_events_observed": 1098,
+      "funding_events_missing": 16467
+    },
+    {
+      "window": "WF2",
+      "model": "V3.9",
+      "track": "STRICT_AUTONOMOUS",
+      "cost_profile": "BASE",
+      "target_coefficient_max_abs": 0.5793565144690831,
+      "status": "PASS",
+      "active_symbols": 1,
+      "net_return": 0.0017478746874817208,
+      "gross_profit": 0.8462084065852837,
+      "gross_loss": 0.8440697545889333,
+      "profit_factor": 1.0025337384555284,
+      "fees": 3.2342194919980984e-05,
+      "funding": 0.0,
+      "slippage": 6.730806834294038e-08,
+      "turnover": 0.06288639940928759,
+      "executed_adjustments": 1,
+      "signal_count": 8759,
+      "funding_events_observed": 0,
+      "funding_events_missing": 8760
+    },
+    {
+      "window": "WF3",
+      "model": "V3.9",
+      "track": "STRICT_AUTONOMOUS",
+      "cost_profile": "BASE",
+      "target_coefficient_max_abs": 0.5792688085035509,
+      "status": "PASS",
+      "active_symbols": 1,
+      "net_return": 0.2531747246372349,
+      "gross_profit": 7.771077651617117,
+      "gross_loss": 7.488736688604984,
+      "profit_factor": 1.0377020817732514,
+      "fees": 0.0006481113784598364,
+      "funding": 0.0,
+      "slippage": 1.3921246545710652e-06,
+      "turnover": 1.2601924856481936,
+      "executed_adjustments": 76,
+      "signal_count": 4773,
+      "funding_events_observed": 0,
+      "funding_events_missing": 4774
+    }
+  ],
+  "per_symbol_results": [
+    {
+      "window": "WF1",
+      "state_key": "BITMEX:BTC-PERP",
+      "source_venue": "BITMEX",
+      "canonical_asset": "BTC-PERP",
+      "rows": 8784,
+      "prediction_rows": 8784,
+      "action_count": 8784,
+      "mean_confidence": 0.9633364624862358,
+      "net_return": -0.6334628623837799,
+      "profit_factor": 0.94848329831734,
+      "executed_adjustments": 31,
+      "fees": 0.0006392613381145134,
+      "funding": 0.0,
+      "slippage": 2.7784839722340264e-06,
+      "action_macro_f1": 0.0002538715410002539,
+      "target_exposure_mae": 0.8594186596863733,
+      "predicted_no_trade_rate": 0.0,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF1",
+      "state_key": "BITMEX:DOGEUSD",
+      "source_venue": "BITMEX",
+      "canonical_asset": "DOGEUSD",
+      "rows": 7414,
+      "prediction_rows": 7414,
+      "action_count": 6704,
+      "mean_confidence": 0.8972746835292063,
+      "net_return": -0.17637040359392175,
+      "profit_factor": 0.9705619858292831,
+      "executed_adjustments": 1,
+      "fees": 0.0001012996677309047,
+      "funding": 0.09282359786075316,
+      "slippage": 0.24308010846009595,
+      "action_macro_f1": 0.029283489096573207,
+      "target_exposure_mae": 0.14523416556428512,
+      "predicted_no_trade_rate": 0.09576476935527381,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF1",
+      "state_key": "BITMEX:ETHUSD",
+      "source_venue": "BITMEX",
+      "canonical_asset": "ETHUSD",
+      "rows": 1363,
+      "prediction_rows": 1363,
+      "action_count": 1323,
+      "mean_confidence": 0.8338202263066188,
+      "net_return": 0.021786011910538416,
+      "profit_factor": 1.0999851824609013,
+      "executed_adjustments": 1,
+      "fees": 4.515680048349795e-05,
+      "funding": 0.006475175402824437,
+      "slippage": 3.7187417652369184e-06,
+      "action_macro_f1": 0.008335938314056476,
+      "target_exposure_mae": 0.09298404453715149,
+      "predicted_no_trade_rate": 0.029347028613352897,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF2",
+      "state_key": "BITMEX:BTC-PERP",
+      "source_venue": "BITMEX",
+      "canonical_asset": "BTC-PERP",
+      "rows": 8760,
+      "prediction_rows": 8760,
+      "action_count": 8758,
+      "mean_confidence": 0.972625234930956,
+      "net_return": 0.0017478746874817208,
+      "profit_factor": 1.0025337384555284,
+      "executed_adjustments": 1,
+      "fees": 3.2342194919980984e-05,
+      "funding": 0.0,
+      "slippage": 6.730806834294038e-08,
+      "action_macro_f1": 4.685431821110214e-05,
+      "target_exposure_mae": 0.28026990464571583,
+      "predicted_no_trade_rate": 0.00022831050228310502,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF3",
+      "state_key": "BITMEX:BTC-PERP",
+      "source_venue": "BITMEX",
+      "canonical_asset": "BTC-PERP",
+      "rows": 4773,
+      "prediction_rows": 4773,
+      "action_count": 4773,
+      "mean_confidence": 0.9256850441016494,
+      "net_return": 0.2531747246372349,
+      "profit_factor": 1.0377020817732514,
+      "executed_adjustments": 76,
+      "fees": 0.0006481113784598364,
+      "funding": 0.0,
+      "slippage": 1.3921246545710652e-06,
+      "action_macro_f1": 0.004101161995898838,
+      "target_exposure_mae": 0.8483013979070866,
+      "predicted_no_trade_rate": 0.0,
+      "status": "STABLE_SAMPLE"
+    }
+  ],
+  "venue_coverage": {
+    "BITMEX": {
+      "rows": 258492,
+      "first_decision_time": "2020-05-02T00:00:00.000Z",
+      "last_decision_time": "2026-07-18T20:00:00.000Z",
+      "global_test_rows": {
+        "WF1": 24671,
+        "WF2": 8760,
+        "WF3": 4773
+      },
+      "global_model_test_rows": {
+        "WF1": 17561,
+        "WF2": 8760,
+        "WF3": 4773
+      }
+    },
+    "HYPERLIQUID": {
+      "rows": 5796,
+      "first_decision_time": "2025-11-15T18:00:00.000Z",
+      "last_decision_time": "2026-07-15T05:00:00.000Z",
+      "global_test_rows": {
+        "WF1": 0,
+        "WF2": 1110,
+        "WF3": 4686
+      },
+      "global_model_test_rows": {
+        "WF1": 0,
+        "WF2": 0,
+        "WF3": 0
+      }
+    }
+  },
+  "gates": {
+    "causal_audit_pass": true,
+    "all_walk_forward_windows_available": true,
+    "target_coefficients_finite_and_bounded": true,
+    "global_cross_venue_test_coverage": false,
+    "strict_autonomous_positive_all_windows": false,
+    "strict_autonomous_profit_factor_gt_one_all_windows": false,
+    "per_symbol_results_complete": true
+  },
+  "conclusion": "The state-robust candidate remains research-only until causal, cross-venue coverage, stable costed autonomous performance, and per-symbol gates all pass."
+}

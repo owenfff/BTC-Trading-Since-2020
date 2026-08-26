@@ -254,3 +254,10 @@
 - The temporal label audit is `PASS_WITH_WARNINGS`: `32552` event rows, `264609` temporal rows, `264288` eligible rows, zero hard failures, `373` same-timestamp event ties, and `70` same-hour net-zero labels that can hide offsetting source actions.
 - The repaired data was re-run through v3.7 strict autonomous replay. The promotion result is unchanged: WF1/WF3 make zero adjustments, WF2 net return is approximately `-0.048939` with PF approximately `0.933658`; the active Demo model remains unchanged.
 - These repairs establish causal/action-target consistency, not exact strategy recovery, full learning, or a profitability claim.
+
+## 2026-08-26 — State-robust and autonomous-threshold candidates remain research-only
+
+- Candidate `behavioral-distillation-v3.8-state-robust-action-target` added deterministic zero-start and half-teacher-state variants for non-idle training actions only. It reduced the teacher/autonomous state-distribution mismatch in training, but strict costed returns were `-3.514461`, `-0.103915`, and `+0.229969` in WF1/WF2/WF3; it is not promoted.
+- Candidate `behavioral-distillation-v3.9-state-robust-autonomous-threshold` selected thresholds using autonomous zero-start state probabilities from a train-only chronological segment. Strict costed returns were `-0.262682`, `+0.001748`, and `+0.253175`, with WF1 PF `0.954884`; cross-venue coverage and all-window stability gates still fail. The active Demo model remains unchanged.
+- The descriptive strategy profile reports `264288` eligible hourly rows, `95.13%` explicit `NO_TRADE`, `4.87%` non-idle actions, mean observed cycle duration about `49.9` hours, and mean same-instrument action interval about `20.2` hours. Current exposure is a stronger observed action conditioning variable than any single indicator; this is association, not proof of a private rule.
+- The honest status remains `BEHAVIORAL_APPROXIMATION`: the data has been distilled into auditable candidates and behavior facts, but the robot has not fully learned the trader's strategy and no profitability or production claim is authorized.

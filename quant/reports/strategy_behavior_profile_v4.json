@@ -1,0 +1,1526 @@
+{
+  "report_version": "STRATEGY-BEHAVIOR-PROFILE-V4",
+  "total_rows_seen": 264609,
+  "eligible_rows": 264288,
+  "first_decision_time": "2020-05-01T11:00:00Z",
+  "last_decision_time": "2026-07-18T20:00:00Z",
+  "overall": {
+    "rows": 264288,
+    "non_idle_rows": 12866,
+    "non_idle_rate": 0.04868174113088752,
+    "action_counts": {
+      "ADD_LONG": 3754,
+      "ADD_SHORT": 2488,
+      "CLOSE_LONG": 681,
+      "CLOSE_SHORT": 232,
+      "FLIP_LONG": 115,
+      "FLIP_SHORT": 106,
+      "NO_TRADE": 251422,
+      "OPEN_LONG": 663,
+      "OPEN_SHORT": 248,
+      "REDUCE_LONG": 2671,
+      "REDUCE_SHORT": 1908
+    },
+    "target_mean": 0.05103940643708111,
+    "target_abs_mean": 0.10565618604218524,
+    "target_abs_p95": 0.5202122678320587
+  },
+  "by_venue": {
+    "BITMEX": {
+      "rows": 258492,
+      "non_idle_rows": 12709,
+      "non_idle_rate": 0.049165931634247866,
+      "action_counts": {
+        "ADD_LONG": 3688,
+        "ADD_SHORT": 2484,
+        "CLOSE_LONG": 681,
+        "CLOSE_SHORT": 232,
+        "FLIP_LONG": 111,
+        "FLIP_SHORT": 102,
+        "NO_TRADE": 245783,
+        "OPEN_LONG": 663,
+        "OPEN_SHORT": 248,
+        "REDUCE_LONG": 2596,
+        "REDUCE_SHORT": 1904
+      },
+      "target_mean": 0.044786724161341857,
+      "target_abs_mean": 0.10056617428394803,
+      "target_abs_p95": 0.4939304347826087
+    },
+    "HYPERLIQUID": {
+      "rows": 5796,
+      "non_idle_rows": 157,
+      "non_idle_rate": 0.027087646652864044,
+      "action_counts": {
+        "ADD_LONG": 66,
+        "ADD_SHORT": 4,
+        "FLIP_LONG": 4,
+        "FLIP_SHORT": 4,
+        "NO_TRADE": 5639,
+        "REDUCE_LONG": 75,
+        "REDUCE_SHORT": 4
+      },
+      "target_mean": 0.3298986795255284,
+      "target_abs_mean": 0.33266227979816226,
+      "target_abs_p95": 0.9274893387885402
+    }
+  },
+  "by_dimension": {
+    "rsi14": {
+      "buckets": {
+        "30-45": {
+          "rows": 73921,
+          "non_idle_rows": 3632,
+          "non_idle_rate": 0.04913353444893873,
+          "action_counts": {
+            "ADD_LONG": 1308,
+            "ADD_SHORT": 516,
+            "CLOSE_LONG": 167,
+            "CLOSE_SHORT": 58,
+            "FLIP_LONG": 37,
+            "FLIP_SHORT": 30,
+            "NO_TRADE": 70289,
+            "OPEN_LONG": 164,
+            "OPEN_SHORT": 59,
+            "REDUCE_LONG": 673,
+            "REDUCE_SHORT": 620
+          },
+          "target_mean": 0.05689303659753115,
+          "target_abs_mean": 0.11190207767219482,
+          "target_abs_p95": 0.5989208633093526
+        },
+        "45-55_NEUTRAL": {
+          "rows": 89083,
+          "non_idle_rows": 3527,
+          "non_idle_rate": 0.03959229033597881,
+          "action_counts": {
+            "ADD_LONG": 1050,
+            "ADD_SHORT": 730,
+            "CLOSE_LONG": 179,
+            "CLOSE_SHORT": 63,
+            "FLIP_LONG": 30,
+            "FLIP_SHORT": 25,
+            "NO_TRADE": 85556,
+            "OPEN_LONG": 190,
+            "OPEN_SHORT": 69,
+            "REDUCE_LONG": 706,
+            "REDUCE_SHORT": 485
+          },
+          "target_mean": 0.046304716169283694,
+          "target_abs_mean": 0.09544170629904168,
+          "target_abs_p95": 0.45941528002807736
+        },
+        "55-70": {
+          "rows": 73935,
+          "non_idle_rows": 3711,
+          "non_idle_rate": 0.05019273686346115,
+          "action_counts": {
+            "ADD_LONG": 904,
+            "ADD_SHORT": 849,
+            "CLOSE_LONG": 197,
+            "CLOSE_SHORT": 75,
+            "FLIP_LONG": 27,
+            "FLIP_SHORT": 29,
+            "NO_TRADE": 70224,
+            "OPEN_LONG": 205,
+            "OPEN_SHORT": 76,
+            "REDUCE_LONG": 868,
+            "REDUCE_SHORT": 481
+          },
+          "target_mean": 0.04604689361058211,
+          "target_abs_mean": 0.1002818008562529,
+          "target_abs_p95": 0.4926678293335953
+        },
+        "<30_OVERSOLD": {
+          "rows": 12683,
+          "non_idle_rows": 901,
+          "non_idle_rate": 0.07103997476937633,
+          "action_counts": {
+            "ADD_LONG": 304,
+            "ADD_SHORT": 89,
+            "CLOSE_LONG": 51,
+            "CLOSE_SHORT": 18,
+            "FLIP_LONG": 10,
+            "FLIP_SHORT": 12,
+            "NO_TRADE": 11782,
+            "OPEN_LONG": 48,
+            "OPEN_SHORT": 17,
+            "REDUCE_LONG": 140,
+            "REDUCE_SHORT": 212
+          },
+          "target_mean": 0.06511011971662857,
+          "target_abs_mean": 0.14283659580781644,
+          "target_abs_p95": 0.7610037841067516
+        },
+        ">=70_OVERBOUGHT": {
+          "rows": 14666,
+          "non_idle_rows": 1095,
+          "non_idle_rate": 0.07466248465839356,
+          "action_counts": {
+            "ADD_LONG": 188,
+            "ADD_SHORT": 304,
+            "CLOSE_LONG": 87,
+            "CLOSE_SHORT": 18,
+            "FLIP_LONG": 11,
+            "FLIP_SHORT": 10,
+            "NO_TRADE": 13571,
+            "OPEN_LONG": 56,
+            "OPEN_SHORT": 27,
+            "REDUCE_LONG": 284,
+            "REDUCE_SHORT": 110
+          },
+          "target_mean": 0.06329474513463318,
+          "target_abs_mean": 0.13115938905835722,
+          "target_abs_p95": 0.65625
+        }
+      },
+      "top_action_lifts": [
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "FLIP_SHORT",
+          "support": 12,
+          "bucket_rows": 12683,
+          "action_rate": 0.0009461483876054561,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 2.3590157081459506
+        },
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "REDUCE_SHORT",
+          "support": 212,
+          "bucket_rows": 12683,
+          "action_rate": 0.016715288181029724,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 2.315330232069174
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "CLOSE_LONG",
+          "support": 87,
+          "bucket_rows": 14666,
+          "action_rate": 0.005932087822173735,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 2.302172725912852
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "ADD_SHORT",
+          "support": 304,
+          "bucket_rows": 14666,
+          "action_rate": 0.020728214918859948,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 2.2018562960111168
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "OPEN_SHORT",
+          "support": 27,
+          "bucket_rows": 14666,
+          "action_rate": 0.0018409927723987455,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 1.961904426740805
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "REDUCE_LONG",
+          "support": 284,
+          "bucket_rows": 14666,
+          "action_rate": 0.019364516568934953,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 1.9160649026472034
+        },
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "FLIP_LONG",
+          "support": 10,
+          "bucket_rows": 12683,
+          "action_rate": 0.0007884569896712135,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 1.8119975729237012
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "FLIP_LONG",
+          "support": 11,
+          "bucket_rows": 14666,
+          "action_rate": 0.0007500340924587481,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 1.7236957411107618
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "FLIP_SHORT",
+          "support": 10,
+          "bucket_rows": 14666,
+          "action_rate": 0.0006818491749624983,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.7000429693631012
+        },
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "ADD_LONG",
+          "support": 304,
+          "bucket_rows": 12683,
+          "action_rate": 0.02396909248600489,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 1.6874649746780128
+        },
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "CLOSE_SHORT",
+          "support": 18,
+          "bucket_rows": 12683,
+          "action_rate": 0.0014192225814081841,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.6167392137724403
+        },
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "CLOSE_LONG",
+          "support": 51,
+          "bucket_rows": 12683,
+          "action_rate": 0.0040211306473231885,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 1.560552975799928
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "OPEN_LONG",
+          "support": 56,
+          "bucket_rows": 14666,
+          "action_rate": 0.0038183553797899905,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.522089753565516
+        },
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "OPEN_LONG",
+          "support": 48,
+          "bucket_rows": 12683,
+          "action_rate": 0.0037845935504218246,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.5086314634296882
+        },
+        {
+          "bucket": "<30_OVERSOLD",
+          "action": "OPEN_SHORT",
+          "support": 17,
+          "bucket_rows": 12683,
+          "action_rate": 0.0013403768824410628,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 1.4284093770426758
+        },
+        {
+          "bucket": ">=70_OVERBOUGHT",
+          "action": "CLOSE_SHORT",
+          "support": 18,
+          "bucket_rows": 14666,
+          "action_rate": 0.001227328514932497,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.3981387868727575
+        },
+        {
+          "bucket": "30-45",
+          "action": "ADD_LONG",
+          "support": 1308,
+          "bucket_rows": 73921,
+          "action_rate": 0.017694565820267582,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 1.2457276002948532
+        },
+        {
+          "bucket": "55-70",
+          "action": "ADD_SHORT",
+          "support": 849,
+          "bucket_rows": 73935,
+          "action_rate": 0.01148305944410631,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 1.2197889125257106
+        },
+        {
+          "bucket": "30-45",
+          "action": "REDUCE_SHORT",
+          "support": 620,
+          "bucket_rows": 73921,
+          "action_rate": 0.008387332422450995,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 1.1617774168054134
+        },
+        {
+          "bucket": "55-70",
+          "action": "REDUCE_LONG",
+          "support": 868,
+          "bucket_rows": 73935,
+          "action_rate": 0.011740041928721174,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 1.1616444033163091
+        }
+      ]
+    },
+    "macd_histogram": {
+      "buckets": {
+        "NEGATIVE": {
+          "rows": 132181,
+          "non_idle_rows": 6594,
+          "non_idle_rate": 0.04988614097336228,
+          "action_counts": {
+            "ADD_LONG": 2186,
+            "ADD_SHORT": 1104,
+            "CLOSE_LONG": 318,
+            "CLOSE_SHORT": 124,
+            "FLIP_LONG": 68,
+            "FLIP_SHORT": 57,
+            "NO_TRADE": 125587,
+            "OPEN_LONG": 334,
+            "OPEN_SHORT": 130,
+            "REDUCE_LONG": 1179,
+            "REDUCE_SHORT": 1094
+          },
+          "target_mean": 0.050112056008732316,
+          "target_abs_mean": 0.10615914030750612,
+          "target_abs_p95": 0.5202122678320587
+        },
+        "NONNEGATIVE": {
+          "rows": 132107,
+          "non_idle_rows": 6272,
+          "non_idle_rate": 0.047476666641434594,
+          "action_counts": {
+            "ADD_LONG": 1568,
+            "ADD_SHORT": 1384,
+            "CLOSE_LONG": 363,
+            "CLOSE_SHORT": 108,
+            "FLIP_LONG": 47,
+            "FLIP_SHORT": 49,
+            "NO_TRADE": 125835,
+            "OPEN_LONG": 329,
+            "OPEN_SHORT": 118,
+            "REDUCE_LONG": 1492,
+            "REDUCE_SHORT": 814
+          },
+          "target_mean": 0.05196727632262407,
+          "target_abs_mean": 0.1051529500459793,
+          "target_abs_p95": 0.5231954845758261
+        }
+      },
+      "top_action_lifts": [
+        {
+          "bucket": "NEGATIVE",
+          "action": "FLIP_LONG",
+          "support": 68,
+          "bucket_rows": 132181,
+          "action_rate": 0.0005144461004229049,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 1.1822776607701624
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "ADD_LONG",
+          "support": 2186,
+          "bucket_rows": 132181,
+          "action_rate": 0.016537929051830446,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 1.16429839990681
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "REDUCE_SHORT",
+          "support": 1094,
+          "bucket_rows": 132181,
+          "action_rate": 0.008276529909744972,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 1.1464295266177564
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "REDUCE_LONG",
+          "support": 1492,
+          "bucket_rows": 132107,
+          "action_rate": 0.011293875419167796,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 1.1174974716514483
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "ADD_SHORT",
+          "support": 1384,
+          "bucket_rows": 132107,
+          "action_rate": 0.010476356286949215,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 1.1128517887320073
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "FLIP_SHORT",
+          "support": 57,
+          "bucket_rows": 132181,
+          "action_rate": 0.00043122687829567034,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.07517065293402
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "CLOSE_SHORT",
+          "support": 124,
+          "bucket_rows": 132181,
+          "action_rate": 0.0009381075948888267,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.0686662932671473
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "CLOSE_LONG",
+          "support": 363,
+          "bucket_rows": 132107,
+          "action_rate": 0.002747772638845784,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 1.0663778783777893
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "OPEN_SHORT",
+          "support": 130,
+          "bucket_rows": 132181,
+          "action_rate": 0.0009834998978673183,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 1.0480936330949913
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "OPEN_LONG",
+          "support": 334,
+          "bucket_rows": 132181,
+          "action_rate": 0.002526838199136033,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.007259447923475
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "OPEN_LONG",
+          "support": 329,
+          "bucket_rows": 132107,
+          "action_rate": 0.0024904055046288238,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 0.9927364856822664
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "OPEN_SHORT",
+          "support": 118,
+          "bucket_rows": 132107,
+          "action_rate": 0.0008932153481647452,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 0.9518794271603395
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "CLOSE_LONG",
+          "support": 318,
+          "bucket_rows": 132181,
+          "action_rate": 0.0024057920578600556,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 0.9336592825076628
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "CLOSE_SHORT",
+          "support": 108,
+          "bucket_rows": 132107,
+          "action_rate": 0.0008175191322185804,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 0.9312952431714835
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "FLIP_SHORT",
+          "support": 49,
+          "bucket_rows": 132107,
+          "action_rate": 0.00037091145813620776,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 0.9247872400745478
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "ADD_SHORT",
+          "support": 1104,
+          "bucket_rows": 132181,
+          "action_rate": 0.008352183748042457,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 0.8872113900332174
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "REDUCE_LONG",
+          "support": 1179,
+          "bucket_rows": 132181,
+          "action_rate": 0.008919587535273603,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 0.8825683079454848
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "REDUCE_SHORT",
+          "support": 814,
+          "bucket_rows": 132107,
+          "action_rate": 0.006161671978017819,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 0.8534884505903425
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "ADD_LONG",
+          "support": 1568,
+          "bucket_rows": 132107,
+          "action_rate": 0.011869166660358648,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 0.8356095680162137
+        },
+        {
+          "bucket": "NONNEGATIVE",
+          "action": "FLIP_LONG",
+          "support": 47,
+          "bucket_rows": 132107,
+          "action_rate": 0.0003557722149469748,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 0.8176202360339658
+        }
+      ]
+    },
+    "bollinger_percent_b": {
+      "buckets": {
+        "0-0.2_LOWER_ZONE": {
+          "rows": 36982,
+          "non_idle_rows": 2022,
+          "non_idle_rate": 0.054675247417662644,
+          "action_counts": {
+            "ADD_LONG": 773,
+            "ADD_SHORT": 252,
+            "CLOSE_LONG": 93,
+            "CLOSE_SHORT": 36,
+            "FLIP_LONG": 16,
+            "FLIP_SHORT": 23,
+            "NO_TRADE": 34960,
+            "OPEN_LONG": 81,
+            "OPEN_SHORT": 33,
+            "REDUCE_LONG": 331,
+            "REDUCE_SHORT": 384
+          },
+          "target_mean": 0.05736121088210655,
+          "target_abs_mean": 0.1135585821295876,
+          "target_abs_p95": 0.6005747832281202
+        },
+        "0.2-0.8_MIDDLE": {
+          "rows": 156379,
+          "non_idle_rows": 6659,
+          "non_idle_rate": 0.04258244393428785,
+          "action_counts": {
+            "ADD_LONG": 1945,
+            "ADD_SHORT": 1335,
+            "CLOSE_LONG": 343,
+            "CLOSE_SHORT": 120,
+            "FLIP_LONG": 60,
+            "FLIP_SHORT": 43,
+            "NO_TRADE": 149720,
+            "OPEN_LONG": 353,
+            "OPEN_SHORT": 130,
+            "REDUCE_LONG": 1362,
+            "REDUCE_SHORT": 968
+          },
+          "target_mean": 0.05000501204566519,
+          "target_abs_mean": 0.10429030136764655,
+          "target_abs_p95": 0.5177718909407348
+        },
+        "0.8-1_UPPER_ZONE": {
+          "rows": 38185,
+          "non_idle_rows": 2076,
+          "non_idle_rate": 0.05436689799659552,
+          "action_counts": {
+            "ADD_LONG": 456,
+            "ADD_SHORT": 519,
+            "CLOSE_LONG": 132,
+            "CLOSE_SHORT": 33,
+            "FLIP_LONG": 15,
+            "FLIP_SHORT": 23,
+            "NO_TRADE": 36109,
+            "OPEN_LONG": 103,
+            "OPEN_SHORT": 46,
+            "REDUCE_LONG": 512,
+            "REDUCE_SHORT": 237
+          },
+          "target_mean": 0.04837900916732784,
+          "target_abs_mean": 0.10173943166330397,
+          "target_abs_p95": 0.4977686956521739
+        },
+        "<0_BELOW_LOWER": {
+          "rows": 16343,
+          "non_idle_rows": 1049,
+          "non_idle_rate": 0.06418650186624243,
+          "action_counts": {
+            "ADD_LONG": 382,
+            "ADD_SHORT": 120,
+            "CLOSE_LONG": 51,
+            "CLOSE_SHORT": 19,
+            "FLIP_LONG": 14,
+            "FLIP_SHORT": 6,
+            "NO_TRADE": 15294,
+            "OPEN_LONG": 62,
+            "OPEN_SHORT": 16,
+            "REDUCE_LONG": 155,
+            "REDUCE_SHORT": 224
+          },
+          "target_mean": 0.05163519296599949,
+          "target_abs_mean": 0.11028804668340936,
+          "target_abs_p95": 0.5625
+        },
+        ">1_ABOVE_UPPER": {
+          "rows": 16399,
+          "non_idle_rows": 1060,
+          "non_idle_rate": 0.06463808768827367,
+          "action_counts": {
+            "ADD_LONG": 198,
+            "ADD_SHORT": 262,
+            "CLOSE_LONG": 62,
+            "CLOSE_SHORT": 24,
+            "FLIP_LONG": 10,
+            "FLIP_SHORT": 11,
+            "NO_TRADE": 15339,
+            "OPEN_LONG": 64,
+            "OPEN_SHORT": 23,
+            "REDUCE_LONG": 311,
+            "REDUCE_SHORT": 95
+          },
+          "target_mean": 0.05224770688544993,
+          "target_abs_mean": 0.1053642191483094,
+          "target_abs_p95": 0.5171084198329784
+        }
+      },
+      "top_action_lifts": [
+        {
+          "bucket": "<0_BELOW_LOWER",
+          "action": "FLIP_LONG",
+          "support": 14,
+          "bucket_rows": 16343,
+          "action_rate": 0.0008566358685675825,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 1.968683308104254
+        },
+        {
+          "bucket": "<0_BELOW_LOWER",
+          "action": "REDUCE_SHORT",
+          "support": 224,
+          "bucket_rows": 16343,
+          "action_rate": 0.01370617389708132,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 1.8985205906246478
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "REDUCE_LONG",
+          "support": 311,
+          "bucket_rows": 16399,
+          "action_rate": 0.018964571010427464,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 1.8764914051680468
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "ADD_SHORT",
+          "support": 262,
+          "bucket_rows": 16399,
+          "action_rate": 0.015976583938045002,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 1.6971139131101436
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "FLIP_SHORT",
+          "support": 11,
+          "bucket_rows": 16399,
+          "action_rate": 0.0006707726080858589,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.6724259532622214
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "CLOSE_SHORT",
+          "support": 24,
+          "bucket_rows": 16399,
+          "action_rate": 0.0014635038721873285,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.6671832386751926
+        },
+        {
+          "bucket": "<0_BELOW_LOWER",
+          "action": "ADD_LONG",
+          "support": 382,
+          "bucket_rows": 16343,
+          "action_rate": 0.023373921556629748,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 1.645563926573938
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "OPEN_LONG",
+          "support": 64,
+          "bucket_rows": 16399,
+          "action_rate": 0.0039026769924995425,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.5557024087386413
+        },
+        {
+          "bucket": "0-0.2_LOWER_ZONE",
+          "action": "FLIP_SHORT",
+          "support": 23,
+          "bucket_rows": 36982,
+          "action_rate": 0.0006219241793304851,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.5506329953480682
+        },
+        {
+          "bucket": "<0_BELOW_LOWER",
+          "action": "OPEN_LONG",
+          "support": 62,
+          "bucket_rows": 16343,
+          "action_rate": 0.003793673132227865,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.512250806591611
+        },
+        {
+          "bucket": "0.8-1_UPPER_ZONE",
+          "action": "FLIP_SHORT",
+          "support": 23,
+          "bucket_rows": 38185,
+          "action_rate": 0.0006023307581511064,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.5017810510399963
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "OPEN_SHORT",
+          "support": 23,
+          "bucket_rows": 16399,
+          "action_rate": 0.001402524544179523,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 1.4946387368230556
+        },
+        {
+          "bucket": "0-0.2_LOWER_ZONE",
+          "action": "ADD_LONG",
+          "support": 773,
+          "bucket_rows": 36982,
+          "action_rate": 0.020902060461846304,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 1.4715406913533393
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "CLOSE_LONG",
+          "support": 62,
+          "bucket_rows": 16399,
+          "action_rate": 0.003780718336483932,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 1.4672518174929008
+        },
+        {
+          "bucket": "0.8-1_UPPER_ZONE",
+          "action": "ADD_SHORT",
+          "support": 519,
+          "bucket_rows": 38185,
+          "action_rate": 0.01359172449914888,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 1.443782027504445
+        },
+        {
+          "bucket": "0-0.2_LOWER_ZONE",
+          "action": "REDUCE_SHORT",
+          "support": 384,
+          "bucket_rows": 36982,
+          "action_rate": 0.0103834297766481,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 1.4382682855402376
+        },
+        {
+          "bucket": ">1_ABOVE_UPPER",
+          "action": "FLIP_LONG",
+          "support": 10,
+          "bucket_rows": 16399,
+          "action_rate": 0.0006097932800780535,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 1.4014004035240748
+        },
+        {
+          "bucket": "0.8-1_UPPER_ZONE",
+          "action": "CLOSE_LONG",
+          "support": 132,
+          "bucket_rows": 38185,
+          "action_rate": 0.0034568547859106977,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 1.341564225636955
+        },
+        {
+          "bucket": "0.8-1_UPPER_ZONE",
+          "action": "REDUCE_LONG",
+          "support": 512,
+          "bucket_rows": 38185,
+          "action_rate": 0.013408406442320282,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 1.3267244185054072
+        },
+        {
+          "bucket": "<0_BELOW_LOWER",
+          "action": "CLOSE_SHORT",
+          "support": 19,
+          "bucket_rows": 16343,
+          "action_rate": 0.001162577250198862,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.3243759323299864
+        }
+      ]
+    },
+    "market_regime": {
+      "buckets": {
+        "RANGE_OR_MIXED": {
+          "rows": 60791,
+          "non_idle_rows": 2656,
+          "non_idle_rate": 0.04369067789639914,
+          "action_counts": {
+            "ADD_LONG": 765,
+            "ADD_SHORT": 595,
+            "CLOSE_LONG": 127,
+            "CLOSE_SHORT": 55,
+            "FLIP_LONG": 20,
+            "FLIP_SHORT": 18,
+            "NO_TRADE": 58135,
+            "OPEN_LONG": 136,
+            "OPEN_SHORT": 54,
+            "REDUCE_LONG": 507,
+            "REDUCE_SHORT": 379
+          },
+          "target_mean": 0.042848411476223126,
+          "target_abs_mean": 0.10856920202275619,
+          "target_abs_p95": 0.5074928965321615
+        },
+        "TREND_DOWN": {
+          "rows": 100830,
+          "non_idle_rows": 5024,
+          "non_idle_rate": 0.04982644054348904,
+          "action_counts": {
+            "ADD_LONG": 1732,
+            "ADD_SHORT": 708,
+            "CLOSE_LONG": 242,
+            "CLOSE_SHORT": 85,
+            "FLIP_LONG": 58,
+            "FLIP_SHORT": 41,
+            "NO_TRADE": 95806,
+            "OPEN_LONG": 237,
+            "OPEN_SHORT": 93,
+            "REDUCE_LONG": 946,
+            "REDUCE_SHORT": 882
+          },
+          "target_mean": 0.05755818550858538,
+          "target_abs_mean": 0.10997019655896836,
+          "target_abs_p95": 0.5981894150417827
+        },
+        "TREND_UP": {
+          "rows": 102667,
+          "non_idle_rows": 5186,
+          "non_idle_rate": 0.0505128230103149,
+          "action_counts": {
+            "ADD_LONG": 1257,
+            "ADD_SHORT": 1185,
+            "CLOSE_LONG": 312,
+            "CLOSE_SHORT": 92,
+            "FLIP_LONG": 37,
+            "FLIP_SHORT": 47,
+            "NO_TRADE": 97481,
+            "OPEN_LONG": 290,
+            "OPEN_SHORT": 101,
+            "REDUCE_LONG": 1218,
+            "REDUCE_SHORT": 647
+          },
+          "target_mean": 0.049487303822663996,
+          "target_abs_mean": 0.0996945154480517,
+          "target_abs_p95": 0.4977686956521739
+        }
+      },
+      "top_action_lifts": [
+        {
+          "bucket": "TREND_DOWN",
+          "action": "FLIP_LONG",
+          "support": 58,
+          "bucket_rows": 100830,
+          "action_rate": 0.0005752256272934642,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 1.321958526835957
+        },
+        {
+          "bucket": "TREND_UP",
+          "action": "ADD_SHORT",
+          "support": 1185,
+          "bucket_rows": 102667,
+          "action_rate": 0.011542170317628839,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 1.2260679698173194
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "REDUCE_SHORT",
+          "support": 882,
+          "bucket_rows": 100830,
+          "action_rate": 0.008747396608152335,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 1.2116519679116167
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "ADD_LONG",
+          "support": 1732,
+          "bucket_rows": 100830,
+          "action_rate": 0.017177427352970346,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 1.2093201705545622
+        },
+        {
+          "bucket": "TREND_UP",
+          "action": "CLOSE_LONG",
+          "support": 312,
+          "bucket_rows": 102667,
+          "action_rate": 0.0030389511722364536,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 1.1793808038297031
+        },
+        {
+          "bucket": "TREND_UP",
+          "action": "REDUCE_LONG",
+          "support": 1218,
+          "bucket_rows": 102667,
+          "action_rate": 0.011863597845461541,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 1.1738699166534405
+        },
+        {
+          "bucket": "TREND_UP",
+          "action": "FLIP_SHORT",
+          "support": 47,
+          "bucket_rows": 102667,
+          "action_rate": 0.00045779072145869657,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.1414018320082642
+        },
+        {
+          "bucket": "TREND_UP",
+          "action": "OPEN_LONG",
+          "support": 290,
+          "bucket_rows": 102667,
+          "action_rate": 0.0028246661536813194,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.1259809478493643
+        },
+        {
+          "bucket": "TREND_UP",
+          "action": "OPEN_SHORT",
+          "support": 101,
+          "bucket_rows": 102667,
+          "action_rate": 0.0009837630397303905,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 1.0483740574365543
+        },
+        {
+          "bucket": "RANGE_OR_MIXED",
+          "action": "ADD_SHORT",
+          "support": 595,
+          "bucket_rows": 60791,
+          "action_rate": 0.009787633037785199,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 1.0396921062259545
+        },
+        {
+          "bucket": "RANGE_OR_MIXED",
+          "action": "CLOSE_SHORT",
+          "support": 55,
+          "bucket_rows": 60791,
+          "action_rate": 0.000904739188366699,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.0306539250649058
+        },
+        {
+          "bucket": "TREND_UP",
+          "action": "CLOSE_SHORT",
+          "support": 92,
+          "bucket_rows": 102667,
+          "action_rate": 0.0008961009866851081,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.0208135240044562
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "FLIP_SHORT",
+          "support": 41,
+          "bucket_rows": 100830,
+          "action_rate": 0.00040662501239710405,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.0138312384566588
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "OPEN_SHORT",
+          "support": 93,
+          "bucket_rows": 100830,
+          "action_rate": 0.0009223445403153824,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 0.9829217494793216
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "CLOSE_SHORT",
+          "support": 85,
+          "bucket_rows": 100830,
+          "action_rate": 0.0008430030744818011,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 0.9603258471924406
+        },
+        {
+          "bucket": "RANGE_OR_MIXED",
+          "action": "OPEN_SHORT",
+          "support": 54,
+          "bucket_rows": 60791,
+          "action_rate": 0.00088828938494185,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 0.9466299393851276
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "OPEN_LONG",
+          "support": 237,
+          "bucket_rows": 100830,
+          "action_rate": 0.0023504909253198453,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 0.9369631156424303
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "CLOSE_LONG",
+          "support": 242,
+          "bucket_rows": 100830,
+          "action_rate": 0.0024000793414658337,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 0.9314422452236745
+        },
+        {
+          "bucket": "TREND_DOWN",
+          "action": "REDUCE_LONG",
+          "support": 946,
+          "bucket_rows": 100830,
+          "action_rate": 0.009382128334820985,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 0.9283354299337957
+        },
+        {
+          "bucket": "RANGE_OR_MIXED",
+          "action": "OPEN_LONG",
+          "support": 136,
+          "bucket_rows": 60791,
+          "action_rate": 0.002237173265779474,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 0.8917919277018486
+        }
+      ]
+    },
+    "current_exposure": {
+      "buckets": {
+        "FLAT_OR_MISSING": {
+          "rows": 122118,
+          "non_idle_rows": 911,
+          "non_idle_rate": 0.007459997707135721,
+          "action_counts": {
+            "NO_TRADE": 121207,
+            "OPEN_LONG": 663,
+            "OPEN_SHORT": 248
+          },
+          "target_mean": 0.0003208840987306879,
+          "target_abs_mean": 0.00044463037938451984,
+          "target_abs_p95": 0.0
+        },
+        "LONG": {
+          "rows": 97556,
+          "non_idle_rows": 7212,
+          "non_idle_rate": 0.07392677026528353,
+          "action_counts": {
+            "ADD_LONG": 3754,
+            "CLOSE_LONG": 681,
+            "FLIP_SHORT": 106,
+            "NO_TRADE": 90344,
+            "REDUCE_LONG": 2671
+          },
+          "target_mean": 0.2116718665629096,
+          "target_abs_mean": 0.211777227759512,
+          "target_abs_p95": 0.8947368421052632
+        },
+        "SHORT": {
+          "rows": 44614,
+          "non_idle_rows": 4743,
+          "non_idle_rate": 0.10631192002510423,
+          "action_counts": {
+            "ADD_SHORT": 2488,
+            "CLOSE_SHORT": 232,
+            "FLIP_LONG": 115,
+            "NO_TRADE": 39871,
+            "REDUCE_SHORT": 1908
+          },
+          "target_mean": -0.1613830566713484,
+          "target_abs_mean": 0.1615911035265667,
+          "target_abs_p95": 0.003914773297435732
+        }
+      },
+      "top_action_lifts": [
+        {
+          "bucket": "SHORT",
+          "action": "ADD_SHORT",
+          "support": 2488,
+          "bucket_rows": 44614,
+          "action_rate": 0.05576724794907428,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 5.923880396288161
+        },
+        {
+          "bucket": "SHORT",
+          "action": "REDUCE_SHORT",
+          "support": 1908,
+          "bucket_rows": 44614,
+          "action_rate": 0.04276684448827722,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 5.923880396288161
+        },
+        {
+          "bucket": "SHORT",
+          "action": "CLOSE_SHORT",
+          "support": 232,
+          "bucket_rows": 44614,
+          "action_rate": 0.005200161384318823,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 5.92388039628816
+        },
+        {
+          "bucket": "SHORT",
+          "action": "FLIP_LONG",
+          "support": 115,
+          "bucket_rows": 44614,
+          "action_rate": 0.0025776662034338997,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 5.92388039628816
+        },
+        {
+          "bucket": "LONG",
+          "action": "ADD_LONG",
+          "support": 3754,
+          "bucket_rows": 97556,
+          "action_rate": 0.038480462503587685,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 2.7090901635983435
+        },
+        {
+          "bucket": "LONG",
+          "action": "REDUCE_LONG",
+          "support": 2671,
+          "bucket_rows": 97556,
+          "action_rate": 0.02737914633646316,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 2.7090901635983435
+        },
+        {
+          "bucket": "LONG",
+          "action": "CLOSE_LONG",
+          "support": 681,
+          "bucket_rows": 97556,
+          "action_rate": 0.006980606010906556,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 2.7090901635983435
+        },
+        {
+          "bucket": "LONG",
+          "action": "FLIP_SHORT",
+          "support": 106,
+          "bucket_rows": 97556,
+          "action_rate": 0.0010865554143261306,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 2.709090163598343
+        },
+        {
+          "bucket": "FLAT_OR_MISSING",
+          "action": "OPEN_LONG",
+          "support": 663,
+          "bucket_rows": 122118,
+          "action_rate": 0.005429175060187687,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 2.1642018375669436
+        },
+        {
+          "bucket": "FLAT_OR_MISSING",
+          "action": "OPEN_SHORT",
+          "support": 248,
+          "bucket_rows": 122118,
+          "action_rate": 0.002030822646948034,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 2.1642018375669436
+        }
+      ]
+    },
+    "return_24bar": {
+      "buckets": {
+        "NEGATIVE": {
+          "rows": 130343,
+          "non_idle_rows": 6270,
+          "non_idle_rate": 0.048103849075132536,
+          "action_counts": {
+            "ADD_LONG": 2063,
+            "ADD_SHORT": 1015,
+            "CLOSE_LONG": 304,
+            "CLOSE_SHORT": 107,
+            "FLIP_LONG": 66,
+            "FLIP_SHORT": 53,
+            "NO_TRADE": 124073,
+            "OPEN_LONG": 307,
+            "OPEN_SHORT": 114,
+            "REDUCE_LONG": 1181,
+            "REDUCE_SHORT": 1060
+          },
+          "target_mean": 0.05417270568601917,
+          "target_abs_mean": 0.10954023002516641,
+          "target_abs_p95": 0.5780136309245096
+        },
+        "POSITIVE": {
+          "rows": 132514,
+          "non_idle_rows": 6560,
+          "non_idle_rate": 0.049504203329459526,
+          "action_counts": {
+            "ADD_LONG": 1676,
+            "ADD_SHORT": 1472,
+            "CLOSE_LONG": 371,
+            "CLOSE_SHORT": 125,
+            "FLIP_LONG": 49,
+            "FLIP_SHORT": 53,
+            "NO_TRADE": 125954,
+            "OPEN_LONG": 350,
+            "OPEN_SHORT": 134,
+            "REDUCE_LONG": 1482,
+            "REDUCE_SHORT": 848
+          },
+          "target_mean": 0.04687949925776485,
+          "target_abs_mean": 0.10093699794519582,
+          "target_abs_p95": 0.4914638191896999
+        },
+        "ZERO": {
+          "rows": 1431,
+          "non_idle_rows": 36,
+          "non_idle_rate": 0.025157232704402517,
+          "action_counts": {
+            "ADD_LONG": 15,
+            "ADD_SHORT": 1,
+            "CLOSE_LONG": 6,
+            "NO_TRADE": 1395,
+            "OPEN_LONG": 6,
+            "REDUCE_LONG": 8
+          },
+          "target_mean": 0.15085933372954335,
+          "target_abs_mean": 0.18888507954620734,
+          "target_abs_p95": 0.684931506849315
+        }
+      },
+      "top_action_lifts": [
+        {
+          "bucket": "ZERO",
+          "action": "OPEN_LONG",
+          "support": 6,
+          "bucket_rows": 1431,
+          "action_rate": 0.0041928721174004195,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.6713812762647393
+        },
+        {
+          "bucket": "ZERO",
+          "action": "CLOSE_LONG",
+          "support": 6,
+          "bucket_rows": 1431,
+          "action_rate": 0.0041928721174004195,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 1.6272037975969487
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "ADD_SHORT",
+          "support": 1472,
+          "bucket_rows": 132514,
+          "action_rate": 0.011108260259293358,
+          "baseline_rate": 0.009413972635912338,
+          "lift": 1.1799758389904031
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "FLIP_LONG",
+          "support": 66,
+          "bucket_rows": 130343,
+          "action_rate": 0.0005063563060540266,
+          "baseline_rate": 0.00043513137183678413,
+          "lift": 1.1636860470817965
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "REDUCE_SHORT",
+          "support": 1060,
+          "bucket_rows": 130343,
+          "action_rate": 0.008132389157837398,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 1.1264637661145338
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "ADD_LONG",
+          "support": 2063,
+          "bucket_rows": 130343,
+          "action_rate": 0.015827470596809955,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 1.1142809134495764
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "REDUCE_LONG",
+          "support": 1482,
+          "bucket_rows": 132514,
+          "action_rate": 0.011183723983880949,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 1.106598294366128
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "CLOSE_LONG",
+          "support": 371,
+          "bucket_rows": 132514,
+          "action_rate": 0.0027997041821996166,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 1.0865318926654512
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "OPEN_SHORT",
+          "support": 134,
+          "bucket_rows": 132514,
+          "action_rate": 0.001011213909473716,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 1.077627829463667
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "CLOSE_SHORT",
+          "support": 125,
+          "bucket_rows": 132514,
+          "action_rate": 0.0009432965573448843,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 1.0745774161532964
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "OPEN_LONG",
+          "support": 350,
+          "bucket_rows": 132514,
+          "action_rate": 0.002641230360565676,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 1.0528589585719177
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "FLIP_SHORT",
+          "support": 53,
+          "bucket_rows": 130343,
+          "action_rate": 0.0004066194578918699,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 1.0138173895030802
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "FLIP_SHORT",
+          "support": 53,
+          "bucket_rows": 132514,
+          "action_rate": 0.00039995774031423097,
+          "baseline_rate": 0.00040107761230173146,
+          "lift": 0.9972078421902592
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "OPEN_LONG",
+          "support": 307,
+          "bucket_rows": 130343,
+          "action_rate": 0.0023553240296755483,
+          "baseline_rate": 0.0025086269524155465,
+          "lift": 0.9388897091325661
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "CLOSE_SHORT",
+          "support": 107,
+          "bucket_rows": 130343,
+          "action_rate": 0.0008209109810269826,
+          "baseline_rate": 0.0008778302457924689,
+          "lift": 0.9351591437657724
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "OPEN_SHORT",
+          "support": 114,
+          "bucket_rows": 130343,
+          "action_rate": 0.0008746154377296825,
+          "baseline_rate": 0.0009383702627436736,
+          "lift": 0.9320579226076706
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "CLOSE_LONG",
+          "support": 304,
+          "bucket_rows": 130343,
+          "action_rate": 0.00233230783394582,
+          "baseline_rate": 0.002576734471485652,
+          "lift": 0.9051409292479778
+        },
+        {
+          "bucket": "NEGATIVE",
+          "action": "REDUCE_LONG",
+          "support": 1181,
+          "bucket_rows": 130343,
+          "action_rate": 0.00906070905226978,
+          "baseline_rate": 0.010106399079791743,
+          "lift": 0.8965318884336487
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "ADD_LONG",
+          "support": 1676,
+          "bucket_rows": 132514,
+          "action_rate": 0.01264772024088021,
+          "baseline_rate": 0.014204201477176414,
+          "lift": 0.8904210674005724
+        },
+        {
+          "bucket": "POSITIVE",
+          "action": "REDUCE_SHORT",
+          "support": 848,
+          "bucket_rows": 132514,
+          "action_rate": 0.0063993238450276956,
+          "baseline_rate": 0.007219397021431166,
+          "lift": 0.886406970835786
+        }
+      ]
+    }
+  },
+  "holding_period_observed": {
+    "rows": 142170,
+    "mean_hours": 49.92728832392948,
+    "p95_hours": 223.26404194444444
+  },
+  "action_interval_observed": {
+    "series_count": 64,
+    "interval_count": 12802,
+    "mean_hours": 20.183877519137635,
+    "p95_hours": 64.0
+  },
+  "interpretation_boundary": "Post-hoc association from causal, already-closed inputs; indicators are model-input candidates and are not evidence of the original trader's private decision rules.",
+  "input": "quant\\outputs\\cross_venue_temporal_dataset_v3.csv",
+  "input_sha256": "e19d2abd50f5fed28ec7941981848037585159dfb33f3c289e64d700b6208f98"
+}

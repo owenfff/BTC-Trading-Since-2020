@@ -142,3 +142,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The v3.7 strict autonomous re-audit remains blocked: WF1/WF3 make no adjustments, while WF2 remains negative after costs (`-0.048939`, PF `0.933658`).
 - Keep the active Demo model unchanged; do not switch the Demo deployment or add new Demo orders.
 - Remaining research options are a short action-sequence/memory protocol or verified pre-2025 Hyperliquid behavior/scale coverage. Hourly offsetting actions should become an explicit sequence target if they are needed for fidelity, rather than being silently relabeled.
+
+## 2026-08-26 — State-robust candidates remain blocked
+
+- The v3.8 state-augmentation candidate reduces zero-start state mismatch but overtrades and remains negative in WF1/WF2 after costs (`-3.514461`, `-0.103915`). It is not a deployable policy.
+- The v3.9 autonomous-threshold correction prevents teacher-state threshold selection from masking all autonomous actions, but results remain unstable (`-0.262682`, `+0.001748`, `+0.253175` across WF1/WF2/WF3); WF1 PF is below one and Hyperliquid has zero global model-eligible test rows.
+- The strategy profile is descriptive only. It confirms a sparse, stateful adjustment process, but it cannot identify a unique original strategy from trade records alone. Keep the current Demo model unchanged and do not add Demo orders.

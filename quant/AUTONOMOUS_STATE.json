@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15.8-label-timing-repair-and-v3.7-reaudit",
+  "current_work_package": "M15.9-state-robust-threshold-and-strategy-profile",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "db8369c",
-  "last_report_commit": "8fb232d",
-  "test_count": 374,
-  "last_test_status": "FULL_SUITE_374_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_LABEL_AUDIT_PASS_WITH_WARNINGS;ACTION_TARGET_CONSISTENCY_PASS;V3.7_REAUDIT_BLOCKED;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
+  "last_code_commit": "8a8b521",
+  "last_report_commit": "UNCOMMITTED",
+  "test_count": 378,
+  "last_test_status": "FULL_SUITE_378_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_LABEL_AUDIT_PASS_WITH_WARNINGS;V3.8_STATE_ROBUST_BLOCKED;V3.9_AUTONOMOUS_THRESHOLD_BLOCKED;STRATEGY_PROFILE_READY_WITH_BOUNDARY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -53,7 +53,10 @@
     "Event-target label contamination was repaired by preferring isolated order-episode local_position_after targets; action/target consistency now passes, but this does not establish exact strategy recovery or profitability.",
     "Temporal label audit is PASS_WITH_WARNINGS: 373 same-timestamp event ties and 70 same-hour net-zero labels can hide offsetting source actions; both are retained as explicit warnings.",
     "The v3.7 strict autonomous re-audit remains blocked after repair: WF1/WF3 make zero adjustments and WF2 remains negative after costs; the active Demo model is unchanged and no new Demo orders are authorized.",
-    "PyArrow dataset writes now refresh the downstream CSV mirror; ignored generated outputs were rebuilt without changing raw CSV/JSON inputs."
+    "PyArrow dataset writes now refresh the downstream CSV mirror; ignored generated outputs were rebuilt without changing raw CSV/JSON inputs.",
+    "The v3.8 state-robust candidate remains blocked after deterministic train-only state augmentation: it overtrades and has negative WF1/WF2 costed returns.",
+    "The v3.9 autonomous-threshold candidate selects thresholds under zero-start state but remains unstable across time; WF1 is negative and Hyperliquid has zero global model-eligible test rows.",
+    "The strategy behavior profile is post-hoc descriptive: it cannot uniquely identify the original trader's private rules or establish that the robot has fully learned them."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -67,6 +70,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model unchanged; do not promote v3.7 or add Demo orders. Labels are causally and action-target consistent after repair, but strict autonomous WF1/WF3 make zero adjustments and WF2 is negative; Hyperliquid global coverage remains unavailable. Next research: model a short action sequence or acquire verified pre-2025 Hyperliquid behavior/scale, then re-evaluate without live credentials.",
-  "updated_at_utc": "2026-08-26T11:07:49Z"
+  "next_action": "Keep the current Demo model unchanged; do not promote v3.8 or v3.9 and do not add Demo orders. The strategy profile now documents sparse stateful behavior, but candidates remain unstable in strict costed walk-forward replay and Hyperliquid global coverage is unavailable. Next research: use the profile to define an explicit causal action-sequence/venue-native protocol, then re-evaluate without live credentials.",
+  "updated_at_utc": "2026-08-26T11:43:23Z"
 }

@@ -290,3 +290,12 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Final audit: `PASS_WITH_WARNINGS`; `32552` event rows across `66` state keys; `264609` temporal rows with `264288` eligible rows; zero hard failures; `373` same-timestamp event ties and `70` same-hour net-zero labels retained as explicit warnings.
 - Rebuilt source-derived inputs: behavior dataset counts remain `173434` raw executions, `160302` derivative fills, `62388` execution batches, `31702` order episodes, `32231` decision episodes, and `1401` trade cycles. The cross-venue temporal dataset remains `264609` rows.
 - The repaired inputs were re-audited by `cross_venue_two_stage_autonomous_audit.py`; v3.7 remains `DEMO_CONTINUE_LIVE_BLOCKED` and the active Demo model is unchanged. Raw account CSV/JSON hashes remain unchanged; generated large outputs remain ignored and were rebuilt locally; no credentials or private endpoints were used.
+
+## M15.9 state-robust threshold audit and behavior profile
+
+- Code commit: `8a8b521` (`Add state-robust audit and strategy behavior profile`).
+- Independent candidates: `behavioral-distillation-v3.8-state-robust-action-target` and `behavioral-distillation-v3.9-state-robust-autonomous-threshold`; both use deterministic NumPy models, train-only chronological fitting, zero-start autonomous replay, and no active Demo artifact replacement.
+- Reports: `quant/reports/cross_venue_state_robust_autonomous_audit.*`, `cross_venue_state_robust_by_symbol.csv`, `cross_venue_state_robust_autonomous_threshold_audit.*`, and `cross_venue_state_robust_autonomous_threshold_by_symbol.csv`.
+- v3.8 strict costed returns: `-3.514461`, `-0.103915`, `+0.229969` for WF1/WF2/WF3. v3.9 strict costed returns: `-0.262682`, `+0.001748`, `+0.253175`; both candidates remain blocked by stability and/or cross-venue gates.
+- Behavior profile outputs: `strategy_behavior_profile_v4.md`, `.json`, and `strategy_behavior_profile_v4_by_symbol.csv`; input `quant/outputs/cross_venue_temporal_dataset_v3.csv`, `264609` rows, `264288` eligible. It is post-hoc descriptive and not a model artifact.
+- Full suite after this package: `378 passed`. Raw account CSV/JSON remained unchanged; ignored derived outputs were read/rebuilt locally; no credentials, private endpoints, mainnet connection, or order was used.
