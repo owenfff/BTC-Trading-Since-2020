@@ -276,3 +276,10 @@
 - Hyperliquid used `4636` train rows and `1160` holdout rows. Strict autonomous replay made no effective adjustment, with `0.000000` net return and a `0.00%` action rate; its coverage is materially smaller and funding context is mostly missing.
 - The same trader across venues does not imply one identical executable policy: contract scale, funding, liquidity, symbol coverage, and execution rules are venue-specific. Preserve a shared behavior layer plus venue-native scale/execution/calibration rather than silently treating platforms as interchangeable.
 - Both results are `DIAGNOSTIC_ONLY`; the active Demo model remains unchanged. No exact-strategy, full-learning, or profitability claim is authorized.
+
+## 2026-08-26 — Shared intent plus native layer remains blocked
+
+- Candidate `behavioral-distillation-v4.2-shared-intent-native-layer` collapses direction-specific labels into venue-neutral `OPEN`, `ADD`, `REDUCE`, `FLIP`, and `NO_TRADE` intent families. Contract/unit categories, funding, and mark/index basis are excluded from the shared input; normalized state and common market features remain.
+- The split is per venue and chronological: `60%` fit, `20%` calibration, and a final untouched `20%` test. Causal checks pass with zero violations. Native exposure calibration is fitted only on the middle slice and is bounded to prevent direction reversal or unbounded resizing.
+- On the untouched test, BitMEX and Hyperliquid both predicted `100% NO_TRADE`; the native exposure slopes collapsed to `0.0`. The candidate therefore does not capture an executable shared intent and is not promoted.
+- The result narrows the diagnosis: the remaining issue is autonomous action timing/state generalization and sparse-label identifiability, not simply venue contract-unit scaling. Active Demo remains unchanged.

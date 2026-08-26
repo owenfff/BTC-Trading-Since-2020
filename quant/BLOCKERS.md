@@ -159,3 +159,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The independent BitMEX holdout is negative after costs (`-0.004768`, PF `0.971626`) and predicts actions on `57.43%` of rows, which is materially overactive for this replay.
 - The independent Hyperliquid holdout produces no autonomous adjustments (`0.00%` action rate) and has only `1160` test rows, with incomplete funding context. It is not evidence of a deployable policy.
 - The remaining blocker is executable-policy calibration and cross-venue generalization, not a missing indicator or exchange-connection problem. Keep the active Demo model unchanged; do not promote v4.1 or add Demo orders.
+
+## 2026-08-26 — Shared intent/native layer collapses to no-trade
+
+- Candidate v4.2 passes the causal audit and uses a final untouched chronological test slice, but both venue results predict `100% NO_TRADE`; no autonomous adjustments are executed.
+- Native exposure calibration is non-informative on the calibration slice (`slope=0.0` for both BitMEX and Hyperliquid), so it cannot rescue the shared model's action-timing failure.
+- This is a sparse-label/model-identifiability and autonomous state-generalization blocker. Do not promote v4.2, switch the active Demo model, or add Demo orders.

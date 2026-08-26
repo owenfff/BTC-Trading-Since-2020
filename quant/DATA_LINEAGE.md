@@ -316,3 +316,13 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - BitMEX: `206793` train / `42624` holdout; strict autonomous net return `-0.004768`, PF `0.971626`, action rate `57.43%`.
 - Hyperliquid: `4636` train / `1160` holdout; strict autonomous net return `0.000000`, no effective adjustments, action rate `0.00%`.
 - Status: diagnostic evidence only; no model promotion, Demo change, order, credential, private endpoint, or mainnet connection. Raw account CSV/JSON remained unchanged.
+
+## M15.12 shared intent / venue-native execution layer
+
+- Code commit: `e57b643` (`Add shared intent native layer audit`); tests: `quant/tests/test_shared_intent_native_layer.py`.
+- Candidate: `behavioral-distillation-v4.2-shared-intent-native-layer`. Reports: `quant/reports/shared_intent_native_layer_audit.md`, `.json`, and `shared_intent_native_layer_by_symbol.csv`.
+- Source: `quant/outputs/cross_venue_temporal_dataset_v3.csv`, `264288` model-eligible rows. Per venue: chronological `60%` train / `20%` calibration / `20%` untouched test; shared fit rows `158572`.
+- Causal audit: `PASS` with zero future-bar, future-funding, non-strict-clock, and non-future-label violations.
+- BitMEX: `41996` untouched test rows, predicted action rate `0.00%`, layered net return `0.000000`, action Macro-F1 `0.192789`, target MAE `0.112609`.
+- Hyperliquid: `1160` untouched test rows, predicted action rate `0.00%`, layered net return `0.000000`, action Macro-F1 `0.329702`, target MAE `0.502278`.
+- Native exposure slope was `0.0` for both venues. Status is diagnostic-only; active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential/private endpoint/order was used.
