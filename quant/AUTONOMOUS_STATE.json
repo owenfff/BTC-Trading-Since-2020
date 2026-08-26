@@ -5,7 +5,7 @@
   "current_work_package": "M15-v3.5-cost-calibrated-threshold-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "6c0e0396c65db0e662fe5f3bae65180c3b2475f1",
-  "last_report_commit": "c637156c8f370f1de411bc7306e461478261f9f0",
+  "last_report_commit": "56434b1",
   "test_count": 366,
   "last_test_status": "FULL_SUITE_366_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_CAUSAL_AUDIT_PASS;THRESHOLD_CALIBRATION_TRAIN_ONLY;CALIBRATED_TEMPORAL_CANDIDATE_PROMOTION_BLOCKED;ACTION_TARGET_CONSISTENCY_TESTED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
