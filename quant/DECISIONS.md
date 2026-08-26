@@ -343,3 +343,10 @@
 - Each row records venue mapping, pre-action quantity/equity, quote and closed-bar timestamps, funding/mark/index coverage, allowlisted strategy features, and the model output. It never records credentials or raw adapter payloads and retains at most `5,000` newest rows.
 - This improves prospective Demo evidence collection and future causal replay; it does not create historical labels, recover past private triggers, prove exact learning, or authorize model promotion/orders.
 - Full suite after this change: `411 passed`. Active Demo and raw account CSV/JSON remain unchanged.
+
+## 2026-08-27 — Append-only prospective decision audit journal
+
+- M15.22 adds `quant_bot/decision_audit_journal.py` and `quant/scripts/audit_decision_audit_journal.py`. The runtime writes the same credential-free pre-action snapshot to daily JSONL under ignored `quant/outputs/decision_audit/`.
+- The compact runtime state still retains the newest `5,000` rows for restart/dashboard use; the daily journal is append-only, flushed and synced, so long Demo observations are not silently evicted.
+- Sensitive key names, non-JSON values, invalid ISO timestamps, and records over `128 KiB` are rejected before append. No raw adapter payload is copied.
+- Verification: `414 passed`; the journal audit is `READY_NO_RUNTIME_RECORDS` until a new Demo cycle produces records. Active Demo/model are unchanged, no new orders were submitted, and exact strategy recovery remains unproven.

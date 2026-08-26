@@ -1,0 +1,17 @@
+{
+  "status": "READY_NO_RUNTIME_RECORDS",
+  "journal_root": "C:\\Users\\yhyzd\\Documents\\Codex\\2026-08-19\\m0-01-1-fork-text-fork\\outputs\\BTC-Trading-Since-2020\\quant\\outputs\\decision_audit",
+  "file_count": 0,
+  "record_count": 0,
+  "records_by_file": {},
+  "malformed_lines": 0,
+  "invalid_date_filenames": 0,
+  "sensitive_key_paths": [],
+  "retention": {
+    "runtime_state_ring_rows": 5000,
+    "journal": "append-only JSONL partitioned by UTC decision date",
+    "maximum_record_bytes": 131072
+  },
+  "historical_strategy_recovery": "NOT_PROVEN_BY_THIS_JOURNAL",
+  "generated_at_utc": "2026-08-26T16:29:54.448026Z"
+}

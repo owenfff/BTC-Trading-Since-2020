@@ -218,3 +218,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 
 - M15.21 now records the robot's own pre-order context for future Demo cycles, but those new observations cannot reconstruct the original trader's past private trigger or retroactively fill missing historical order-book data.
 - The completion audit remains `NOT_COMPLETE`; prospective snapshots are evidence for future model validation only. Do not treat them as historical teacher labels or use them to promote the current model.
+
+## 2026-08-27 — Prospective evidence is append-only, but historical recovery remains blocked
+
+- M15.22 adds a flushed, append-only daily JSONL journal for credential-free pre-action decision context, while keeping the bounded `5,000`-row runtime ring for fast recovery.
+- The journal is empty until a new Demo run produces decisions, and it records the robot's observations rather than the original trader's missing private trigger. It cannot turn future robot decisions into historical teacher labels.
+- Keep the active Demo model unchanged; do not promote a candidate or add Demo orders based on this journal. The exact-recovery, pre-action-context, autonomous-timing and Demo-authorization blockers remain.

@@ -400,3 +400,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The runtime writes a bounded, credential-free `behavior_state.decision_audit` snapshot after feature construction/model prediction and before order side effects. It contains only the pre-action market context, allowlisted feature contract values, reconciled account state needed for the decision, and model output.
 - Retention is capped at `5,000` rows in ignored `quant/outputs` runtime state; older rows are evicted deterministically. No historical CSV/JSON inputs are modified and no historical labels are created.
 - Verification: targeted runtime tests `5 passed`; full suite `411 passed`; implementation commit `b3ccf395a905a0d8cac679307c1e66e110f7a965`; promotion remains false and active Demo remains unchanged.
+
+## M15.22 append-only prospective decision audit journal
+
+- Code: `quant_bot/decision_audit_journal.py`, `quant_bot/venue_runtime.py`, and `quant/scripts/audit_decision_audit_journal.py`; tests: `quant/tests/test_decision_audit_journal.py` plus `quant/tests/test_venue_runtime.py`.
+- Source: runtime-generated prospective observations only. The journal reads no root historical CSV/JSON and writes only ignored `quant/outputs/decision_audit/decision_audit_YYYY-MM-DD.jsonl` files.
+- Each record is allowlisted pre-action context: venue mapping, reconciled quantity/equity, quote/bar/funding/mark/index timestamps and coverage, strategy features, and model output. Credential-shaped keys, invalid records, and oversized records are rejected; no raw adapter payload is copied.
+- Retention: state snapshot ring `5,000` newest rows; journal append-only by UTC date with `128 KiB` maximum record size. Audit report status at implementation time: `READY_NO_RUNTIME_RECORDS`.
+- Verification: full suite `414 passed`; raw root CSV/JSON inputs, active Demo model and Demo orders remained unchanged. This lineage is prospective evidence and does not establish exact strategy recovery.
