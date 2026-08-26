@@ -5,7 +5,7 @@
   "current_work_package": "M15.12-shared-intent-native-layer-diagnostics",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "e57b643e084d0ece00e2bbc790e408cd9124d9e3",
-  "last_report_commit": "UNCOMMITTED",
+  "last_report_commit": "9d86be54eb0cd4a537fc0dff02c4f4270ceda4be",
   "test_count": 387,
   "last_test_status": "FULL_SUITE_387_PASSED;SHARED_INTENT_CAUSAL_PASS;SHARED_INTENT_BITMEX_ZERO_ACTION;SHARED_INTENT_HYPERLIQUID_ZERO_ACTION;V4.2_DIAGNOSTIC_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
