@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15.14-public-record-identifiability-ceiling",
+  "current_work_package": "M15.15-pre-action-observability-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "74ce3fbc13728bfd39b124f61f418a0a21a75c42",
+  "last_code_commit": "aaf015a0f23ae470b42a379e04c28bee5b6382fb",
   "last_report_commit": "126a9f918ebab03f4c3b71c11654ebbae4450fd8",
-  "test_count": 391,
-  "last_test_status": "FULL_SUITE_391_PASSED;IDENTIFIABILITY_CEILING_DIAGNOSTIC;CONDITIONAL_ACTION_TYPE_PARTIAL;AUTONOMOUS_TIMING_F1_ZERO_BOTH_VENUES;V4.4_DIAGNOSTIC_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
+  "test_count": 393,
+  "last_test_status": "FULL_SUITE_393_PASSED;PRE_ACTION_OBSERVABILITY_DIAGNOSTIC;NO_QUOTE_ORDERBOOK_HISTORY;ALL_DECISIONS_CONTEMPORANEOUS_WITH_ORDER_EVENT;V4.5_SOURCE_SUFFICIENCY_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -65,7 +65,8 @@
     "Autonomous action timing/state generalization remains unresolved after separating shared intent from venue-native exposure scaling.",
     "Venue-neutral v4.3 timing head predicts only 2 BitMEX holdout actions and 0 Hyperliquid actions; timing F1 is zero on both untouched holdouts.",
     "BitMEX v4.3 costed holdout is -0.004365 with PF 0.964532; Hyperliquid executes no adjustment.",
-    "The v4.4 conditional event-type benchmark reaches Macro-F1 0.382047 (BitMEX) and 0.585714 (Hyperliquid) only with an oracle event trigger and teacher dynamic state; autonomous timing F1 remains 0."
+    "The v4.4 conditional event-type benchmark reaches Macro-F1 0.382047 (BitMEX) and 0.585714 (Hyperliquid) only with an oracle event trigger and teacher dynamic state; autonomous timing F1 remains 0.",
+    "The v4.5 source audit found no independent quote/orderbook history; all 31702 non-idle decisions align exactly with the first recorded order event, so complete pre-action trigger context is absent."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -79,6 +80,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model unchanged; do not promote v4.4 or add Demo orders. The public-record ceiling is now quantified: action type is partially predictable once an event is known, but autonomous timing is not. Next research: verify whether complete public order-intent/cancel/order-book context exists before attempting another timing model; otherwise treat exact strategy recovery as unidentifiable and keep only the auditable approximation.",
+  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Source sufficiency is now verified: indicators and closed bars are available, but complete pre-action order intent, cancellation-before-fill, and order-book context are absent from the current public export. Only pursue another imitation candidate if an additional verified public source supplies that context; otherwise exact strategy recovery is unidentifiable and the auditable approximation is the honest endpoint.",
   "updated_at_utc": "2026-08-26T14:15:00Z"
 }

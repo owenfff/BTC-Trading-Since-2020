@@ -177,3 +177,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The event-conditioned benchmark reaches action-type Macro-F1 `0.382047` (BitMEX) and `0.585714` (Hyperliquid) only after an oracle tells it that a non-idle event occurred and allows historical state. Strict autonomous timing F1 remains `0.000000` on both venues.
 - This gap means the public exports do not identify the trader's pre-action trigger well enough for autonomous imitation. Treating the conditional score as a deployable result would be leakage.
 - Unless additional public pre-decision information (such as complete order intent/cancel/order-book context) is verified, exact strategy recovery is not identifiable. Keep the active Demo model unchanged and do not add Demo orders.
+
+## 2026-08-26 — Repository lacks complete pre-action trigger context
+
+- The source audit found no independent historical quote/order-book stream. All `31,702` non-idle decision episodes align with the first recorded order event, so the order fields are contemporaneous rather than pre-action observations.
+- The current indicator set is causally valid (`264,288/264,288` closed bars strictly before decisions), but it cannot supply absent order intent, cancellation-before-fill context, or microstructure history.
+- Exact strategy recovery from this export is not identifiable without an additional verified public source containing pre-action context. Keep the active Demo model unchanged; do not promote v4.5 or add Demo orders.

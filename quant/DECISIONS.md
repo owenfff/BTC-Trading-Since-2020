@@ -296,3 +296,10 @@
 - Conditional action-type Macro-F1 is `0.382047` on BitMEX and `0.585714` on Hyperliquid, with target exposure MAE `0.055041` and `0.047233` respectively. The corresponding strict autonomous timing F1 is `0.000000` on both venues.
 - The large gap shows that the public record contains some information about how an observed action was sized/classified, but does not identify when the action should begin. This is a data/identifiability limit, not evidence that another indicator will recover the private trigger.
 - Keep the active Demo model unchanged. No exact-strategy or full-learning claim is authorized.
+
+## 2026-08-26 — Pre-action observability is insufficient for exact recovery
+
+- Source audit `behavioral-distillation-v4.5-pre-action-observability` confirms `43,251` raw order lifecycle rows, `31,702` order episodes, and `31,702/31,702` non-idle decisions aligned exactly with the first order event time.
+- The repository has no independent historical quote, level-2, order-book, or pre-order intent stream. Submission fields are contemporaneous with the action; fill/lifecycle fields such as average price, cumulative quantity, leaves quantity, and fees are post-action-sensitive.
+- All `264,288` temporal rows have a closed bar strictly before the decision and indicator coverage, but adding those hourly indicators cannot recreate missing pre-action order intent or order-book context.
+- Exact autonomous recovery from the current public export is therefore not identifiable. Keep the auditable approximation and the active Demo model unchanged; do not promote a candidate or add Demo orders.

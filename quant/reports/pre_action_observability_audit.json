@@ -1,0 +1,134 @@
+{
+  "report_version": "M15-PRE-ACTION-OBSERVABILITY-1.0",
+  "status": "DIAGNOSTIC_ONLY",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "candidate_model_version": "behavioral-distillation-v4.5-pre-action-observability",
+  "raw_order_file": "api-v1-order.csv",
+  "raw_order_rows": 43251,
+  "raw_order_columns": [
+    "timestamp",
+    "transactTime",
+    "ordStatus",
+    "ordType",
+    "symbol",
+    "side",
+    "orderQty",
+    "cumQty",
+    "leavesQty",
+    "price",
+    "avgPx",
+    "stopPx",
+    "timeInForce",
+    "execInst",
+    "displayQty",
+    "workingIndicator",
+    "triggered",
+    "orderID",
+    "currency",
+    "ordRejReason",
+    "settlCurrency",
+    "strategy"
+  ],
+  "order_field_classes": {
+    "contemporaneous_submission": [
+      "execInst",
+      "ordType",
+      "orderQty",
+      "price",
+      "side",
+      "stopPx",
+      "strategy",
+      "symbol",
+      "timeInForce",
+      "timestamp",
+      "transactTime"
+    ],
+    "execution_or_lifecycle": [
+      "avgPx",
+      "cumQty",
+      "leavesQty",
+      "ordRejReason",
+      "ordStatus",
+      "triggered",
+      "workingIndicator"
+    ],
+    "post_fill_sensitive": [
+      "avgPx",
+      "cumQty",
+      "leavesQty"
+    ],
+    "other": [
+      "currency",
+      "displayQty",
+      "orderID",
+      "settlCurrency"
+    ]
+  },
+  "order_id_unique": false,
+  "order_id_rows": 43251,
+  "order_id_distinct": 43216,
+  "order_episode_rows": 31702,
+  "order_lifecycle_status_counts": {
+    "Canceled": 454,
+    "Filled": 31248,
+    "PartiallyFilled": 1
+  },
+  "submission_time_alignment": {
+    "non_idle_decisions_matched_to_order_episode": 31702,
+    "decision_time_equal_first_order_event": 31702,
+    "decision_time_before_first_order_event": 0,
+    "decision_time_after_first_order_event": 0,
+    "order_rows": 43251,
+    "order_status_counts": {
+      "Canceled": 11783,
+      "Filled": 31262,
+      "New": 20,
+      "Rejected": 186
+    }
+  },
+  "independent_quote_orderbook_files": [],
+  "independent_quote_orderbook_history_present": false,
+  "market_context": {
+    "rows": 264288,
+    "non_idle_rows": 12866,
+    "coverage": {
+      "feature_latest_bar_time": {
+        "all_rows_present": 264288,
+        "non_idle_rows_present": 12866
+      },
+      "feature_return_1bar": {
+        "all_rows_present": 264288,
+        "non_idle_rows_present": 12866
+      },
+      "feature_rsi_14": {
+        "all_rows_present": 264288,
+        "non_idle_rows_present": 12866
+      },
+      "feature_macd_histogram": {
+        "all_rows_present": 264288,
+        "non_idle_rows_present": 12866
+      },
+      "feature_bollinger_percent_b_20": {
+        "all_rows_present": 264288,
+        "non_idle_rows_present": 12866
+      },
+      "feature_volume_percentile_72bar": {
+        "all_rows_present": 264288,
+        "non_idle_rows_present": 12866
+      }
+    },
+    "latest_closed_bar_strictly_before_decision": 264288,
+    "latest_bar_equal_or_after_decision": 0
+  },
+  "pre_action_trigger_assessment": {
+    "order_submission_fields_are_pre_decision": false,
+    "post_fill_fields_are_pre_decision": false,
+    "independent_quote_or_orderbook_history_present": false,
+    "complete_pre_action_trigger_context_available": false,
+    "reason": "The export records order submission/lifecycle at or after the action and has no independent historical quote/order-book stream. Historical fills and observed post-action state are not valid pre-action features."
+  },
+  "raw_inputs_untouched": true,
+  "active_demo_unchanged": true,
+  "promotion_allowed": false,
+  "conclusion": "Public records support partial conditional action reconstruction, but the current repository does not contain complete pre-action trigger context required to claim exact autonomous strategy recovery."
+}

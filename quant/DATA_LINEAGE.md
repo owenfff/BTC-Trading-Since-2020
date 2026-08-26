@@ -345,3 +345,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - BitMEX: `8006` train events / `2923` untouched events; conditional action Macro-F1 `0.382047`, target MAE `0.055041`; strict autonomous timing F1 reference `0.000000`.
 - Hyperliquid: `117` train events / `25` untouched events; conditional action Macro-F1 `0.585714`, target MAE `0.047233`; strict autonomous timing F1 reference `0.000000`.
 - Status: diagnostic-only; the conditional benchmark is not a signal, active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential, private endpoint, mainnet connection, or order was used.
+
+## M15.15 pre-action observability audit
+
+- Code commit: `aaf015a` (`Add pre action observability audit`); tests: `quant/tests/test_pre_action_observability.py`; full suite after this package: `393 passed`.
+- Candidate/source audit: `behavioral-distillation-v4.5-pre-action-observability`; report: `quant/reports/pre_action_observability_audit.md` and `.json`.
+- Raw source: `api-v1-order.csv` (`43,251` rows), `quant/outputs/order_episodes.csv` (`31,702` episodes), `quant/outputs/decision_episodes.csv`, and `quant/outputs/cross_venue_temporal_dataset_v3.csv` (`264,288` rows).
+- Findings: order IDs are lifecycle-repeated; `31,702/31,702` non-idle decisions match an order episode and have decision time equal to its first recorded order event. No independent quote/order-book history was found. All temporal rows have a closed market bar strictly before the decision (`264,288/264,288`).
+- Status: source-sufficiency diagnostic only; exact autonomous trigger context is absent, active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential, private endpoint, mainnet connection, or order was used.
