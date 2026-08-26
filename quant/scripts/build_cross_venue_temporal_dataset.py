@@ -209,12 +209,19 @@ def _dynamic_state(events: list[dict[str, Any]], index: int, when: datetime, cur
     recent_add = number(last.get("feature_recent_add_count_24h"), 0.0) if last else 0.0
     recent_reduce = number(last.get("feature_recent_reduce_count_24h"), 0.0) if last else 0.0
     recent_flip = number(last.get("feature_recent_flip_count_24h"), 0.0) if last else 0.0
+    action_lags = [
+        str(events[index - offset + 1].get("observed_action") or "") if index - offset + 1 >= 0 else ""
+        for offset in (1, 2, 3)
+    ]
     return {
         "feature_current_net_position_contracts": current,
         "feature_current_normalized_exposure": current / scale if scale else 0.0,
         "feature_position_scale_contracts": scale,
         "feature_cycle_duration_seconds": (when - cycle_start).total_seconds() if cycle_start else None,
         "feature_latest_action": last_action,
+        "feature_action_lag_1": action_lags[0],
+        "feature_action_lag_2": action_lags[1],
+        "feature_action_lag_3": action_lags[2],
         "feature_recent_add_count_24h": recent_add,
         "feature_recent_reduce_count_24h": recent_reduce,
         "feature_recent_flip_count_24h": recent_flip,

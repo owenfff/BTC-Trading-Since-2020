@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Audit a state-robust two-stage behavioral model.
 
-This is an independent research candidate.  It addresses the distribution
+This is an independent research candidate. It addresses the distribution
 shift between teacher-state rows and a zero-start autonomous replay by
-augmenting *training rows only*.  For observed non-idle actions, deterministic
-zero/intermediate state variants retain the same future target and receive a
-causally recomputed action label.  No test row, future observation, or active
-Demo artifact is changed.
+augmenting *training rows only*, and consumes the causal last-three-action
+memory fields emitted by the temporal dataset. For observed non-idle actions,
+deterministic zero/intermediate state variants retain the same future target
+and receive a causally recomputed action label. No test row, future observation,
+or active Demo artifact is changed.
 """
 
 from __future__ import annotations
@@ -58,10 +59,10 @@ from research.autonomous_replay import (  # noqa: E402
 )
 
 
-VERSION = "behavioral-distillation-v3.9-state-robust-autonomous-threshold"
-REPORT = ROOT / "quant" / "reports" / "cross_venue_state_robust_autonomous_threshold_audit.json"
-REPORT_MD = ROOT / "quant" / "reports" / "cross_venue_state_robust_autonomous_threshold_audit.md"
-PER_SYMBOL = ROOT / "quant" / "reports" / "cross_venue_state_robust_autonomous_threshold_by_symbol.csv"
+VERSION = "behavioral-distillation-v4.0-sequence-memory"
+REPORT = ROOT / "quant" / "reports" / "cross_venue_sequence_memory_autonomous_audit.json"
+REPORT_MD = ROOT / "quant" / "reports" / "cross_venue_sequence_memory_autonomous_audit.md"
+PER_SYMBOL = ROOT / "quant" / "reports" / "cross_venue_sequence_memory_by_symbol.csv"
 UTC = timezone.utc
 
 
@@ -307,12 +308,12 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, report_path: Path = REPORT, 
         replay = _replay_portfolio(autonomous["merged_events"], bars, start=window.test_start, end=window.test_end, fee_rate=FEE_RATE)
         per_symbol.extend(_per_symbol_rows(test, autonomous["row_predictions"], replay, window.name))
         behavior.extend([
-            {"window": window.name, "model": "V3.9", "track": "CONDITIONAL_BEHAVIOR", **_behavior_metrics(test, conditional), **_rates(test, conditional)},
-            {"window": window.name, "model": "V3.9", "track": "STRICT_AUTONOMOUS", **auto_metrics, **_rates(test, autonomous["row_predictions"]), "teacher_state_fields_consumed": autonomous["teacher_state_fields_consumed"]},
+            {"window": window.name, "model": "V4.0", "track": "CONDITIONAL_BEHAVIOR", **_behavior_metrics(test, conditional), **_rates(test, conditional)},
+            {"window": window.name, "model": "V4.0", "track": "STRICT_AUTONOMOUS", **auto_metrics, **_rates(test, autonomous["row_predictions"]), "teacher_state_fields_consumed": autonomous["teacher_state_fields_consumed"]},
         ])
         performance.append({
             "window": window.name,
-            "model": "V3.9",
+            "model": "V4.0",
             "track": "STRICT_AUTONOMOUS",
             "cost_profile": "BASE",
             "target_coefficient_max_abs": max(abs(float(value)) for value in model.action_model.target_coef) if model.action_model.target_coef is not None else None,
@@ -331,7 +332,7 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, report_path: Path = REPORT, 
     venue_coverage = _venue_coverage(rows)
     for venue, summary in venue_coverage.items():
         summary["global_model_test_rows"] = {window.name: model_test_counts.get(venue, {}).get(window.name, 0) for window in WINDOWS}
-    performance_rows = [row for row in performance if row.get("model") == "V3.9"]
+    performance_rows = [row for row in performance if row.get("model") == "V4.0"]
     gates = {
         "causal_audit_pass": causal.get("status") == "PASS",
         "all_walk_forward_windows_available": len(performance_rows) == len(WINDOWS),
@@ -342,7 +343,7 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, report_path: Path = REPORT, 
         "per_symbol_results_complete": all(window.get("per_symbol_stability", {}).get("stable_symbol_count", 0) > 0 for window in windows if window.get("status") == "TEST_DATA_AVAILABLE"),
     }
     result = {
-        "report_version": "M15-STATE-ROBUST-AUTONOMOUS-THRESHOLD-AUDIT-1.0",
+        "report_version": "M15-SEQUENCE-MEMORY-AUTONOMOUS-AUDIT-1.0",
         "status": "DEMO_CONTINUE_LIVE_BLOCKED" if not all(gates.values()) else "CANDIDATE_REVIEW_REQUIRED",
         "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
         "active_model_unchanged": True,
@@ -350,7 +351,7 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, report_path: Path = REPORT, 
         "dataset": str(dataset_path.relative_to(ROOT)),
         "dataset_rows": len(rows),
         "causal_audit": causal,
-        "augmentation_contract": "Training-only non-idle rows receive deterministic ZERO_START and HALF_TEACHER_STATE variants; test rows are untouched; synthetic targets use the original next target and actions are recomputed from the synthetic current state. Threshold selection also uses autonomous zero-start state probabilities from a training-only chronological segment.",
+        "augmentation_contract": "Training-only non-idle rows receive deterministic ZERO_START and HALF_TEACHER_STATE variants; test rows are untouched; synthetic targets use the original next target and actions are recomputed from the synthetic current state. The model consumes causal last-three-action memory fields, and threshold selection uses autonomous zero-start state probabilities from a training-only chronological segment.",
         "windows": windows,
         "behavior_results": behavior,
         "performance_results": performance,
@@ -363,7 +364,7 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, report_path: Path = REPORT, 
     report_path.write_text(json.dumps(result, indent=2, ensure_ascii=False, default=str) + "\n", encoding="utf-8")
     _write_csv(per_symbol_path, per_symbol)
     lines = [
-        "# Cross-Venue State-Robust Autonomous-Threshold Audit",
+        "# Cross-Venue Sequence-Memory Autonomous Audit",
         "",
         f"- status: **{result['status']}**",
         f"- candidate: `{VERSION}`",

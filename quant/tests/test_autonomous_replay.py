@@ -67,4 +67,17 @@ def test_autonomous_replay_overrides_teacher_state_and_starts_at_zero() -> None:
     assert result["teacher_state_fields_consumed"] == 0
     assert model.inputs[0].current_strategy_position == 0.0
     assert model.inputs[1].current_strategy_position == 0.25
+    assert model.inputs[0].features["feature_action_lag_1"] == ""
+    assert model.inputs[1].features["feature_action_lag_1"] == "OPEN_LONG"
     assert all("TEACHER_FAKE_ACTION" not in item.features.values() for item in model.inputs)
+
+
+def test_autonomous_state_retains_only_last_three_executed_actions() -> None:
+    from research.autonomous_replay import AutonomousState
+
+    state = AutonomousState()
+    start = datetime(2025, 1, 1, tzinfo=UTC)
+    targets = (0.25, 0.5, 0.1, 0.0)
+    for index, (action, target) in enumerate(zip(("OPEN_LONG", "ADD_LONG", "REDUCE_LONG", "CLOSE_LONG"), targets)):
+        state.apply_execution(target, action, start + timedelta(hours=index))
+    assert state.action_history == ["ADD_LONG", "REDUCE_LONG", "CLOSE_LONG"]

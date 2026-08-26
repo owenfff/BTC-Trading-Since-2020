@@ -25,6 +25,9 @@ STATE_FIELDS = (
     "feature_position_scale_contracts",
     "feature_cycle_duration_seconds",
     "feature_latest_action",
+    "feature_action_lag_1",
+    "feature_action_lag_2",
+    "feature_action_lag_3",
     "feature_recent_add_count_24h",
     "feature_recent_reduce_count_24h",
     "feature_recent_flip_count_24h",
@@ -80,12 +83,17 @@ class AutonomousState:
     fee_accumulation_raw: float = 0.0
     funding_accumulation_raw: float = 0.0
     last_execution_time: datetime | None = None
+    action_history: list[str] | None = None
 
     def apply_execution(self, target: float, action: str, execution_time: datetime, fee_rate: float = 0.0005) -> None:
         before = self.current_normalized_exposure
         delta = target - before
         if abs(delta) <= 1e-12:
             return
+        if self.action_history is None:
+            self.action_history = []
+        self.action_history.append(str(action))
+        self.action_history = self.action_history[-3:]
         self.current_normalized_exposure = target
         self.fee_accumulation_raw += abs(delta) * fee_rate
         self.latest_action = action
@@ -123,6 +131,9 @@ def override_dynamic_state(row: Mapping[str, Any], state: AutonomousState, scale
         "feature_position_scale_contracts": scale,
         "feature_cycle_duration_seconds": (decision_time - state.cycle_start).total_seconds() if state.cycle_start and state.current_normalized_exposure else None,
         "feature_latest_action": state.latest_action,
+        "feature_action_lag_1": state.action_history[-1] if state.action_history else "",
+        "feature_action_lag_2": state.action_history[-2] if state.action_history and len(state.action_history) >= 2 else "",
+        "feature_action_lag_3": state.action_history[-3] if state.action_history and len(state.action_history) >= 3 else "",
         "feature_recent_add_count_24h": state.recent_add_count,
         "feature_recent_reduce_count_24h": state.recent_reduce_count,
         "feature_recent_flip_count_24h": state.recent_flip_count,

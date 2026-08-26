@@ -110,3 +110,15 @@ def test_build_rows_labels_gap_as_no_trade_and_is_deterministic() -> None:
     assert coverage_a == coverage_b
     assert any(row["label_next_action"] == "NO_TRADE" for row in rows_a)
     assert all(temporal.parse_time(row["feature_latest_bar_time"]) < temporal.parse_time(row["decision_time"]) for row in rows_a)
+
+
+def test_dynamic_state_action_lags_use_only_prior_events() -> None:
+    start = datetime(2021, 1, 1, tzinfo=UTC)
+    events = [
+        _event("e1", start + timedelta(hours=1), 0, 100),
+        _event("e2", start + timedelta(hours=2), 100, 50),
+    ]
+    state = temporal._dynamic_state(events, 1, start + timedelta(hours=3), 50, 100)
+    assert state["feature_action_lag_1"] == "REDUCE_LONG"
+    assert state["feature_action_lag_2"] == "OPEN_LONG"
+    assert state["feature_action_lag_3"] == ""
