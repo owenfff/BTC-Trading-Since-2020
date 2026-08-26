@@ -5,7 +5,7 @@
   "current_work_package": "M15.20-cross-venue-strategy-equivalence-boundary",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "2ca629f857f12dd36ee014413ca6329c7de44726",
-  "last_report_commit": "e47ca74c1af80b2b845268f0fd68067afed85f73",
+  "last_report_commit": "e6cf3ee8ef3271bb063a52331086926a8d718316",
   "test_count": 409,
   "last_test_status": "FULL_SUITE_409_PASSED;CROSS_VENUE_EQUIVALENCE_BOUNDARY;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
