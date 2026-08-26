@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import json
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -107,6 +109,52 @@ def test_private_websocket_guards_auth_and_deduplication() -> None:
     binance = BinanceSpotTestnetWebSocket(BinanceSpotTestnetTransport(BinanceTestnetCredentials("key", "secret")))
     assert binance.accept_message({"e": "executionReport", "i": 1}) is True
     assert binance.accept_message({"e": "executionReport", "i": 1}) is False
+
+
+def test_okx_private_websocket_waits_for_login_before_subscribe() -> None:
+    class FakeSocket:
+        def __init__(self, first_message: dict[str, object]) -> None:
+            self.sent: list[dict[str, object]] = []
+            self.incoming = [json.dumps(first_message), json.dumps({"event": "subscribe", "code": "0"})]
+
+        async def send(self, raw: str) -> None:
+            self.sent.append(json.loads(raw))
+
+        async def recv(self) -> str:
+            return self.incoming.pop(0)
+
+        async def close(self) -> None:
+            return None
+
+    socket = FakeSocket({"event": "login", "code": "0"})
+
+    async def factory(*args: object, **kwargs: object) -> FakeSocket:
+        return socket
+
+    websocket = OKXDemoWebSocket(OKXDemoCredentials("key", "secret", "pass"), connect_factory=factory)
+    asyncio.run(websocket.connect(["account"]))
+    assert [message.get("op") for message in socket.sent] == ["login", "subscribe"]
+    assert asyncio.run(websocket.receive())["event"] == "login"
+
+
+def test_okx_private_websocket_auth_failure_is_explicit() -> None:
+    class FakeSocket:
+        async def send(self, raw: str) -> None:
+            return None
+
+        async def recv(self) -> str:
+            return json.dumps({"event": "error", "code": "60009", "msg": "Please log in"})
+
+        async def close(self) -> None:
+            return None
+
+    async def factory(*args: object, **kwargs: object) -> FakeSocket:
+        return FakeSocket()
+
+    websocket = OKXDemoWebSocket(OKXDemoCredentials("key", "secret", "pass"), connect_factory=factory)
+    with pytest.raises(AdapterError) as error:
+        asyncio.run(websocket.connect(["account"]))
+    assert error.value.code == "WEBSOCKET_AUTH_FAILED"
 
 
 def test_binance_region_block_is_explicit(monkeypatch: pytest.MonkeyPatch) -> None:

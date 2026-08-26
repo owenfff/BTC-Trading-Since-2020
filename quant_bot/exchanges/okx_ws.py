@@ -26,6 +26,7 @@ class OKXDemoWebSocket:
         self.connected = False
         self.seen_messages: set[str] = set()
         self.latest: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.pending_messages: list[dict[str, Any]] = []
 
     def set_clock_offset_ms(self, offset_ms: int) -> None:
         self.clock_offset_seconds = int(offset_ms / 1000)
@@ -58,6 +59,20 @@ class OKXDemoWebSocket:
         factory = self.connect_factory or websockets.connect
         self.socket = await factory(self.url, ping_interval=20, ping_timeout=20, close_timeout=5)
         await self.socket.send(json.dumps(self.login_message(), separators=(",", ":")))
+        try:
+            raw_login = await asyncio.wait_for(self.socket.recv(), timeout=10)
+        except asyncio.TimeoutError as error:
+            raise AdapterError("okx-demo", "WEBSOCKET_AUTH_TIMEOUT", "OKX private WebSocket login acknowledgement timed out", retryable=True) from error
+        try:
+            login_message = json.loads(raw_login)
+        except (TypeError, json.JSONDecodeError) as error:
+            raise AdapterError("okx-demo", "WEBSOCKET_AUTH_SCHEMA", "OKX private WebSocket login acknowledgement was invalid") from error
+        if not isinstance(login_message, dict):
+            raise AdapterError("okx-demo", "WEBSOCKET_AUTH_SCHEMA", "OKX private WebSocket login acknowledgement was not an object")
+        self.accept_message(login_message)
+        self.pending_messages.append(login_message)
+        if login_message.get("event") != "login" or str(login_message.get("code", "0")) != "0":
+            raise AdapterError("okx-demo", "WEBSOCKET_AUTH_FAILED", str(login_message.get("msg") or login_message.get("code") or "OKX private WebSocket login failed"))
         if channels:
             await self.socket.send(json.dumps({"op": "subscribe", "args": [{"channel": channel} for channel in channels]}, separators=(",", ":")))
         self.connected = True
@@ -65,6 +80,8 @@ class OKXDemoWebSocket:
     async def receive(self) -> dict[str, Any]:
         if self.socket is None:
             raise AdapterError("okx-demo", "WEBSOCKET_NOT_CONNECTED", "connect before receive")
+        if self.pending_messages:
+            return self.pending_messages.pop(0)
         raw = await self.socket.recv()
         message = json.loads(raw)
         if isinstance(message, dict):
@@ -74,6 +91,7 @@ class OKXDemoWebSocket:
 
     async def close(self) -> None:
         self.connected = False
+        self.pending_messages.clear()
         if self.socket is not None:
             await self.socket.close()
             self.socket = None
