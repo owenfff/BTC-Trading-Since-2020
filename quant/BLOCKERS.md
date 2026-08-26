@@ -201,3 +201,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The pinned Hyperliquid snapshot supplies recent submitted order terms and lifecycle status, but its historical-orders endpoint is limited to a recent window and does not include the historical quote/order-book state around submission.
 - `203/203` filled-status order IDs join to fills, which supports execution analysis but not complete trigger identification. Exact full-strategy recovery remains `NOT_COMPLETE`.
 - Do not promote a model or add Demo orders based on this partial context. A paid/incomplete external archive must not be silently treated as a complete dataset.
+
+## 2026-08-26 — Historical L2 archive access is an external boundary
+
+- Four no-download probes to representative Hyperliquid archive keys returned `403`. This is ambiguous between requester-pays and object authorization; it does not establish availability or absence.
+- The archive may require requester-pays transfer and may have gaps. Do not download or incur transfer costs without explicit authorization and a coverage plan.
+- Historical L2 context is therefore not verified or integrated; the full strategy-learning audit remains `NOT_COMPLETE`.

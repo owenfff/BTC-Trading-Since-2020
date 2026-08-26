@@ -1,0 +1,46 @@
+{
+  "report_version": "M15-HYPERLIQUID-L2-ARCHIVE-ACCESS-1.0",
+  "status": "REQUESTER_OR_OBJECT_ACCESS_BLOCKED",
+  "generated_at_utc": "2026-08-26T13:47:20.230181Z",
+  "archive_base_url": "https://hyperliquid-archive.s3.amazonaws.com/",
+  "probe_method": "HTTP HEAD only; no body download",
+  "requester_pays_header_sent": false,
+  "download_performed": false,
+  "probe_keys": [
+    "market_data/20251115/17/l2Book/BTC.lz4",
+    "market_data/20251115/18/l2Book/BTC.lz4",
+    "market_data/20260101/00/l2Book/BTC.lz4",
+    "market_data/20260718/20/l2Book/BTC.lz4"
+  ],
+  "probe_results": [
+    {
+      "url": "https://hyperliquid-archive.s3.amazonaws.com/market_data/20251115/17/l2Book/BTC.lz4",
+      "http_status": 403,
+      "status": "HTTP_ERROR",
+      "error_reason": "Forbidden"
+    },
+    {
+      "url": "https://hyperliquid-archive.s3.amazonaws.com/market_data/20251115/18/l2Book/BTC.lz4",
+      "http_status": 403,
+      "status": "HTTP_ERROR",
+      "error_reason": "Forbidden"
+    },
+    {
+      "url": "https://hyperliquid-archive.s3.amazonaws.com/market_data/20260101/00/l2Book/BTC.lz4",
+      "http_status": 403,
+      "status": "HTTP_ERROR",
+      "error_reason": "Forbidden"
+    },
+    {
+      "url": "https://hyperliquid-archive.s3.amazonaws.com/market_data/20260718/20/l2Book/BTC.lz4",
+      "http_status": 403,
+      "status": "HTTP_ERROR",
+      "error_reason": "Forbidden"
+    }
+  ],
+  "interpretation": "A 403 response is an access boundary, not proof that an object is absent. The archive remains unverified in this environment and must not be treated as complete historical quote/order-book context.",
+  "impact_on_strategy_learning": "Historical L2 context is not available to the current reproducible pipeline; exact pre-action trigger recovery remains incomplete.",
+  "raw_inputs_untouched": true,
+  "active_demo_unchanged": true,
+  "promotion_allowed": false
+}

@@ -377,3 +377,10 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Outputs: `quant/reports/hyperliquid_order_intent_audit.md` and `quant/reports/hyperliquid_order_intent_audit.json`.
 - Result: `2,649` historical-order records / `1,343` unique IDs; `203/203` filled-status IDs join to fills; `203/203` joined orders were created no later than first fill. This is `PARTIAL_PRE_ACTION_CONTEXT`, not complete trigger context.
 - No root raw CSV/JSON was changed. No credentials, private endpoint, mainnet connection, Demo order or active model change was performed.
+
+## M15.19 Hyperliquid historical L2 archive access boundary
+
+- Builder: `quant/scripts/audit_hyperliquid_l2_archive_access.py`; tests: `quant/tests/test_hyperliquid_l2_archive_access.py`.
+- Outputs: `quant/reports/hyperliquid_l2_archive_access.md` and `quant/reports/hyperliquid_l2_archive_access.json`.
+- Four representative `market_data/[date]/[hour]/l2Book/BTC.lz4` keys were probed with HTTP `HEAD` only; all returned `403`. `requester_pays_header_sent=false` and `download_performed=false` are recorded in the JSON.
+- This is an access/coverage diagnostic, not a market-data import. No credentials, paid request, private endpoint, mainnet connection, order, or raw root CSV/JSON change occurred.

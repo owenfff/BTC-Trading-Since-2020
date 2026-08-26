@@ -322,3 +322,9 @@
 - M15.18 audits the pinned Hyperliquid snapshot's `historicalOrders.json` against `userFillsByTime.json` and the source manifest.
 - The snapshot contains submitted side, limit price, size, GTC, trigger/reduce-only flags, order timestamp and later lifecycle status. `203/203` filled-status order IDs join to fills, and all `203/203` joined orders were created no later than their first fill.
 - This improves execution-style analysis for Hyperliquid, but the official historical-orders source is a recent-window feed and the snapshot has no historical quote/order-book state. Keep exact autonomous timing and private trigger recovery blocked.
+
+## 2026-08-26 — Historical L2 archive remains unverified
+
+- M15.19 performed HTTP `HEAD`-only probes for four representative official Hyperliquid L2 archive object keys covering the observed source period; all returned `403` without a requester-pays header.
+- The result is recorded as `REQUESTER_OR_OBJECT_ACCESS_BLOCKED`, not as proof that the objects are absent. No market-file body was downloaded and no potentially billable requester-pays access was attempted.
+- Until access, cost, and coverage are independently verified, historical L2 cannot be added to the reproducible model dataset. Exact autonomous trigger recovery remains incomplete.
