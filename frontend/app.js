@@ -14,6 +14,94 @@ function displayNumber(value, fallback = "—") {
   return parsed.toLocaleString("en-US", { maximumFractionDigits: 8 });
 }
 
+function fmtMoney(value, fallback = "—") {
+  if (value === null || value === undefined || value === "") return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return String(value);
+  return parsed.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtPnl(value, fallback = "—") {
+  if (value === null || value === undefined || value === "") return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return String(value);
+  const absolute = Math.abs(parsed).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (parsed > 0) return `+${absolute}`;
+  if (parsed < 0) return `-${absolute}`;
+  return "0.00";
+}
+
+function numberClass(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed === 0) return "number-zero";
+  return parsed > 0 ? "number-positive" : "number-negative";
+}
+
+function setPnl(selector, value, fallback = "—") {
+  const element = $(selector);
+  if (!element) return;
+  element.textContent = fmtPnl(value, fallback);
+  element.title = value === null || value === undefined || value === "" ? fallback : String(value);
+  element.classList.remove("pnl-positive", "pnl-negative", "pnl-zero");
+  const parsed = Number(value);
+  element.classList.add(!Number.isFinite(parsed) || parsed === 0 ? "pnl-zero" : parsed > 0 ? "pnl-positive" : "pnl-negative");
+}
+
+function firstValue(item, keys) {
+  for (const key of keys) {
+    if (item?.[key] !== null && item?.[key] !== undefined && item?.[key] !== "") return item[key];
+  }
+  return null;
+}
+
+function localTime(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("zh-CN", { hour12: false });
+}
+
+function relativeTime(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  const seconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  return `${Math.floor(seconds / 3600)}h ago`;
+}
+
+function compactSymbol(value) {
+  const text = String(value || "—");
+  return text.replace(/-USDT-SWAP$|-USD-SWAP$|-SWAP$/i, "");
+}
+
+function appendSymbolCell(row, value) {
+  const cell = document.createElement("td");
+  cell.className = "symbol-cell";
+  const strong = document.createElement("strong");
+  strong.textContent = compactSymbol(value);
+  const small = document.createElement("small");
+  small.textContent = String(value || "—").includes("SWAP") ? "SWAP" : "历史品种";
+  cell.append(strong, small);
+  row.append(cell);
+}
+
+function appendPnlCell(row, value) {
+  appendCell(row, fmtPnl(value), numberClass(value));
+}
+
+function appendDirectionCell(row, value) {
+  const cell = document.createElement("td");
+  const text = String(value || "").toUpperCase();
+  const long = text === "BUY" || text === "LONG" || text === "多" || text === "1";
+  const short = text === "SELL" || text === "SHORT" || text === "空" || text === "-1";
+  const badge = document.createElement("span");
+  badge.className = `direction-badge ${long ? "direction-long" : short ? "direction-short" : "direction-flat"}`;
+  badge.textContent = long ? "多" : short ? "空" : text || "—";
+  cell.append(badge);
+  row.append(cell);
+}
+
 function appendCell(row, value, className = "") {
   const cell = document.createElement("td");
   if (className) cell.className = className;
@@ -48,6 +136,19 @@ const riskTagLabels = {
   UNKNOWN_MARKET_REGIME: "市场状态不明确",
   INSUFFICIENT_HISTORY: "历史行情不足",
   MISSING_MARKET_DATA: "行情数据不完整",
+};
+
+const riskReasonLabels = {
+  LEVERAGE_LIMIT_OR_UNVERIFIED: "杠杆未核验",
+  MARGIN_MODE_NOT_ALLOWED: "保证金模式受限",
+  HISTORICAL_TOTAL_EXPOSURE_EXCEEDED: "历史总敞口超限",
+  WEBSOCKET_NOT_CONNECTED: "实时连接未建立",
+  ACCOUNT_RECONCILIATION_FAILED: "账户对账失败",
+  MARKET_DATA_STALE: "行情已过期",
+  CLOCK_DRIFT: "服务端时钟偏移",
+  KILL_SWITCH_ENGAGED: "手动安全开关已触发",
+  ORDERS_DISABLED: "下单未启用",
+  TESTNET_CONFIRMATION_REQUIRED: "需要 Demo/Testnet 确认",
 };
 
 const strategyBasisLabels = {
@@ -134,6 +235,11 @@ function replayTime(value) {
 function replayShortNumber(value) {
   if (value === null || value === undefined || !Number.isFinite(Number(value))) return "—";
   return Number(value).toLocaleString("en-US", { maximumFractionDigits: 6 });
+}
+
+function replayIndicator(value, digits = 4) {
+  if (value === null || value === undefined || !Number.isFinite(Number(value))) return "—";
+  return Number(value).toLocaleString("en-US", { maximumFractionDigits: digits });
 }
 
 function chartSurface(canvas) {
@@ -292,11 +398,16 @@ function updateReplayInspector(snapshot) {
   const orders = data.orders.filter((order) => order.start_ts <= endTs && order.end_ts >= endTs);
   const lastOrder = data.orders.filter((order) => order.end_ts <= endTs && Number.isFinite(order.position_after)).at(-1);
   const pnl = data.pnl.filter((point) => point.ts <= endTs).at(-1);
+  const indicators = bar.indicators || {};
   setText("#replay-time", replayTime(endTs));
   setText("#replay-price", replayShortNumber(Number(bar.close)));
   setText("#replay-position", lastOrder ? `${replayShortNumber(lastOrder.position_after)} contracts` : "0 contracts");
   setText("#replay-orders", `${orders.length}`);
   setText("#replay-pnl", pnl ? replayShortNumber(pnl.value) : "0");
+  setText("#replay-rsi", replayIndicator(indicators.rsi14, 2));
+  setText("#replay-macd", replayIndicator(indicators.macd_histogram, 6));
+  setText("#replay-bollinger", replayIndicator(indicators.bollinger_percent_b, 4));
+  setText("#replay-indicators", indicators.coverage === "COMPLETE" ? "完整" : indicators.coverage === "PARTIAL" ? "部分缺失" : "—");
   setText("#replay-inspector-title", `${data.symbol} · ${lastOrder?.action || "NO ACTION"}`);
   setText("#replay-range", `${replayTime(data.full_start_ts)} → ${replayTime(data.full_end_ts)}`);
 }
@@ -331,13 +442,14 @@ function startReplay() {
 async function loadReplay() {
   const status = $("#replay-status");
   try {
+    const venue = $("#replay-venue")?.value || "bitmex";
     const symbol = $("#replay-symbol")?.value || "XBTUSD";
-    const response = await fetch(panelPath(`/api/replay?symbol=${encodeURIComponent(symbol)}&limit=1000`), { cache: "no-store" });
+    const response = await fetch(panelPath(`/api/replay?venue=${encodeURIComponent(venue)}&symbol=${encodeURIComponent(symbol)}&limit=1000`), { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     replayState.data = await response.json();
     replayState.cursor = 1000;
     setText("#replay-pnl-unit", replayState.data.pnl_unit || "分析值");
-    setText("#replay-note", replayState.data.available ? "数据来自仓库内已审计的历史派生输出；下层为分析性已实现结果，不代表实时账户权益。" : "本地历史回放数据尚未生成。先完成数据节点同步后，这里会显示时间轴。 ");
+    setText("#replay-note", replayState.data.available ? `${replayState.data.source || "本地历史派生输出"}；指标只使用已关闭 K 线，不代表实时账户权益。` : "本地历史回放数据尚未生成。先完成数据节点同步后，这里会显示时间轴。 ");
     setText("#replay-status", replayState.data.available ? "LOCAL REPLAY READY" : "WAITING FOR DATA");
     drawReplay();
   } catch (error) {
@@ -347,6 +459,19 @@ async function loadReplay() {
   }
 }
 
+$("#replay-venue")?.addEventListener("change", () => {
+  stopReplay();
+  const venue = $("#replay-venue").value;
+  const symbol = $("#replay-symbol");
+  if (symbol) {
+    symbol.replaceChildren();
+    const option = document.createElement("option");
+    option.value = venue === "hyperliquid" ? "HL-BTC-PERP" : "XBTUSD";
+    option.textContent = venue === "hyperliquid" ? "BTC-PERP · Hyperliquid" : "XBTUSD · BitMEX";
+    symbol.append(option);
+  }
+  loadReplay();
+});
 $("#replay-play")?.addEventListener("click", startReplay);
 $("#replay-latest")?.addEventListener("click", () => { stopReplay(); replayState.cursor = 1000; const slider = $("#replay-slider"); if (slider) slider.value = "1000"; drawReplay(); });
 $("#replay-slider")?.addEventListener("input", (event) => { stopReplay(); replayState.cursor = Number(event.target.value); drawReplay(); });
@@ -366,34 +491,71 @@ function renderAccount(payload) {
   const risk = runtime.risk || {};
   const hasAccount = account.source && account.source !== "NONE";
 
-  setText("#account-source", hasAccount ? `${runtime.plans || 0} 个信号` : "等待快照");
-  setText("#equity-value", hasAccount ? displayNumber(account.equity) : "—");
+  const positionRealized = positions.reduce((total, item) => total + (Number(item.realized_pnl) || 0), 0);
+  const unrealizedValues = positions.map((item) => firstValue(item, ["upl", "unrealized_pnl", "unrealizedPnl", "floating_pnl"])).filter((value) => value !== null);
+  const unrealized = unrealizedValues.length ? unrealizedValues.reduce((total, value) => total + (Number(value) || 0), 0) : null;
+  const fillPnlValues = fills.map((item) => firstValue(item, ["realized_pnl", "pnl", "profit", "closed_pnl"]));
+  const hasFillPnl = fillPnlValues.some((value) => value !== null && Number.isFinite(Number(value)));
+  const fillRealized = hasFillPnl ? fillPnlValues.reduce((total, value) => total + (Number(value) || 0), 0) : null;
+  const accountRealized = firstValue(account, ["realized_pnl", "realizedPnl"]);
+  const realized = !hasAccount ? null : accountRealized !== null ? accountRealized : fillRealized !== null ? fillRealized : positionRealized;
+  const todayKey = new Date().toLocaleDateString("en-CA");
+  const todayFillPnl = hasFillPnl ? fills.filter((item) => item.timestamp && new Date(item.timestamp).toLocaleDateString("en-CA") === todayKey).reduce((total, item) => total + (Number(firstValue(item, ["realized_pnl", "pnl", "profit", "closed_pnl"])) || 0), 0) : null;
+  const todayPnl = !hasAccount ? null : todayFillPnl !== null ? todayFillPnl : unrealized !== null ? Number(realized || 0) + unrealized : null;
+
+  setText("#account-source", hasAccount ? `${runtime.plans || 0} 个策略目标` : "等待快照");
+  const equityElement = $("#equity-value");
+  if (equityElement) {
+    equityElement.textContent = hasAccount ? fmtMoney(account.equity) : "—";
+    equityElement.title = account.equity === null || account.equity === undefined ? "—" : String(account.equity);
+  }
   setText("#equity-unit", account.equity_unit === "USD_EQUIVALENT" ? "USD 估值" : (account.equity_unit || "账户单位"));
+  setPnl("#today-pnl", todayPnl);
+  setText("#today-pnl-note", todayFillPnl !== null ? "本地自然日 · 成交口径" : "会话已实现 + 未实现");
+  setPnl("#unrealized-pnl", unrealized);
+  setPnl("#realized-pnl", realized);
   const diagnostic = runtime.last_error || runtime.stop_reason;
   setText("#account-note", diagnostic ? `运行诊断 · ${diagnostic}` : hasAccount ? `${runtime.plans || 0} 个目标信号 · 对账 ${account.reconciliation_ok ? "PASS" : "WAITING"}` : "等待实时账户快照。");
   setText("#position-count", positions.length);
   setText("#order-count", orders.length);
   setText("#fill-count", fills.length);
-  setText("#runtime-status", (runtime.status || "NOT RUNNING").toUpperCase());
+  setText("#tab-position-count", positions.length);
+  setText("#tab-order-count", orders.length);
+  setText("#tab-fill-count", fills.length);
+  const marginUsed = firstValue(risk, ["margin_used", "marginUsed"]);
+  const equityNumber = Number(account.equity);
+  const marginRatio = marginUsed !== null && Number.isFinite(equityNumber) && equityNumber !== 0 ? Number(marginUsed) / Math.abs(equityNumber) * 100 : null;
+  setText("#margin-usage", marginRatio === null ? "—" : `${marginRatio.toFixed(1)}%`);
   const riskReasons = Array.isArray(risk.block_reasons) ? risk.block_reasons : [];
   const orderBlockReasons = Array.isArray(runtime.order_block_reasons) ? runtime.order_block_reasons : [];
   const allRiskReasons = [...new Set([...riskReasons, ...orderBlockReasons])];
-  const feedback = runtime.latest_feedback_at ? ` · 最新成交反馈 ${runtime.latest_feedback_at}` : "";
+  const feedback = runtime.latest_feedback_at ? ` · 最新成交反馈 ${relativeTime(runtime.latest_feedback_at)}` : "";
   const orderAge = runtime.oldest_active_order_age_seconds == null ? "" : ` · 最老活动订单 ${displayNumber(runtime.oldest_active_order_age_seconds, "0")} 秒`;
-  setText("#runtime-safety", allRiskReasons.length ? `下单阻断：${allRiskReasons.join("、")}${feedback}${orderAge}` : `风控正常 · 时钟偏移 ${displayNumber(runtime.clock_drift_seconds, "—")} 秒${feedback}${orderAge}`);
+  const riskText = allRiskReasons.map((reason) => riskReasonLabels[String(reason).toUpperCase()] || String(reason)).join("、");
+  const safety = $("#runtime-safety");
+  if (safety) {
+    safety.textContent = allRiskReasons.length ? `下单阻断：${riskText}${feedback}${orderAge}` : `风控正常 · 时钟偏移 ${displayNumber(runtime.clock_drift_seconds, "—")} 秒${feedback}${orderAge}`;
+    safety.classList.toggle("safe", !allRiskReasons.length);
+    safety.classList.toggle("warn", allRiskReasons.length > 0 && !risk.kill_switch_engaged);
+    safety.classList.toggle("danger", Boolean(risk.kill_switch_engaged));
+    safety.title = allRiskReasons.join(" · ") || "风险条件正常";
+  }
 
   const balanceList = $("#balance-list");
   balanceList.replaceChildren();
-  if (!balances.length) {
+  const nonZeroBalances = balances.filter((item) => item.total === null || item.total === undefined || Number(item.total) !== 0);
+  if (!nonZeroBalances.length) {
     const empty = document.createElement("span");
     empty.className = "empty-state";
     empty.textContent = "预检或运行后显示余额明细";
     balanceList.append(empty);
   } else {
-    balances.slice(0, 12).forEach((item) => {
+    nonZeroBalances.slice(0, 12).forEach((item) => {
       const chip = document.createElement("span");
       chip.className = "balance-chip";
-      chip.textContent = `${item.currency || "?"}  ${displayNumber(item.total, "0")}`;
+      chip.innerHTML = `<b></b><span></span>`;
+      chip.querySelector("b").textContent = item.currency || "?";
+      chip.querySelector("span").textContent = displayNumber(item.total, "0");
       chip.title = `可用 ${displayNumber(item.available, "0")}`;
       balanceList.append(chip);
     });
@@ -401,30 +563,44 @@ function renderAccount(payload) {
 
   renderRows("#positions-table", positions, "暂无持仓", (item) => {
     const row = document.createElement("tr");
-    appendCell(row, item.symbol);
-    appendCell(row, displayNumber(item.quantity));
+    appendSymbolCell(row, item.symbol);
+    const quantity = Number(item.quantity);
+    appendDirectionCell(row, firstValue(item, ["posSide", "position_side"]) || (quantity > 0 ? "LONG" : quantity < 0 ? "SHORT" : ""));
+    appendCell(row, displayNumber(Math.abs(quantity)));
     appendCell(row, displayNumber(item.average_entry_price));
-    appendCell(row, displayNumber(item.realized_pnl));
+    appendCell(row, displayNumber(firstValue(item, ["markPx", "mark_price", "markPrice", "last", "last_price", "current_price"])));
+    appendPnlCell(row, unrealizedValues.length ? firstValue(item, ["upl", "unrealized_pnl", "unrealizedPnl", "floating_pnl"]) : null);
+    appendPnlCell(row, item.realized_pnl);
+    appendCell(row, item.leverage === null || item.leverage === undefined ? "—" : `${displayNumber(item.leverage)}x`);
+    appendCell(row, displayNumber(firstValue(item, ["margin", "initial_margin", "occupied_margin", "margin_used"])));
     return row;
-  });
-  renderRows("#orders-table", orders, "暂无订单", (item) => {
+  }, 9);
+  const latestFill = fills.slice().sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))[0];
+  setText("#latest-fill-time", latestFill?.timestamp ? `${localTime(latestFill.timestamp)} · ${relativeTime(latestFill.timestamp)}` : "暂无成交");
+  renderRows("#orders-table", orders, "当前无活动委托", (item) => {
     const row = document.createElement("tr");
-    appendCell(row, item.symbol);
-    appendCell(row, item.side);
+    appendSymbolCell(row, item.symbol);
+    appendDirectionCell(row, item.side);
     appendCell(row, displayNumber(item.quantity));
     appendCell(row, displayNumber(item.price, "市价"));
+    appendCell(row, item.status || item.state || "活动", "order-status");
+    appendCell(row, localTime(firstValue(item, ["timestamp", "created_at", "transactTime"])), "time-cell");
     appendStrategyReasonCell(row, item);
     return row;
-  }, 5);
+  }, 7);
   renderRows("#fills-table", fills, "暂无成交记录", (item) => {
     const row = document.createElement("tr");
-    const time = item.timestamp ? new Date(item.timestamp).toLocaleString("zh-CN", { hour12: false }) : "—";
-    appendCell(row, time);
-    appendCell(row, item.symbol);
-    appendCell(row, item.side);
-    appendCell(row, `${displayNumber(item.quantity)} / ${displayNumber(item.price)}`);
+    appendCell(row, localTime(item.timestamp), "time-cell");
+    appendSymbolCell(row, item.symbol);
+    appendDirectionCell(row, item.side);
+    appendCell(row, displayNumber(item.quantity));
+    appendCell(row, displayNumber(item.price));
+    appendCell(row, displayNumber(item.fee));
+    appendPnlCell(row, firstValue(item, ["realized_pnl", "pnl", "profit", "closed_pnl"]));
+    const orderId = String(firstValue(item, ["client_order_id", "order_id", "ordId", "clientOid"]) || "—");
+    appendCell(row, orderId === "—" ? orderId : orderId.slice(-6));
     return row;
-  });
+  }, 8);
 }
 
 function renderVenues(venues) {
@@ -467,21 +643,54 @@ function renderVenues(venues) {
 function render(payload) {
   const localControl = Boolean(payload.control?.enabled && payload.control?.local_only);
   document.body.classList.toggle("public-mode", !localControl);
-  document.querySelector(".control-panel")?.toggleAttribute("hidden", !localControl);
-  document.querySelectorAll("details.advanced").forEach((item) => item.toggleAttribute("hidden", !localControl));
-  const feed = payload.feed_status === "CONNECTED";
+  const feed = payload.feed_status === "CONNECTED" || payload.runtime?.market_connected === true;
   const badge = $("#feed-badge");
-  badge.classList.toggle("live", feed);
-  badge.classList.toggle("waiting", !feed);
-  badge.innerHTML = `<i></i>${feed ? "交易节点已连接" : "等待交易节点"}`;
+  if (badge) {
+    badge.classList.toggle("live", feed);
+    badge.classList.toggle("waiting", !feed);
+    badge.innerHTML = `<i></i>OKX DEMO · ${feed ? "已连接" : "等待连接"}`;
+  }
 
-  setText("#updated-at", feed ? `状态源 · ${payload.updated_at_utc}` : "等待状态源");
+  const runtimeStatus = String(payload.runtime?.status || "WAITING").toUpperCase();
+  const runtimeElement = $("#runtime-status");
+  if (runtimeElement) {
+    runtimeElement.textContent = runtimeStatus.includes("RUNNING") ? "RUNNING" : runtimeStatus.replaceAll("_", " ");
+    runtimeElement.classList.toggle("waiting", !runtimeStatus.includes("RUNNING"));
+    runtimeElement.classList.toggle("blocked", runtimeStatus.includes("BLOCK") || runtimeStatus.includes("STOP"));
+  }
+
+  const updatedAt = payload.updated_at_utc || payload.account?.captured_at_utc;
+  const updatedElement = $("#updated-at");
+  if (updatedElement) {
+    updatedElement.textContent = updatedAt ? relativeTime(updatedAt) : "等待状态源";
+    updatedElement.title = updatedAt ? localTime(updatedAt) : "等待状态源";
+  }
+  const ageSeconds = updatedAt ? Math.max(0, (Date.now() - new Date(updatedAt).getTime()) / 1000) : Infinity;
+  const topbar = $("#topbar");
+  const heartbeat = $(".heartbeat");
+  if (topbar) {
+    topbar.classList.toggle("is-stale", ageSeconds > 15 && ageSeconds <= 60);
+    topbar.classList.toggle("is-dead", ageSeconds > 60 || !feed);
+  }
+  if (heartbeat) {
+    heartbeat.classList.toggle("live", feed && ageSeconds <= 15);
+    heartbeat.classList.toggle("stale", ageSeconds > 15 && ageSeconds <= 60);
+    heartbeat.classList.toggle("dead", ageSeconds > 60 || !feed);
+  }
+  setText("#connection-heartbeat", !feed ? "未连接" : ageSeconds > 60 ? "已过期" : ageSeconds > 15 ? "延迟" : "心跳正常");
   setText("#model-version", payload.model?.version || "—");
   const modelSha = payload.model?.sha256 || "";
-  setText("#model-meta", modelSha ? modelSha.slice(0, 12) : "—");
+  const featureContract = payload.model?.feature_contract_version || "";
+  setText("#model-meta", modelSha ? `${modelSha.slice(0, 12)}${featureContract ? ` · ${featureContract}` : ""}` : "—");
   renderVenues(payload.venues || []);
   setText("#allowed-count", payload.mapping?.allowed_count ?? 0);
-  setText("#reconciliation", payload.preflight?.reconciliation_ok ? "PASS" : "WAITING");
+  const reconciliation = $("#reconciliation");
+  if (reconciliation) {
+    const reconciliationOk = Boolean(payload.preflight?.reconciliation_ok || payload.account?.reconciliation_ok);
+    reconciliation.textContent = `对账 ${reconciliationOk ? "PASS" : "WAITING"}`;
+    reconciliation.classList.toggle("state-positive", reconciliationOk);
+    reconciliation.classList.toggle("state-warning", !reconciliationOk);
+  }
   renderAccount(payload);
   renderControl(payload.control || {});
 
@@ -492,9 +701,9 @@ function render(payload) {
   setText("#scope-monitor", mapping.monitor_only_count || 0);
   setText("#scope-unavailable", mapping.unavailable_count || 0);
   const width = (number) => total ? `${Math.max(2, Math.round((number / total) * 100))}%` : "0%";
-  $("#bar-allowed").style.width = width(mapping.allowed_count || 0);
-  $("#bar-monitor").style.width = width(mapping.monitor_only_count || 0);
-  $("#bar-unavailable").style.width = width(mapping.unavailable_count || 0);
+  $("#bar-allowed")?.style && ($("#bar-allowed").style.width = width(mapping.allowed_count || 0));
+  $("#bar-monitor")?.style && ($("#bar-monitor").style.width = width(mapping.monitor_only_count || 0));
+  $("#bar-unavailable")?.style && ($("#bar-unavailable").style.width = width(mapping.unavailable_count || 0));
 
   const symbols = $("#symbol-list");
   symbols.replaceChildren();
@@ -512,7 +721,158 @@ function render(payload) {
       symbols.append(chip);
     });
   }
+  recordSessionEquity(payload.account?.equity, updatedAt);
+  renderRuntimeLog(payload, allRuntimeLogEntries(payload));
+  drawSessionEquity();
 }
+
+const sessionEquityKey = "q01.session-equity.v1";
+const runtimeLogState = { entries: [], signatures: new Set() };
+
+function loadSessionEquity() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(sessionEquityKey) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((point) => Number.isFinite(Number(point.equity)) && point.ts) : [];
+  } catch (_error) {
+    return [];
+  }
+}
+
+function recordSessionEquity(equity, timestamp) {
+  const value = Number(equity);
+  if (!Number.isFinite(value)) return;
+  const points = loadSessionEquity();
+  const now = timestamp || new Date().toISOString();
+  const last = points.at(-1);
+  if (!last || last.ts !== now) points.push({ ts: now, equity: value });
+  while (points.length > 240) points.shift();
+  try { window.localStorage.setItem(sessionEquityKey, JSON.stringify(points)); } catch (_error) { /* private browsing/storage limits */ }
+}
+
+function drawSessionEquity() {
+  const canvas = $("#equity-session-chart");
+  const points = loadSessionEquity();
+  const empty = $("#curve-empty");
+  if (!canvas || points.length < 2) {
+    empty?.classList.remove("has-data");
+    return;
+  }
+  empty?.classList.add("has-data");
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(320, Math.floor(rect.width));
+  const height = Math.max(180, Math.floor(rect.height));
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  const pad = { left: 66, right: 16, top: 16, bottom: 28 };
+  const values = points.map((point) => Number(point.equity));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = Math.max(0.01, max - min);
+  const floor = min - span * .12;
+  const ceiling = max + span * .12;
+  const innerWidth = width - pad.left - pad.right;
+  const innerHeight = height - pad.top - pad.bottom;
+  const x = (index) => pad.left + (index / Math.max(1, points.length - 1)) * innerWidth;
+  const y = (value) => pad.top + ((ceiling - value) / Math.max(.01, ceiling - floor)) * innerHeight;
+  ctx.font = "10px IBM Plex Mono, SFMono-Regular, Consolas, monospace";
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#1e2630";
+  ctx.fillStyle = "#8b97a4";
+  for (let row = 0; row <= 3; row += 1) {
+    const yy = pad.top + innerHeight * row / 3;
+    ctx.beginPath(); ctx.moveTo(pad.left, yy); ctx.lineTo(width - pad.right, yy); ctx.stroke();
+    const label = fmtMoney(ceiling - (ceiling - floor) * row / 3);
+    ctx.fillText(label, 8, yy + 3);
+  }
+  ctx.strokeStyle = "#3ee0c5";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  points.forEach((point, index) => { const px = x(index); const py = y(Number(point.equity)); if (index === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); });
+  ctx.stroke();
+  const last = points.at(-1);
+  ctx.fillStyle = "#3ee0c5";
+  ctx.beginPath(); ctx.arc(x(points.length - 1), y(Number(last.equity)), 3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#8b97a4";
+  ctx.fillText(localTime(points[0].ts), pad.left, height - 8);
+  ctx.textAlign = "right";
+  ctx.fillText(`${relativeTime(last.ts)} · ${fmtMoney(last.equity)}`, width - pad.right, height - 8);
+  ctx.textAlign = "left";
+}
+
+function allRuntimeLogEntries(payload) {
+  const runtime = payload.runtime || {};
+  const risk = runtime.risk || {};
+  const updatedAt = payload.updated_at_utc || payload.account?.captured_at_utc || new Date().toISOString();
+  const reasons = [...new Set([...(risk.block_reasons || []), ...(runtime.order_block_reasons || [])])];
+  const entries = [
+    { kind: "STATUS", text: `运行状态 · ${String(runtime.status || "WAITING").replaceAll("_", " ")}`, ts: updatedAt },
+    { kind: "ACCOUNT", text: `账户对账 · ${payload.account?.reconciliation_ok ? "PASS" : "WAITING"}`, ts: payload.account?.captured_at_utc || updatedAt },
+  ];
+  if (reasons.length) entries.push({ kind: "RISK", text: `下单阻断 · ${reasons.map((reason) => riskReasonLabels[String(reason).toUpperCase()] || reason).join("、")}`, ts: updatedAt });
+  if (runtime.latest_feedback_at) entries.push({ kind: "FILL", text: "收到最新成交反馈", ts: runtime.latest_feedback_at });
+  return entries;
+}
+
+function renderRuntimeLog(_payload, entries) {
+  const list = $("#runtime-log");
+  if (!list) return;
+  entries.forEach((entry) => {
+    const signature = `${entry.kind}|${entry.ts}|${entry.text}`;
+    if (runtimeLogState.signatures.has(signature)) return;
+    runtimeLogState.signatures.add(signature);
+    runtimeLogState.entries.unshift(entry);
+  });
+  runtimeLogState.entries = runtimeLogState.entries.slice(0, 40);
+  list.replaceChildren();
+  if (!runtimeLogState.entries.length) {
+    const empty = document.createElement("li");
+    empty.className = "log-empty";
+    empty.textContent = "等待状态事件";
+    list.append(empty);
+    return;
+  }
+  runtimeLogState.entries.forEach((entry) => {
+    const item = document.createElement("li");
+    const time = document.createElement("time");
+    time.textContent = `${localTime(entry.ts)} · ${relativeTime(entry.ts)}`;
+    const text = document.createElement("span");
+    text.className = "log-text";
+    text.innerHTML = `<b class="log-kind"></b><span></span>`;
+    text.querySelector(".log-kind").textContent = entry.kind;
+    text.querySelector("span").textContent = entry.text;
+    item.append(time, text);
+    list.append(item);
+  });
+}
+
+function selectTab(name) {
+  document.querySelectorAll("[data-tab]").forEach((button) => {
+    const active = button.dataset.tab === name;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  document.querySelectorAll(".tab-panel").forEach((panel) => {
+    const active = panel.id === `tab-${name}`;
+    panel.hidden = !active;
+    panel.classList.toggle("is-active", active);
+  });
+  if (name === "curve") window.requestAnimationFrame(drawSessionEquity);
+}
+
+document.querySelectorAll("[data-tab]").forEach((button) => button.addEventListener("click", () => selectTab(button.dataset.tab)));
+$("#refresh-button")?.addEventListener("click", () => refresh());
+$("#control-open")?.addEventListener("click", () => {
+  const drawer = $("#control-drawer");
+  if (!drawer) return;
+  drawer.hidden = !drawer.hidden;
+  $("#control-open").setAttribute("aria-expanded", String(!drawer.hidden));
+  if (!drawer.hidden) drawer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+window.addEventListener("resize", () => { if (!$("#tab-curve")?.hidden) drawSessionEquity(); });
 
 let controlState = {};
 
@@ -532,6 +892,8 @@ function renderControl(control) {
   const start = $("#control-start");
   const stop = $("#control-stop");
   const preflight = $("#control-preflight");
+  const kill = $("#control-kill");
+  const clearKill = $("#control-clear-kill");
   const form = $("#credential-form");
   const credentialStatus = $("#credential-status");
   if (!status || !note || !start || !stop) return;
@@ -540,18 +902,23 @@ function renderControl(control) {
   const testnetMode = $("#control-mode")?.value === "testnet";
   const credentialSetupAvailable = control.credential_setup_available !== false;
   const configured = !credentialSetupAvailable || control.credential_statuses?.[selectedVenue] === "CONFIGURED";
-  status.textContent = !enabled ? "只读面板" : running ? `运行中 · ${control.venue}` : "本机控制已就绪";
+  const killEngaged = Boolean(control.kill_switch_engaged);
+  status.textContent = !enabled ? "公开只读" : killEngaged ? "安全停机已触发" : running ? `运行中 · ${control.venue}` : "本机控制已就绪";
   if (form) form.hidden = !enabled || !credentialSetupAvailable;
   if (credentialStatus) credentialStatus.textContent = configured ? "已配置" : "未配置";
   start.disabled = !enabled || running || (testnetMode && !configured);
   stop.disabled = !enabled || !running;
   if (preflight) preflight.disabled = !enabled || running || !configured;
+  if (kill) kill.disabled = !enabled || killEngaged;
+  if (clearKill) clearKill.disabled = !enabled || !killEngaged;
   if (!enabled) {
-    note.textContent = "当前是远程/只读面板。请在交易节点本机启动 start-local-control-panel.ps1 或 start-local-control-panel.sh 后使用控制按钮。";
+    note.textContent = "公开页只显示控制入口，按钮不可操作；请通过 SSH 隧道打开交易节点本机控制页后使用。";
   } else if (!credentialSetupAvailable) {
     note.textContent = "Windows 节点请使用启动器的 DPAPI 凭证流程；Linux 交易节点可在本区配置凭证。";
   } else if (running) {
     note.textContent = `本机节点已启动：${control.venue} · ${control.mode}。凭证不会进入网页。`;
+  } else if (killEngaged) {
+    note.textContent = "安全停机已触发：停止新增订单并撤销机器人活动订单，现有持仓保留；解除后需重新预检。";
   } else if (testnetMode && !configured) {
     note.textContent = "先在上方本机凭证区保存当前交易所凭证，再运行预检。";
   } else {
@@ -652,6 +1019,34 @@ $("#control-stop")?.addEventListener("click", async () => {
   }
 });
 
+$("#control-kill")?.addEventListener("click", async () => {
+  if (!(controlState.enabled && controlState.local_only)) {
+    setText("#control-note", "安全停机仅允许在交易节点本机的 loopback 面板中使用。");
+    return;
+  }
+  if (!window.confirm("确认安全停机？将停止新增订单并撤销机器人活动订单，但保留现有持仓。")) return;
+  try {
+    await controlRequest("/api/control/kill-switch");
+    await refresh();
+  } catch (error) {
+    setText("#control-note", `安全停机失败 · ${error.message}`);
+  }
+});
+
+$("#control-clear-kill")?.addEventListener("click", async () => {
+  if (!(controlState.enabled && controlState.local_only)) {
+    setText("#control-note", "解除安全停机仅允许在交易节点本机的 loopback 面板中使用。");
+    return;
+  }
+  if (!window.confirm("确认解除安全停机？解除后仍需重新预检，才会恢复 Demo 运行。")) return;
+  try {
+    await controlRequest("/api/control/kill-switch/clear");
+    await refresh();
+  } catch (error) {
+    setText("#control-note", `解除安全停机失败 · ${error.message}`);
+  }
+});
+
 async function refresh() {
   try {
     const response = await fetch(panelPath("/api/status"), { cache: "no-store" });
@@ -659,14 +1054,18 @@ async function refresh() {
     render(await response.json());
   } catch (error) {
     setText("#updated-at", "状态接口不可用");
+    setText("#connection-heartbeat", "接口异常");
     const badge = $("#feed-badge");
-    badge.classList.remove("live");
-    badge.classList.add("waiting");
-    badge.innerHTML = "<i></i>前端服务异常";
+    if (badge) {
+      badge.classList.remove("live");
+      badge.classList.add("waiting");
+      badge.innerHTML = "<i></i>OKX DEMO · 接口异常";
+    }
+    $("#topbar")?.classList.add("is-dead");
     console.warn("dashboard refresh failed", error);
   }
 }
 
 loadReplay();
 refresh();
-window.setInterval(refresh, 15000);
+window.setInterval(refresh, 5000);

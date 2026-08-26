@@ -220,3 +220,26 @@ def test_replay_payload_is_waiting_for_missing_local_outputs(monkeypatch) -> Non
     assert payload["status"] == "WAITING"
     assert payload["available"] is False
     assert payload["bars"] == []
+
+
+def test_replay_payload_selects_hyperliquid_public_snapshot(monkeypatch) -> None:
+    dashboard.REPLAY_CACHE.clear()
+    monkeypatch.setattr(dashboard, "_read_replay_dataset", lambda symbol, venue: {
+        "symbol": symbol,
+        "venue": "HYPERLIQUID",
+        "bars": [{"ts": 0, "close": 100, "indicators": {"rsi14": 55}}],
+        "orders": [],
+        "pnl": [],
+        "available": True,
+        "start_ts": 0,
+        "end_ts": 0,
+        "pnl_unit": "USDC",
+        "source": "Hyperliquid public snapshot",
+        "source_revision": "pinned-revision",
+        "indicator_policy": "causal closed-bar indicators",
+    })
+    payload = dashboard.replay_payload({"venue": ["hyperliquid"], "symbol": ["HL-BTC-PERP"]})
+    assert payload["status"] == "READY"
+    assert payload["venue"] == "HYPERLIQUID"
+    assert payload["source_revision"] == "pinned-revision"
+    assert payload["bars"][0]["indicators"]["rsi14"] == 55

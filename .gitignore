@@ -9,3 +9,5 @@ quant/outputs/bybit_demo_credentials.json
 quant/outputs/replay_dashboard_*.json
 quant/outputs/*_supervisor_state.json
 quant/outputs/cross_asset_model_dataset_v3.csv
+quant/outputs/strategy_effectiveness_per_trade*.csv
+quant/outputs/strategy_effectiveness_*.parquet

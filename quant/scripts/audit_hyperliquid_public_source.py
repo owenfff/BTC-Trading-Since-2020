@@ -244,7 +244,7 @@ def build_behavior_profile(
         "interpretation_boundary": [
             "This profile describes public order, fill and account events; it does not recover private intent or a guaranteed trading rule.",
             "crossed is reported from the public fill field and is not independently reclassified as maker or taker.",
-            "The profile is an external Hyperliquid reference and is excluded from the BitMEX teacher-model training set.",
+            "Raw Hyperliquid files are excluded from the BitMEX teacher-model training set; normalized rows may enter the separate cross-venue dataset only after its causal and strict-autonomous audit.",
         ],
     }
 
@@ -341,7 +341,7 @@ def audit(data_dir: Path, manifest_path: Path | None = None, comparison_dir: Pat
             "source_revision": manifest.get("source", {}).get("revision"),
             "website_snapshot_synced_at": manifest.get("syncedAt"),
             "audit_only": True,
-            "model_training_inclusion": False,
+            "model_training_inclusion": "NORMALIZED_ONLY_AFTER_CROSS_VENUE_AUDIT",
         },
         "coverage": {
             "historical_order_events": len(orders),
@@ -410,7 +410,7 @@ def write_outputs(result: dict[str, Any], markdown_path: Path, json_path: Path) 
         f"- Source repository: `{scope.get('source_repository')}`",
         f"- Source revision: `{scope.get('source_revision')}`",
         f"- Target wallet: `{scope.get('target_user')}`",
-        "- Model inclusion: **false** (audit-only external reference)",
+        "- Model inclusion: **normalized-only after cross-venue audit** (raw source remains separate)",
         "",
         "## Coverage",
         "",
@@ -455,7 +455,7 @@ def write_outputs(result: dict[str, Any], markdown_path: Path, json_path: Path) 
         "",
         "The site demonstrates a reproducible public-account pipeline: pin the source revision and file hashes, preserve raw events, keep daily state checkpoints, collapse orders by lifecycle, replay fills into position, normalize funding aggregation, and only then derive leverage/PnL timelines.",
         "",
-        "This report is an external reference for data engineering and behavior-audit design. It does not claim that the Hyperliquid trader and the BitMEX teacher used the same strategy, and it is not used as a training label.",
+        "This report is a source-quality audit. It does not claim that the Hyperliquid trader and the BitMEX teacher used the same strategy; normalized behavior rows are eligible for the separate cross-venue experiment only after its own leakage, cost and strict-autonomous gates.",
         "",
         "## Version boundary",
         "",

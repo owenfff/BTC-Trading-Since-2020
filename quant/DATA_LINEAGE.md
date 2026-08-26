@@ -202,3 +202,29 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The panel can run on a Shanghai trading node through an SSH tunnel. It does
   not change the exchange-neutral model, raw-input lineage, or single-venue
   default, and it does not claim a completed external order lifecycle.
+
+## M15 Hyperliquid public replay and cross-venue indicator artifact
+
+- Website: `https://paul.catseye.today/`; public source repository:
+  `pystashell/track_paul_btc_hyperliquid_trade`.
+- Pinned source revision: `ace13c7a675a20d4932b430508a750d7ad7867e9`;
+  target wallet: `0xdae4df7207feb3b350e4284c8efe5f7dac37f637`.
+- Source manifest checks: 7/7 files PASS. Candle archive: 7,894 1h bars,
+  SHA256 `4cc68091ad1f8c687db7c7a59290073dfe43928566a280dd9813659765f52a3d`.
+  Normalized snapshot: 321 Hyperliquid BTC-perpetual fill rows, 320 eligible
+  rows at the frozen cutoff, 2,084 funding records.
+- Combined datasets: 32,552 rows and 31,631 eligible rows in both v2/v3
+  contracts; source counts are 32,231 BitMEX and 321 Hyperliquid rows.
+- Reports: `quant/reports/hyperliquid_public_source_audit.md`,
+  `quant/reports/cross_venue_indicator_autonomous_audit.md`,
+  `quant/reports/cross_venue_indicator_by_window.csv`,
+  `quant/reports/cross_venue_indicator_by_symbol.csv`, and
+  `quant/reports/cross_venue_indicator_cost_sensitivity.csv`.
+- Replay artifact: ignored
+  `quant/outputs/replay_dashboard_hyperliquid_btc.json`; it contains public
+  1h bars, fill-derived order lifecycle points, observed closed PnL and causal
+  indicator snapshots for the local panel.
+- Strict autonomous result: WF1/WF2/WF3 data is available and leakage/hash
+  gates pass, but the candidate remains `DEMO_CONTINUE_LIVE_BLOCKED` because
+  costed autonomous performance fails the positive/profit-factor/hold-control
+  promotion gates. No model switch, private API call, or order was performed.

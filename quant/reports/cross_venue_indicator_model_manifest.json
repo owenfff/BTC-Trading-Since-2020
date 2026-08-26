@@ -1,0 +1,8 @@
+{
+  "model_version": "behavioral-distillation-v3-cross-venue-indicators",
+  "feature_contract_version": "m13-v3-cross-asset-indicators",
+  "fit_policy": "per-window TRAIN-only deterministic NumPy logistic; no online training",
+  "training_data_sha256": "e131e08e45883664242f9443b2d4847341792a5df020aa31cb65eea05ade02e9",
+  "artifact_status": "NOT_PROMOTED_AUTONOMOUS_GATES_FAILED",
+  "artifact_path": null
+}

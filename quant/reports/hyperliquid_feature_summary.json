@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "feature_rows": 321,
+  "eligible_rows": 320,
+  "bars": 6977,
+  "funding_records": 2084,
+  "cutoff": "2026-07-18T21:17:31.514000Z",
+  "feature_output": "quant/outputs/hyperliquid_btc_feature_rows.csv (ignored)",
+  "replay_dashboard": {
+    "status": "PASS",
+    "output": "quant\\outputs\\replay_dashboard_hyperliquid_btc.json",
+    "bars": 6976,
+    "orders": 321,
+    "pnl_points": 321,
+    "source_revision": "ace13c7a675a20d4932b430508a750d7ad7867e9"
+  }
+}

@@ -37,6 +37,11 @@ outputs/binance_spot_testnet_*.log
 outputs/frontend_dashboard.log
 outputs/frontend_dashboard.error.log
 outputs/cross_asset_market_coverage.json
+outputs/cross_venue_model_dataset*.csv
+outputs/hyperliquid_btc_feature_rows.csv
+outputs/replay_dashboard_hyperliquid_*.json
+data/external/
+reports/cross_venue_rowwise_coverage.csv
 data/market/raw/
 data/market/cache/
 outputs/instrument_terms_temporal_audit.csv

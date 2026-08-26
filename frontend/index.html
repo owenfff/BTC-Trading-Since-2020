@@ -3,56 +3,153 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#102021" />
-    <title>Quant Operator Console</title>
+    <meta name="theme-color" content="#07090c" />
+    <meta name="color-scheme" content="dark" />
+    <title>Q/01 · OKX Demo Trading Room</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="shell">
-      <header class="topbar">
-        <div class="brand"><span class="brand-mark">Q/01</span><div><p class="eyebrow">OKX DEMO · OBSERVER</p><h1>交易面板</h1></div></div>
-        <div class="top-status"><span id="feed-badge" class="status-badge waiting"><i></i>等待交易节点</span><span id="updated-at" class="updated-at">等待状态源</span></div>
+      <header class="topbar" id="topbar">
+        <div class="brand-lockup">
+          <span class="brand-mark">Q/01</span>
+          <span class="brand-name">Quant Operator Console</span>
+        </div>
+        <div class="topbar-status" aria-label="运行状态">
+          <span id="feed-badge" class="status-pill waiting"><i></i>OKX DEMO · 等待连接</span>
+          <span class="heartbeat"><i></i><span id="connection-heartbeat">连接中</span></span>
+          <strong id="runtime-status" class="runtime-pill">WAITING</strong>
+          <span id="updated-at" class="updated-at" title="最后状态更新时间">—</span>
+          <button id="refresh-button" class="icon-button" type="button" title="刷新状态" aria-label="刷新状态">↻</button>
+          <button id="control-open" class="control-trigger" type="button" aria-controls="control-drawer" aria-expanded="false">控制 <span>▾</span></button>
+        </div>
       </header>
 
-      <section class="intro intro-compact">
-        <div><p class="eyebrow accent">OKX DEMO · PAPER EXECUTION</p><h2>账户状态，<em>一眼看清。</em></h2></div>
-        <div class="intro-meta"><span>模型</span><strong id="model-version">—</strong><span>指纹</span><strong id="model-meta">—</strong><span>对账</span><strong id="reconciliation" class="status-value">WAITING</strong></div>
-      </section>
-
-      <section class="summary-grid" aria-label="核心指标">
-        <article class="summary-card primary"><span class="card-label">权益</span><strong id="equity-value">—</strong><small id="equity-unit">USD 估值</small></article>
-        <article class="summary-card"><span class="card-label">持仓</span><strong id="position-count">0</strong><small>当前数量</small></article>
-        <article class="summary-card"><span class="card-label">订单</span><strong id="order-count">0</strong><small>活动数量</small></article>
-        <article class="summary-card"><span class="card-label">状态</span><strong id="runtime-status" class="status-value">未运行</strong><small id="account-source">等待快照</small></article>
-      </section>
-
-      <section class="main-grid" aria-label="账户与控制">
-        <article class="panel account-panel"><div class="section-head"><div><p class="eyebrow">ACCOUNT</p><h3>资产</h3></div><span class="section-code">LIVE</span></div><p id="account-note" class="muted-copy">等待账户快照。</p><p id="runtime-safety" class="muted-copy">风险状态等待同步。</p><div id="balance-list" class="balance-list"><span class="empty-state">暂无余额</span></div></article>
-
-        <article class="panel control-panel"><div class="section-head"><div><p class="eyebrow">CONTROL</p><h3>启动交易节点</h3></div><span id="control-status" class="section-code">只读面板</span></div>
-          <div class="control-fields"><label>交易所<select id="control-venue"><option value="okx-demo">OKX Demo</option><option value="binance-futures-testnet">Binance Futures Testnet</option><option value="binance-spot-testnet">Binance Spot Testnet（行为近似）</option></select></label><label>模式<select id="control-mode"><option value="readonly">只读监控</option><option value="testnet">Demo / Testnet 模拟下单</option></select></label></div>
-          <div id="credential-form" class="credential-box" hidden><div class="credential-title"><span>本机凭证</span><small id="credential-status">未配置</small></div><p>仅在上海节点的 loopback/SSH 面板保存，权限 600，不会回显。</p><div class="credential-fields"><label>API Key<input id="credential-key" type="password" autocomplete="off" spellcheck="false" /></label><label>API Secret<input id="credential-secret" type="password" autocomplete="new-password" spellcheck="false" /></label><label id="credential-passphrase-field">Passphrase<input id="credential-passphrase" type="password" autocomplete="new-password" spellcheck="false" /></label><button id="credential-save" type="button" class="button warm">保存凭证</button></div></div>
-          <label class="confirm-row"><input id="control-confirm" type="checkbox" /> 我确认只使用 Demo/Testnet</label><div class="button-row"><button id="control-preflight" type="button" class="button secondary">预检</button><button id="control-start" type="button" class="button">启动</button><button id="control-stop" type="button" class="button secondary">停止</button></div><p id="control-note" class="control-note">先预检账户与品种连接；预检不会提交订单。</p>
+      <section class="command-strip" aria-label="账户指挥条">
+        <article class="metric metric-equity">
+          <span class="metric-label">权益</span>
+          <strong id="equity-value" class="metric-value metric-number" title="—">—</strong>
+          <span id="equity-unit" class="metric-sub">USD 估值</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">今日 PnL</span>
+          <strong id="today-pnl" class="metric-value pnl-zero" title="会话口径">—</strong>
+          <span id="today-pnl-note" class="metric-sub">等待成交数据</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">未实现</span>
+          <strong id="unrealized-pnl" class="metric-value pnl-zero" title="—">—</strong>
+          <span class="metric-sub">持仓浮动结果</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">已实现</span>
+          <strong id="realized-pnl" class="metric-value pnl-zero" title="—">—</strong>
+          <span class="metric-sub">账户 / 会话可见</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">持仓 · 委托</span>
+          <strong class="metric-value compact-value"><span id="position-count">0</span><b> · </b><span id="order-count">0</span></strong>
+          <span id="account-source" class="metric-sub">等待账户快照</span>
+        </article>
+        <article class="metric">
+          <span class="metric-label">状态 / 保证金</span>
+          <strong id="margin-usage" class="metric-value compact-value">—</strong>
+          <span id="reconciliation" class="metric-sub state-neutral">对账 WAITING</span>
         </article>
       </section>
 
-      <section class="records-grid" aria-label="交易记录">
-        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">POSITION</p><h3>持仓</h3></div></div><div class="table-wrap"><table><thead><tr><th>品种</th><th>数量</th><th>均价</th><th>已实现</th></tr></thead><tbody id="positions-table"><tr><td colspan="4" class="empty-cell">暂无持仓</td></tr></tbody></table></div></article>
-        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">ORDERS</p><h3>订单</h3></div></div><div class="table-wrap"><table><thead><tr><th>品种</th><th>方向</th><th>数量</th><th>价格</th><th>策略原因</th></tr></thead><tbody id="orders-table"><tr><td colspan="5" class="empty-cell">暂无订单</td></tr></tbody></table></div></article>
-        <article class="panel table-panel"><div class="section-head"><div><p class="eyebrow">FILLS</p><h3>成交</h3></div><span id="fill-count" class="section-code">0</span></div><div class="table-wrap"><table><thead><tr><th>时间</th><th>品种</th><th>方向</th><th>数量 / 价格</th></tr></thead><tbody id="fills-table"><tr><td colspan="4" class="empty-cell">暂无成交</td></tr></tbody></div></article>
+      <section class="main-stage" aria-label="模拟盘主舞台">
+        <nav class="tab-nav" role="tablist" aria-label="账户数据视图">
+          <button class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="tab-positions" data-tab="positions">持仓 <span id="tab-position-count">0</span></button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tab-orders" data-tab="orders">委托 <span id="tab-order-count">0</span></button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tab-fills" data-tab="fills">成交 <span id="tab-fill-count">0</span></button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tab-curve" data-tab="curve">曲线</button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tab-logs" data-tab="logs">日志</button>
+          <span class="tab-spacer"></span>
+          <span class="tab-hint">只读观察 · Demo</span>
+        </nav>
+
+        <section id="tab-positions" class="tab-panel is-active" role="tabpanel" aria-label="持仓">
+          <div class="panel-heading">
+            <div><span class="panel-kicker">POSITIONS</span><h2>当前持仓</h2></div>
+            <span class="panel-note">标记价与浮动结果来自账户快照；缺失显示 —</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table positions-table">
+              <thead><tr><th>品种</th><th>方向</th><th>数量</th><th>均价</th><th>标记价 / 现价</th><th>未实现</th><th>已实现</th><th>杠杆</th><th>占用</th></tr></thead>
+              <tbody id="positions-table"><tr><td colspan="9" class="empty-cell">暂无持仓</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="tab-orders" class="tab-panel" role="tabpanel" aria-label="委托" hidden>
+          <div class="panel-heading">
+            <div><span class="panel-kicker">ORDERS</span><h2>活动委托</h2></div>
+            <span class="panel-note">每个合约最多一个机器人活动订单</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table orders-table">
+              <thead><tr><th>品种</th><th>方向</th><th>数量</th><th>价格</th><th>状态</th><th>时间</th><th>策略依据 / 执行原因</th></tr></thead>
+              <tbody id="orders-table"><tr><td colspan="7" class="empty-cell">当前无活动委托</td></tr></tbody>
+            </table>
+          </div>
+          <div class="empty-support"><span>最近成交</span><strong id="latest-fill-time">—</strong></div>
+        </section>
+
+        <section id="tab-fills" class="tab-panel" role="tabpanel" aria-label="成交" hidden>
+          <div class="panel-heading">
+            <div><span class="panel-kicker">FILLS</span><h2>最近成交</h2></div>
+            <span id="fill-count" class="panel-note">0 条</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table fills-table">
+              <thead><tr><th>时间</th><th>品种</th><th>方向</th><th>数量</th><th>价格</th><th>手续费</th><th>盈亏</th><th>订单号</th></tr></thead>
+              <tbody id="fills-table"><tr><td colspan="8" class="empty-cell">暂无成交记录</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="tab-curve" class="tab-panel" role="tabpanel" aria-label="资金曲线" hidden>
+          <div class="panel-heading">
+            <div><span class="panel-kicker">SESSION EQUITY</span><h2>会话资金曲线</h2></div>
+            <span id="curve-note" class="panel-note">本机浏览器会话记录</span>
+          </div>
+          <div class="session-chart-wrap"><canvas id="equity-session-chart" height="260" aria-label="会话权益折线图"></canvas><div id="curve-empty" class="chart-empty">等待权益点</div></div>
+        </section>
+
+        <section id="tab-logs" class="tab-panel" role="tabpanel" aria-label="运行日志" hidden>
+          <div class="panel-heading">
+            <div><span class="panel-kicker">RUNTIME LOG</span><h2>运行日志</h2></div>
+            <span class="panel-note">浏览器会话内保留最近事件</span>
+          </div>
+          <ol id="runtime-log" class="runtime-log"><li class="log-empty">等待状态事件</li></ol>
+        </section>
       </section>
 
-      <details class="advanced" data-advanced="replay"><summary><span>历史交易回放</span><small id="replay-status">加载历史数据…</small></summary><div class="advanced-body">
-        <div class="replay-toolbar"><label>品种<select id="replay-symbol"><option value="XBTUSD">XBTUSD · BitMEX</option></select></label><button id="replay-play" type="button" class="button">▶ 播放</button><button id="replay-latest" type="button" class="button secondary">⏭ 最新</button><label>速度<select id="replay-speed"><option value="900">慢</option><option value="450" selected>标准</option><option value="180">快</option></select></label><span id="replay-range" class="replay-range">—</span></div>
-        <div class="replay-layout"><div class="replay-charts"><article class="chart-block"><div class="chart-title"><strong>市场与订单</strong><span>实线=成交 · 虚线=未完整成交</span></div><canvas id="price-chart" height="240" aria-label="价格、成交和订单生命周期图"></canvas></article><article class="chart-block compact-chart"><div class="chart-title"><strong>仓位</strong><span>绿=多 · 红=空</span></div><canvas id="position-chart" height="120" aria-label="历史仓位图"></canvas></article><article class="chart-block compact-chart"><div class="chart-title"><strong>累计结果</strong><span id="replay-pnl-unit">—</span></div><canvas id="pnl-chart" height="120" aria-label="累计已实现结果图"></canvas></article></div><aside class="replay-inspector"><p class="eyebrow">TIME MACHINE</p><h4 id="replay-inspector-title">当前时间点</h4><dl><div><dt>时间</dt><dd id="replay-time">—</dd></div><div><dt>收盘价</dt><dd id="replay-price">—</dd></div><div><dt>仓位</dt><dd id="replay-position">—</dd></div><div><dt>活跃订单</dt><dd id="replay-orders">—</dd></div><div><dt>累计结果</dt><dd id="replay-pnl">—</dd></div></dl><p id="replay-note" class="replay-note">历史回放只用于理解行为，不代表实时账户权益。</p></aside></div>
+      <section class="bottom-strip" aria-label="资产与风控">
+        <div class="asset-bar"><span class="strip-label">非零资产</span><div id="balance-list" class="balance-list"><span class="empty-state">暂无余额</span></div></div>
+        <div class="risk-bar"><span class="strip-label">风控</span><span id="runtime-safety" class="risk-message">等待账户对账</span></div>
+      </section>
+
+      <section id="control-drawer" class="secondary-panel control-panel" hidden>
+        <div class="secondary-head"><div><span class="panel-kicker">LOCAL CONTROL</span><h2>控制台</h2></div><span id="control-status" class="state-badge">只读面板</span></div>
+        <div class="control-fields"><label>交易所<select id="control-venue"><option value="okx-demo">OKX Demo</option><option value="binance-futures-testnet">Binance Futures Testnet</option><option value="binance-spot-testnet">Binance Spot Testnet（行为近似）</option></select></label><label>模式<select id="control-mode"><option value="readonly">只读监控</option><option value="testnet">Demo / Testnet 模拟下单</option></select></label></div>
+        <div id="credential-form" class="credential-box" hidden><div class="credential-title"><span>本机凭证</span><small id="credential-status">未配置</small></div><p>仅在交易节点的 loopback/SSH 面板使用，网页不会回显或保存密钥。</p><div class="credential-fields"><label>API Key<input id="credential-key" type="password" autocomplete="off" spellcheck="false" /></label><label>API Secret<input id="credential-secret" type="password" autocomplete="new-password" spellcheck="false" /></label><label id="credential-passphrase-field">Passphrase<input id="credential-passphrase" type="password" autocomplete="new-password" spellcheck="false" /></label><button id="credential-save" type="button" class="button warm">保存凭证</button></div></div>
+        <label class="confirm-row"><input id="control-confirm" type="checkbox" /> 我确认只使用 Demo/Testnet</label>
+        <div class="button-row"><button id="control-preflight" type="button" class="button secondary">预检</button><button id="control-start" type="button" class="button">启动 Demo</button><button id="control-stop" type="button" class="button secondary">停止</button><button id="control-kill" type="button" class="button danger" title="停止新增订单并撤销机器人活动订单，保留现有持仓">安全停机</button><button id="control-clear-kill" type="button" class="button secondary">解除安全停机</button></div>
+        <p id="control-note" class="control-note">先预检账户与品种连接；预检不会提交订单。</p>
+      </section>
+
+      <section class="secondary-grid">
+        <details class="secondary-panel" data-advanced="system"><summary><span>系统与模型</span><small>版本、指纹、对账</small></summary><div class="secondary-body system-grid"><div><span>模型版本</span><strong id="model-version">—</strong></div><div><span>模型指纹</span><strong id="model-meta">—</strong></div><div><span>账户备注</span><strong id="account-note">等待账户快照</strong></div><div><span>允许映射</span><strong id="allowed-count">0</strong></div></div></details>
+        <details class="secondary-panel" data-advanced="venues"><summary><span>交易所与品种</span><small>当前节点与映射范围</small></summary><div class="secondary-body"><div id="venue-list" class="venue-list"><span class="empty-state">等待交易节点状态</span></div><div class="mapping-header"><span>品种映射 <strong id="mapping-total">0</strong></span><span>可交易 <b id="scope-allowed">0</b> · 仅监控 <b id="scope-monitor">0</b> · 不可用 <b id="scope-unavailable">0</b></span></div><div class="scope-bars"><div><span>可交易</span><b id="bar-allowed" style="width:0%"></b></div><div><span>仅监控</span><b id="bar-monitor" class="amber" style="width:0%"></b></div><div><span>不可用</span><b id="bar-unavailable" class="muted" style="width:0%"></b></div></div><div id="symbol-list" class="symbol-list"><span class="empty-state">等待品种清单</span></div></div></details>
+      </section>
+
+      <details class="secondary-panel diagnostics-panel"><summary><span>回放与诊断</span><small>历史行为与系统链路</small></summary><div class="secondary-body">
+        <div class="replay-toolbar"><label>回放<select id="replay-venue"><option value="bitmex">BitMEX · 历史账户</option><option value="hyperliquid">Hyperliquid · 公开回放</option></select></label><label>品种<select id="replay-symbol"><option value="XBTUSD">XBTUSD · BitMEX</option></select></label><button id="replay-play" type="button" class="button">▶ 播放</button><button id="replay-latest" type="button" class="button secondary">⏭ 最新</button><label>速度<select id="replay-speed"><option value="900">慢</option><option value="450" selected>标准</option><option value="180">快</option></select></label><span id="replay-status" class="replay-status">加载历史数据…</span><span id="replay-range" class="replay-range">—</span></div>
+        <div class="replay-layout"><div class="replay-charts"><article class="chart-block"><div class="chart-title"><strong>市场与订单</strong><span>实线=成交 · 虚线=未完整成交</span></div><canvas id="price-chart" height="240" aria-label="价格、成交和订单生命周期图"></canvas></article><article class="chart-block compact-chart"><div class="chart-title"><strong>仓位</strong><span>绿=多 · 红=空</span></div><canvas id="position-chart" height="120" aria-label="历史仓位图"></canvas></article><article class="chart-block compact-chart"><div class="chart-title"><strong>累计结果</strong><span id="replay-pnl-unit">—</span></div><canvas id="pnl-chart" height="120" aria-label="累计已实现结果图"></canvas></article></div><aside class="replay-inspector"><span class="panel-kicker">TIME MACHINE</span><h3 id="replay-inspector-title">当前时间点</h3><dl><div><dt>时间</dt><dd id="replay-time">—</dd></div><div><dt>收盘价</dt><dd id="replay-price">—</dd></div><div><dt>仓位</dt><dd id="replay-position">—</dd></div><div><dt>活跃订单</dt><dd id="replay-orders">—</dd></div><div><dt>累计结果</dt><dd id="replay-pnl">—</dd></div><div><dt>RSI14</dt><dd id="replay-rsi">—</dd></div><div><dt>MACD 柱</dt><dd id="replay-macd">—</dd></div><div><dt>布林 %B</dt><dd id="replay-bollinger">—</dd></div><div><dt>指标覆盖</dt><dd id="replay-indicators">—</dd></div></dl><p id="replay-note" class="replay-note">历史回放只用于理解行为，不代表实时账户权益。</p></aside></div>
         <div class="replay-scrubber"><span>起点</span><input id="replay-slider" type="range" min="0" max="1000" value="1000" aria-label="历史回放时间点" /><span>最新</span></div>
-      </div></details>
-
-      <details class="advanced"><summary><span>交易所连接状态</span><small>多交易所只选一个运行</small></summary><div class="advanced-body"><div id="venue-list" class="venue-list"><span class="empty-state">等待交易节点状态</span></div></div></details>
-
-      <details class="advanced"><summary><span>品种与安全诊断</span><small>映射、风控和系统链路</small></summary><div class="advanced-body diagnostic-grid">
-        <article class="diagnostic-card"><div class="section-head"><div><p class="eyebrow">SYSTEM PATH</p><h3>运行链路</h3></div><span class="section-code">Q-READ/01</span></div><div class="pipeline"><div class="pipeline-node"><span>01</span><div><strong>公开行情</strong><small>已收盘 1H</small></div><b>FEED</b></div><div class="pipeline-line"></div><div class="pipeline-node"><span>02</span><div><strong>Strategy Core</strong><small>冻结行为模型</small></div><b>FROZEN</b></div><div class="pipeline-line"></div><div class="pipeline-node"><span>03</span><div><strong>Risk gate</strong><small>暴露与对账检查</small></div><b>SAFE</b></div><div class="pipeline-line"></div><div class="pipeline-node"><span>04</span><div><strong>Execution</strong><small>Demo/Testnet 才可用</small></div><b>GATED</b></div></div></article>
-        <article class="diagnostic-card"><div class="section-head"><div><p class="eyebrow">UNIVERSE</p><h3>品种映射</h3></div><span id="mapping-total" class="section-code">0</span></div><div class="scope-bars"><div><span>可交易</span><b id="bar-allowed" style="width:0%"></b><strong id="scope-allowed">0</strong></div><div><span>仅监控</span><b id="bar-monitor" class="amber" style="width:0%"></b><strong id="scope-monitor">0</strong></div><div><span>不可用</span><b id="bar-unavailable" class="muted" style="width:0%"></b><strong id="scope-unavailable">0</strong></div></div><div id="symbol-list" class="symbol-list"><span class="empty-state">等待交易节点同步品种清单</span></div></article>
+        <div class="diagnostic-note"><span>链路</span><strong>公开行情 → Strategy Core → Risk gate → Demo Execution</strong><span>模型输入仅使用决策时刻及之前的信息；策略结果标记为 BEHAVIORAL_APPROXIMATION。</span></div>
       </div></details>
 
       <footer><span>Q/01 · DEMO / TESTNET ONLY</span><span>BEHAVIORAL_APPROXIMATION</span><span>UTC</span></footer>

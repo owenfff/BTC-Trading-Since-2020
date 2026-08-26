@@ -127,7 +127,7 @@ def _downsample(rows: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
     return [rows[index] for index in sorted(indexes)]
 
 
-def _read_replay_dataset(symbol: str) -> dict[str, Any]:
+def _read_replay_dataset(symbol: str, venue: str = "bitmex") -> dict[str, Any]:
     """Load a compact historical replay view from local, already-derived outputs.
 
     This intentionally reads no credentials and no exchange endpoint.  The panel
@@ -136,12 +136,17 @@ def _read_replay_dataset(symbol: str) -> dict[str, Any]:
     """
 
     output_root = PROJECT_ROOT / "quant" / "outputs"
-    compact_path = output_root / f"replay_dashboard_{symbol.lower()}.json"
+    normalized_venue = venue.strip().lower()
+    if normalized_venue in {"hyperliquid", "hl"}:
+        compact_path = output_root / "replay_dashboard_hyperliquid_btc.json"
+    else:
+        compact_path = output_root / f"replay_dashboard_{symbol.lower()}.json"
     if compact_path.exists():
         compact = _read_json(compact_path)
         if isinstance(compact.get("bars"), list) and isinstance(compact.get("orders"), list) and isinstance(compact.get("pnl"), list):
             return {
                 "symbol": symbol,
+                "venue": compact.get("venue", normalized_venue.upper()),
                 "bars": compact["bars"],
                 "orders": compact["orders"],
                 "pnl": compact["pnl"],
@@ -150,6 +155,9 @@ def _read_replay_dataset(symbol: str) -> dict[str, Any]:
                 "end_ts": compact.get("full_end_ts") or compact.get("end_ts"),
                 "pnl_unit": compact.get("pnl_unit", "analytical realised PnL"),
                 "source": compact.get("source", "local compact replay snapshot"),
+                "source_repository": compact.get("source_repository"),
+                "source_revision": compact.get("source_revision"),
+                "indicator_policy": compact.get("indicator_policy", "causal closed-bar indicators"),
             }
     bars: list[dict[str, Any]] = []
     bars_path = output_root / "market_bars_1h.csv"
@@ -243,6 +251,7 @@ def _read_replay_dataset(symbol: str) -> dict[str, Any]:
     all_timestamps.extend(item["start_ts"] for item in orders)
     return {
         "symbol": symbol,
+        "venue": normalized_venue.upper(),
         "bars": bars,
         "orders": orders,
         "pnl": pnl,
@@ -255,19 +264,27 @@ def _read_replay_dataset(symbol: str) -> dict[str, Any]:
             else "raw analytical realised PnL (scale unresolved)"
         ),
         "source": "local derived replay outputs",
+        "indicator_policy": "causal closed-bar indicators",
     }
 
 
-def _replay_dataset(symbol: str) -> dict[str, Any]:
+def _replay_dataset(symbol: str, venue: str = "bitmex") -> dict[str, Any]:
+    cache_key = f"{venue.lower()}:{symbol.upper()}"
     with REPLAY_LOCK:
-        if symbol not in REPLAY_CACHE:
-            REPLAY_CACHE[symbol] = _read_replay_dataset(symbol)
-        return REPLAY_CACHE[symbol]
+        # Keep compatibility with older tests/tools that keyed the original
+        # BitMEX replay cache by symbol only.
+        if venue.lower() == "bitmex" and symbol.upper() in REPLAY_CACHE:
+            return REPLAY_CACHE[symbol.upper()]
+        if cache_key not in REPLAY_CACHE:
+            REPLAY_CACHE[cache_key] = _read_replay_dataset(symbol) if venue.lower() == "bitmex" else _read_replay_dataset(symbol, venue)
+        return REPLAY_CACHE[cache_key]
 
 
 def replay_payload(query: dict[str, list[str]]) -> dict[str, Any]:
-    symbol = (query.get("symbol") or ["XBTUSD"])[0].strip().upper() or "XBTUSD"
-    dataset = _replay_dataset(symbol)
+    venue = (query.get("venue") or ["bitmex"])[0].strip().lower() or "bitmex"
+    symbol_default = "HL-BTC-PERP" if venue in {"hyperliquid", "hl"} else "XBTUSD"
+    symbol = (query.get("symbol") or [symbol_default])[0].strip().upper() or symbol_default
+    dataset = _replay_dataset(symbol, venue)
     try:
         limit = int((query.get("limit") or ["900"])[0])
     except ValueError:
@@ -281,12 +298,14 @@ def replay_payload(query: dict[str, list[str]]) -> dict[str, Any]:
     if start is None or end is None:
         return {
             "status": "WAITING",
+            "venue": dataset.get("venue", venue.upper()),
             "symbol": symbol,
             "available": False,
             "bars": [],
             "orders": [],
             "pnl": [],
             "source": dataset.get("source"),
+            "indicator_policy": dataset.get("indicator_policy"),
         }
     if start > end:
         start, end = end, start
@@ -295,6 +314,7 @@ def replay_payload(query: dict[str, list[str]]) -> dict[str, Any]:
     pnl = [row for row in dataset["pnl"] if start <= row["ts"] <= end]
     return {
         "status": "READY" if dataset["available"] else "WAITING",
+        "venue": dataset.get("venue", venue.upper()),
         "symbol": symbol,
         "available": dataset["available"],
         "start_ts": start,
@@ -307,6 +327,9 @@ def replay_payload(query: dict[str, list[str]]) -> dict[str, Any]:
         "counts": {"bars": len(bars), "orders": len(orders), "pnl_points": len(pnl)},
         "pnl_unit": dataset["pnl_unit"],
         "source": dataset["source"],
+        "source_repository": dataset.get("source_repository"),
+        "source_revision": dataset.get("source_revision"),
+        "indicator_policy": dataset.get("indicator_policy"),
     }
 
 

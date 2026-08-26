@@ -2,6 +2,34 @@
 
 本目录固定数据版本并完成数据体检；M0-02A.1 在此基础上只按 execution 重放衍生品合约张数，并将 Spot Trade 单独保留为原始余额方向。不训练模型、不接交易所 API、不修改原始 CSV/JSON、不计算 PnL、净值、杠杆或保证金，也不自动交易。
 
+## M15 Hyperliquid 公开回放与跨交易所行为审计
+
+本阶段把 Hyperliquid 网站的公开快照作为固定、可校验的外部教师来源；原始文件保存于被忽略的 `quant/data/external/`，不与 BitMEX 原始 CSV 混写。只有经过来源 SHA256 校验、因果指标检查和严格自主回放的归一化行才进入跨交易所研究数据集。交易所和结算单位始终单独保留，Spot 不进入衍生品仓位语义。
+
+从仓库根目录运行：
+
+```bash
+python quant/scripts/import_hyperliquid_public.py --cutoff 2026-07-18T21:17:31.514Z
+python quant/scripts/build_cross_venue_model_dataset.py --contract v2
+python quant/scripts/build_cross_venue_model_dataset.py --contract v3
+python quant/scripts/audit_hyperliquid_public_source.py \
+  --data-dir quant/data/external/hyperliquid/paul/ace13c7a675a20d4932b430508a750d7ad7867e9 \
+  --manifest quant/data/external/hyperliquid/paul/ace13c7a675a20d4932b430508a750d7ad7867e9/source-manifest.json \
+  --report-md quant/reports/hyperliquid_public_source_audit.md \
+  --report-json quant/reports/hyperliquid_public_source_audit.json
+python quant/scripts/audit_cross_venue_strategy.py
+```
+
+`audit_cross_venue_strategy.py` 同时输出 `CONDITIONAL_BEHAVIOR` 与 `STRICT_AUTONOMOUS_REPLAY`，后者从零仓位开始，只用决策时已经关闭的 K 线，在下一根 K 线开盘模拟执行，并计入费用、资金费和滑点。当前候选若未通过自主收益门槛会保持 `DEMO_CONTINUE_LIVE_BLOCKED`，不会切换部署模型或提交订单。
+
+官方公开 API 的有限近期刷新使用：
+
+```bash
+python quant/scripts/refresh_hyperliquid_public.py
+```
+
+该命令只调用 Hyperliquid `info` 公共接口，不读取凭证；API 的历史/响应窗口有限，失败时明确阻断，不用它冒充完整历史。`build_hyperliquid_replay_dashboard.py` 生成被忽略的 `quant/outputs/replay_dashboard_hyperliquid_btc.json`，本地前端的“回放与诊断”可在 BitMEX / Hyperliquid 间切换，并显示 RSI14、MACD 柱、布林 `%B` 和指标覆盖状态。
+
 ## 运行
 
 在仓库根目录执行：

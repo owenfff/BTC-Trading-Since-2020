@@ -183,3 +183,26 @@
   frontend-only observability surface.
 - Normal operation still selects one venue. OKX/Binance support means
   selectable adapters, not a requirement to run them simultaneously.
+
+## 2026-08-26 — Add Hyperliquid public replay and cross-venue indicator audit
+
+- Treat the published Hyperliquid replay site as a pinned public snapshot
+  source, not as a DOM or private-account integration. The current manifest
+  revision is `ace13c7a675a20d4932b430508a750d7ad7867e9`; raw files remain
+  under ignored external storage and retain their own SHA256 values.
+- Keep BitMEX and Hyperliquid venue, symbol, contract and settlement fields
+  separate. Only normalized rows that pass source verification, causal
+  features and strict autonomous replay may enter the combined research
+  dataset; raw files are never merged.
+- Evaluate both `CONDITIONAL_BEHAVIOR` and `STRICT_AUTONOMOUS_REPLAY`. The
+  strict track starts from zero simulated state, uses prior closed bars and
+  next-bar execution, and never consumes teacher position/action/account
+  fields. Same-time aliases are confidence-weighted into one net event.
+- Add RSI14, MACD 12/26/9, Bollinger 20/2, volume percentile 72 and existing
+  causal features as model inputs. These are model-input explanations only;
+  they are not claims about the original trader's private indicators.
+- The current strict autonomous candidate fails the promotion gates because
+  costed results are not positive and do not beat the equal-weight hold
+  control in all windows. Keep the current Demo model; do not auto-switch and
+  do not add Demo orders. The public API refresh is credential-free and remains
+  fail-closed when the local network cannot complete TLS.

@@ -2,10 +2,10 @@
   "sources": [
     {
       "id": "paul-hyperliquid-public-reference",
-      "kind": "external_behavior_audit_only",
+      "kind": "cross_venue_teacher_source",
       "website": "https://paul.catseye.today/",
       "source_repository": "https://github.com/pystashell/track_paul_btc_hyperliquid_trade",
-      "source_revision": "10b04962c67d5281a6e0f4bae0cf8d405da851c4",
+      "source_revision": "ace13c7a675a20d4932b430508a750d7ad7867e9",
       "target_user": "0xdae4df7207feb3b350e4284c8efe5f7dac37f637",
       "venue": "Hyperliquid",
       "scope": [
@@ -16,8 +16,9 @@
         "account snapshots",
         "spot account snapshots"
       ],
-      "model_training_inclusion": false,
-      "rule": "Pin the website snapshot manifest and file hashes before every refresh; never mix it with a different checkout or with the BitMEX teacher data."
+      "model_training_inclusion": "NORMALIZED_ONLY_AFTER_CROSS_VENUE_AUDIT",
+      "identity_status": "USER_CONFIRMED_NOT_CRYPTOGRAPHIC",
+      "rule": "Keep raw Hyperliquid and BitMEX files separate; only normalized rows that pass source hash, causal feature and strict autonomous replay checks may enter a combined research dataset."
     }
   ]
 }
