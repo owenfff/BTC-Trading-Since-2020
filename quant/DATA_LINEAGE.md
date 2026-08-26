@@ -205,6 +205,8 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 
 ## M15 Hyperliquid public replay and cross-venue indicator artifact
 
+- Implementation/report commit: `54ead1ab466acca9d2e4388e954bf4c0cf8ed2ed`.
+
 - Website: `https://paul.catseye.today/`; public source repository:
   `pystashell/track_paul_btc_hyperliquid_trade`.
 - Pinned source revision: `ace13c7a675a20d4932b430508a750d7ad7867e9`;
