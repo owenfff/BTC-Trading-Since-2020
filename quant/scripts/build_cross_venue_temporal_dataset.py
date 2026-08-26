@@ -35,7 +35,6 @@ for path in (ROOT, SRC):
         sys.path.insert(0, str(path))
 
 from cross_asset.hyperliquid import bars_for_features, load_candle_archive, load_funding  # noqa: E402
-from features.market_features import build_market_features  # noqa: E402
 
 
 UTC = timezone.utc
@@ -238,12 +237,6 @@ def _stable_id(key: str, when: datetime) -> str:
 def _scale(events: list[dict[str, Any]]) -> float:
     maximum = max((abs(number(row.get("_after"), 0.0) or 0.0) for row in events), default=0.0)
     return max(1.0, maximum)
-
-
-def _complete_window(timestamps: list[datetime], start: int, end: int) -> bool:
-    if start < 0 or end >= len(timestamps) or start > end:
-        return False
-    return all((timestamps[index] - timestamps[index - 1]).total_seconds() == BAR_SECONDS for index in range(start + 1, end + 1))
 
 
 def _ema(values: list[float], period: int) -> list[float]:

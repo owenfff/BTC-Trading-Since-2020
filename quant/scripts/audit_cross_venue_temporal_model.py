@@ -9,6 +9,7 @@ import math
 import sys
 from collections import Counter
 from datetime import datetime, timezone
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -40,6 +41,7 @@ REPORT_MD = ROOT / "quant" / "reports" / "cross_venue_temporal_autonomous_audit.
 TEMPORAL_VERSION = "behavioral-distillation-v3-cross-venue-temporal-clock"
 BALANCED_TEMPORAL_VERSION = "behavioral-distillation-v3-cross-venue-temporal-balanced"
 CALIBRATED_TEMPORAL_VERSION = "behavioral-distillation-v3.4-calibrated-action-target"
+THRESHOLD_TEMPORAL_VERSION = "behavioral-distillation-v3.5-cost-calibrated-threshold"
 EVENT_BASELINE_VERSION = "behavioral-distillation-v3.2-event-supervision-baseline"
 
 
@@ -73,15 +75,58 @@ def _read_temporal(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _fit_temporal(rows: list[dict[str, Any]], *, balanced: bool = False, calibrated: bool = False) -> CrossAssetNumpyLogisticStrategy:
+def _fit_temporal(rows: list[dict[str, Any]], *, balanced: bool = False, calibrated: bool = False, min_action_confidence: float | None = None) -> CrossAssetNumpyLogisticStrategy:
     train = [dict(row, dataset_split="TRAIN") for row in rows if str(row.get("label_status")) == "AVAILABLE"]
     model = CrossAssetNumpyLogisticStrategy(
         target_l2=1.0,
         class_weighting="sqrt_balanced" if calibrated else ("balanced" if balanced else None),
         enforce_action_target_consistency=calibrated,
+        min_action_confidence=min_action_confidence,
     ).fit(train)
     model.version = CALIBRATED_TEMPORAL_VERSION if calibrated else (BALANCED_TEMPORAL_VERSION if balanced else TEMPORAL_VERSION)
     return model
+
+
+def _threshold_predictions(predictions: list[tuple[dict[str, Any], Any]], threshold: float) -> list[tuple[dict[str, Any], Any]]:
+    output = []
+    for row, signal in predictions:
+        if signal.confidence < threshold and signal.action != "NO_TRADE":
+            current = _number(row.get("feature_current_normalized_exposure"), 0.0) or 0.0
+            output.append((row, replace(signal, action="NO_TRADE", target_exposure=current)))
+        else:
+            output.append((row, signal))
+    return output
+
+
+def _select_threshold(model: CrossAssetNumpyLogisticStrategy, calibration_rows: list[dict[str, Any]]) -> tuple[float, dict[str, Any]]:
+    """Select an abstention threshold using only a chronological train tail.
+
+    The selection score rewards action macro-F1, penalizes a mismatch to the
+    observed no-trade rate, and applies a small turnover/fee proxy.  The
+    selected value is then frozen before the out-of-time window is evaluated.
+    """
+
+    raw = _conditional_predictions(model, calibration_rows)
+    observed_rate = sum(str(row.get("label_next_action")) == "NO_TRADE" for row in calibration_rows) / len(calibration_rows) if calibration_rows else 0.0
+    candidates: list[dict[str, Any]] = []
+    threshold_grid = [round(0.01 * index, 2) for index in range(51)] + [0.55, 0.65, 0.75, 0.85, 0.95]
+    for threshold in threshold_grid:
+        predicted = _threshold_predictions(raw, threshold)
+        metrics = _behavior_metrics(calibration_rows, predicted)
+        turnover_proxy = sum(abs(float(signal.target_exposure) - (_number(row.get("feature_current_normalized_exposure"), 0.0) or 0.0)) for row, signal in predicted if signal.action != "NO_TRADE") / len(predicted) if predicted else 0.0
+        predicted_rate = sum(signal.action == "NO_TRADE" for _, signal in predicted) / len(predicted) if predicted else 0.0
+        score = float(metrics.get("action_macro_f1") or 0.0) - 0.25 * abs(predicted_rate - observed_rate) - 10.0 * FEE_RATE * turnover_proxy
+        candidates.append({
+            "threshold": threshold,
+            "score": score,
+            "action_macro_f1": metrics.get("action_macro_f1"),
+            "target_exposure_mae": metrics.get("target_exposure_mae"),
+            "observed_no_trade_rate": observed_rate,
+            "predicted_no_trade_rate": predicted_rate,
+            "turnover_proxy": turnover_proxy,
+        })
+    selected = max(candidates, key=lambda row: (float(row["score"]), float(row.get("action_macro_f1") or 0.0), -float(row["turnover_proxy"]), -float(row["threshold"]))) if candidates else {"threshold": 0.5, "score": 0.0}
+    return float(selected["threshold"]), {"selected": selected, "candidates": candidates, "selection_data_rows": len(calibration_rows), "selection_contract": "train-only chronological tail; macro-F1 minus no-trade-rate mismatch and fee turnover proxy"}
 
 
 def _fit_event_baseline(rows: list[dict[str, Any]]) -> CrossAssetNumpyLogisticStrategy:
@@ -154,9 +199,9 @@ def _causal_audit(rows: list[Mapping[str, Any]]) -> dict[str, Any]:
     return {"status": "PASS" if not any(values.values()) else "BLOCKED", "checks": values}
 
 
-def build(*, dataset_path: Path = DATASET_TEMPORAL, balanced: bool = False, calibrated: bool = False, report_path: Path = REPORT, report_md_path: Path = REPORT_MD) -> dict[str, Any]:
+def build(*, dataset_path: Path = DATASET_TEMPORAL, balanced: bool = False, calibrated: bool = False, threshold_calibrated: bool = False, report_path: Path = REPORT, report_md_path: Path = REPORT_MD) -> dict[str, Any]:
     rows = _read_temporal(dataset_path)
-    candidate_version = CALIBRATED_TEMPORAL_VERSION if calibrated else (BALANCED_TEMPORAL_VERSION if balanced else TEMPORAL_VERSION)
+    candidate_version = THRESHOLD_TEMPORAL_VERSION if threshold_calibrated else (CALIBRATED_TEMPORAL_VERSION if calibrated else (BALANCED_TEMPORAL_VERSION if balanced else TEMPORAL_VERSION))
     causal = _causal_audit(rows)
     bars, opens = _load_bars()
     behavior: list[dict[str, Any]] = []
@@ -173,7 +218,15 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, balanced: bool = False, cali
             windows.append({"window": window.name, "status": "NO_DATA", "train_rows": len(train), "test_rows": len(test)})
             continue
 
-        temporal_model = _fit_temporal(train, balanced=balanced, calibrated=calibrated)
+        threshold_selection = None
+        if threshold_calibrated:
+            ordered_train = sorted(train, key=lambda row: str(row.get("decision_time")))
+            split_at = max(1, min(len(ordered_train) - 1, int(len(ordered_train) * 0.80)))
+            calibration_fit = _fit_temporal(ordered_train[:split_at], calibrated=True)
+            selected_threshold, threshold_selection = _select_threshold(calibration_fit, ordered_train[split_at:])
+            temporal_model = _fit_temporal(train, calibrated=True, min_action_confidence=selected_threshold)
+        else:
+            temporal_model = _fit_temporal(train, balanced=balanced, calibrated=calibrated)
         event_train, event_test, event_scales = _event_baseline_rows(rows, window)
         event_model = _fit_event_baseline(event_train)
         event_test_on_temporal, _ = normalize_window_rows(test_raw, event_train)
@@ -208,8 +261,11 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, balanced: bool = False, cali
             "test_rows": len(test),
             "event_baseline_train_rows": len(event_train),
             "event_baseline_test_rows": len(event_test_on_temporal),
+            "threshold_selection": threshold_selection,
         })
         del temporal_conditional_predictions, event_conditional_predictions, temporal_auto, event_auto, temporal_model, event_model
+        if threshold_selection is not None:
+            del calibration_fit
 
     temporal_perf = [row for row in performance if row["model"] == "TEMPORAL"]
     event_perf = [row for row in performance if row["model"] == "EVENT_BASELINE"]
@@ -299,9 +355,13 @@ def main() -> int:
     parser.add_argument("--dataset", type=Path, default=DATASET_TEMPORAL)
     parser.add_argument("--balanced", action="store_true", help="use explicit inverse-frequency class weighting")
     parser.add_argument("--calibrated", action="store_true", help="use sqrt-balanced weighting and action-target consistency")
+    parser.add_argument("--threshold-calibrated", action="store_true", help="select a train-only confidence threshold with a fee/turnover proxy")
     args = parser.parse_args()
     try:
-        if args.calibrated:
+        if args.threshold_calibrated:
+            report_path = ROOT / "quant" / "reports" / "cross_venue_temporal_threshold_calibrated_autonomous_audit.json"
+            report_md_path = ROOT / "quant" / "reports" / "cross_venue_temporal_threshold_calibrated_autonomous_audit.md"
+        elif args.calibrated:
             report_path = ROOT / "quant" / "reports" / "cross_venue_temporal_calibrated_autonomous_audit.json"
             report_md_path = ROOT / "quant" / "reports" / "cross_venue_temporal_calibrated_autonomous_audit.md"
         elif args.balanced:
@@ -310,7 +370,7 @@ def main() -> int:
         else:
             report_path = REPORT
             report_md_path = REPORT_MD
-        result = build(dataset_path=args.dataset.resolve(), balanced=args.balanced, calibrated=args.calibrated, report_path=report_path, report_md_path=report_md_path)
+        result = build(dataset_path=args.dataset.resolve(), balanced=args.balanced, calibrated=args.calibrated, threshold_calibrated=args.threshold_calibrated, report_path=report_path, report_md_path=report_md_path)
     except (FileNotFoundError, OSError, ValueError) as error:
         print(json.dumps({"status": "BLOCKED", "error_code": "TEMPORAL_AUDIT_FAILED", "message": str(error)}, ensure_ascii=False))
         return 2

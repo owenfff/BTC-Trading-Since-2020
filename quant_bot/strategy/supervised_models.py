@@ -138,11 +138,13 @@ class NumpyLogisticStrategy:
 
     version = "behavioral-distillation-v1-logistic-numpy"
 
-    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3, target_l2: float = 0.0, class_weighting: str | None = None, enforce_action_target_consistency: bool = False) -> None:
+    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3, target_l2: float = 0.0, class_weighting: str | None = None, enforce_action_target_consistency: bool = False, min_action_confidence: float | None = None) -> None:
         if target_l2 < 0:
             raise ValueError("target_l2 must be non-negative")
         if class_weighting not in {None, "balanced", "sqrt_balanced"}:
             raise ValueError("class_weighting must be None, 'balanced', or 'sqrt_balanced'")
+        if min_action_confidence is not None and not 0.0 <= min_action_confidence <= 1.0:
+            raise ValueError("min_action_confidence must be in [0, 1]")
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.l2 = l2
@@ -153,6 +155,7 @@ class NumpyLogisticStrategy:
         self.target_l2 = target_l2
         self.class_weighting = class_weighting
         self.enforce_action_target_consistency = enforce_action_target_consistency
+        self.min_action_confidence = min_action_confidence
         self.encoder = FeatureEncoder()
         self.actions: list[str] = []
         self.weights: np.ndarray | None = None
@@ -223,16 +226,19 @@ class NumpyLogisticStrategy:
         vector = self.encoder.transform(strategy_input.features)
         probabilities = _softmax((vector.reshape(1, -1) @ self.weights) + self.bias)[0]
         class_index = int(np.argmax(probabilities))
+        action = self.actions[class_index]
+        if self.min_action_confidence is not None and float(probabilities[class_index]) < self.min_action_confidence and "NO_TRADE" in self.actions:
+            action = "NO_TRADE"
         augmented = np.concatenate(([1.0], vector))
         target = float(np.clip(augmented @ self.target_coef, -1.0, 1.0))
-        if self.enforce_action_target_consistency and self.actions[class_index] in {"NO_TRADE", "HOLD_LONG", "HOLD_SHORT"}:
+        if self.enforce_action_target_consistency and action in {"NO_TRADE", "HOLD_LONG", "HOLD_SHORT"}:
             # A hold/no-trade action must not secretly generate a new target
             # position from the independent regression head.
             target = float(np.clip(strategy_input.current_strategy_position, -1.0, 1.0))
         tags = ["TRAIN_NUMPY_LOGISTIC"]
         if str(strategy_input.features.get("feature_mark_index_missing")) in {"True", "true", "1"}:
             tags.append("MARK_INDEX_MISSING")
-        return make_signal(strategy_input.decision_time, target_exposure=target, action=self.actions[class_index], confidence=float(probabilities[class_index]), risk_tags=tuple(tags), strategy_version=self.version)
+        return make_signal(strategy_input.decision_time, target_exposure=target, action=action, confidence=float(probabilities[class_index]), risk_tags=tuple(tags), strategy_version=self.version)
 
 
 class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
@@ -255,6 +261,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             "target_l2": self.target_l2,
             "class_weighting": self.class_weighting,
             "enforce_action_target_consistency": self.enforce_action_target_consistency,
+            "min_action_confidence": self.min_action_confidence,
             "fit_row_count": self.fit_row_count,
             "actions": list(self.actions),
             "weights": self.weights.tolist(),
@@ -274,6 +281,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             target_l2=float(payload.get("target_l2", 0.0)),
             class_weighting=payload.get("class_weighting"),
             enforce_action_target_consistency=bool(payload.get("enforce_action_target_consistency", False)),
+            min_action_confidence=(float(payload["min_action_confidence"]) if payload.get("min_action_confidence") is not None else None),
         )
         model.version = str(payload.get("version", cls.version))
         model.actions = [str(item) for item in payload.get("actions", [])]

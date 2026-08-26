@@ -176,10 +176,11 @@ def test_balanced_class_weighting_is_explicit_and_round_trips() -> None:
             "feature_current_normalized_exposure": 0.0,
         })
         rows.append(row)
-    model = CrossAssetNumpyLogisticStrategy(target_l2=1.0, class_weighting="balanced").fit(rows)
+    model = CrossAssetNumpyLogisticStrategy(target_l2=1.0, class_weighting="balanced", min_action_confidence=0.73).fit(rows)
     restored = CrossAssetNumpyLogisticStrategy.from_dict(model.to_dict())
     assert model.class_weighting == "balanced"
     assert restored.class_weighting == "balanced"
+    assert restored.min_action_confidence == 0.73
 
 
 def test_action_target_consistency_prevents_no_trade_from_repositioning() -> None:
