@@ -117,3 +117,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 
 - Candidate `behavioral-distillation-v3.4-calibrated-action-target` enforces action-target consistency and avoids the ordinary candidate's hidden repositioning, but costed strict autonomous returns are `+0.018150`, `-0.135907`, and `-0.002102` for WF1/WF2/WF3.
 - The candidate therefore fails stable all-window positivity, profit-factor, and event-baseline gates. The remaining blocker is model calibration/generalization, not exchange access or credentials; no Demo model switch or new Demo order is authorized.
+
+## 2026-08-26 — Cost-calibrated threshold candidate remains blocked
+
+- Candidate `behavioral-distillation-v3.5-cost-calibrated-threshold` uses train-only chronological threshold selection (`0.18`, `0.16`, `0.00` for WF1/WF2/WF3) and preserves causal replay.
+- Strict autonomous costed returns remain `+0.018150`, `-0.135907`, and `-0.002102`; WF2 and WF3 are negative, and the candidate does not pass all-window positivity, profit-factor, or event-baseline gates.
+- This is a model calibration/generalization blocker, not a credential or exchange-access blocker. Do not promote the candidate, switch the active Demo model, or add Demo orders.

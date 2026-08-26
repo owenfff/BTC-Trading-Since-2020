@@ -256,3 +256,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Candidate version: `behavioral-distillation-v3.4-calibrated-action-target`; it uses `sqrt_balanced` class weighting and enforces that `NO_TRADE`/`HOLD_*` target exposure equals the current simulated exposure.
 - Report: `quant/reports/cross_venue_temporal_calibrated_autonomous_audit.md` and `.json`. Causal checks remain zero; strict costed returns are `+0.018150`, `-0.135907`, and `-0.002102` across WF1/WF2/WF3, so the candidate is not promoted.
 - Full suite after the change: `366 passed`. No raw CSV/JSON, credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.
+
+## M15.5 cost-calibrated threshold candidate
+
+- Code commit: `6c0e0396c65db0e662fe5f3bae65180c3b2475f1`.
+- Candidate version: `behavioral-distillation-v3.5-cost-calibrated-threshold`; the action-target consistency invariant remains enabled.
+- Report: `quant/reports/cross_venue_temporal_threshold_calibrated_autonomous_audit.md` and `.json`.
+- Thresholds were selected from train-only chronological tails: `WF1=0.18`, `WF2=0.16`, `WF3=0.00`. Strict autonomous costed returns were `+0.018150`, `-0.135907`, and `-0.002102`; the candidate remains blocked.
+- Causal checks pass and all `366` tests pass. No raw CSV/JSON was modified; no credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.

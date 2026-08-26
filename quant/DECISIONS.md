@@ -226,3 +226,9 @@
 - Add an opt-in calibrated temporal candidate `behavioral-distillation-v3.4-calibrated-action-target` using square-root inverse-frequency weighting and an explicit invariant: `NO_TRADE`/`HOLD_*` cannot produce a different target exposure from the current simulated position.
 - The candidate reduces unnecessary repositioning and is positive in WF1, but remains negative in WF2 and WF3 after costed autonomous replay; it fails the all-window positive/profit-factor/event-baseline gates.
 - Keep the active Demo model unchanged. A model that is numerically stable or better than a weak event baseline is not sufficient for deployment without stable out-of-time autonomous behavior.
+
+## 2026-08-26 — Train-only cost-calibrated threshold remains blocked
+
+- Candidate `behavioral-distillation-v3.5-cost-calibrated-threshold` selects confidence thresholds only from the chronological tail of each training window (`WF1=0.18`, `WF2=0.16`, `WF3=0.00`); the test windows remain untouched during selection.
+- Strict autonomous, costed normalized returns are `+0.018150`, `-0.135907`, and `-0.002102` for WF1/WF2/WF3. The candidate fails stable all-window positivity, profit-factor, and event-baseline gates.
+- Keep the active Demo model unchanged. Threshold calibration is research evidence, not proof that the robot has learned the original trader's strategy or a deployable profitable signal.
