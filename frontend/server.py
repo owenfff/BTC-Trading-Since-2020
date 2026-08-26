@@ -344,6 +344,17 @@ def status_payload() -> dict[str, Any]:
     has_feed = bool(preflight or runtime or mapping)
     account = _account_payload(runtime, preflight)
     mapping_rows = mapping.get("symbols", []) if isinstance(mapping.get("symbols"), list) else []
+    deployment = _read_json(PROJECT_ROOT / "quant" / "outputs" / "cross_asset_deployment_model.json")
+    active_model_version = (
+        preflight.get("model_version")
+        or deployment.get("model_version")
+        or "behavioral-distillation-v2-cross-asset-deploy"
+    )
+    active_feature_contract = (
+        preflight.get("feature_contract_version")
+        or deployment.get("feature_contract_version")
+        or "m13-v2-cross-asset"
+    )
     return {
         "dashboard_role": "FRONTEND_ONLY",
         "exchange_connection": "NONE_FROM_THIS_SERVER",
@@ -351,7 +362,8 @@ def status_payload() -> dict[str, Any]:
         "feed_status": "CONNECTED" if has_feed else "WAITING_FOR_TRADING_NODE",
         "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "model": {
-            "version": preflight.get("model_version", "behavioral-distillation-v2-cross-asset-deploy"),
+            "version": active_model_version,
+            "feature_contract_version": active_feature_contract,
             "fidelity": "BEHAVIORAL_APPROXIMATION",
             "online_training": False,
         },
