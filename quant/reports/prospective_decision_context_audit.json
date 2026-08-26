@@ -1,0 +1,46 @@
+{
+  "report_version": "M15-PROSPECTIVE-DECISION-CONTEXT-1.0",
+  "status": "READY_FOR_PROSPECTIVE_CAPTURE",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "purpose": "Capture the market and model state observed immediately before each runtime decision for future causal replay analysis.",
+  "capture_order": [
+    "reconcile_account_state",
+    "fetch_closed_bars_and_market_context",
+    "build_strategy_input",
+    "predict_signal",
+    "persist_pre_action_snapshot",
+    "cancel_or_replace_stale_order",
+    "submit_order_if_risk_gate_allows"
+  ],
+  "captured_fields": [
+    "decision_time",
+    "historical_symbol",
+    "venue_symbol",
+    "quote_bid_ask_and_observed_at",
+    "closed_bar_time",
+    "funding_mark_index_values_and_source_times",
+    "coverage_status",
+    "allowlisted_strategy_features",
+    "model_action_target_confidence_and_valid_until",
+    "pre_action_quantity_and_equity"
+  ],
+  "retention": {
+    "storage": "behavior_state.decision_audit in ignored runtime state",
+    "max_rows": 5000,
+    "overflow_policy": "drop_oldest_keep_newest"
+  },
+  "safety": {
+    "credentials_recorded": false,
+    "raw_adapter_payloads_recorded": false,
+    "historical_labels_created": false,
+    "active_demo_changed": false,
+    "promotion_allowed": false,
+    "raw_inputs_untouched": true
+  },
+  "verification": {
+    "targeted_tests": "5 passed",
+    "full_suite": "411 passed",
+    "implementation_commit": "b3ccf395a905a0d8cac679307c1e66e110f7a965"
+  },
+  "conclusion": "Prospective snapshots improve future evidence collection but do not reconstruct past private triggers or prove exact strategy recovery."
+}

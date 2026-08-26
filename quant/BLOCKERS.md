@@ -213,3 +213,8 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - M15.20 finds shared `OPEN`/`ADD`/`REDUCE`/`FLIP` action families, but this is only a behavioral approximation. BitMEX clock-row rates and Hyperliquid fill/event rates cannot be compared as if they were the same denominator.
 - The same-trader premise does not remove venue-native contract, cost, funding, liquidity, order-queue or lifecycle differences. Do not merge positions, units, fees, funding or order-book context across venues.
 - Exact private trigger recovery remains blocked because complete pre-action quote/order-book and cancellation-intent context is unavailable or unverified. Keep the active Demo model unchanged and do not add Demo orders.
+
+## 2026-08-26 — Prospective capture does not remove historical identifiability ceiling
+
+- M15.21 now records the robot's own pre-order context for future Demo cycles, but those new observations cannot reconstruct the original trader's past private trigger or retroactively fill missing historical order-book data.
+- The completion audit remains `NOT_COMPLETE`; prospective snapshots are evidence for future model validation only. Do not treat them as historical teacher labels or use them to promote the current model.

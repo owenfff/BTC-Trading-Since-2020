@@ -392,3 +392,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The audit normalizes only high-level action families for comparison; it does not merge source records or create Hyperliquid training labels. Common families are `OPEN`, `ADD`, `REDUCE`, and `FLIP`.
 - BitMEX evidence is a clock-row behavior profile (`258492` rows / `12709` non-idle actions); Hyperliquid evidence is a partial public snapshot (`341` fills / `1343` order IDs). All observed Hyperliquid orders in that snapshot are Limit/GTC, but pre-action trigger context is incomplete.
 - Status: `SHARED_INTENT_SUPPORTED_VENUE_NATIVE_POLICY_REQUIRED`; promotion is false. Full suite: `409 passed`; raw root CSV/JSON remained unchanged; active Demo remained unchanged.
+
+## M15.21 prospective decision context capture
+
+- Runtime code: `quant_bot/venue_runtime.py`; tests extended in `quant/tests/test_venue_runtime.py`.
+- Report: `quant/reports/prospective_decision_context_audit.md` and `.json`.
+- The runtime writes a bounded, credential-free `behavior_state.decision_audit` snapshot after feature construction/model prediction and before order side effects. It contains only the pre-action market context, allowlisted feature contract values, reconciled account state needed for the decision, and model output.
+- Retention is capped at `5,000` rows in ignored `quant/outputs` runtime state; older rows are evicted deterministically. No historical CSV/JSON inputs are modified and no historical labels are created.
+- Verification: targeted runtime tests `5 passed`; full suite `411 passed`; implementation commit `b3ccf395a905a0d8cac679307c1e66e110f7a965`; promotion remains false and active Demo remains unchanged.

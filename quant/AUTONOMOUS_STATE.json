@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15.20-cross-venue-strategy-equivalence-boundary",
+  "current_work_package": "M15.21-prospective-decision-context-capture",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "2ca629f857f12dd36ee014413ca6329c7de44726",
+  "last_code_commit": "b3ccf395a905a0d8cac679307c1e66e110f7a965",
   "last_report_commit": "e6cf3ee8ef3271bb063a52331086926a8d718316",
-  "test_count": 409,
-  "last_test_status": "FULL_SUITE_409_PASSED;CROSS_VENUE_EQUIVALENCE_BOUNDARY;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
+  "test_count": 411,
+  "last_test_status": "FULL_SUITE_411_PASSED;PROSPECTIVE_DECISION_CONTEXT_CAPTURE;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -71,7 +71,8 @@
     "M15.17 completion audit is NOT_COMPLETE: exact recovery, pre-action context, autonomous timing, candidate promotion, and Demo authorization gates fail; passing causal/test gates do not prove full strategy learning.",
     "M15.18 Hyperliquid historicalOrders adds partial submitted-order intent (203/203 filled-status IDs joined to fills) but is recent-window data without historical quote/order-book context; exact timing remains blocked.",
     "M15.19 four no-download probes of representative Hyperliquid historical L2 archive keys returned 403; access/cost/coverage are unverified, so no L2 data was downloaded or integrated.",
-    "M15.20 finds shared OPEN/ADD/REDUCE/FLIP action families across the separate BitMEX and Hyperliquid sources, but denominators and execution semantics are not interchangeable; exact private trigger recovery remains blocked and the active Demo model is unchanged."
+    "M15.20 finds shared OPEN/ADD/REDUCE/FLIP action families across the separate BitMEX and Hyperliquid sources, but denominators and execution semantics are not interchangeable; exact private trigger recovery remains blocked and the active Demo model is unchanged.",
+    "M15.21 adds bounded credential-free prospective decision snapshots before order side effects; this improves future Demo evidence but cannot reconstruct historical private triggers or prove exact strategy learning."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -85,6 +86,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Use the shared-intent/venue-native boundary for future replay, and do not claim exact learning without verified pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
+  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Use prospective decision snapshots for future evidence, and do not claim exact learning without verified historical pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
   "updated_at_utc": "2026-08-26T14:05:39Z"
 }

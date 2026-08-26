@@ -336,3 +336,10 @@
 - Both sources expose a common high-level action vocabulary (`OPEN`, `ADD`, `REDUCE`, `FLIP`), supporting a shared intent layer. Their denominators and source scopes are not interchangeable, so records remain separate and Hyperliquid is not silently used as a BitMEX label.
 - Contract scale, settlement currency, market availability, costs, funding, margin, liquidity, order queue and lifecycle semantics remain venue-native. The report does not establish identical executable rules or the trader's private trigger.
 - Full suite after this package: `409 passed`. Active Demo remains unchanged; no model promotion, new Demo order, credential, private endpoint, mainnet connection or raw CSV/JSON modification occurred.
+
+## 2026-08-26 — Capture prospective decision context before order side effects
+
+- M15.21 adds a bounded `behavior_state.decision_audit` ring to `quant_bot/venue_runtime.py`. It is written after the model predicts but before order cancellation/replacement or submission.
+- Each row records venue mapping, pre-action quantity/equity, quote and closed-bar timestamps, funding/mark/index coverage, allowlisted strategy features, and the model output. It never records credentials or raw adapter payloads and retains at most `5,000` newest rows.
+- This improves prospective Demo evidence collection and future causal replay; it does not create historical labels, recover past private triggers, prove exact learning, or authorize model promotion/orders.
+- Full suite after this change: `411 passed`. Active Demo and raw account CSV/JSON remain unchanged.
