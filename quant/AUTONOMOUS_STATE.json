@@ -5,7 +5,7 @@
   "current_work_package": "M15.13-shared-intent-timing-diagnostics",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "c2d7eef2b1db19d01ea55af32504b91834e2b194",
-  "last_report_commit": "9d86be54eb0cd4a537fc0dff02c4f4270ceda4be",
+  "last_report_commit": "68c3d9ba312ab9d090e5c43f99ef144cdbdf607a",
   "test_count": 389,
   "last_test_status": "FULL_SUITE_389_PASSED;SHARED_TIMING_CAUSAL_PASS;SHARED_TIMING_BITMEX_TWO_ACTIONS_F1_ZERO;SHARED_TIMING_HYPERLIQUID_ZERO_ACTION;V4.3_DIAGNOSTIC_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
