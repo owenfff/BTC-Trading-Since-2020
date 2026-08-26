@@ -165,3 +165,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - Candidate v4.2 passes the causal audit and uses a final untouched chronological test slice, but both venue results predict `100% NO_TRADE`; no autonomous adjustments are executed.
 - Native exposure calibration is non-informative on the calibration slice (`slope=0.0` for both BitMEX and Hyperliquid), so it cannot rescue the shared model's action-timing failure.
 - This is a sparse-label/model-identifiability and autonomous state-generalization blocker. Do not promote v4.2, switch the active Demo model, or add Demo orders.
+
+## 2026-08-26 — Venue-neutral timing head fails to capture action timing
+
+- v4.3 is causally clean but predicts only `2` actions on the BitMEX untouched holdout and `0` on Hyperliquid; timing F1 is `0.000000` on both.
+- BitMEX costed net return is `-0.004365` with PF `0.964532`; Hyperliquid has no executed adjustment. The all-NO_TRADE baseline is not treated as learned behavior.
+- Autonomous action timing and sparse-label identifiability remain unresolved. Do not promote v4.3, switch the active Demo model, or add Demo orders.

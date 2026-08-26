@@ -326,3 +326,13 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - BitMEX: `41996` untouched test rows, predicted action rate `0.00%`, layered net return `0.000000`, action Macro-F1 `0.192789`, target MAE `0.112609`.
 - Hyperliquid: `1160` untouched test rows, predicted action rate `0.00%`, layered net return `0.000000`, action Macro-F1 `0.329702`, target MAE `0.502278`.
 - Native exposure slope was `0.0` for both venues. Status is diagnostic-only; active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential/private endpoint/order was used.
+
+## M15.13 shared intent timing head
+
+- Code commits: `c7c284a` (timing audit) and `c2d7eef` (timing tests). Full suite after this package: `389 passed`.
+- Candidate: `behavioral-distillation-v4.3-shared-intent-timing`. Reports: `quant/reports/shared_intent_timing_audit.md`, `.json`, and `shared_intent_timing_by_symbol.csv`.
+- Source: `quant/outputs/cross_venue_temporal_dataset_v3.csv`; per venue the model used chronological `60%` training, `20%` calibration, and a final untouched `20%` test. Shared training rows: `158572`; global probability calibration rows: `45873`.
+- Causal audit: `PASS` with zero invalid decision times, future bars, future funding, non-strict clock ordering, and non-future labels.
+- BitMEX: test `41996` rows, threshold `0.05`, `2` predicted actions, timing F1 `0.000000`, net return `-0.004365`, PF `0.964532`.
+- Hyperliquid: test `1160` rows, threshold `0.15`, `0` predicted actions, timing F1 `0.000000`, net return `0.000000`.
+- Status: diagnostic-only; active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential, private endpoint, mainnet connection, or order was used.

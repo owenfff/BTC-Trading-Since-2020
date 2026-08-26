@@ -283,3 +283,9 @@
 - The split is per venue and chronological: `60%` fit, `20%` calibration, and a final untouched `20%` test. Causal checks pass with zero violations. Native exposure calibration is fitted only on the middle slice and is bounded to prevent direction reversal or unbounded resizing.
 - On the untouched test, BitMEX and Hyperliquid both predicted `100% NO_TRADE`; the native exposure slopes collapsed to `0.0`. The candidate therefore does not capture an executable shared intent and is not promoted.
 - The result narrows the diagnosis: the remaining issue is autonomous action timing/state generalization and sparse-label identifiability, not simply venue contract-unit scaling. Active Demo remains unchanged.
+
+## 2026-08-26 — Venue-neutral timing head remains blocked
+
+- Candidate `behavioral-distillation-v4.3-shared-intent-timing` separates the binary action-timing head from action family and target size. It uses venue-neutral features, a causal zero-start state path, a 60% fit / 20% calibration / 20% untouched test split, and train-only probability calibration.
+- On the untouched BitMEX holdout, selected threshold `0.05` produced only `2` predicted actions, timing F1 `0.000000`, and costed net return `-0.004365` (PF `0.964532`). On Hyperliquid, threshold `0.15` produced `0` actions and timing F1 `0.000000`.
+- The separated timing head therefore does not recover executable action timing. Keep the active Demo model unchanged; no candidate promotion or new Demo orders are authorized.
