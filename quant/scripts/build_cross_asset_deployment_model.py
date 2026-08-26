@@ -210,7 +210,7 @@ def build(
             "- runtime training: **disabled**",
             "- Spot: **monitor-only**",
             "",
-            "The artifact is intended for BitMEX Testnet only. It is a behavioral approximation and is not a claim of exact strategy recovery or future profitability.",
+            "The artifact is intended for an explicitly configured Demo venue only; it is never a mainnet credential or endpoint. It is a behavioral approximation and is not a claim of exact strategy recovery or future profitability.",
         ]) + "\n",
         encoding="utf-8",
     )
