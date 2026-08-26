@@ -38,6 +38,8 @@ outputs/frontend_dashboard.log
 outputs/frontend_dashboard.error.log
 outputs/cross_asset_market_coverage.json
 outputs/cross_venue_model_dataset*.csv
+outputs/cross_venue_temporal*.csv
+outputs/cross_venue_temporal*.json
 outputs/hyperliquid_btc_feature_rows.csv
 outputs/replay_dashboard_hyperliquid_*.json
 data/external/

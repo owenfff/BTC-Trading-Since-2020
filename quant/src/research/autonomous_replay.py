@@ -171,6 +171,7 @@ def roll_forward_predictions(
     *,
     market_bar_opens: Mapping[str, list[datetime]] | None = None,
     fee_rate: float = 0.0005,
+    include_state_overrides: bool = True,
 ) -> dict[str, Any]:
     """Predict chronologically with zero-start simulated state.
 
@@ -180,7 +181,9 @@ def roll_forward_predictions(
     call; raw market/instrument fields remain from the dataset.
     """
 
-    ordered = sorted((dict(row) for row in rows), key=lambda row: (parse_time(row.get("decision_time")) or datetime.max.replace(tzinfo=UTC), state_key(row), str(row.get("decision_episode_id"))))
+    # Rows are never mutated by the replay path; sorting references avoids a
+    # second full copy of large temporal datasets before grouping them.
+    ordered = sorted(rows, key=lambda row: (parse_time(row.get("decision_time")) or datetime.max.replace(tzinfo=UTC), state_key(row), str(row.get("decision_episode_id"))))
     states: dict[str, AutonomousState] = defaultdict(AutonomousState)
     pending: dict[str, list[tuple[datetime, float, str]]] = defaultdict(list)
     row_predictions: list[tuple[dict[str, Any], StrategySignal]] = []
@@ -202,7 +205,8 @@ def roll_forward_predictions(
             overridden = override_dynamic_state(row, state, scale, when)
             signal = model.predict(strategy_input_from_row(overridden))
             local.append((row, signal))
-            overrides.append({"decision_episode_id": row.get("decision_episode_id"), "state_key": key, "teacher_state_fields_overridden": list(STATE_FIELDS)})
+            if include_state_overrides:
+                overrides.append({"decision_episode_id": row.get("decision_episode_id"), "state_key": key, "teacher_state_fields_overridden": list(STATE_FIELDS)})
             row_predictions.append((row, signal))
         merged = merge_same_time_signals(local, key=key, decision_time=when)
         if merged is None:

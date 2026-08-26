@@ -138,9 +138,11 @@ class NumpyLogisticStrategy:
 
     version = "behavioral-distillation-v1-logistic-numpy"
 
-    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3, target_l2: float = 0.0) -> None:
+    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3, target_l2: float = 0.0, class_weighting: str | None = None) -> None:
         if target_l2 < 0:
             raise ValueError("target_l2 must be non-negative")
+        if class_weighting not in {None, "balanced"}:
+            raise ValueError("class_weighting must be None or 'balanced'")
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.l2 = l2
@@ -149,6 +151,7 @@ class NumpyLogisticStrategy:
         # important because the standardized feature matrix still contains
         # near-collinear instrument and indicator columns.
         self.target_l2 = target_l2
+        self.class_weighting = class_weighting
         self.encoder = FeatureEncoder()
         self.actions: list[str] = []
         self.weights: np.ndarray | None = None
@@ -161,29 +164,52 @@ class NumpyLogisticStrategy:
         if not train:
             raise ValueError("NumpyLogisticStrategy requires TRAIN labels")
         self.encoder.fit(train)
-        matrix = np.vstack([self.encoder.transform(row) for row in train])
+        # Preallocate instead of building a Python list of one NumPy array per
+        # row.  Temporal market-clock datasets can contain hundreds of
+        # thousands of rows; the old construction retained both the list and
+        # the stacked copy during fit.
+        first_vector = self.encoder.transform(train[0])
+        matrix = np.empty((len(train), first_vector.shape[0]), dtype=float)
+        matrix[0] = first_vector
+        for index, row in enumerate(train[1:], start=1):
+            matrix[index] = self.encoder.transform(row)
         self.actions, labels = _label_data(train)
         class_count = len(self.actions)
         self.weights = np.zeros((matrix.shape[1], class_count), dtype=float)
         self.bias = np.zeros(class_count, dtype=float)
         targets = np.asarray([float(row["label_next_target_exposure"]) for row in train], dtype=float)
-        augmented = np.column_stack([np.ones(matrix.shape[0]), matrix])
+        sample_weights = np.ones(len(train), dtype=float)
+        if self.class_weighting == "balanced":
+            counts = np.bincount(labels, minlength=class_count).astype(float)
+            sample_weights = np.asarray([len(train) / (class_count * counts[label]) if counts[label] else 1.0 for label in labels], dtype=float)
+        weight_sum = float(sample_weights.sum())
         if self.target_l2:
-            penalty = np.eye(augmented.shape[1], dtype=float)
-            penalty[0, 0] = 0.0
-            gram = augmented.T @ augmented + self.target_l2 * penalty
+            # Equivalent to X'X + λI for X=[1, matrix], but without materializing
+            # a second (rows x features) array for the intercept column.
+            feature_count = matrix.shape[1]
+            gram = np.eye(feature_count + 1, dtype=float) * self.target_l2
+            gram[0, 0] = 0.0
+            gram[0, 0] += weight_sum
+            column_sum = (matrix * sample_weights[:, None]).sum(axis=0)
+            gram[0, 1:] = column_sum
+            gram[1:, 0] = column_sum
+            gram[1:, 1:] += matrix.T @ (matrix * sample_weights[:, None])
+            rhs = np.empty(feature_count + 1, dtype=float)
+            rhs[0] = float(sample_weights @ targets)
+            rhs[1:] = matrix.T @ (sample_weights * targets)
             try:
-                self.target_coef = np.linalg.solve(gram, augmented.T @ targets)
+                self.target_coef = np.linalg.solve(gram, rhs)
             except np.linalg.LinAlgError:
-                self.target_coef = np.linalg.pinv(gram) @ (augmented.T @ targets)
+                self.target_coef = np.linalg.pinv(gram) @ rhs
         else:
+            augmented = np.column_stack([np.ones(matrix.shape[0]), matrix])
             self.target_coef = np.linalg.pinv(augmented) @ targets
         one_hot = np.eye(class_count)[labels]
         for _ in range(self.epochs):
             probabilities = _softmax(matrix @ self.weights + self.bias)
-            error = probabilities - one_hot
-            self.weights -= self.learning_rate * ((matrix.T @ error) / len(train) + self.l2 * self.weights)
-            self.bias -= self.learning_rate * error.mean(axis=0)
+            error = (probabilities - one_hot) * sample_weights[:, None]
+            self.weights -= self.learning_rate * ((matrix.T @ error) / weight_sum + self.l2 * self.weights)
+            self.bias -= self.learning_rate * error.sum(axis=0) / weight_sum
         self.fit_row_count = len(train)
         return self
 
@@ -219,6 +245,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             "learning_rate": self.learning_rate,
             "l2": self.l2,
             "target_l2": self.target_l2,
+            "class_weighting": self.class_weighting,
             "fit_row_count": self.fit_row_count,
             "actions": list(self.actions),
             "weights": self.weights.tolist(),
@@ -236,6 +263,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             learning_rate=float(payload.get("learning_rate", 0.18)),
             l2=float(payload.get("l2", 1e-3)),
             target_l2=float(payload.get("target_l2", 0.0)),
+            class_weighting=payload.get("class_weighting"),
         )
         model.version = str(payload.get("version", cls.version))
         model.actions = [str(item) for item in payload.get("actions", [])]
