@@ -206,3 +206,10 @@
   control in all windows. Keep the current Demo model; do not auto-switch and
   do not add Demo orders. The public API refresh is credential-free and remains
   fail-closed when the local network cannot complete TLS.
+
+## 2026-08-26 — Stabilize target-exposure regression; keep candidate blocked
+
+- The existing NumPy target regression used an unregularized pseudoinverse. Near-collinear contract/indicator features produced coefficients up to approximately `1e11` and caused zero-start autonomous predictions to saturate at `-1/+1`.
+- Add an opt-in ridge penalty (`target_l2`) while preserving `target_l2=0` for legacy artifact compatibility. Build the independent candidate `behavioral-distillation-v3.2-stable-target` with `λ=1.0` and record its artifact/model hash.
+- The candidate artifact loads successfully and reduces strict-autonomous target MAE to approximately `0.19–0.20`, but costed WF1/WF2/WF3 net returns remain negative and the promotion gates fail. Keep the active Demo model unchanged; no new Demo orders are authorized.
+- The next model-research task is bar-clock/temporal supervision and explicit no-trade frequency alignment. This is required before claiming the model has learned a deployable signal policy.

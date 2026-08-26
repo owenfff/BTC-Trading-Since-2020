@@ -1,0 +1,361 @@
+{
+  "report_version": "M13-DEPLOYMENT-MODEL-1.0",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "model_version": "behavioral-distillation-v3.2-stable-target",
+  "feature_contract_version": "m13-v3.1-operational-parity",
+  "training_data_sha256": "2a38dbb79daae88bb49d1d998bf18b8aac6bc5de3bafb94481e0a71b574916c5",
+  "model_sha256": "7d8a12e97cb90f1e71f3d94087cfc5069c0a4c90a3fa928fcf989c62e06f8d07",
+  "code_commit": "14f11b14e77190457f2af5ccb96806d15037fce1",
+  "deployment_time": "2026-08-26T07:27:44Z",
+  "frozen_cutoff": "2026-07-18T21:17:31.514Z",
+  "source_row_count": 32231,
+  "fit_row_count": 32165,
+  "symbol_count": 66,
+  "symbols": [
+    "AAVEUSDT",
+    "ADAM20",
+    "ADAUSD",
+    "ADAUSDT",
+    "ALTMEXUSD",
+    "AXSUSDT",
+    "BCHH21",
+    "BCHUSD",
+    "BMEXUSD",
+    "BNBUSD",
+    "BNBUSDT",
+    "DOGEUSD",
+    "DOGEUSDT",
+    "DOTUSDT",
+    "DOTUSDTH21",
+    "EOSH21",
+    "EOSUSDTZ20",
+    "ETHH21",
+    "ETHH22",
+    "ETHH23",
+    "ETHH24",
+    "ETHM20",
+    "ETHM21",
+    "ETHM22",
+    "ETHM23",
+    "ETHM24",
+    "ETHU20",
+    "ETHU21",
+    "ETHU22",
+    "ETHU23",
+    "ETHU24",
+    "ETHUSD",
+    "ETHUSDZ20",
+    "ETHZ20",
+    "ETHZ21",
+    "ETHZ22",
+    "ETHZ23",
+    "ETHZ24",
+    "LINKUSDT",
+    "LINKUSDTZ20",
+    "LTCH21",
+    "LTCM20",
+    "LTCM21",
+    "LTCU20",
+    "LTCU21",
+    "LTCUSD",
+    "LTCZ20",
+    "LTCZ21",
+    "LUNAUSD",
+    "ORDIUSD",
+    "TRXH21",
+    "TRXM20",
+    "TRXM21",
+    "TRXU20",
+    "TRXU21",
+    "TRXUSDT",
+    "TRXZ20",
+    "TRXZ21",
+    "UNIUSDT",
+    "XBTM21",
+    "XBTUSD",
+    "XLMUSDT",
+    "XRPUSD",
+    "XTZUSDTZ20",
+    "YFIUSDTH21",
+    "YFIUSDTZ20"
+  ],
+  "position_scales_fit_on": "all historical rows before the frozen deployment cutoff; no online retraining",
+  "spot_policy": "monitor-only; never mixed with derivative position semantics",
+  "risk_envelope": {
+    "method": "full-history-behavioral-envelope",
+    "per_symbol_target_exposure": {
+      "AAVEUSDT": {
+        "p99_abs_target_exposure": 0.8456091763976439,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAM20": {
+        "p99_abs_target_exposure": 0.953896889938151,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAUSD": {
+        "p99_abs_target_exposure": 0.9987600000000001,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAUSDT": {
+        "p99_abs_target_exposure": 0.622610294117647,
+        "max_abs_target_exposure": 0.6231617647058824
+      },
+      "ALTMEXUSD": {
+        "p99_abs_target_exposure": 0.9996052631578948,
+        "max_abs_target_exposure": 1.0
+      },
+      "AXSUSDT": {
+        "p99_abs_target_exposure": 0.8929432435745513,
+        "max_abs_target_exposure": 0.9591386425857067
+      },
+      "BCHH21": {
+        "p99_abs_target_exposure": 0.9598,
+        "max_abs_target_exposure": 1.0
+      },
+      "BCHUSD": {
+        "p99_abs_target_exposure": 0.9286956521739131,
+        "max_abs_target_exposure": 1.0
+      },
+      "BMEXUSD": {
+        "p99_abs_target_exposure": 0.9729166666666665,
+        "max_abs_target_exposure": 1.0
+      },
+      "BNBUSD": {
+        "p99_abs_target_exposure": 0.9975757575757576,
+        "max_abs_target_exposure": 1.0
+      },
+      "BNBUSDT": {
+        "p99_abs_target_exposure": 0.9532424519670631,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOGEUSD": {
+        "p99_abs_target_exposure": 0.7958661152829822,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOGEUSDT": {
+        "p99_abs_target_exposure": 0.73,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOTUSDT": {
+        "p99_abs_target_exposure": 0.9073684210526316,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOTUSDTH21": {
+        "p99_abs_target_exposure": 0.9313526570048309,
+        "max_abs_target_exposure": 1.0
+      },
+      "EOSH21": {
+        "p99_abs_target_exposure": 0.98,
+        "max_abs_target_exposure": 1.0
+      },
+      "EOSUSDTZ20": {
+        "p99_abs_target_exposure": 0.99,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH21": {
+        "p99_abs_target_exposure": 0.8847058823529411,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH22": {
+        "p99_abs_target_exposure": 0.9793417066049688,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH23": {
+        "p99_abs_target_exposure": 0.9446666666666667,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH24": {
+        "p99_abs_target_exposure": 0.9906666666666666,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM20": {
+        "p99_abs_target_exposure": 0.9802717391304349,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM21": {
+        "p99_abs_target_exposure": 0.9808917197452228,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM22": {
+        "p99_abs_target_exposure": 0.9776436396154706,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM23": {
+        "p99_abs_target_exposure": 0.9758667846512751,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM24": {
+        "p99_abs_target_exposure": 0.9888712241653418,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU20": {
+        "p99_abs_target_exposure": 0.9006024096385542,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU22": {
+        "p99_abs_target_exposure": 0.97125,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU23": {
+        "p99_abs_target_exposure": 0.9705790784557908,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU24": {
+        "p99_abs_target_exposure": 0.9959315384615386,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHUSD": {
+        "p99_abs_target_exposure": 0.5627115375249597,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHUSDZ20": {
+        "p99_abs_target_exposure": 0.0,
+        "max_abs_target_exposure": 0.0
+      },
+      "ETHZ20": {
+        "p99_abs_target_exposure": 0.9471797323135754,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ21": {
+        "p99_abs_target_exposure": 0.9886517157524993,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ22": {
+        "p99_abs_target_exposure": 0.9626829268292684,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ23": {
+        "p99_abs_target_exposure": 0.9382443758270843,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ24": {
+        "p99_abs_target_exposure": 0.9949436050223451,
+        "max_abs_target_exposure": 1.0
+      },
+      "LINKUSDT": {
+        "p99_abs_target_exposure": 0.921213030432919,
+        "max_abs_target_exposure": 1.0
+      },
+      "LINKUSDTZ20": {
+        "p99_abs_target_exposure": 0.9876635514018691,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCH21": {
+        "p99_abs_target_exposure": 0.9449982046678636,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCM20": {
+        "p99_abs_target_exposure": 0.9521591825759613,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCM21": {
+        "p99_abs_target_exposure": 0.9893714285714286,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCU20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCU21": {
+        "p99_abs_target_exposure": 0.9359999999999999,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCUSD": {
+        "p99_abs_target_exposure": 0.7049819525205213,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCZ20": {
+        "p99_abs_target_exposure": 0.8058409228901031,
+        "max_abs_target_exposure": 0.8718882817243473
+      },
+      "LTCZ21": {
+        "p99_abs_target_exposure": 0.9999133044348116,
+        "max_abs_target_exposure": 1.0
+      },
+      "LUNAUSD": {
+        "p99_abs_target_exposure": 0.9513333333333334,
+        "max_abs_target_exposure": 1.0
+      },
+      "ORDIUSD": {
+        "p99_abs_target_exposure": 0.98796875,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXH21": {
+        "p99_abs_target_exposure": 0.8704347826086957,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXM20": {
+        "p99_abs_target_exposure": 0.965,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXM21": {
+        "p99_abs_target_exposure": 0.9669811320754716,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXU20": {
+        "p99_abs_target_exposure": 0.9194520547945204,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXUSDT": {
+        "p99_abs_target_exposure": 0.993332933269323,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXZ20": {
+        "p99_abs_target_exposure": 0.9158432493850904,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXZ21": {
+        "p99_abs_target_exposure": 0.9940000000000001,
+        "max_abs_target_exposure": 1.0
+      },
+      "UNIUSDT": {
+        "p99_abs_target_exposure": 0.9167660371468707,
+        "max_abs_target_exposure": 1.0
+      },
+      "XBTM21": {
+        "p99_abs_target_exposure": 0.0,
+        "max_abs_target_exposure": 0.0
+      },
+      "XBTUSD": {
+        "p99_abs_target_exposure": 0.6592152928270001,
+        "max_abs_target_exposure": 1.0
+      },
+      "XLMUSDT": {
+        "p99_abs_target_exposure": 0.9866666666666667,
+        "max_abs_target_exposure": 1.0
+      },
+      "XRPUSD": {
+        "p99_abs_target_exposure": 0.8106205858288332,
+        "max_abs_target_exposure": 1.0
+      },
+      "XTZUSDTZ20": {
+        "p99_abs_target_exposure": 0.99,
+        "max_abs_target_exposure": 1.0
+      },
+      "YFIUSDTH21": {
+        "p99_abs_target_exposure": 0.9494244604316546,
+        "max_abs_target_exposure": 1.0
+      },
+      "YFIUSDTZ20": {
+        "p99_abs_target_exposure": 0.6425,
+        "max_abs_target_exposure": 1.0
+      }
+    },
+    "historical_simultaneous_total_exposure_cap": 4.082937816748451,
+    "historical_single_adjustment_p99": 0.3403062887244386,
+    "historical_single_adjustment_max": 1.4814666666666667,
+    "units": "normalized exposure; runtime converts through current settlement equity and instrument terms",
+    "fail_closed_if_missing": true
+  },
+  "artifact": "C:/Users/yhyzd/Documents/Codex/2026-08-19/m0-01-1-fork-text-fork/outputs/BTC-Trading-Since-2020/quant/outputs/cross_asset_deployment_model_v32.json (tracked deployment artifact)",
+  "rollout_status": "CANDIDATE_NOT_PROMOTED_PENDING_STRICT_AUTONOMOUS_VALIDATION",
+  "target_regression_l2": 1.0
+}

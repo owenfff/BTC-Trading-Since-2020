@@ -230,3 +230,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
   gates pass, but the candidate remains `DEMO_CONTINUE_LIVE_BLOCKED` because
   costed autonomous performance fails the positive/profit-factor/hold-control
   promotion gates. No model switch, private API call, or order was performed.
+
+## M15.1 v3.2 stable-target candidate
+
+- Code commit: `14f11b14e77190457f2af5ccb96806d15037fce1`.
+- Candidate model: `behavioral-distillation-v3.2-stable-target`; feature contract: `m13-v3.1-operational-parity`; artifact: `quant/outputs/cross_asset_deployment_model_v32.json`.
+- Target regression uses opt-in ridge `λ=1.0`; legacy models retain `λ=0` when loaded from existing artifacts. Candidate model SHA256: `7d8a12e97cb90f1e71f3d94087cfc5069c0a4c90a3fa928fcf989c62e06f8d07`.
+- Validation report: `quant/reports/cross_asset_v32_stable_target_audit.md` and `.json`. Candidate coefficients are bounded (`max abs ≈ 0.2754`) and artifact loading passes, but strict autonomous costed returns remain negative in all three windows; candidate was not promoted.
+- No raw account CSV/JSON was changed. No private API, credential, mainnet endpoint, or order was used.

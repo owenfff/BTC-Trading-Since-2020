@@ -100,3 +100,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - No real exchange credential, private endpoint, or order lifecycle was used
   during autonomous verification. Until that external local step is complete,
   the bot remains non-production code with a fail-closed credential boundary.
+
+## 2026-08-26 — v3.2 stable-target candidate remains blocked
+
+- The active v3/v3.1 target regression was numerically unstable: near-collinear standardized features yielded very large target coefficients and invalid zero-start extrapolation.
+- Candidate `behavioral-distillation-v3.2-stable-target` fixes coefficient stability, but strict autonomous, costed WF1/WF2/WF3 results are still negative (`-0.1778`, `-0.0367`, `-0.0488` normalized return). Profit factor is below `1` in all three windows.
+- This is a model-quality blocker, not a credentials or network blocker. The candidate remains non-active and Demo order generation remains unchanged.

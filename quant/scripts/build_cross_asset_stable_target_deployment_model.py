@@ -22,5 +22,4 @@ if __name__ == "__main__":
         strategy_version="behavioral-distillation-v3.2-stable-target",
         target_l2=1.0,
     )
-    result["rollout_status"] = "CANDIDATE_NOT_PROMOTED_PENDING_STRICT_AUTONOMOUS_VALIDATION"
     print(json.dumps({"status": "PASS", "model_version": result["model_version"], "symbols": result["symbol_count"], "fit_rows": result["fit_row_count"], "model_sha256": result["model_sha256"], "rollout_status": result["rollout_status"]}, ensure_ascii=False))
