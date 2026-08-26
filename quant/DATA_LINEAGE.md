@@ -299,3 +299,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - v3.8 strict costed returns: `-3.514461`, `-0.103915`, `+0.229969` for WF1/WF2/WF3. v3.9 strict costed returns: `-0.262682`, `+0.001748`, `+0.253175`; both candidates remain blocked by stability and/or cross-venue gates.
 - Behavior profile outputs: `strategy_behavior_profile_v4.md`, `.json`, and `strategy_behavior_profile_v4_by_symbol.csv`; input `quant/outputs/cross_venue_temporal_dataset_v3.csv`, `264609` rows, `264288` eligible. It is post-hoc descriptive and not a model artifact.
 - Full suite after this package: `378 passed`. Raw account CSV/JSON remained unchanged; ignored derived outputs were read/rebuilt locally; no credentials, private endpoints, mainnet connection, or order was used.
+
+## M15.10 causal action-sequence memory
+
+- Code commit: `8699326` (`Add causal action sequence memory features`).
+- Feature contract additions: `feature_action_lag_1/2/3`; `build_cross_venue_temporal_dataset.py` derives them from prior source events only, and `research/autonomous_replay.py` replaces them with the autonomous state's last three executed actions.
+- Candidate: `behavioral-distillation-v4.0-sequence-memory`; report: `quant/reports/cross_venue_sequence_memory_autonomous_audit.md` and `.json`; per-symbol detail: `cross_venue_sequence_memory_by_symbol.csv`.
+- Strict autonomous costed returns: `0.000000`, `-0.000028`, `+0.004218` for WF1/WF2/WF3; candidate remains `DEMO_CONTINUE_LIVE_BLOCKED` and active Demo is unchanged.
+- The temporal dataset remains `264609` rows / `264288` eligible after rebuild; temporal label audit remains `PASS_WITH_WARNINGS` with no hard failures. Full suite: `380 passed`. Raw account CSV/JSON was not modified; no credentials, private endpoints, mainnet connection, or order was used.

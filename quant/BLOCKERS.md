@@ -148,3 +148,8 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The v3.8 state-augmentation candidate reduces zero-start state mismatch but overtrades and remains negative in WF1/WF2 after costs (`-3.514461`, `-0.103915`). It is not a deployable policy.
 - The v3.9 autonomous-threshold correction prevents teacher-state threshold selection from masking all autonomous actions, but results remain unstable (`-0.262682`, `+0.001748`, `+0.253175` across WF1/WF2/WF3); WF1 PF is below one and Hyperliquid has zero global model-eligible test rows.
 - The strategy profile is descriptive only. It confirms a sparse, stateful adjustment process, but it cannot identify a unique original strategy from trade records alone. Keep the current Demo model unchanged and do not add Demo orders.
+
+## 2026-08-26 — Sequence-memory candidate remains blocked
+
+- The v4.0 candidate adds causal last-three-action memory and uses autonomous executed history at replay time, but strict costed returns are `0.000000`, `-0.000028`, and `+0.004218` for WF1/WF2/WF3; WF1 makes no adjustments and the global Hyperliquid coverage gate still fails.
+- This is a model-identifiability/generalization blocker, not a missing indicator or exchange-connection problem. Keep the active Demo model unchanged; do not promote v4.0 or add Demo orders.

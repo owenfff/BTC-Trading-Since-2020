@@ -261,3 +261,10 @@
 - Candidate `behavioral-distillation-v3.9-state-robust-autonomous-threshold` selected thresholds using autonomous zero-start state probabilities from a train-only chronological segment. Strict costed returns were `-0.262682`, `+0.001748`, and `+0.253175`, with WF1 PF `0.954884`; cross-venue coverage and all-window stability gates still fail. The active Demo model remains unchanged.
 - The descriptive strategy profile reports `264288` eligible hourly rows, `95.13%` explicit `NO_TRADE`, `4.87%` non-idle actions, mean observed cycle duration about `49.9` hours, and mean same-instrument action interval about `20.2` hours. Current exposure is a stronger observed action conditioning variable than any single indicator; this is association, not proof of a private rule.
 - The honest status remains `BEHAVIORAL_APPROXIMATION`: the data has been distilled into auditable candidates and behavior facts, but the robot has not fully learned the trader's strategy and no profitability or production claim is authorized.
+
+## 2026-08-26 — Add causal action-sequence memory; keep candidate blocked
+
+- Add `feature_action_lag_1`, `feature_action_lag_2`, and `feature_action_lag_3` to the shared feature contract. Temporal rows derive them only from events strictly before the decision timestamp; autonomous replay supplies the robot's own last three executed actions.
+- Candidate `behavioral-distillation-v4.0-sequence-memory` was evaluated with the existing state-robust training protocol and untouched chronological test windows. Strict costed returns were `0.000000`, `-0.000028`, and `+0.004218` in WF1/WF2/WF3; it remains blocked.
+- Sequence memory improves the causal representation and prevents the model from reading teacher action history during autonomous replay, but it does not establish stable strategy recovery. The active Demo model remains unchanged.
+- Full test suite after the change: `380 passed`. No claim of exact learning or future profitability is permitted.
