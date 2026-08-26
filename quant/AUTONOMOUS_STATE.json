@@ -5,7 +5,7 @@
   "current_work_package": "M15-v3.6-probability-calibrated-stability-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "7773c76",
-  "last_report_commit": "56434b1",
+  "last_report_commit": "e190ce1",
   "test_count": 368,
   "last_test_status": "FULL_SUITE_368_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_CAUSAL_AUDIT_PASS;PROBABILITY_CALIBRATION_TRAIN_ONLY;PER_SYMBOL_STABILITY_AUDIT;CROSS_VENUE_COVERAGE_BLOCKED;CALIBRATED_TEMPORAL_CANDIDATE_PROMOTION_BLOCKED;ACTION_TARGET_CONSISTENCY_TESTED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -63,5 +63,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep the current Demo model; do not promote temporal, balanced, calibrated, threshold, or v3.6 candidates. The next research task is to obtain a verified pre-2025 Hyperliquid behavior/scale window or explicitly define a venue-native evaluation protocol, then test a two-stage action-timing and target-size model. No candidate promotion or new Demo orders are authorized by this phase.",
-  "updated_at_utc": "2026-08-26T08:52:25Z"
+  "updated_at_utc": "2026-08-26T10:05:00Z"
 }
