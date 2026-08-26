@@ -9,7 +9,7 @@ from cross_asset.universe import fit_position_scales, split_by_global_time
 from features.market_features import build_market_features
 from quant_bot.strategy.base import StrategyInput
 from quant_bot.strategy.feature_contract import FEATURE_COLUMNS
-from quant_bot.strategy.supervised_models import CrossAssetNumpyLogisticStrategy
+from quant_bot.strategy.supervised_models import CrossAssetNumpyLogisticStrategy, TwoStageCrossAssetStrategy
 from quant_bot.paper import PaperTradingEngine
 
 
@@ -234,6 +234,46 @@ def test_nested_probability_split_is_chronological_and_non_overlapping() -> None
     assert len(threshold) == 2
     assert fit[-1]["decision_time"] < calibration[0]["decision_time"]
     assert calibration[-1]["decision_time"] < threshold[0]["decision_time"]
+
+
+def test_two_stage_strategy_separates_timing_and_action_heads() -> None:
+    rows = []
+    labels = ("NO_TRADE", "OPEN_LONG", "OPEN_SHORT", "ADD_LONG", "REDUCE_SHORT")
+    targets = ("0.0", "0.25", "-0.25", "0.5", "-0.1")
+    for index in range(60):
+        label_index = index % len(labels)
+        day = index + 1 if index < 28 else index - 27
+        month = "01" if index < 28 else "02"
+        row = {key: None for key in FEATURE_COLUMNS}
+        row.update({
+            "decision_time": f"2020-{month}-{day:02d}T00:00:00Z",
+            "dataset_split": "TRAIN",
+            "label_status": "AVAILABLE",
+            "label_next_action": labels[label_index],
+            "label_next_target_exposure": targets[label_index],
+            "feature_symbol": "A",
+            "feature_instrument_class": "DERIVATIVE",
+            "feature_payout_model": "LINEAR",
+            "feature_quote_currency": "USD",
+            "feature_settlement_currency": "USD",
+            "feature_market_bar_interval": "1h",
+            "feature_market_data_available": True,
+            "feature_mark_index_missing": False,
+            "feature_market_regime": "RANGE_OR_MIXED",
+            "feature_contract_lot_size": 1.0,
+            "feature_multiplier_major": 1.0,
+            "feature_current_normalized_exposure": 0.0,
+            "feature_return_1bar": (index % 7 - 3) / 100.0,
+        })
+        rows.append(row)
+    model = TwoStageCrossAssetStrategy(timing_threshold=0.25).fit(rows[:48])
+    signal = model.predict(StrategyInput(datetime(2020, 3, 1, tzinfo=UTC), rows[48]))
+    assert model.fit_row_count == 48
+    assert signal.strategy_version == model.version
+    assert 0.0 <= model.action_probability(StrategyInput(datetime(2020, 3, 1, tzinfo=UTC), rows[48])) <= 1.0
+    restored = TwoStageCrossAssetStrategy.from_dict(model.to_dict())
+    assert restored.version == model.version
+    assert restored.fit_row_count == model.fit_row_count
 
 
 def test_action_target_consistency_prevents_no_trade_from_repositioning() -> None:

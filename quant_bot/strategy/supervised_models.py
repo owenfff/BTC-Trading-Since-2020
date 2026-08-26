@@ -410,6 +410,121 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
         return model
 
 
+class TwoStageCrossAssetStrategy:
+    """Separate action timing from action type and target exposure.
+
+    The timing head answers whether the next decision changes exposure.  The
+    action head is trained only on non-idle teacher actions, so rare open/close
+    direction classes are not forced to compete with thousands of no-trade
+    rows in the same classifier.  Both heads remain deterministic NumPy
+    models and share the frozen feature contract.
+    """
+
+    version = "behavioral-distillation-v3.7-two-stage-action-target"
+    IDLE_ACTIONS = frozenset({"NO_TRADE", "HOLD_LONG", "HOLD_SHORT"})
+
+    def __init__(self, *, timing_threshold: float | None = None, target_l2: float = 1.0) -> None:
+        self.timing_threshold = timing_threshold
+        self.target_l2 = target_l2
+        self.timing_model = CrossAssetNumpyLogisticStrategy(
+            target_l2=target_l2,
+            class_weighting="sqrt_balanced",
+            enforce_action_target_consistency=True,
+        )
+        self.action_model = CrossAssetNumpyLogisticStrategy(target_l2=target_l2)
+        self.fit_row_count = 0
+
+    @classmethod
+    def _is_idle(cls, row: Mapping[str, Any]) -> bool:
+        return str(row.get("label_next_action") or "") in cls.IDLE_ACTIONS
+
+    @classmethod
+    def _timing_rows(cls, rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        output: list[dict[str, Any]] = []
+        for original in rows:
+            row = dict(original)
+            idle = cls._is_idle(row)
+            row["label_next_action"] = "NO_TRADE" if idle else "ACTION"
+            if idle:
+                row["label_next_target_exposure"] = row.get("feature_current_normalized_exposure", "0")
+            output.append(row)
+        return output
+
+    def fit(self, rows: Iterable[Mapping[str, Any]]) -> "TwoStageCrossAssetStrategy":
+        source = [dict(row, dataset_split="TRAIN") for row in rows if row.get("label_status") == "AVAILABLE" and row.get("label_next_action")]
+        if not source:
+            raise ValueError("TwoStageCrossAssetStrategy requires labeled rows")
+        timing_rows = self._timing_rows(source)
+        action_rows = [row for row in source if not self._is_idle(row)]
+        if not action_rows:
+            raise ValueError("TwoStageCrossAssetStrategy requires non-idle action rows")
+        self.timing_model.fit(timing_rows)
+        self.action_model.fit(action_rows)
+        self.timing_model.version = f"{self.version}:timing"
+        self.action_model.version = f"{self.version}:action"
+        self.fit_row_count = len(source)
+        return self
+
+    def action_probability(self, strategy_input: StrategyInput) -> float:
+        probabilities = self.timing_model.predict_proba(strategy_input)
+        try:
+            index = self.timing_model.actions.index("ACTION")
+        except ValueError:
+            return 0.0
+        return float(probabilities[index])
+
+    def calibrate_action_probability(self, rows: Iterable[Mapping[str, Any]]) -> dict[str, float | int]:
+        """Calibrate the timing head on a training-only chronological holdout."""
+
+        return self.timing_model.calibrate_probabilities(self._timing_rows(rows))
+
+    def predict(self, strategy_input: StrategyInput) -> StrategySignal:
+        action_probability = self.action_probability(strategy_input)
+        threshold = 0.5 if self.timing_threshold is None else float(self.timing_threshold)
+        current = float(np.clip(strategy_input.current_strategy_position, -1.0, 1.0))
+        if action_probability < threshold:
+            action = "HOLD_LONG" if current > 0 else "HOLD_SHORT" if current < 0 else "NO_TRADE"
+            return make_signal(
+                strategy_input.decision_time,
+                target_exposure=current,
+                action=action,
+                confidence=float(max(0.0, min(1.0, 1.0 - action_probability))),
+                risk_tags=("TWO_STAGE_TIMING", "ACTION_PROBABILITY_BELOW_THRESHOLD"),
+                strategy_version=self.version,
+            )
+        signal = self.action_model.predict(strategy_input)
+        return make_signal(
+            strategy_input.decision_time,
+            target_exposure=signal.target_exposure,
+            action=signal.action,
+            confidence=float(max(0.0, min(1.0, action_probability * signal.confidence))),
+            risk_tags=tuple(dict.fromkeys(("TWO_STAGE_TIMING", "TWO_STAGE_ACTION_TARGET", *signal.risk_tags))),
+            strategy_version=self.version,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "model_type": "TwoStageCrossAssetStrategy",
+            "version": self.version,
+            "timing_threshold": self.timing_threshold,
+            "target_l2": self.target_l2,
+            "fit_row_count": self.fit_row_count,
+            "timing_model": self.timing_model.to_dict(),
+            "action_model": self.action_model.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "TwoStageCrossAssetStrategy":
+        if payload.get("model_type") != "TwoStageCrossAssetStrategy":
+            raise ValueError("unsupported two-stage deployment model type")
+        model = cls(timing_threshold=(float(payload["timing_threshold"]) if payload.get("timing_threshold") is not None else None), target_l2=float(payload.get("target_l2", 1.0)))
+        model.version = str(payload.get("version", cls.version))
+        model.fit_row_count = int(payload.get("fit_row_count", 0))
+        model.timing_model = CrossAssetNumpyLogisticStrategy.from_dict(payload.get("timing_model", {}))
+        model.action_model = CrossAssetNumpyLogisticStrategy.from_dict(payload.get("action_model", {}))
+        return model
+
+
 @dataclass
 class _TreeNode:
     action: str
