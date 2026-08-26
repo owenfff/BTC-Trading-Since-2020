@@ -6,7 +6,8 @@ from typing import Any, Mapping
 from .base import StrategyInput
 
 
-FEATURE_CONTRACT_VERSION = "m13-v2-cross-asset"
+LEGACY_FEATURE_CONTRACT_VERSION = "m13-v2-cross-asset"
+FEATURE_CONTRACT_VERSION = "m13-v3-cross-asset-indicators"
 
 FEATURE_COLUMNS = (
     "feature_symbol",
@@ -37,6 +38,12 @@ FEATURE_COLUMNS = (
     "feature_distance_rolling_low_72bar",
     "feature_funding_rate",
     "feature_mark_index_basis",
+    "feature_rsi_14",
+    "feature_macd_line_12_26",
+    "feature_macd_signal_9",
+    "feature_macd_histogram",
+    "feature_bollinger_zscore_20",
+    "feature_bollinger_percent_b_20",
     "feature_market_regime",
     "feature_time_of_day_fraction",
     "feature_day_of_week",

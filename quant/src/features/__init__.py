@@ -2,5 +2,6 @@
 
 from .account_features import build_account_features
 from .market_features import build_market_features, load_market_context
+from .technical_indicators import calculate_technical_indicators
 
-__all__ = ["build_account_features", "build_market_features", "load_market_context"]
+__all__ = ["build_account_features", "build_market_features", "load_market_context", "calculate_technical_indicators"]

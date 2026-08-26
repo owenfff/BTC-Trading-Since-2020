@@ -10,6 +10,8 @@ from pathlib import Path
 from statistics import pstdev
 from typing import Any, Iterable
 
+from .technical_indicators import calculate_technical_indicators
+
 
 UTC = timezone.utc
 BAR_SECONDS = 5 * 60
@@ -149,6 +151,13 @@ def build_market_features(
     output["feature_latest_bar_time"] = iso_utc(current["timestamp"])
     output["feature_market_data_available"] = True
 
+    output.update(calculate_technical_indicators(
+        [row.get("close") for row in rows[: index + 1]],
+        [row.get("high") for row in rows[: index + 1]],
+        [row.get("low") for row in rows[: index + 1]],
+        [row.get("volume") for row in rows[: index + 1]],
+    ))
+
     for lag in RETURN_LAGS:
         if index - lag >= 0 and _complete_window(rows, index - lag, index, bar_seconds=bar_seconds):
             previous = rows[index - lag].get("close")
@@ -175,12 +184,6 @@ def build_market_features(
     previous_volume = rows[index - 1].get("volume") if index > 0 and _complete_window(rows, index - 1, index, bar_seconds=bar_seconds) else None
     if previous_volume and previous_volume > 0 and current.get("volume") is not None:
         output["feature_volume_change_1bar"] = current["volume"] / previous_volume - 1.0
-
-    volume_start = index - 71
-    if volume_start >= 0 and _complete_window(rows, volume_start, index, bar_seconds=bar_seconds):
-        volumes = [row.get("volume") for row in rows[volume_start:index + 1]]
-        if all(value is not None for value in volumes):
-            output["feature_volume_percentile_72bar"] = sum(value <= current["volume"] for value in volumes) / len(volumes)
 
     ma_start = index - 23
     if ma_start >= 0 and _complete_window(rows, ma_start, index, bar_seconds=bar_seconds):

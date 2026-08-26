@@ -8,9 +8,10 @@ from typing import Any
 
 from quant_bot.domain.instrument import Instrument, InstrumentType
 from quant_bot.domain.market_data import MarketBar
+from features.technical_indicators import calculate_technical_indicators
 
 from .base import StrategyInput
-from .feature_contract import FEATURE_CONTRACT_VERSION, FEATURE_COLUMNS, validate_feature_mapping
+from .feature_contract import FEATURE_CONTRACT_VERSION, FEATURE_COLUMNS, LEGACY_FEATURE_CONTRACT_VERSION, validate_feature_mapping
 
 
 def _f(value: Any, default: float = 0.0) -> float:
@@ -24,10 +25,11 @@ def _f(value: Any, default: float = 0.0) -> float:
 class RealtimeFeatureEngine:
     """Closed-bar-only feature state; no labels or remote future state enter it."""
 
-    def __init__(self, instrument: Instrument, *, feature_symbol: str | None = None, position_scale: float = 1.0) -> None:
+    def __init__(self, instrument: Instrument, *, feature_symbol: str | None = None, position_scale: float = 1.0, feature_contract_version: str = FEATURE_CONTRACT_VERSION) -> None:
         self.instrument = instrument
         self.feature_symbol = feature_symbol or instrument.canonical_symbol
         self.position_scale = max(float(position_scale), 1.0)
+        self.feature_contract_version = feature_contract_version
         self.bars: deque[MarketBar] = deque(maxlen=100)
         self.latest_decision: datetime | None = None
         self.latest_action = "UNKNOWN"
@@ -71,6 +73,13 @@ class RealtimeFeatureEngine:
         ma = sum(closes[-24:]) / max(len(closes[-24:]), 1) if closes else 0.0
         latest_close = closes[-1] if closes else 0.0
         regime = "UP" if latest_close > ma and ret(6) > 0 else ("DOWN" if latest_close < ma and ret(6) < 0 else "RANGE")
+        indicators = calculate_technical_indicators(
+            [bar.close for bar in bars],
+            [bar.high for bar in bars],
+            [bar.low for bar in bars],
+            [bar.volume for bar in bars],
+        )
+        legacy_contract = self.feature_contract_version == LEGACY_FEATURE_CONTRACT_VERSION
         values: dict[str, Any] = {key: "" for key in FEATURE_COLUMNS}
         values.update({
             "feature_symbol": self.feature_symbol,
@@ -88,12 +97,13 @@ class RealtimeFeatureEngine:
             "feature_realized_volatility_72bar": vol,
             "feature_atr_14bar": (sum(abs(_f(bar.high) - _f(bar.low)) for bar in bars[-14:]) / max(len(bars[-14:]), 1)) / latest_close if latest_close else 0.0,
             "feature_volume_change_1bar": volumes[-1] / volumes[-2] - 1.0 if len(volumes) > 1 and volumes[-2] else 0.0,
-            "feature_volume_percentile_72bar": 0.5,
+            "feature_volume_percentile_72bar": 0.5 if legacy_contract else indicators["feature_volume_percentile_72bar"],
             "feature_ma_distance_24bar": latest_close / ma - 1.0 if ma else 0.0,
             "feature_trend_slope_24bar": ret(24) / 24.0,
             "feature_distance_rolling_high_72bar": latest_close / max(closes[-72:]) - 1.0 if closes else 0.0,
             "feature_distance_rolling_low_72bar": latest_close / min(closes[-72:]) - 1.0 if closes and min(closes[-72:]) else 0.0,
-            "feature_funding_rate": 0.0, "feature_mark_index_basis": 0.0,
+            "feature_funding_rate": 0.0 if legacy_contract else (float(latest.funding_rate) if latest and latest.funding_rate is not None else None),
+            "feature_mark_index_basis": 0.0 if legacy_contract else None,
             "feature_market_regime": regime,
             "feature_time_of_day_fraction": (decision_time.hour * 3600 + decision_time.minute * 60) / 86400,
             "feature_day_of_week": decision_time.weekday(), "feature_day_of_week_sin": math.sin(2 * math.pi * decision_time.weekday() / 7), "feature_day_of_week_cos": math.cos(2 * math.pi * decision_time.weekday() / 7),
@@ -102,6 +112,16 @@ class RealtimeFeatureEngine:
             "feature_recent_realised_outcome": self.realised_outcome, "feature_realised_drawdown": self.drawdown, "feature_fee_accumulation_raw": self.fees, "feature_funding_accumulation_raw": self.funding,
             "feature_order_execution_style": "Limit_POST_ONLY", "feature_ordering_confidence": "HIGH", "feature_accounting_confidence": "HIGH", "feature_history_last_decision_time": self.latest_decision.isoformat().replace("+00:00", "Z") if self.latest_decision else "",
         })
+        if not legacy_contract:
+            values.update({key: indicators[key] for key in indicators if key != "feature_volume_percentile_72bar"})
+            funding_time = getattr(latest, "funding_source_time", None) if latest else None
+            if funding_time is not None and funding_time <= decision_time:
+                values["feature_funding_source_time"] = funding_time.isoformat().replace("+00:00", "Z")
+            mark = getattr(latest, "mark_price", None) if latest else None
+            index_price = getattr(latest, "index_price", None) if latest else None
+            if mark is not None and index_price is not None and float(index_price) > 0:
+                values["feature_mark_index_missing"] = False
+                values["feature_mark_index_basis"] = float(mark) / float(index_price) - 1.0
         return values
 
     def build_input(self, *, decision_time: datetime, current_qty: Decimal, current_equity: Decimal) -> StrategyInput:

@@ -253,7 +253,7 @@ class TestnetRuntime:
         bars = self.adapter.fetch_closed_bars(venue_symbol, limit=100)
         if not bars:
             return None
-        engine = self.engines.setdefault(symbol, RealtimeFeatureEngine(instrument, feature_symbol=symbol, position_scale=self.bundle.position_scales.get(symbol, 1.0)))
+        engine = self.engines.setdefault(symbol, RealtimeFeatureEngine(instrument, feature_symbol=symbol, position_scale=self.bundle.position_scales.get(symbol, 1.0), feature_contract_version=self.bundle.feature_contract_version))
         engine.ingest_closed_bars(bars)
         latest = bars[-1]
         decision_time = datetime.now(timezone.utc)

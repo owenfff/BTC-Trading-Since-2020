@@ -50,6 +50,32 @@ const riskTagLabels = {
   MISSING_MARKET_DATA: "行情数据不完整",
 };
 
+const strategyBasisLabels = {
+  RSI14: "RSI14",
+  MACD_HIST: "MACD柱",
+  BB_PERCENT_B: "布林带位置",
+  MOMENTUM_24H: "24小时动量",
+  MA_DISTANCE_24H: "24小时均线距离",
+  VOLATILITY_72H: "72小时波动率",
+  VOLUME_PERCENTILE_72: "成交量分位数",
+  FUNDING_RATE: "资金费率",
+  MARK_INDEX_BASIS: "标记/指数基差",
+  MERGED_DUPLICATE_SYMBOLS: "重复映射已合并",
+};
+
+function strategyBasisText(item) {
+  const basis = Array.isArray(item.strategy_basis) ? item.strategy_basis : [];
+  if (!basis.length || basis.includes("INDICATORS_INCOMPLETE")) {
+    return "暂无完整指标依据，模型仅依据可用历史行为特征";
+  }
+  const values = basis.map((entry) => {
+    const [code, rawValue] = String(entry).split("=");
+    const label = strategyBasisLabels[code] || code;
+    return rawValue === undefined ? label : `${label}=${rawValue}`;
+  }).filter((entry, index, all) => entry && all.indexOf(entry) === index);
+  return values.length ? `模型输入依据：${values.join("、")}` : "暂无完整指标依据，模型仅依据可用历史行为特征";
+}
+
 function strategyReasonParts(item) {
   const action = String(item.strategy_action || "").toUpperCase();
   const executionReason = String(item.strategy_reason || "").toUpperCase();
@@ -57,10 +83,14 @@ function strategyReasonParts(item) {
   const executionLabel = executionReasonLabels[executionReason] || "根据策略目标仓位执行";
   const target = item.strategy_target_exposure ? `目标暴露 ${displayNumber(item.strategy_target_exposure)}` : "目标暴露未知";
   const confidence = item.strategy_confidence ? `置信度 ${displayNumber(item.strategy_confidence)}` : "置信度未知";
+  const basis = strategyBasisText(item);
+  const sources = Array.isArray(item.strategy_source_symbols) && item.strategy_source_symbols.length > 1
+    ? `合并来源：${item.strategy_source_symbols.join(" / ")}`
+    : "";
   const tags = (Array.isArray(item.strategy_risk_tags) ? item.strategy_risk_tags : [])
     .map((tag) => riskTagLabels[String(tag).toUpperCase()] || String(tag))
     .filter((tag, index, all) => tag && all.indexOf(tag) === index);
-  return { actionLabel, executionLabel, detail: [target, confidence, ...tags].join(" · ") };
+  return { actionLabel, executionLabel, detail: [target, confidence, basis, sources, ...tags].filter(Boolean).join(" · ") };
 }
 
 function appendStrategyReasonCell(row, item) {

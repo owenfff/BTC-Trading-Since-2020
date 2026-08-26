@@ -25,12 +25,13 @@ if str(ROOT) not in sys.path:
 
 from quant_bot.strategy.deployment import (  # noqa: E402
     DEPLOYMENT_MODEL_VERSION,
+    LEGACY_DEPLOYMENT_MODEL_VERSION,
     DeploymentBundle,
     save_deployment_bundle,
     sha256_file,
     utc_now,
 )
-from quant_bot.strategy.feature_contract import FEATURE_CONTRACT_VERSION  # noqa: E402
+from quant_bot.strategy.feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION  # noqa: E402
 from quant_bot.strategy.supervised_models import CrossAssetNumpyLogisticStrategy  # noqa: E402
 
 
@@ -104,8 +105,16 @@ def _risk_envelope(rows: list[dict[str, Any]], scales: dict[str, float]) -> dict
     }
 
 
-def build() -> dict[str, Any]:
-    dataset_path = ROOT / "quant" / "outputs" / "cross_asset_model_dataset.csv"
+def build(
+    *,
+    dataset_path: Path | None = None,
+    artifact_path: Path | None = None,
+    report_stem: str = "cross_asset_deployment_manifest",
+    model_version: str = LEGACY_DEPLOYMENT_MODEL_VERSION,
+    feature_contract_version: str = LEGACY_FEATURE_CONTRACT_VERSION,
+    strategy_version: str = "behavioral-distillation-v2-cross-asset-logistic",
+) -> dict[str, Any]:
+    dataset_path = dataset_path or (ROOT / "quant" / "outputs" / "cross_asset_model_dataset.csv")
     if not dataset_path.exists():
         raise FileNotFoundError(dataset_path)
     with dataset_path.open("r", encoding="utf-8", newline="") as handle:
@@ -137,6 +146,7 @@ def build() -> dict[str, Any]:
         row["label_next_target_exposure"] = (target_contracts / scale) if target_contracts is not None else ""
         fit_rows.append(row)
     model = CrossAssetNumpyLogisticStrategy().fit(fit_rows)
+    model.version = strategy_version
     symbols = sorted({str(row["symbol"]) for row in source_rows if row.get("symbol")})
     policy: dict[str, dict[str, Any]] = {}
     for symbol in symbols:
@@ -151,8 +161,8 @@ def build() -> dict[str, Any]:
     cutoff = max(parsed_times) if parsed_times else ""
     bundle = DeploymentBundle(
         model=model,
-        model_version=DEPLOYMENT_MODEL_VERSION,
-        feature_contract_version=FEATURE_CONTRACT_VERSION,
+        model_version=model_version,
+        feature_contract_version=feature_contract_version,
         training_data_sha256=sha256_file(dataset_path),
         code_commit=_git_head(),
         deployment_time=utc_now(),
@@ -164,12 +174,13 @@ def build() -> dict[str, Any]:
     )
     outputs = ROOT / "quant" / "outputs"
     reports = ROOT / "quant" / "reports"
-    save_deployment_bundle(bundle, outputs / "cross_asset_deployment_model.json")
+    artifact_path = artifact_path or (outputs / "cross_asset_deployment_model.json")
+    save_deployment_bundle(bundle, artifact_path)
     report = {
         "report_version": "M13-DEPLOYMENT-MODEL-1.0",
         "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
-        "model_version": DEPLOYMENT_MODEL_VERSION,
-        "feature_contract_version": FEATURE_CONTRACT_VERSION,
+        "model_version": model_version,
+        "feature_contract_version": feature_contract_version,
         "training_data_sha256": bundle.training_data_sha256,
         "code_commit": bundle.code_commit,
         "deployment_time": bundle.deployment_time,
@@ -181,15 +192,15 @@ def build() -> dict[str, Any]:
         "position_scales_fit_on": "all historical rows before the frozen deployment cutoff; no online retraining",
         "spot_policy": "monitor-only; never mixed with derivative position semantics",
         "risk_envelope": bundle.risk_envelope,
-        "artifact": "quant/outputs/cross_asset_deployment_model.json (ignored runtime artifact)",
+        "artifact": f"{artifact_path.as_posix()} (ignored runtime artifact)",
     }
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / "cross_asset_deployment_manifest.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    (reports / "cross_asset_deployment_manifest.md").write_text(
+    (reports / f"{report_stem}.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (reports / f"{report_stem}.md").write_text(
         "\n".join([
             "# Cross-Asset Deployment Model",
             "",
-            f"- model: **{DEPLOYMENT_MODEL_VERSION}**",
+            f"- model: **{model_version}**",
             "- fidelity: **BEHAVIORAL_APPROXIMATION**",
             f"- source rows: `{len(source_rows)}`; fit rows: `{len(fit_rows)}`",
             f"- symbols: `{len(symbols)}`",

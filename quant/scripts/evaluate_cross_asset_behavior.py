@@ -61,14 +61,14 @@ def _git_head() -> str:
         return "UNKNOWN"
 
 
-def _read_rows() -> list[dict[str, Any]]:
-    with DATASET.open("r", encoding="utf-8", newline="") as handle:
+def _read_rows(path: Path = DATASET) -> list[dict[str, Any]]:
+    with path.open("r", encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
 
 
-def _read_market() -> dict[str, list[dict[str, Any]]]:
+def _read_market(path: Path = MARKET) -> dict[str, list[dict[str, Any]]]:
     grouped: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
-    with MARKET.open("r", encoding="utf-8", newline="") as handle:
+    with path.open("r", encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle):
             timestamp = parse_utc(row.get("timestamp"))
             if timestamp is None:
@@ -97,13 +97,18 @@ def _model_metrics(rows: list[dict[str, Any]], predictions: list[tuple[dict[str,
     return _evaluate(rows, predictions)
 
 
-def _fit_models(train_rows: list[dict[str, Any]]) -> dict[str, Any]:
+DEFAULT_STRATEGY_VERSION = "behavioral-distillation-v2-cross-asset-logistic"
+
+
+def _fit_models(train_rows: list[dict[str, Any]], *, strategy_version: str = DEFAULT_STRATEGY_VERSION) -> dict[str, Any]:
     if not train_rows:
         raise ValueError("cross-asset model has no eligible TRAIN rows")
+    cross_asset_model = CrossAssetNumpyLogisticStrategy().fit(train_rows)
+    cross_asset_model.version = strategy_version
     return {
         "frequency_baseline": HistoricalBehaviorBaseline().fit(train_rows),
         "distilled_rules": DistilledRuleStrategy(),
-        "cross_asset_logistic": CrossAssetNumpyLogisticStrategy().fit(train_rows),
+        "cross_asset_logistic": cross_asset_model,
     }
 
 
@@ -114,7 +119,7 @@ def _predict(rows: list[dict[str, Any]], models: dict[str, Any]) -> dict[str, li
     return output
 
 
-def _walk_forward(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _walk_forward(rows: list[dict[str, Any]], *, strategy_version: str = DEFAULT_STRATEGY_VERSION) -> list[dict[str, Any]]:
     ordered = sorted((row for row in rows if parse_utc(row.get("decision_time")) is not None), key=lambda row: parse_utc(row["decision_time"]))
     if not ordered:
         return []
@@ -142,7 +147,7 @@ def _walk_forward(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         test = [row for row in rows if validation_end <= (parse_utc(row["decision_time"]) or datetime.min.replace(tzinfo=UTC)) < test_end]
         if not train:
             continue
-        models = _fit_models(train)
+        models = _fit_models(train, strategy_version=strategy_version)
         for split_name, split_rows in (("VALIDATION", validation), ("TEST", test)):
             predictions = _predict(split_rows, models)
             for model_name, values in predictions.items():
@@ -221,12 +226,12 @@ def _sensitivity(rows: list[dict[str, Any]], predictions: list[tuple[dict[str, A
     return output
 
 
-def build() -> dict[str, Any]:
-    rows = [row for row in _read_rows() if str(row.get("model_eligible", "")).lower() == "true"]
+def build(*, dataset_path: Path = DATASET, report_suffix: str = "", strategy_version: str = DEFAULT_STRATEGY_VERSION) -> dict[str, Any]:
+    rows = [row for row in _read_rows(dataset_path) if str(row.get("model_eligible", "")).lower() == "true"]
     if not rows:
         raise ValueError("cross-asset dataset contains no model-eligible rows")
     train_rows = [row for row in rows if row.get("dataset_split") == "TRAIN"]
-    models = _fit_models(train_rows)
+    models = _fit_models(train_rows, strategy_version=strategy_version)
     predictions = _predict(rows, models)
     global_metrics = {name: _model_metrics(rows, values) for name, values in predictions.items()}
     per_symbol: list[dict[str, Any]] = []
@@ -235,12 +240,14 @@ def build() -> dict[str, Any]:
         for name, values in predictions.items():
             symbol_values = [(row, signal) for row, signal in values if row["symbol"] == symbol]
             per_symbol.append({"symbol": symbol, "model": name, **_model_metrics(symbol_rows, symbol_values)})
-    walk_forward = _walk_forward(rows)
+    walk_forward = _walk_forward(rows, strategy_version=strategy_version)
     sensitivity = _sensitivity(rows, predictions["cross_asset_logistic"], _read_market())
+    suffix = f"_{report_suffix}" if report_suffix else ""
     result = {
-        "report_version": "M13-CROSS-ASSET-STRATEGY-1.0",
+        "report_version": f"M13-CROSS-ASSET-STRATEGY{suffix}-1.0",
         "analysis_commit": _git_head(),
         "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+        "strategy_version": strategy_version,
         "dataset_rows": len(rows),
         "train_rows": len(train_rows),
         "models": list(models),
@@ -254,12 +261,12 @@ def build() -> dict[str, Any]:
         "next_stage": "paper replay only after model review; no private exchange connectivity",
     }
     REPORTS.mkdir(parents=True, exist_ok=True)
-    (REPORTS / "cross_asset_strategy_fidelity.json").write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    _write_csv(REPORTS / "cross_asset_per_symbol_metrics.csv", per_symbol)
-    _write_csv(REPORTS / "cross_asset_walk_forward.csv", walk_forward)
-    _write_csv(REPORTS / "cross_asset_sensitivity.csv", sensitivity)
+    (REPORTS / f"cross_asset_strategy_fidelity{suffix}.json").write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    _write_csv(REPORTS / f"cross_asset_per_symbol_metrics{suffix}.csv", per_symbol)
+    _write_csv(REPORTS / f"cross_asset_walk_forward{suffix}.csv", walk_forward)
+    _write_csv(REPORTS / f"cross_asset_sensitivity{suffix}.csv", sensitivity)
     lines = [
-        "# Cross-Asset Strategy Fidelity",
+        f"# Cross-Asset Strategy Fidelity{suffix}",
         "",
         f"- strategy fidelity: **{result['strategy_fidelity']}**",
         f"- eligible rows: `{len(rows)}`",
@@ -273,7 +280,7 @@ def build() -> dict[str, Any]:
         "",
         "This is a behavioral approximation. Per-symbol metrics, walk-forward rows, and sensitivity rows are descriptive validation artifacts. The return columns are normalized exposure-return proxies and are not wallet, account, or strategy PnL claims.",
     ]
-    (REPORTS / "cross_asset_strategy_fidelity.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (REPORTS / f"cross_asset_strategy_fidelity{suffix}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     return result
 
 

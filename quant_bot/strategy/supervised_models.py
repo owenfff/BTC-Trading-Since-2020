@@ -52,20 +52,24 @@ class FeatureEncoder:
     means: dict[str, float] | None = None
     scales: dict[str, float] | None = None
     categories: dict[str, tuple[str, ...]] | None = None
+    numeric_features: tuple[str, ...] | None = None
+    categorical_features: tuple[str, ...] | None = None
 
     def fit(self, rows: Iterable[Mapping[str, Any]]) -> "FeatureEncoder":
         rows = list(rows)
         self.means = {}
         self.scales = {}
         self.categories = {}
-        for key in NUMERIC_FEATURES:
+        self.numeric_features = NUMERIC_FEATURES
+        self.categorical_features = CATEGORICAL_FEATURES
+        for key in self.numeric_features:
             values = [parse_float(row.get(key)) for row in rows]
             clean = np.array([value for value in values if value is not None and np.isfinite(value)], dtype=float)
             mean = float(clean.mean()) if clean.size else 0.0
             scale = float(clean.std()) if clean.size else 1.0
             self.means[key] = mean
             self.scales[key] = scale if scale > 1e-12 else 1.0
-        for key in CATEGORICAL_FEATURES:
+        for key in self.categorical_features:
             values = sorted({str(row.get(key) or "__MISSING__") for row in rows})
             self.categories[key] = tuple(values)
         return self
@@ -74,11 +78,13 @@ class FeatureEncoder:
         if self.means is None or self.scales is None or self.categories is None:
             raise RuntimeError("FeatureEncoder must be fit on TRAIN rows before transform")
         values: list[float] = []
-        for key in NUMERIC_FEATURES:
+        numeric_features = self.numeric_features or NUMERIC_FEATURES
+        categorical_features = self.categorical_features or CATEGORICAL_FEATURES
+        for key in numeric_features:
             value = parse_float(features.get(key), self.means[key])
             value = self.means[key] if value is None or not np.isfinite(value) else value
             values.append((value - self.means[key]) / self.scales[key])
-        for key in CATEGORICAL_FEATURES:
+        for key in categorical_features:
             value = str(features.get(key) or "__MISSING__")
             values.extend(1.0 if value == category else 0.0 for category in self.categories[key])
         return np.asarray(values, dtype=float)
@@ -90,6 +96,8 @@ class FeatureEncoder:
             "means": self.means,
             "scales": self.scales,
             "categories": {key: list(values) for key, values in self.categories.items()},
+            "numeric_features": list(self.numeric_features or NUMERIC_FEATURES),
+            "categorical_features": list(self.categorical_features or CATEGORICAL_FEATURES),
         }
 
     @classmethod
@@ -98,9 +106,11 @@ class FeatureEncoder:
             means={str(key): float(value) for key, value in dict(payload.get("means", {})).items()},
             scales={str(key): float(value) for key, value in dict(payload.get("scales", {})).items()},
             categories={str(key): tuple(str(item) for item in values) for key, values in dict(payload.get("categories", {})).items()},
+            numeric_features=tuple(str(item) for item in payload.get("numeric_features", payload.get("means", {}).keys())),
+            categorical_features=tuple(str(item) for item in payload.get("categorical_features", payload.get("categories", {}).keys())),
         )
-        missing = [key for key in NUMERIC_FEATURES if key not in encoder.means or key not in encoder.scales]
-        missing.extend(key for key in CATEGORICAL_FEATURES if key not in encoder.categories)
+        missing = [key for key in (encoder.numeric_features or ()) if key not in encoder.means or key not in encoder.scales]
+        missing.extend(key for key in (encoder.categorical_features or ()) if key not in encoder.categories)
         if missing:
             raise ValueError(f"deployment encoder is missing feature definitions: {missing[:5]}")
         return encoder
@@ -178,6 +188,9 @@ class NumpyLogisticStrategy:
 class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
     """Shared deterministic imitation model for the m13 cross-asset contract."""
 
+    # The class default remains compatible with the frozen v2 artifact. The
+    # v3 evaluator and deployment builder stamp their explicit version after
+    # fitting, so callers cannot accidentally relabel v2 as v3.
     version = "behavioral-distillation-v2-cross-asset-logistic"
 
     def to_dict(self) -> dict[str, Any]:
@@ -206,6 +219,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             learning_rate=float(payload.get("learning_rate", 0.18)),
             l2=float(payload.get("l2", 1e-3)),
         )
+        model.version = str(payload.get("version", cls.version))
         model.actions = [str(item) for item in payload.get("actions", [])]
         model.weights = np.asarray(payload.get("weights", []), dtype=float)
         model.bias = np.asarray(payload.get("bias", []), dtype=float)

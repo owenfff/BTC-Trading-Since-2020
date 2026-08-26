@@ -18,6 +18,9 @@ class MarketBar:
     volume: Any | None = None
     funding_rate: Any | None = None
     source: str = "unknown"
+    funding_source_time: datetime | None = None
+    mark_price: Any | None = None
+    index_price: Any | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "symbol", canonical_symbol(self.symbol))
@@ -31,3 +34,7 @@ class MarketBar:
             object.__setattr__(self, "volume", decimal(self.volume))
         if self.funding_rate is not None:
             object.__setattr__(self, "funding_rate", decimal(self.funding_rate))
+        if self.mark_price is not None:
+            object.__setattr__(self, "mark_price", decimal(self.mark_price))
+        if self.index_price is not None:
+            object.__setattr__(self, "index_price", decimal(self.index_price))

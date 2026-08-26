@@ -166,7 +166,7 @@ def _feature_metadata(meta: dict[str, Any], symbol: str) -> dict[str, Any]:
     }
 
 
-def build() -> dict[str, Any]:
+def build(*, output_stem: str = "cross_asset_model_dataset", report_stem: str = "cross_asset_model_dataset_manifest") -> dict[str, Any]:
     outputs = ROOT / "quant" / "outputs"
     reports = ROOT / "quant" / "reports"
     decisions = split_by_global_time(load_decision_rows(outputs / "decision_episodes.csv"))
@@ -234,9 +234,9 @@ def build() -> dict[str, Any]:
     eligible = [row for row in rows if row.get("model_eligible")]
     # No operation in this script is allowed to mutate the account exports;
     # take the second snapshot only after all derived outputs are written.
-    _write_csv(outputs / "cross_asset_model_dataset.csv", rows)
+    _write_csv(outputs / f"{output_stem}.csv", rows)
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / "cross_asset_model_dataset_manifest.json").write_text(json.dumps({"status": "PENDING"}) + "\n", encoding="utf-8")
+    (reports / f"{report_stem}.json").write_text(json.dumps({"status": "PENDING"}) + "\n", encoding="utf-8")
     after = hash_files(ROOT, PROTECTED_FILES)
     changed = [name for name in PROTECTED_FILES if before.get(name) != after.get(name)]
     report = {
@@ -257,10 +257,11 @@ def build() -> dict[str, Any]:
         "position_scales": scales,
         "raw_account_inputs_unchanged": not changed,
         "changed_protected_files": changed,
-        "large_output": "quant/outputs/cross_asset_model_dataset.csv (ignored)",
+        "large_output": f"quant/outputs/{output_stem}.csv (ignored)",
     }
-    (reports / "cross_asset_model_dataset_manifest.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    (reports / "cross_asset_leakage_audit.md").write_text(
+    (reports / f"{report_stem}.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    leakage_stem = report_stem.replace("_model_dataset_manifest", "_leakage_audit")
+    (reports / f"{leakage_stem}.md").write_text(
         "\n".join([
             "# Cross-Asset Leakage Audit", "", f"- status: **{leakage['status']}**",
             f"- rows: `{len(rows)}`", f"- model-eligible rows: `{len(eligible)}`", "",

@@ -17,9 +17,12 @@ from quant_bot.exchanges.binance import BinanceSpotAdapter
 from quant_bot.exchanges.binance_futures import BinanceFuturesAdapter
 from quant_bot.exchanges.http import AdapterError
 from quant_bot.exchanges.okx import OKXAdapter
+from quant_bot.execution.aggregation import merge_duplicate_target_plans
 from quant_bot.execution.target_planner import TargetOrderPlan, plan_spot_order, plan_target_order
 from quant_bot.risk.testnet_gate import check_testnet_order, portfolio_target_scale, risk_envelope_for_symbol
 from quant_bot.strategy.deployment import DeploymentBundle, load_deployment_bundle
+from quant_bot.strategy.explanations import strategy_basis_from_features
+from quant_bot.strategy.feature_contract import LEGACY_FEATURE_CONTRACT_VERSION
 from quant_bot.strategy.realtime_features import RealtimeFeatureEngine
 
 
@@ -163,6 +166,9 @@ def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str, order
             "strategy_target_contracts": context.get("strategy_target_contracts"),
             "strategy_signal_timestamp": context.get("strategy_signal_timestamp"),
             "strategy_risk_tags": context.get("strategy_risk_tags", []),
+            "strategy_basis": context.get("strategy_basis", []),
+            "strategy_source_symbols": context.get("strategy_source_symbols", []),
+            "strategy_source_signals": context.get("strategy_source_signals", []),
         }
 
     return {
@@ -236,7 +242,49 @@ class VenueRuntime:
             strategy_confidence=source.strategy_confidence,
             strategy_signal_timestamp=source.strategy_signal_timestamp,
             strategy_risk_tags=source.strategy_risk_tags,
+            strategy_basis=source.strategy_basis,
+            strategy_source_symbols=source.strategy_source_symbols,
+            strategy_source_signals=source.strategy_source_signals,
         )
+
+    def _source_symbols(self, plan: TargetOrderPlan) -> tuple[str, ...]:
+        return plan.strategy_source_symbols or (plan.symbol,)
+
+    def _historical_symbol(self, plan: TargetOrderPlan) -> str:
+        return self._source_symbols(plan)[0]
+
+    def _instrument_for_plan(self, plan: TargetOrderPlan) -> Instrument:
+        for historical_symbol in self._source_symbols(plan):
+            instrument = self.instruments.get(historical_symbol)
+            if instrument is not None:
+                return instrument
+        for instrument in self.instruments.values():
+            if instrument.canonical_symbol == plan.symbol:
+                return instrument
+        raise KeyError(f"no instrument for canonical symbol {plan.symbol}")
+
+    def _limit_for_plan(self, plan: TargetOrderPlan) -> Decimal:
+        limits = [risk_envelope_for_symbol(self.bundle.risk_envelope, symbol) for symbol in self._source_symbols(plan)]
+        positive = [limit for limit in limits if limit > 0]
+        return min(positive) if positive else Decimal("0")
+
+    def _rebuild_plan(self, plan: TargetOrderPlan, target: Decimal, equity: Decimal) -> TargetOrderPlan | None:
+        instrument = self._instrument_for_plan(plan)
+        kwargs = {
+            "equity": equity,
+            "target_exposure": target,
+            "reference_price": plan.reference_price or Decimal("0"),
+            "bid": plan.bid or Decimal("0"),
+            "ask": plan.ask or Decimal("0"),
+            "decision_time": datetime.now(timezone.utc),
+            "active_orders": self.active_orders,
+            "max_target_exposure": self._limit_for_plan(plan),
+        }
+        if instrument.instrument_type == InstrumentType.SPOT:
+            rebuilt = plan_spot_order(instrument, current_base_quantity=plan.current_contracts, **kwargs)
+        else:
+            rebuilt = plan_target_order(instrument, current_contracts=plan.current_contracts, **kwargs)
+        return self._carry_strategy_context(plan, rebuilt) if rebuilt is not None else None
 
     def _available_collateral_scales(self, plans: list[TargetOrderPlan], equity: Decimal) -> dict[str, Decimal]:
         """Keep each derivative bucket inside its available settle-currency margin.
@@ -251,8 +299,7 @@ class VenueRuntime:
             return {}
         notional_by_currency: dict[str, Decimal] = {}
         for plan in plans:
-            historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
-            instrument = self.instruments[historical_symbol]
+            instrument = self._instrument_for_plan(plan)
             if instrument.instrument_type == InstrumentType.SPOT:
                 continue
             currency = instrument.settlement_currency.upper()
@@ -322,7 +369,7 @@ class VenueRuntime:
         bars = self.adapter.fetch_closed_bars(venue_symbol, limit=100)
         if not bars:
             return None
-        engine = self.engines.setdefault(historical_symbol, RealtimeFeatureEngine(instrument, feature_symbol=historical_symbol, position_scale=self.bundle.position_scales.get(historical_symbol, 1.0)))
+        engine = self.engines.setdefault(historical_symbol, RealtimeFeatureEngine(instrument, feature_symbol=historical_symbol, position_scale=self.bundle.position_scales.get(historical_symbol, 1.0), feature_contract_version=getattr(self.bundle, "feature_contract_version", LEGACY_FEATURE_CONTRACT_VERSION)))
         engine.ingest_closed_bars(bars)
         latest = bars[-1]
         decision_time = datetime.now(timezone.utc)
@@ -346,6 +393,15 @@ class VenueRuntime:
             strategy_confidence=Decimal(str(confidence)) if confidence is not None else None,
             strategy_signal_timestamp=str(getattr(signal, "signal_timestamp", "")),
             strategy_risk_tags=tuple(str(item) for item in getattr(signal, "risk_tags", ())),
+            strategy_basis=strategy_basis_from_features(strategy_input.features),
+            strategy_source_symbols=(historical_symbol,),
+            strategy_source_signals=({
+                "historical_symbol": historical_symbol,
+                "strategy_action": str(getattr(signal, "action", plan.reason)),
+                "target_exposure": str(signal.target_exposure),
+                "confidence": str(confidence) if confidence is not None else None,
+                "strategy_basis": list(strategy_basis_from_features(strategy_input.features)),
+            },),
         )
 
     def process_once(self) -> dict[str, Any]:
@@ -374,6 +430,20 @@ class VenueRuntime:
             if plan is not None:
                 plans.append(plan)
 
+        # Crosswalks such as ADAUSD/ADAUSDT -> ADA-USDT-SWAP are one live
+        # position, not two independent accounts. Collapse them before the
+        # portfolio cap, collateral scaling, and submission loops.
+        plans = merge_duplicate_target_plans(plans)
+        duplicate_rebuilt: list[TargetOrderPlan] = []
+        for plan in plans:
+            if len(self._source_symbols(plan)) > 1:
+                rebuilt = self._rebuild_plan(plan, plan.target_exposure, equity)
+                if rebuilt is not None:
+                    duplicate_rebuilt.append(rebuilt)
+            else:
+                duplicate_rebuilt.append(plan)
+        plans = duplicate_rebuilt
+
         total_target = sum((abs(item.target_exposure) for item in plans), Decimal("0"))
         total_limit = Decimal(str(self.bundle.risk_envelope.get("historical_simultaneous_total_exposure_cap", "0")))
         self.portfolio_target_scale = portfolio_target_scale(total_target, total_limit)
@@ -382,15 +452,10 @@ class VenueRuntime:
             # target.  This keeps the cap enforceable after aggregation.
             scaled: list[TargetOrderPlan] = []
             for plan in plans:
-                historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
-                instrument = self.instruments[historical_symbol]
                 target = plan.target_exposure * self.portfolio_target_scale
-                if instrument.instrument_type == InstrumentType.SPOT:
-                    rebuilt = plan_spot_order(instrument, current_base_quantity=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
-                else:
-                    rebuilt = plan_target_order(instrument, current_contracts=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
+                rebuilt = self._rebuild_plan(plan, target, equity)
                 if rebuilt is not None:
-                    scaled.append(self._carry_strategy_context(plan, rebuilt))
+                    scaled.append(rebuilt)
             plans = scaled
             total_target = sum((abs(item.target_exposure) for item in plans), Decimal("0"))
 
@@ -399,19 +464,15 @@ class VenueRuntime:
             scaled = []
             applied_scales: list[Decimal] = []
             for plan in plans:
-                historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
-                instrument = self.instruments[historical_symbol]
+                instrument = self._instrument_for_plan(plan)
                 collateral_scale = collateral_scales.get(instrument.settlement_currency.upper(), Decimal("0"))
                 if collateral_scale <= 0:
                     continue
                 applied_scales.append(collateral_scale)
                 target = plan.target_exposure * collateral_scale
-                if instrument.instrument_type == InstrumentType.SPOT:
-                    rebuilt = plan_spot_order(instrument, current_base_quantity=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
-                else:
-                    rebuilt = plan_target_order(instrument, current_contracts=plan.current_contracts, target_exposure=target, equity=equity, reference_price=plan.reference_price or Decimal("0"), bid=plan.bid or Decimal("0"), ask=plan.ask or Decimal("0"), decision_time=datetime.now(timezone.utc), active_orders=self.active_orders, max_target_exposure=risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol))
+                rebuilt = self._rebuild_plan(plan, target, equity)
                 if rebuilt is not None:
-                    scaled.append(self._carry_strategy_context(plan, rebuilt))
+                    scaled.append(rebuilt)
             plans = scaled
             if applied_scales:
                 self.portfolio_target_scale *= min(applied_scales)
@@ -422,7 +483,7 @@ class VenueRuntime:
         submitted: list[str] = []
         order_errors: dict[str, str] = {}
         for plan in plans:
-            historical_symbol = next((key for key, item in self.instruments.items() if item.canonical_symbol == plan.symbol), plan.symbol)
+            historical_symbol = self._historical_symbol(plan)
             decision = check_testnet_order(enable_orders=self.enable_orders, confirm_testnet=self.confirm_testnet, symbol=historical_symbol, target_exposure=plan.target_exposure, total_target_exposure=total_target, envelope=self.bundle.risk_envelope, reconciliation_ok=self.reconciliation_ok, websocket_connected=self.market_connected, market_fresh=True, clock_drift_seconds=Decimal("0"), consecutive_rejects=self.consecutive_rejects)
             if not decision.allowed:
                 blocked[historical_symbol] = list(decision.reasons)
@@ -436,6 +497,9 @@ class VenueRuntime:
                 "strategy_target_contracts": str(plan.target_contracts),
                 "strategy_signal_timestamp": plan.strategy_signal_timestamp,
                 "strategy_risk_tags": list(plan.strategy_risk_tags),
+                "strategy_basis": list(plan.strategy_basis),
+                "strategy_source_symbols": list(self._source_symbols(plan)),
+                "strategy_source_signals": list(plan.strategy_source_signals),
             }
             order = Order(plan.client_order_id, plan.symbol, plan.side, plan.order_type, plan.quantity, datetime.now(timezone.utc), price=plan.price, reduce_only=plan.reduce_only, post_only=plan.post_only, metadata={"strategy_context": strategy_context})
             try:

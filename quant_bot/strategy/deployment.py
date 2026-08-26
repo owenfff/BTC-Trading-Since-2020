@@ -7,11 +7,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from .feature_contract import FEATURE_CONTRACT_VERSION
+from .feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION
 from .supervised_models import CrossAssetNumpyLogisticStrategy
 
 
-DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v2-cross-asset-deploy"
+LEGACY_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v2-cross-asset-deploy"
+DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3-cross-asset-indicators"
+SUPPORTED_DEPLOYMENT_MODEL_VERSIONS = {LEGACY_DEPLOYMENT_MODEL_VERSION, DEPLOYMENT_MODEL_VERSION}
 
 
 @dataclass(frozen=True)
@@ -31,9 +33,10 @@ class DeploymentBundle:
     symbol_policy: Mapping[str, Mapping[str, Any]]
 
     def validate(self) -> None:
-        if self.model_version != DEPLOYMENT_MODEL_VERSION:
+        if self.model_version not in SUPPORTED_DEPLOYMENT_MODEL_VERSIONS:
             raise ValueError(f"unexpected deployment model version: {self.model_version}")
-        if self.feature_contract_version != FEATURE_CONTRACT_VERSION:
+        expected_contract = LEGACY_FEATURE_CONTRACT_VERSION if self.model_version == LEGACY_DEPLOYMENT_MODEL_VERSION else FEATURE_CONTRACT_VERSION
+        if self.feature_contract_version != expected_contract:
             raise ValueError("deployment feature contract does not match runtime contract")
         if not self.training_data_sha256 or len(self.training_data_sha256) != 64:
             raise ValueError("deployment artifact must contain a SHA256 training-data hash")

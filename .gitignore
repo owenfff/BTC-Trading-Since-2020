@@ -8,3 +8,5 @@ quant/reports/bybit_demo_symbol_mapping.md
 quant/outputs/bybit_demo_credentials.json
 quant/outputs/replay_dashboard_*.json
 quant/outputs/*_supervisor_state.json
+quant/outputs/cross_asset_model_dataset_v3.csv
+quant/outputs/cross_asset_deployment_model_v3.json
