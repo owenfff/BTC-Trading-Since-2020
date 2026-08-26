@@ -316,3 +316,9 @@
 - M15.17 adds `quant/scripts/audit_strategy_completion.py` and `quant/reports/strategy_completion_audit.*` to test the user's full-learning claim against the available evidence rather than infer completion from passing software tests.
 - The audit status is `NOT_COMPLETE`: causal closed-bar features and code regression checks pass, while exact private-rule recovery, pre-action trigger context, strict autonomous timing, candidate promotion, and Demo authorization fail.
 - This is an evidence result, not a software crash. Keep the active Demo model unchanged; the next valid path for exact imitation requires a verified public source with pre-action quote/order-book/order-intent context. A standalone profitable strategy would be a different research objective.
+
+## 2026-08-26 — Hyperliquid adds partial pre-fill order intent only
+
+- M15.18 audits the pinned Hyperliquid snapshot's `historicalOrders.json` against `userFillsByTime.json` and the source manifest.
+- The snapshot contains submitted side, limit price, size, GTC, trigger/reduce-only flags, order timestamp and later lifecycle status. `203/203` filled-status order IDs join to fills, and all `203/203` joined orders were created no later than their first fill.
+- This improves execution-style analysis for Hyperliquid, but the official historical-orders source is a recent-window feed and the snapshot has no historical quote/order-book state. Keep exact autonomous timing and private trigger recovery blocked.

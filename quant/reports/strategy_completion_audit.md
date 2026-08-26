@@ -12,11 +12,12 @@
 |---|---|---|---|
 | `exact_strategy_recovery` | **FAIL** | `behavior_spec.strategy_fidelity` | The evidence contract is BEHAVIORAL_APPROXIMATION, not an exact private-rule recovery. |
 | `pre_action_trigger_context` | **FAIL** | `pre_action.pre_action_trigger_assessment.complete_pre_action_trigger_context_available` | Complete pre-action trigger, cancellation intent and order-book context are absent from the current public export. |
+| `hyperliquid_partial_order_intent` | **PASS** | `hyperliquid_order_intent.order_intent` | Hyperliquid submitted order terms are available for a recent snapshot and all filled-status order IDs in that snapshot join to fills; this improves execution analysis but is not complete trigger context. |
 | `strict_autonomous_timing` | **FAIL** | `identifiability.venue_results[*].strict_autonomous_timing_reference.f1` | Strict autonomous timing F1 by venue: {'BITMEX': 0.0, 'HYPERLIQUID': 0.0}. |
 | `causal_closed_bar_features` | **PASS** | `pre_action.market_context` | 264288 rows use a strictly prior closed bar; equal/after rows: 0. |
 | `candidate_promotion` | **FAIL** | `venue_native/shared_intent/shared_timing.status` | 3/3 latest venue-generalization candidates remain diagnostic or blocked; active model is unchanged. |
 | `autonomous_demo_authorization` | **FAIL** | `behavior_spec.active_runtime.promotion_allowed` | The specification does not authorize Demo order additions or automatic model promotion. |
-| `regression_verification` | **PASS** | `state.test_count` | Current recorded full-suite count is 397; this verifies code regressions, not strategy fidelity. |
+| `regression_verification` | **PASS** | `state.test_count` | Current recorded full-suite count is 400; this verifies code regressions, not strategy fidelity. |
 
 ## What is actually distilled
 

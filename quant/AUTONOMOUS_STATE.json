@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15.17-strategy-learning-completion-audit",
+  "current_work_package": "M15.18-hyperliquid-partial-order-intent-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "50b801b21bcbaebbcf27afd5e9c2f9dd08861121",
+  "last_code_commit": "53be35c070bce054d6d9e7007ce71d3a4c4d6e52",
   "last_report_commit": "dfa4b7feeca8c9dbaed44cb98bc014f8b6e49795",
-  "test_count": 400,
-  "last_test_status": "FULL_SUITE_400_PASSED;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
+  "test_count": 403,
+  "last_test_status": "FULL_SUITE_403_PASSED;HYPERLIQUID_PARTIAL_ORDER_INTENT_AUDIT;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -68,7 +68,8 @@
     "The v4.4 conditional event-type benchmark reaches Macro-F1 0.382047 (BitMEX) and 0.585714 (Hyperliquid) only with an oracle event trigger and teacher dynamic state; autonomous timing F1 remains 0.",
     "The v4.5 source audit found no independent quote/orderbook history; all 31702 non-idle decisions align exactly with the first recorded order event, so complete pre-action trigger context is absent.",
     "M15.16 formalizes the evidence-bounded strategy specification, but exact private triggers remain unidentifiable; the specification cannot authorize model promotion or new Demo orders.",
-    "M15.17 completion audit is NOT_COMPLETE: exact recovery, pre-action context, autonomous timing, candidate promotion, and Demo authorization gates fail; passing causal/test gates do not prove full strategy learning."
+    "M15.17 completion audit is NOT_COMPLETE: exact recovery, pre-action context, autonomous timing, candidate promotion, and Demo authorization gates fail; passing causal/test gates do not prove full strategy learning.",
+    "M15.18 Hyperliquid historicalOrders adds partial submitted-order intent (203/203 filled-status IDs joined to fills) but is recent-window data without historical quote/order-book context; exact timing remains blocked."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -82,6 +83,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. The full-learning objective is NOT_COMPLETE. Only continue exact-imitation research if a verified public source adds pre-action quote/order-book/order-intent context; otherwise preserve the auditable behavioral approximation or define a separate standalone-strategy objective.",
-  "updated_at_utc": "2026-08-26T13:33:28Z"
+  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Hyperliquid partial order intent is now auditable, but exact autonomous timing still requires verified historical quote/order-book context beyond the recent order window. Preserve the behavioral approximation or define a separate standalone-strategy objective.",
+  "updated_at_utc": "2026-08-26T13:44:11Z"
 }

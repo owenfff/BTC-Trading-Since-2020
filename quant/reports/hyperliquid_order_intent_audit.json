@@ -1,0 +1,170 @@
+{
+  "report_version": "M15-HYPERLIQUID-ORDER-INTENT-1.0",
+  "status": "PARTIAL_PRE_ACTION_CONTEXT",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "generated_at_utc": "2026-08-26T13:38:19.958619Z",
+  "source": {
+    "directory": "quant\\data\\external\\hyperliquid\\paul\\ace13c7a675a20d4932b430508a750d7ad7867e9",
+    "repository": "pystashell/track_paul_btc_hyperliquid_trade",
+    "revision": "ace13c7a675a20d4932b430508a750d7ad7867e9",
+    "target_user": "0xdae4df7207feb3b350e4284c8efe5f7dac37f637",
+    "manifest_verification": {
+      "historicalOrders.json": {
+        "expected": {
+          "bytes": 913349,
+          "sha256": "40d26a416562c60adb189243d915738971c8621e68f5b91f82c30e6d671a0acd"
+        },
+        "actual": {
+          "exists": true,
+          "bytes": 913349,
+          "sha256": "40d26a416562c60adb189243d915738971c8621e68f5b91f82c30e6d671a0acd",
+          "status": "PASS"
+        }
+      },
+      "userFillsByTime.json": {
+        "expected": {
+          "bytes": 114584,
+          "sha256": "440c076de00abb95a9273636188bf789b7237fb5ea12a5d5ebeb847944e6251f"
+        },
+        "actual": {
+          "exists": true,
+          "bytes": 114584,
+          "sha256": "440c076de00abb95a9273636188bf789b7237fb5ea12a5d5ebeb847944e6251f",
+          "status": "PASS"
+        }
+      },
+      "userFunding.json": {
+        "expected": {
+          "bytes": 608022,
+          "sha256": "3cc2512cd3bd76371981092a9162922bd4ee7a7dea8a2c2682c9699babc91f42"
+        },
+        "actual": {
+          "exists": true,
+          "bytes": 608022,
+          "sha256": "3cc2512cd3bd76371981092a9162922bd4ee7a7dea8a2c2682c9699babc91f42",
+          "status": "PASS"
+        }
+      },
+      "userNonFundingLedgerUpdates.json": {
+        "expected": {
+          "bytes": 289,
+          "sha256": "d8975bd3736b22e0bb16c6c990504d77cc87451fa5d2a4c22621bea540add78c"
+        },
+        "actual": {
+          "exists": true,
+          "bytes": 289,
+          "sha256": "d8975bd3736b22e0bb16c6c990504d77cc87451fa5d2a4c22621bea540add78c",
+          "status": "PASS"
+        }
+      },
+      "frontendOpenOrders.json": {
+        "expected": {
+          "bytes": 110473,
+          "sha256": "a6feff967ae82424bdec359dd01ed0e61e87b37460c241b12f9101024ff3d3d3"
+        },
+        "actual": {
+          "exists": true,
+          "bytes": 110473,
+          "sha256": "a6feff967ae82424bdec359dd01ed0e61e87b37460c241b12f9101024ff3d3d3",
+          "status": "PASS"
+        }
+      },
+      "clearinghouseState.json": {
+        "expected": {
+          "bytes": 29978,
+          "sha256": "1a7a83ad3ab725f08ed740b85a8eebb3055755811647a3108d27c1727e7aa27f"
+        },
+        "actual": {
+          "exists": true,
+          "bytes": 29978,
+          "sha256": "1a7a83ad3ab725f08ed740b85a8eebb3055755811647a3108d27c1727e7aa27f",
+          "status": "PASS"
+        }
+      },
+      "spotClearinghouseState.json": {
+        "expected": {
+          "bytes": 15992,
+          "sha256": "74206c26632a3de1ec31ad6ce89292e0f315f3af92d1dfc494402d06fed8c96f"
+        },
+        "actual": {
+          "exists": true,
+          "bytes": 15992,
+          "sha256": "74206c26632a3de1ec31ad6ce89292e0f315f3af92d1dfc494402d06fed8c96f",
+          "status": "PASS"
+        }
+      }
+    }
+  },
+  "order_intent": {
+    "order_records": 2649,
+    "unique_order_ids": 1343,
+    "orders_per_id": {
+      "1": 37,
+      "2": 1306
+    },
+    "status_counts": {
+      "canceled": 1126,
+      "filled": 203,
+      "open": 1320
+    },
+    "order_type_counts": {
+      "Limit": 2649
+    },
+    "time_in_force_counts": {
+      "Gtc": 2649
+    },
+    "reduce_only_count": 0,
+    "trigger_order_count": 0,
+    "intent_field_presence": {
+      "coin": 2649,
+      "side": 2649,
+      "limitPx": 2649,
+      "sz": 2649,
+      "origSz": 2649,
+      "orderType": 2649,
+      "tif": 2649,
+      "reduceOnly": 2649,
+      "isTrigger": 2649,
+      "triggerPx": 2649,
+      "timestamp": 2649
+    },
+    "fill_records": 341,
+    "fill_order_ids": 203,
+    "filled_status_order_ids": 203,
+    "filled_status_fill_overlap": 203,
+    "order_created_at_or_before_first_fill": 203,
+    "order_time_range_utc": {
+      "min": "2025-11-15T17:34:04.580000Z",
+      "max": "2026-08-21T13:31:17.525000Z"
+    }
+  },
+  "available_before_fill": [
+    "coin",
+    "side",
+    "limitPx",
+    "sz",
+    "origSz",
+    "orderType",
+    "tif",
+    "reduceOnly",
+    "isTrigger",
+    "triggerPx",
+    "timestamp"
+  ],
+  "limitations": {
+    "historical_order_endpoint_is_recent_window": true,
+    "independent_historical_quote_or_orderbook_present": false,
+    "private_trigger_or_subjective_intent_present": false,
+    "complete_pre_action_trigger_context_available": false,
+    "reason": "Historical orders expose submitted terms and lifecycle timing, but not the quote/order-book state or private rule that caused submission; coverage is also limited to the source snapshot's recent order window."
+  },
+  "interpretation": "Hyperliquid order-intent evidence is stronger than fills-only data and can support execution-style analysis. It still cannot establish the original trader's exact autonomous timing or complete private strategy.",
+  "raw_inputs_untouched": true,
+  "active_demo_unchanged": true,
+  "promotion_allowed": false,
+  "quality_checks": {
+    "all_manifest_files_pass": false,
+    "filled_order_join_rate": 1.0,
+    "created_before_or_at_fill_rate": 1.0
+  }
+}

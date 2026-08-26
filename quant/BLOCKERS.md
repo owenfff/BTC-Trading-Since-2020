@@ -195,3 +195,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The M15.17 completion audit records `NOT_COMPLETE` with five failed gates: exact strategy recovery, pre-action trigger context, strict autonomous timing, candidate promotion, and autonomous Demo authorization.
 - The passing gates cover causal closed-bar ordering and software regression only; they cannot prove that the robot has learned the trader's complete private strategy.
 - No additional implementation can recover missing information from the same public fills/orders alone. Continue only with a verified source that adds pre-action context, or explicitly switch to a separate standalone-strategy research goal.
+
+## 2026-08-26 — Hyperliquid order intent is only partial
+
+- The pinned Hyperliquid snapshot supplies recent submitted order terms and lifecycle status, but its historical-orders endpoint is limited to a recent window and does not include the historical quote/order-book state around submission.
+- `203/203` filled-status order IDs join to fills, which supports execution analysis but not complete trigger identification. Exact full-strategy recovery remains `NOT_COMPLETE`.
+- Do not promote a model or add Demo orders based on this partial context. A paid/incomplete external archive must not be silently treated as a complete dataset.

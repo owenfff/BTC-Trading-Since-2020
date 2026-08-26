@@ -369,3 +369,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The audit consumes the existing frozen state/profile/pre-action/identifiability/native/shared-intent reports and returns `NOT_COMPLETE` unless every completion gate is explicitly `PASS`.
 - Current result: `5` failed gates and `2` passing gates; the result distinguishes strategy fidelity from causal feature correctness and test health.
 - No raw root CSV/JSON, credentials, private endpoint, mainnet connection, Demo order, or active model was changed.
+
+## M15.18 Hyperliquid partial pre-fill order intent
+
+- Builder: `quant/scripts/audit_hyperliquid_order_intent.py`; tests: `quant/tests/test_hyperliquid_order_intent.py`.
+- Source: the pinned public snapshot under `quant/data/external/hyperliquid/paul/ace13c7a675a20d4932b430508a750d7ad7867e9`; manifest SHA256 verification covers its declared files.
+- Outputs: `quant/reports/hyperliquid_order_intent_audit.md` and `quant/reports/hyperliquid_order_intent_audit.json`.
+- Result: `2,649` historical-order records / `1,343` unique IDs; `203/203` filled-status IDs join to fills; `203/203` joined orders were created no later than first fill. This is `PARTIAL_PRE_ACTION_CONTEXT`, not complete trigger context.
+- No root raw CSV/JSON was changed. No credentials, private endpoint, mainnet connection, Demo order or active model change was performed.

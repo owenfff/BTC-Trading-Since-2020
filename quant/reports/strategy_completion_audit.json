@@ -2,7 +2,7 @@
   "report_version": "M15-STRATEGY-COMPLETION-AUDIT-1.0",
   "status": "NOT_COMPLETE",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
-  "generated_at_utc": "2026-08-26T13:28:14.208957Z",
+  "generated_at_utc": "2026-08-26T13:38:20.113600Z",
   "objective": "Determine whether the robot has fully learned the original trader's complete strategy from the available public records.",
   "completion_definition": [
     "exact private strategy recovery",
@@ -22,6 +22,12 @@
       "status": "FAIL",
       "evidence": "pre_action.pre_action_trigger_assessment.complete_pre_action_trigger_context_available",
       "detail": "Complete pre-action trigger, cancellation intent and order-book context are absent from the current public export."
+    },
+    {
+      "id": "hyperliquid_partial_order_intent",
+      "status": "PASS",
+      "evidence": "hyperliquid_order_intent.order_intent",
+      "detail": "Hyperliquid submitted order terms are available for a recent snapshot and all filled-status order IDs in that snapshot join to fills; this improves execution analysis but is not complete trigger context."
     },
     {
       "id": "strict_autonomous_timing",
@@ -51,7 +57,7 @@
       "id": "regression_verification",
       "status": "PASS",
       "evidence": "state.test_count",
-      "detail": "Current recorded full-suite count is 397; this verifies code regressions, not strategy fidelity."
+      "detail": "Current recorded full-suite count is 400; this verifies code regressions, not strategy fidelity."
     }
   ],
   "observed_behavior": {
