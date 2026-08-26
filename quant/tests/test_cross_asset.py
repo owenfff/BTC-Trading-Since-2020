@@ -5,6 +5,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from cross_asset.market import _audit, _join_funding
+from cross_asset.hyperliquid import HyperliquidBehaviorEvent, next_strictly_later_event
 from cross_asset.universe import fit_position_scales, split_by_global_time
 from features.market_features import build_market_features
 from quant_bot.strategy.base import StrategyInput
@@ -66,6 +67,19 @@ def test_funding_join_keeps_latest_asof_event_and_source_time() -> None:
     _join_funding(bars, [{"timestamp": "2020-01-01T00:30:00.000Z", "fundingRate": 0.001}])
     assert bars[0]["funding_rate"] == 0.001
     assert bars[0]["funding_source_timestamp_utc"] == "2020-01-01T00:30:00.000Z"
+
+
+def test_hyperliquid_labels_skip_same_timestamp_fill_ties() -> None:
+    def event(event_id: str, when: datetime) -> HyperliquidBehaviorEvent:
+        return HyperliquidBehaviorEvent(event_id, when, "HYPERLIQUID", "BTC", "BTC-PERP", Decimal("0"), Decimal("1"), "OPEN_LONG", "o", event_id, Decimal("1"), Decimal("1"), Decimal("0"), "USDC")
+
+    rows = [
+        event("a", datetime(2025, 1, 1, 0, 0, tzinfo=UTC)),
+        event("b", datetime(2025, 1, 1, 0, 0, tzinfo=UTC)),
+        event("c", datetime(2025, 1, 1, 1, 0, tzinfo=UTC)),
+    ]
+    assert next_strictly_later_event(rows, 0) == rows[2]
+    assert next_strictly_later_event(rows, 1) == rows[2]
 
 
 def test_cross_asset_logistic_uses_symbol_metadata_and_versioned_signal() -> None:

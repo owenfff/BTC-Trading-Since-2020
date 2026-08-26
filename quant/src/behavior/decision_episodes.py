@@ -21,6 +21,15 @@ def _date(value: Any) -> date | None:
 
 
 def _base_decision(row: dict[str, Any], *, decision_id: str, decision_type: str) -> dict[str, Any]:
+    # ``build_order_episodes`` also retains the isolated post-episode position
+    # as ``local_position_after``.  ``position_after`` is the replay snapshot
+    # after the last fill and can include an interleaved fill from another
+    # order on the same instrument.  Mixing the local action with that global
+    # snapshot creates contradictory teacher rows (for example ADD_LONG with a
+    # smaller target position).  A decision target must describe this order
+    # episode's own intended transition; use the isolated value when present
+    # and keep the old field as a compatibility fallback for hand-built rows.
+    target_position = row.get("local_position_after", row.get("position_after", row.get("target_position")))
     return {
         "decision_episode_id": decision_id,
         "decision_type": decision_type,
@@ -31,7 +40,7 @@ def _base_decision(row: dict[str, Any], *, decision_id: str, decision_type: str)
         "source_order_episode_id": row.get("order_episode_id", ""),
         "action": row.get("action", "NO_TRADE"),
         "position_before": _int(row.get("position_before")),
-        "target_position": _int(row.get("position_after", row.get("target_position"))),
+        "target_position": _int(target_position),
         "position_delta": _int(row.get("signed_contract_qty", row.get("position_delta"))),
         "execution_count": _int(row.get("execution_count")),
         "synthetic_negative_sample": decision_type != "ORDER",

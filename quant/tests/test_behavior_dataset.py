@@ -67,6 +67,25 @@ def test_decisions_include_hold_and_no_trade_samples() -> None:
     assert any(row["action"] == "HOLD_LONG" for row in decisions)
 
 
+def test_decision_target_uses_isolated_order_episode_position() -> None:
+    # The replay snapshot at the last fill can include an interleaved order.
+    # The decision target must remain the local post-episode position that was
+    # used to classify the action.
+    order_rows = [{
+        "order_episode_id": "XBTUSD-o1",
+        "symbol": "XBTUSD",
+        "first_event_time": "2020-01-01T00:00:00Z",
+        "action": "ADD_LONG",
+        "position_before": 100,
+        "position_after": 130,
+        "local_position_after": 120,
+        "signed_contract_qty": 20,
+        "execution_count": 2,
+    }]
+    decisions = build_decision_episodes(order_rows, [])
+    assert decisions[0]["target_position"] == 120
+
+
 def test_trade_actions_and_cycle_close() -> None:
     rows = [
         event("e1", "2020-01-01T00:00:00Z", before=0, after=10, action="OPEN_LONG"),

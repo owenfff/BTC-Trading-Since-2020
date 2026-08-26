@@ -402,6 +402,16 @@ def normalize_fills(fills: Iterable[Mapping[str, Any]], *, cutoff: datetime | No
     return output
 
 
+def next_strictly_later_event(events: list[HyperliquidBehaviorEvent], index: int) -> HyperliquidBehaviorEvent | None:
+    """Return the next event after a timestamp, skipping same-time fill ties."""
+
+    current_time = events[index].time
+    next_index = index + 1
+    while next_index < len(events) and events[next_index].time <= current_time:
+        next_index += 1
+    return events[next_index] if next_index < len(events) else None
+
+
 def load_funding(path: Path, *, cutoff: datetime | None = None) -> list[dict[str, Any]]:
     rows = load_json(path)
     if not isinstance(rows, list):
@@ -431,7 +441,7 @@ def build_hyperliquid_feature_rows(
     rows: list[dict[str, Any]] = []
     for index, event in enumerate(events):
         market = build_market_features(feature_bars, event.time, timestamps=feature_times, bar_seconds=3600)
-        next_event = events[index + 1] if index + 1 < len(events) else None
+        next_event = next_strictly_later_event(events, index)
         row = {
             "decision_episode_id": event.event_id,
             "decision_time": _iso(event.time),
@@ -495,6 +505,7 @@ __all__ = [
     "load_candle_archive",
     "load_funding",
     "normalize_fills",
+    "next_strictly_later_event",
     "sha256_file",
     "verify_snapshot_directory",
 ]

@@ -115,7 +115,14 @@ def write_large_output(rows: list[dict[str, Any]], parquet_path: Path) -> dict[s
 
     try:
         write_parquet(rows, parquet_path)
-        return {"format": "parquet", "path": str(parquet_path.relative_to(ROOT)), "row_count": len(rows)}
+        # Several downstream research builders intentionally use the CSV
+        # fallback so a clean environment can reproduce the same pipeline
+        # without requiring a Parquet engine.  Keep that mirror current even
+        # when PyArrow is installed; otherwise a rebuild can silently leave an
+        # older CSV being consumed by the next stage.
+        csv_mirror = parquet_path.with_suffix(".csv")
+        write_csv(rows, csv_mirror, _fieldnames(rows))
+        return {"format": "parquet_with_csv_mirror", "path": str(parquet_path.relative_to(ROOT)), "csv_mirror": str(csv_mirror.relative_to(ROOT)), "row_count": len(rows)}
     except (ImportError, RuntimeError):
         fallback = parquet_path.with_suffix(".csv")
         write_csv(rows, fallback, _fieldnames(rows))
@@ -124,6 +131,22 @@ def write_large_output(rows: list[dict[str, Any]], parquet_path: Path) -> dict[s
             "path": str(fallback.relative_to(ROOT)),
             "requested_path": str(parquet_path.relative_to(ROOT)),
             "row_count": len(rows),
+        }
+    except Exception as error:
+        # PyArrow can be installed but still reject a derived column with
+        # mixed scalar types.  These large outputs have an auditable CSV
+        # fallback, so keep the research build reproducible without masking
+        # unrelated exceptions from the pipeline.
+        if not error.__class__.__module__.startswith("pyarrow."):
+            raise
+        fallback = parquet_path.with_suffix(".csv")
+        write_csv(rows, fallback, _fieldnames(rows))
+        return {
+            "format": "csv_fallback_parquet_schema_error",
+            "path": str(fallback.relative_to(ROOT)),
+            "requested_path": str(parquet_path.relative_to(ROOT)),
+            "row_count": len(rows),
+            "fallback_reason": str(error),
         }
 
 
