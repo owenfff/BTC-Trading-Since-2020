@@ -249,3 +249,10 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Balanced candidate audit: `quant/reports/cross_venue_temporal_balanced_autonomous_audit.md` and `.json`; it is blocked because it overtrades, remains negative after costs, and fails the event-baseline comparison gate.
 - Batch indicator equivalence: `1440` sampled reference fields compared with zero mismatches; full suite `365 passed`.
 - No raw account CSV/JSON was modified. No private API, credential, mainnet endpoint, or order was used. The active Demo model remains unchanged.
+
+## M15.4 calibrated action-target candidate
+
+- Code commit: `5968c343cb9c7a32fff4174d9e7c1a21903b7437`.
+- Candidate version: `behavioral-distillation-v3.4-calibrated-action-target`; it uses `sqrt_balanced` class weighting and enforces that `NO_TRADE`/`HOLD_*` target exposure equals the current simulated exposure.
+- Report: `quant/reports/cross_venue_temporal_calibrated_autonomous_audit.md` and `.json`. Causal checks remain zero; strict costed returns are `+0.018150`, `-0.135907`, and `-0.002102` across WF1/WF2/WF3, so the candidate is not promoted.
+- Full suite after the change: `366 passed`. No raw CSV/JSON, credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.

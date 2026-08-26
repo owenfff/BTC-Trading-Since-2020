@@ -112,3 +112,8 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The market-clock dataset is causally valid (`264609` rows, `66` groups, `95.12%` explicit `NO_TRADE`, zero future-observation violations), but the unweighted candidate predicts `NO_TRADE` for `100%` of all three strict autonomous test windows.
 - The inverse-frequency balanced candidate produces nonzero actions but overtrades: strict costed normalized returns are `-3.233831`, `-0.195200`, and `-0.253852` for WF1/WF2/WF3, and it does not beat the event baseline in every window.
 - This is a model calibration and action-frequency blocker, not a credentials or exchange connectivity blocker. Keep the active Demo model unchanged and do not add Demo orders.
+
+## 2026-08-26 — Calibrated action-target candidate remains blocked
+
+- Candidate `behavioral-distillation-v3.4-calibrated-action-target` enforces action-target consistency and avoids the ordinary candidate's hidden repositioning, but costed strict autonomous returns are `+0.018150`, `-0.135907`, and `-0.002102` for WF1/WF2/WF3.
+- The candidate therefore fails stable all-window positivity, profit-factor, and event-baseline gates. The remaining blocker is model calibration/generalization, not exchange access or credentials; no Demo model switch or new Demo order is authorized.

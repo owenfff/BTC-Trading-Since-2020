@@ -220,3 +220,9 @@
 - The batch indicator implementation was checked against the reference causal implementation for `1440` sampled fields with zero mismatches. The full temporal dataset audit has zero future-bar, future-funding, non-strict clock-order, and non-future-label violations.
 - The ordinary temporal candidate avoids the event-frequency mismatch but collapses to `NO_TRADE=100%` in all strict autonomous windows. The explicit inverse-frequency balanced candidate avoids that collapse but overtrades and remains negative after fees/slippage; neither candidate is promoted.
 - Keep the existing Demo model unchanged. These reports demonstrate why event similarity, indicator presence, or better relative performance is insufficient without calibrated action frequency and positive costed autonomous validation.
+
+## 2026-08-26 — Enforce action-target consistency; keep calibrated candidate blocked
+
+- Add an opt-in calibrated temporal candidate `behavioral-distillation-v3.4-calibrated-action-target` using square-root inverse-frequency weighting and an explicit invariant: `NO_TRADE`/`HOLD_*` cannot produce a different target exposure from the current simulated position.
+- The candidate reduces unnecessary repositioning and is positive in WF1, but remains negative in WF2 and WF3 after costed autonomous replay; it fails the all-window positive/profit-factor/event-baseline gates.
+- Keep the active Demo model unchanged. A model that is numerically stable or better than a weak event baseline is not sufficient for deployment without stable out-of-time autonomous behavior.
