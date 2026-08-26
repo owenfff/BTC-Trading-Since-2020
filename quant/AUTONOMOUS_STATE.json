@@ -5,7 +5,7 @@
   "current_work_package": "M15.8-label-timing-repair-and-v3.7-reaudit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "db8369c",
-  "last_report_commit": "UNCOMMITTED",
+  "last_report_commit": "8fb232d",
   "test_count": 374,
   "last_test_status": "FULL_SUITE_374_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_LABEL_AUDIT_PASS_WITH_WARNINGS;ACTION_TARGET_CONSISTENCY_PASS;V3.7_REAUDIT_BLOCKED;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
