@@ -232,3 +232,10 @@
 - Candidate `behavioral-distillation-v3.5-cost-calibrated-threshold` selects confidence thresholds only from the chronological tail of each training window (`WF1=0.18`, `WF2=0.16`, `WF3=0.00`); the test windows remain untouched during selection.
 - Strict autonomous, costed normalized returns are `+0.018150`, `-0.135907`, and `-0.002102` for WF1/WF2/WF3. The candidate fails stable all-window positivity, profit-factor, and event-baseline gates.
 - Keep the active Demo model unchanged. Threshold calibration is research evidence, not proof that the robot has learned the original trader's strategy or a deployable profitable signal.
+
+## 2026-08-26 — Probability-calibrated stability candidate remains blocked
+
+- Candidate `behavioral-distillation-v3.6-probability-calibrated` uses a nested chronological split: 60% fit, 20% probability calibration, 20% threshold selection, then an untouched walk-forward test. The calibrator only changed parameters when training-holdout NLL decreased.
+- Causal checks pass and the full suite passes (`368` tests), but the candidate produced zero strict autonomous adjustments and zero net return in WF1/WF2/WF3. It is not a learned deployable policy.
+- The global cross-venue coverage gate fails: Hyperliquid contributes `5796` rows from `2025-11-15` onward, but `0` model-eligible rows enter the global test windows because no earlier training position scale exists. A `1160`-row Hyperliquid native holdout is recorded as diagnostic-only.
+- Keep the active Demo model unchanged and do not interpret the small positive native Hyperliquid diagnostic as proof of cross-venue generalization.

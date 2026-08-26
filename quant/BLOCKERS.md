@@ -123,3 +123,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - Candidate `behavioral-distillation-v3.5-cost-calibrated-threshold` uses train-only chronological threshold selection (`0.18`, `0.16`, `0.00` for WF1/WF2/WF3) and preserves causal replay.
 - Strict autonomous costed returns remain `+0.018150`, `-0.135907`, and `-0.002102`; WF2 and WF3 are negative, and the candidate does not pass all-window positivity, profit-factor, or event-baseline gates.
 - This is a model calibration/generalization blocker, not a credential or exchange-access blocker. Do not promote the candidate, switch the active Demo model, or add Demo orders.
+
+## 2026-08-26 — Probability-calibrated cross-venue candidate remains blocked
+
+- Candidate `behavioral-distillation-v3.6-probability-calibrated` passes causal checks, calibration-holdout improvement, coefficient bounds, and `368` tests, but strict autonomous replay makes zero adjustments in WF1/WF2/WF3 and has zero net return.
+- Hyperliquid coverage is not globally validated: its `5796` rows start at `2025-11-15`, while the global walk-forward normalizer has no pre-2025 training scale for `HYPERLIQUID:BTC-PERP`; therefore all `4686` raw WF3 rows are excluded from model-eligible testing. The `1160`-row native holdout is explicitly diagnostic-only.
+- This is a data-coverage and model-generalization blocker. Do not promote v3.6, switch the active Demo model, or add Demo orders.

@@ -264,3 +264,12 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Report: `quant/reports/cross_venue_temporal_threshold_calibrated_autonomous_audit.md` and `.json`.
 - Thresholds were selected from train-only chronological tails: `WF1=0.18`, `WF2=0.16`, `WF3=0.00`. Strict autonomous costed returns were `+0.018150`, `-0.135907`, and `-0.002102`; the candidate remains blocked.
 - Causal checks pass and all `366` tests pass. No raw CSV/JSON was modified; no credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.
+
+## M15.6 probability-calibrated cross-venue stability candidate
+
+- Code commit: `7773c76` (`Add probability calibration and venue stability audit`).
+- Candidate version: `behavioral-distillation-v3.6-probability-calibrated`; model calibration uses a bounded temperature-plus-class-bias layer fitted only on a chronological training holdout and supports artifact round-trip serialization.
+- Report: `quant/reports/cross_venue_probability_calibrated_stability_audit.md` and `.json`; per-symbol detail: `quant/reports/cross_venue_probability_calibrated_by_symbol.csv`.
+- Global report: `264288` rows, causal checks pass, calibration NLL does not worsen, and the full suite passes with `368` tests. The candidate makes zero strict autonomous adjustments in WF1/WF2/WF3 and is not promoted.
+- Venue coverage: BitMEX has model-eligible global test rows; Hyperliquid has `5796` rows from `2025-11-15` to `2026-07-15` but `0` model-eligible global test rows due to missing pre-2025 training position scale. Its `1160`-row within-venue holdout is diagnostic-only (`net ≈ 0.002951`, `PF ≈ 1.011`) and not a cross-venue promotion result.
+- No raw CSV/JSON was modified; no credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.

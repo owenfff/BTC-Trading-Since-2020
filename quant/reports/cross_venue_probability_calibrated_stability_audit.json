@@ -1,0 +1,2651 @@
+{
+  "report_version": "M15-PROBABILITY-CALIBRATED-STABILITY-1.0",
+  "status": "DEMO_CONTINUE_LIVE_BLOCKED",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "active_model_unchanged": true,
+  "candidate_model_version": "behavioral-distillation-v3.6-probability-calibrated",
+  "dataset": "quant\\outputs\\cross_venue_temporal_dataset_v3.csv",
+  "dataset_rows": 264288,
+  "dataset_eligible_rows": 264288,
+  "causal_audit": {
+    "status": "PASS",
+    "checks": {
+      "invalid_decision_time": 0,
+      "future_market_bar": 0,
+      "future_funding": 0,
+      "non_strict_clock_order": 0,
+      "non_future_label": 0
+    }
+  },
+  "windows": [
+    {
+      "window": "WF1",
+      "status": "TEST_DATA_AVAILABLE",
+      "train_rows": 174053,
+      "test_rows": 17561,
+      "nested_stages": {
+        "fit_rows": 104431,
+        "calibration_rows": 34811,
+        "threshold_rows": 34811,
+        "probability_calibration": {
+          "calibration_rows": 34811,
+          "unseen_label_rows": 0,
+          "nll_before": 2.5172657318519276,
+          "nll_after": 2.5172657318519276,
+          "temperature": 1.0,
+          "bias_l1": 0.0,
+          "evaluation": {
+            "rows": 34811,
+            "nll": 2.5172657318519276,
+            "brier": 0.3585164542010044,
+            "ece": 0.24353169128702337
+          }
+        },
+        "threshold_selection": {
+          "selected": {
+            "threshold": 0.19,
+            "score": 0.10631124484503238,
+            "action_macro_f1": 0.11062863755603294,
+            "target_exposure_mae": 0.0009018721508306537,
+            "observed_no_trade_rate": 0.9706414639050874,
+            "predicted_no_trade_rate": 0.987906121628221,
+            "turnover_proxy": 0.00023882770020773914
+          },
+          "candidates": [
+            {
+              "threshold": 0.0,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.01,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.02,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.03,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.04,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.05,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.06,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.07,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.08,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.09,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.1,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.11,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.12,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.13,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.14,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.15,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.16,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.17,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.18,
+              "score": 0.1062137122156239,
+              "action_macro_f1": 0.11048802712023192,
+              "target_exposure_mae": 0.0009042096269371391,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9877337623165091,
+              "turnover_proxy": 0.00024116517631422464
+            },
+            {
+              "threshold": 0.19,
+              "score": 0.10631124484503238,
+              "action_macro_f1": 0.11062863755603294,
+              "target_exposure_mae": 0.0009018721508306537,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.987906121628221,
+              "turnover_proxy": 0.00023882770020773914
+            },
+            {
+              "threshold": 0.2,
+              "score": 0.1051003533477397,
+              "action_macro_f1": 0.10957569930981262,
+              "target_exposure_mae": 0.0008939654154686192,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9885381057711643,
+              "turnover_proxy": 0.00023050861907117175
+            },
+            {
+              "threshold": 0.21,
+              "score": 0.10313203576592814,
+              "action_macro_f1": 0.10782995505116925,
+              "target_exposure_mae": 0.0008840174708675622,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9894286288816754,
+              "turnover_proxy": 0.00021933713209913722
+            },
+            {
+              "threshold": 0.22,
+              "score": 0.09818593054777995,
+              "action_macro_f1": 0.10312795603509416,
+              "target_exposure_mae": 0.0008727144288621111,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9904053316480422,
+              "turnover_proxy": 0.00020582553947714075
+            },
+            {
+              "threshold": 0.23,
+              "score": 0.09885446095129319,
+              "action_macro_f1": 0.10406214097698459,
+              "target_exposure_mae": 0.0008609309929017251,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9914682140702652,
+              "turnover_proxy": 0.00019297938914978423
+            },
+            {
+              "threshold": 0.24,
+              "score": 0.09862059010590456,
+              "action_macro_f1": 0.10414417147267273,
+              "target_exposure_mae": 0.0008445298944564771,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9927321823561518,
+              "turnover_proxy": 0.00017533770507562383
+            },
+            {
+              "threshold": 0.25,
+              "score": 0.09550063330767217,
+              "action_macro_f1": 0.10128988302971877,
+              "target_exposure_mae": 0.0008357456050356273,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9937950647783746,
+              "turnover_proxy": 0.00016517812309668222
+            },
+            {
+              "threshold": 0.26,
+              "score": 0.09023694212592577,
+              "action_macro_f1": 0.09638520857201517,
+              "target_exposure_mae": 0.0008234949813694842,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9952313923759731,
+              "turnover_proxy": 0.00015250537923777453
+            },
+            {
+              "threshold": 0.27,
+              "score": 0.08934016382772575,
+              "action_macro_f1": 0.09572538852300395,
+              "target_exposure_mae": 0.0008195621542907407,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9961793685903881,
+              "turnover_proxy": 0.00014554354271139792
+            },
+            {
+              "threshold": 0.28,
+              "score": 0.08855545554106212,
+              "action_macro_f1": 0.09502683377035037,
+              "target_exposure_mae": 0.0008148357200958295,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9965240872138117,
+              "turnover_proxy": 0.00014046439197722499
+            },
+            {
+              "threshold": 0.29,
+              "score": 0.08771233751817331,
+              "action_macro_f1": 0.09432014807291568,
+              "target_exposure_mae": 0.0008118648736114484,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9970698917008991,
+              "turnover_proxy": 0.00013680962226509172
+            },
+            {
+              "threshold": 0.3,
+              "score": 0.08554651446487305,
+              "action_macro_f1": 0.09227639938161435,
+              "target_exposure_mae": 0.0008094589351251594,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9975582430840826,
+              "turnover_proxy": 0.00013418782296613734
+            },
+            {
+              "threshold": 0.31,
+              "score": 0.08430986490799722,
+              "action_macro_f1": 0.091111550426321,
+              "target_exposure_mae": 0.0008066922636169201,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9978455086036023,
+              "turnover_proxy": 0.0001311198793157303
+            },
+            {
+              "threshold": 0.32,
+              "score": 0.08427881196570859,
+              "action_macro_f1": 0.09112355779662652,
+              "target_exposure_mae": 0.0008009532806100948,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9980178679153141,
+              "turnover_proxy": 0.00012538089630890508
+            },
+            {
+              "threshold": 0.33,
+              "score": 0.0838045224372224,
+              "action_macro_f1": 0.09067795814381176,
+              "target_exposure_mae": 0.0007938219179035937,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.998132774123122,
+              "turnover_proxy": 0.00011824953360240396
+            },
+            {
+              "threshold": 0.34,
+              "score": 0.08379868934189566,
+              "action_macro_f1": 0.09067930546994235,
+              "target_exposure_mae": 0.0007935853747967956,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9981615006750739,
+              "turnover_proxy": 0.00011801299049560582
+            },
+            {
+              "threshold": 0.35,
+              "score": 0.08376903896982625,
+              "action_macro_f1": 0.09069271016690117,
+              "target_exposure_mae": 0.000786826829009727,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9983338599867858,
+              "turnover_proxy": 0.00011125444470853724
+            },
+            {
+              "threshold": 0.36,
+              "score": 0.08376203144085494,
+              "action_macro_f1": 0.09071436891905164,
+              "target_exposure_mae": 0.0007751077248861596,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9984487661945937,
+              "turnover_proxy": 9.953534058496982e-05
+            },
+            {
+              "threshold": 0.37,
+              "score": 0.08375286070361003,
+              "action_macro_f1": 0.09072671037718433,
+              "target_exposure_mae": 0.0007687458991137952,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9985349458504496,
+              "turnover_proxy": 9.31735148126054e-05
+            },
+            {
+              "threshold": 0.38,
+              "score": 0.08374961757923066,
+              "action_macro_f1": 0.09073781806690909,
+              "target_exposure_mae": 0.0007663228036728494,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9985923989543535,
+              "turnover_proxy": 9.075041937165962e-05
+            },
+            {
+              "threshold": 0.39,
+              "score": 0.08374499730346271,
+              "action_macro_f1": 0.09075469691284256,
+              "target_exposure_mae": 0.0007574189227829239,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9986785786102094,
+              "turnover_proxy": 8.184653848173409e-05
+            },
+            {
+              "threshold": 0.4,
+              "score": 0.08373151270501514,
+              "action_macro_f1": 0.09081294412955342,
+              "target_exposure_mae": 0.0007409760967313848,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9989658441297291,
+              "turnover_proxy": 6.5403712430195e-05
+            },
+            {
+              "threshold": 0.41,
+              "score": 0.08372227521800947,
+              "action_macro_f1": 0.09083239415225329,
+              "target_exposure_mae": 0.0007333846938943662,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.999080750337537,
+              "turnover_proxy": 5.781230959317645e-05
+            },
+            {
+              "threshold": 0.42,
+              "score": 0.08305295137516946,
+              "action_macro_f1": 0.09018458405842807,
+              "target_exposure_mae": 0.0007301435383153357,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9991669299933928,
+              "turnover_proxy": 5.175257416934374e-05
+            },
+            {
+              "threshold": 0.43,
+              "score": 0.08303285975114075,
+              "action_macro_f1": 0.09020751544941044,
+              "target_exposure_mae": 0.0007171523860845272,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9993392893051047,
+              "turnover_proxy": 3.8761421938535256e-05
+            },
+            {
+              "threshold": 0.44,
+              "score": 0.08302630373538926,
+              "action_macro_f1": 0.0902153078651792,
+              "target_exposure_mae": 0.0007142660192974345,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9993967424090087,
+              "turnover_proxy": 3.58750551514425e-05
+            },
+            {
+              "threshold": 0.45,
+              "score": 0.08231683111566863,
+              "action_macro_f1": 0.0895345122631768,
+              "target_exposure_mae": 0.0007122567791671562,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9995116486168165,
+              "turnover_proxy": 2.624358265861505e-05
+            },
+            {
+              "threshold": 0.46,
+              "score": 0.08229351658803892,
+              "action_macro_f1": 0.08953989425507351,
+              "target_exposure_mae": 0.0007064172524684626,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9996265548246244,
+              "turnover_proxy": 2.0404055959921382e-05
+            },
+            {
+              "threshold": 0.47,
+              "score": 0.082270201105442,
+              "action_macro_f1": 0.08954527561925034,
+              "target_exposure_mae": 0.0007006413559705376,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9997414610324323,
+              "turnover_proxy": 1.4628159461996362e-05
+            },
+            {
+              "threshold": 0.48,
+              "score": 0.08226437180530213,
+              "action_macro_f1": 0.08954662086222619,
+              "target_exposure_mae": 0.0006992618238376162,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9997701875843843,
+              "turnover_proxy": 1.3248627329075037e-05
+            },
+            {
+              "threshold": 0.49,
+              "score": 0.08226437180530213,
+              "action_macro_f1": 0.08954662086222619,
+              "target_exposure_mae": 0.0006992618238376162,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9997701875843843,
+              "turnover_proxy": 1.3248627329075037e-05
+            },
+            {
+              "threshold": 0.5,
+              "score": 0.08224688486246408,
+              "action_macro_f1": 0.08955065635581708,
+              "target_exposure_mae": 0.0006948912755516078,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.9998563672402402,
+              "turnover_proxy": 8.878079043066636e-06
+            },
+            {
+              "threshold": 0.55,
+              "score": 0.08222092549567431,
+              "action_macro_f1": 0.08955338601543357,
+              "target_exposure_mae": 0.0006926005088666896,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 0.999971273448048,
+              "turnover_proxy": 1.5815846027611202e-06
+            },
+            {
+              "threshold": 0.65,
+              "score": 0.08221509695957427,
+              "action_macro_f1": 0.08955473098330241,
+              "target_exposure_mae": 0.0006910189242639285,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.75,
+              "score": 0.08221509695957427,
+              "action_macro_f1": 0.08955473098330241,
+              "target_exposure_mae": 0.0006910189242639285,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.85,
+              "score": 0.08221509695957427,
+              "action_macro_f1": 0.08955473098330241,
+              "target_exposure_mae": 0.0006910189242639285,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.95,
+              "score": 0.08221509695957427,
+              "action_macro_f1": 0.08955473098330241,
+              "target_exposure_mae": 0.0006910189242639285,
+              "observed_no_trade_rate": 0.9706414639050874,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            }
+          ],
+          "selection_data_rows": 34811,
+          "selection_contract": "train-only chronological tail; macro-F1 minus no-trade-rate mismatch and fee turnover proxy"
+        }
+      },
+      "test_probability_metrics": {
+        "rows": 17561,
+        "nll": 1.0337448809527199,
+        "brier": 0.464239765293439,
+        "ece": 0.15794621160830224
+      },
+      "per_symbol_stability": {
+        "window": "WF1",
+        "stable_symbol_count": 3,
+        "venue_count": 1,
+        "venues": [
+          "BITMEX"
+        ],
+        "positive_net_fraction": 0.0,
+        "profit_factor_gt_one_fraction": null,
+        "median_net_return": 0.0,
+        "minimum_net_return": 0.0,
+        "maximum_net_return": 0.0
+      }
+    },
+    {
+      "window": "WF2",
+      "status": "TEST_DATA_AVAILABLE",
+      "train_rows": 220288,
+      "test_rows": 8760,
+      "nested_stages": {
+        "fit_rows": 132172,
+        "calibration_rows": 44058,
+        "threshold_rows": 44058,
+        "probability_calibration": {
+          "calibration_rows": 44058,
+          "unseen_label_rows": 0,
+          "nll_before": 0.4416838174063969,
+          "nll_after": 0.16468740070997528,
+          "temperature": 0.6264175217265155,
+          "bias_l1": 2.8808780183808693,
+          "evaluation": {
+            "rows": 44058,
+            "nll": 0.1646874007099753,
+            "brier": 0.05914360517813398,
+            "ece": 0.010542149551456746
+          }
+        },
+        "threshold_selection": {
+          "selected": {
+            "threshold": 0.0,
+            "score": 0.08294690954661371,
+            "action_macro_f1": 0.0913450313436433,
+            "target_exposure_mae": 0.0010158181889395035,
+            "observed_no_trade_rate": 0.9654319306368877,
+            "predicted_no_trade_rate": 0.999024013799991,
+            "turnover_proxy": 1.9639729565788742e-05
+          },
+          "candidates": [
+            {
+              "threshold": 0.0,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.01,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.02,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.03,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.04,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.05,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.06,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.07,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.08,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.09,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.1,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.11,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.12,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.13,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.14,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.15,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.16,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.17,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.18,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.19,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.2,
+              "score": 0.08294690954661371,
+              "action_macro_f1": 0.0913450313436433,
+              "target_exposure_mae": 0.0010158181889395035,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.999024013799991,
+              "turnover_proxy": 1.9639729565788742e-05
+            },
+            {
+              "threshold": 0.21,
+              "score": 0.08293358215796162,
+              "action_macro_f1": 0.09134871921061233,
+              "target_exposure_mae": 0.0010143094270172257,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9990921058604567,
+              "turnover_proxy": 1.8130967643511038e-05
+            },
+            {
+              "threshold": 0.22,
+              "score": 0.08291007576781574,
+              "action_macro_f1": 0.0913592457561694,
+              "target_exposure_mae": 0.0010117633170819104,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9992282899813881,
+              "turnover_proxy": 1.5584857708195763e-05
+            },
+            {
+              "threshold": 0.23,
+              "score": 0.08289998765102659,
+              "action_macro_f1": 0.09136617335510909,
+              "target_exposure_mae": 0.0010103440188395927,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9992963820418539,
+              "turnover_proxy": 1.4165559465878116e-05
+            },
+            {
+              "threshold": 0.24,
+              "score": 0.08287971918544848,
+              "action_macro_f1": 0.09137426320469201,
+              "target_exposure_mae": 0.0010077430436064097,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9994098688092968,
+              "turnover_proxy": 1.1564584232695018e-05
+            },
+            {
+              "threshold": 0.25,
+              "score": 0.08241247540716197,
+              "action_macro_f1": 0.09092971009053395,
+              "target_exposure_mae": 0.001006442359547575,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9995006582232512,
+              "turnover_proxy": 1.0263900173860463e-05
+            },
+            {
+              "threshold": 0.26,
+              "score": 0.0823873569454145,
+              "action_macro_f1": 0.09093295308936016,
+              "target_exposure_mae": 0.0010046905196531752,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9996141449906941,
+              "turnover_proxy": 8.274521263879346e-06
+            },
+            {
+              "threshold": 0.27,
+              "score": 0.08237814935489655,
+              "action_macro_f1": 0.09093509020425401,
+              "target_exposure_mae": 0.0010039183308716843,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9996595396976713,
+              "turnover_proxy": 7.5023324823882655e-06
+            },
+            {
+              "threshold": 0.28,
+              "score": 0.08236894189527404,
+              "action_macro_f1": 0.09093722722041306,
+              "target_exposure_mae": 0.001003101492616602,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9997049344046485,
+              "turnover_proxy": 6.685494227306174e-06
+            },
+            {
+              "threshold": 0.29,
+              "score": 0.08181328141341171,
+              "action_macro_f1": 0.09040425348677855,
+              "target_exposure_mae": 0.0010030979820969004,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9997957238186027,
+              "turnover_proxy": 4.623399603575727e-06
+            },
+            {
+              "threshold": 0.3,
+              "score": 0.08181328141341171,
+              "action_macro_f1": 0.09040425348677855,
+              "target_exposure_mae": 0.0010030979820969004,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9997957238186027,
+              "turnover_proxy": 4.623399603575727e-06
+            },
+            {
+              "threshold": 0.31,
+              "score": 0.08181328141341171,
+              "action_macro_f1": 0.09040425348677855,
+              "target_exposure_mae": 0.0010030979820969004,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9997957238186027,
+              "turnover_proxy": 4.623399603575727e-06
+            },
+            {
+              "threshold": 0.32,
+              "score": 0.08181328141341171,
+              "action_macro_f1": 0.09040425348677855,
+              "target_exposure_mae": 0.0010030979820969004,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9997957238186027,
+              "turnover_proxy": 4.623399603575727e-06
+            },
+            {
+              "threshold": 0.33,
+              "score": 0.08180988600408845,
+              "action_macro_f1": 0.09040653106078224,
+              "target_exposure_mae": 0.0010028345061208325,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998184211720913,
+              "turnover_proxy": 4.359923627507782e-06
+            },
+            {
+              "threshold": 0.34,
+              "score": 0.08180528201549936,
+              "action_macro_f1": 0.09040759948119713,
+              "target_exposure_mae": 0.0010024593583702677,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998411185255799,
+              "turnover_proxy": 3.984775876942968e-06
+            },
+            {
+              "threshold": 0.35,
+              "score": 0.08180528201549936,
+              "action_macro_f1": 0.09040759948119713,
+              "target_exposure_mae": 0.0010024593583702677,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998411185255799,
+              "turnover_proxy": 3.984775876942968e-06
+            },
+            {
+              "threshold": 0.36,
+              "score": 0.0812509435359487,
+              "action_macro_f1": 0.08985893294602244,
+              "target_exposure_mae": 0.001002924848730236,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998638158790685,
+              "turnover_proxy": 3.5192855169747303e-06
+            },
+            {
+              "threshold": 0.37,
+              "score": 0.0812509435359487,
+              "action_macro_f1": 0.08985893294602244,
+              "target_exposure_mae": 0.001002924848730236,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998638158790685,
+              "turnover_proxy": 3.5192855169747303e-06
+            },
+            {
+              "threshold": 0.38,
+              "score": 0.0812509435359487,
+              "action_macro_f1": 0.08985893294602244,
+              "target_exposure_mae": 0.001002924848730236,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998638158790685,
+              "turnover_proxy": 3.5192855169747303e-06
+            },
+            {
+              "threshold": 0.39,
+              "score": 0.08124591420937928,
+              "action_macro_f1": 0.08985957619643777,
+              "target_exposure_mae": 0.0010025823632792774,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998865132325571,
+              "turnover_proxy": 3.1768000660162463e-06
+            },
+            {
+              "threshold": 0.4,
+              "score": 0.08124591420937928,
+              "action_macro_f1": 0.08985957619643777,
+              "target_exposure_mae": 0.0010025823632792774,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998865132325571,
+              "turnover_proxy": 3.1768000660162463e-06
+            },
+            {
+              "threshold": 0.41,
+              "score": 0.08124591420937928,
+              "action_macro_f1": 0.08985957619643777,
+              "target_exposure_mae": 0.0010025823632792774,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998865132325571,
+              "turnover_proxy": 3.1768000660162463e-06
+            },
+            {
+              "threshold": 0.42,
+              "score": 0.08124591420937928,
+              "action_macro_f1": 0.08985957619643777,
+              "target_exposure_mae": 0.0010025823632792774,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9998865132325571,
+              "turnover_proxy": 3.1768000660162463e-06
+            },
+            {
+              "threshold": 0.43,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.44,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.45,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.46,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.47,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.48,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.49,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.5,
+              "score": 0.08068657136684773,
+              "action_macro_f1": 0.08930590595698172,
+              "target_exposure_mae": 0.0010023041875991327,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999092105860456,
+              "turnover_proxy": 2.839387723631743e-06
+            },
+            {
+              "threshold": 0.55,
+              "score": 0.08068197167902696,
+              "action_macro_f1": 0.08930697435143677,
+              "target_exposure_mae": 0.001001087747670238,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999319079395342,
+              "turnover_proxy": 1.6229477947370727e-06
+            },
+            {
+              "threshold": 0.65,
+              "score": 0.08067276674713104,
+              "action_macro_f1": 0.08930911106631728,
+              "target_exposure_mae": 0.0009997208355970112,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999773026465114,
+              "turnover_proxy": 2.560357215103152e-07
+            },
+            {
+              "threshold": 0.75,
+              "score": 0.08067276674713104,
+              "action_macro_f1": 0.08930911106631728,
+              "target_exposure_mae": 0.0009997208355970112,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999773026465114,
+              "turnover_proxy": 2.560357215103152e-07
+            },
+            {
+              "threshold": 0.85,
+              "score": 0.08067276674713104,
+              "action_macro_f1": 0.08930911106631728,
+              "target_exposure_mae": 0.0009997208355970112,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999773026465114,
+              "turnover_proxy": 2.560357215103152e-07
+            },
+            {
+              "threshold": 0.95,
+              "score": 0.08067276674713104,
+              "action_macro_f1": 0.08930911106631728,
+              "target_exposure_mae": 0.0009997208355970112,
+              "observed_no_trade_rate": 0.9654319306368877,
+              "predicted_no_trade_rate": 0.9999773026465114,
+              "turnover_proxy": 2.560357215103152e-07
+            }
+          ],
+          "selection_data_rows": 44058,
+          "selection_contract": "train-only chronological tail; macro-F1 minus no-trade-rate mismatch and fee turnover proxy"
+        }
+      },
+      "test_probability_metrics": {
+        "rows": 8760,
+        "nll": 0.6141688508767473,
+        "brier": 0.2611206477790979,
+        "ece": 0.18273773298206514
+      },
+      "per_symbol_stability": {
+        "window": "WF2",
+        "stable_symbol_count": 1,
+        "venue_count": 1,
+        "venues": [
+          "BITMEX"
+        ],
+        "positive_net_fraction": 0.0,
+        "profit_factor_gt_one_fraction": null,
+        "median_net_return": 0.0,
+        "minimum_net_return": 0.0,
+        "maximum_net_return": 0.0
+      }
+    },
+    {
+      "window": "WF3",
+      "status": "TEST_DATA_AVAILABLE",
+      "train_rows": 244959,
+      "test_rows": 4773,
+      "nested_stages": {
+        "fit_rows": 146975,
+        "calibration_rows": 48992,
+        "threshold_rows": 48992,
+        "probability_calibration": {
+          "calibration_rows": 48992,
+          "unseen_label_rows": 0,
+          "nll_before": 0.4182847122123741,
+          "nll_after": 0.1593448295029278,
+          "temperature": 0.6140851209276212,
+          "bias_l1": 3.3879035647388367,
+          "evaluation": {
+            "rows": 48992,
+            "nll": 0.1593448295029278,
+            "brier": 0.057733124695340254,
+            "ece": 0.008976549861512098
+          }
+        },
+        "threshold_selection": {
+          "selected": {
+            "threshold": 0.23,
+            "score": 0.09199360507142795,
+            "action_macro_f1": 0.10254167587968027,
+            "target_exposure_mae": 0.001000276602018688,
+            "observed_no_trade_rate": 0.9536659046374918,
+            "predicted_no_trade_rate": 0.995856466361855,
+            "turnover_proxy": 8.368284880841101e-05
+          },
+          "candidates": [
+            {
+              "threshold": 0.0,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.01,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.02,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.03,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.04,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.05,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.06,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.07,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.08,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.09,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.1,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.11,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.12,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.13,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.14,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.15,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.16,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.17,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.18,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.19,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.2,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.21,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.22,
+              "score": 0.09197507566295073,
+              "action_macro_f1": 0.10250785248646928,
+              "target_exposure_mae": 0.0010031226469130123,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9957952318745917,
+              "turnover_proxy": 8.652889370273536e-05
+            },
+            {
+              "threshold": 0.23,
+              "score": 0.09199360507142795,
+              "action_macro_f1": 0.10254167587968027,
+              "target_exposure_mae": 0.001000276602018688,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.995856466361855,
+              "turnover_proxy": 8.368284880841101e-05
+            },
+            {
+              "threshold": 0.24,
+              "score": 0.09179916155376028,
+              "action_macro_f1": 0.10236763145978302,
+              "target_exposure_mae": 0.0009989974033009074,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9959381123448726,
+              "turnover_proxy": 8.127217577050281e-05
+            },
+            {
+              "threshold": 0.25,
+              "score": 0.09183372222356166,
+              "action_macro_f1": 0.10242259218326238,
+              "target_exposure_mae": 0.0009967725976243135,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9960197583278902,
+              "turnover_proxy": 7.904737009390911e-05
+            },
+            {
+              "threshold": 0.26,
+              "score": 0.09166166151307298,
+              "action_macro_f1": 0.10227093509483177,
+              "target_exposure_mae": 0.000995721068643723,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9961014043109079,
+              "turnover_proxy": 7.751640284207802e-05
+            },
+            {
+              "threshold": 0.27,
+              "score": 0.09168769995179392,
+              "action_macro_f1": 0.10232247521655151,
+              "target_exposure_mae": 0.000993254258574797,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.99620346178968,
+              "turnover_proxy": 7.504959277315217e-05
+            },
+            {
+              "threshold": 0.28,
+              "score": 0.09154789504980591,
+              "action_macro_f1": 0.10222347967801372,
+              "target_exposure_mae": 0.0009906044089327854,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9963667537557153,
+              "turnover_proxy": 7.239974313114039e-05
+            },
+            {
+              "threshold": 0.29,
+              "score": 0.09121435437611133,
+              "action_macro_f1": 0.1019307446190615,
+              "target_exposure_mae": 0.0009873854705621731,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9965300457217505,
+              "turnover_proxy": 6.902099200344815e-05
+            },
+            {
+              "threshold": 0.3,
+              "score": 0.0912495293634268,
+              "action_macro_f1": 0.10199142596510846,
+              "target_exposure_mae": 0.0009858278133717824,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9966321032005225,
+              "turnover_proxy": 6.746333481305734e-05
+            },
+            {
+              "threshold": 0.31,
+              "score": 0.0907657863393125,
+              "action_macro_f1": 0.10153318377174267,
+              "target_exposure_mae": 0.0009844398254599312,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9967341606792945,
+              "turnover_proxy": 6.483081258142192e-05
+            },
+            {
+              "threshold": 0.32,
+              "score": 0.09088015695579713,
+              "action_macro_f1": 0.1016883566195256,
+              "target_exposure_mae": 0.0009804031950066273,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9968974526453298,
+              "turnover_proxy": 6.079418212811809e-05
+            },
+            {
+              "threshold": 0.33,
+              "score": 0.09052099398443128,
+              "action_macro_f1": 0.10136489867957668,
+              "target_exposure_mae": 0.000977629645125399,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9970403331156107,
+              "turnover_proxy": 5.7860819489809594e-05
+            },
+            {
+              "threshold": 0.34,
+              "score": 0.08995063891140488,
+              "action_macro_f1": 0.10084555577782583,
+              "target_exposure_mae": 0.0009744081296538135,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9972444480731548,
+              "turnover_proxy": 5.463930401822409e-05
+            },
+            {
+              "threshold": 0.35,
+              "score": 0.0896623124864629,
+              "action_macro_f1": 0.10057762854041105,
+              "target_exposure_mae": 0.0009732934110453785,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9973260940561725,
+              "turnover_proxy": 5.224608335314767e-05
+            },
+            {
+              "threshold": 0.36,
+              "score": 0.0887399812442782,
+              "action_macro_f1": 0.09969100615507535,
+              "target_exposure_mae": 0.000971423493722079,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9974689745264533,
+              "turnover_proxy": 5.005654051568794e-05
+            },
+            {
+              "threshold": 0.37,
+              "score": 0.08688578547462911,
+              "action_macro_f1": 0.09786740943785258,
+              "target_exposure_mae": 0.0009712495587259411,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9975914435009797,
+              "turnover_proxy": 4.65194293109622e-05
+            },
+            {
+              "threshold": 0.38,
+              "score": 0.08637745974612676,
+              "action_macro_f1": 0.09741009116493103,
+              "target_exposure_mae": 0.0009683363512683432,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9977955584585239,
+              "turnover_proxy": 4.238099071574956e-05
+            },
+            {
+              "threshold": 0.39,
+              "score": 0.08641031764523999,
+              "action_macro_f1": 0.09746845713371531,
+              "target_exposure_mae": 0.0009672711831682332,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9978976159372959,
+              "turnover_proxy": 4.1156009858559495e-05
+            },
+            {
+              "threshold": 0.4,
+              "score": 0.08585843416420516,
+              "action_macro_f1": 0.09694717290184013,
+              "target_exposure_mae": 0.0009659631454429735,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9980200849118224,
+              "turnover_proxy": 3.765715161769857e-05
+            },
+            {
+              "threshold": 0.41,
+              "score": 0.08530546220080938,
+              "action_macro_f1": 0.09642480117796177,
+              "target_exposure_mae": 0.0009629764786111313,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9981425538863488,
+              "turnover_proxy": 3.4350859271696014e-05
+            },
+            {
+              "threshold": 0.42,
+              "score": 0.08321910741935534,
+              "action_macro_f1": 0.09437924693534776,
+              "target_exposure_mae": 0.0009595696418778095,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.998305845852384,
+              "turnover_proxy": 2.99851459958932e-05
+            },
+            {
+              "threshold": 0.43,
+              "score": 0.08170271775507186,
+              "action_macro_f1": 0.09292406919757062,
+              "target_exposure_mae": 0.000955583728342024,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9985507838014369,
+              "turnover_proxy": 2.5598415993249225e-05
+            },
+            {
+              "threshold": 0.44,
+              "score": 0.08170691974357194,
+              "action_macro_f1": 0.09293847581169173,
+              "target_exposure_mae": 0.0009553655160299083,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9985916067929458,
+              "turnover_proxy": 2.5380203681133453e-05
+            },
+            {
+              "threshold": 0.45,
+              "score": 0.08123110387119098,
+              "action_macro_f1": 0.0924932627764728,
+              "target_exposure_mae": 0.0009527225700841498,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9987140757674723,
+              "turnover_proxy": 2.2578999237853566e-05
+            },
+            {
+              "threshold": 0.46,
+              "score": 0.08025262943081408,
+              "action_macro_f1": 0.09157600069625832,
+              "target_exposure_mae": 0.0009484201604831772,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9989590137165252,
+              "turnover_proxy": 1.827658963688093e-05
+            },
+            {
+              "threshold": 0.47,
+              "score": 0.08024821911362118,
+              "action_macro_f1": 0.09158689396695721,
+              "target_exposure_mae": 0.0009482894414964881,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9990202482037883,
+              "turnover_proxy": 1.7297789791020185e-05
+            },
+            {
+              "threshold": 0.48,
+              "score": 0.08024172515182183,
+              "action_macro_f1": 0.09161101197940301,
+              "target_exposure_mae": 0.0009474156148503238,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9991427171783148,
+              "turnover_proxy": 1.627320644401029e-05
+            },
+            {
+              "threshold": 0.49,
+              "score": 0.08024011814477983,
+              "action_macro_f1": 0.09162980840152564,
+              "target_exposure_mae": 0.0009458471412583766,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9992243631613325,
+              "turnover_proxy": 1.4704732852063045e-05
+            },
+            {
+              "threshold": 0.5,
+              "score": 0.08023614514315267,
+              "action_macro_f1": 0.09164114113454526,
+              "target_exposure_mae": 0.0009454770853221646,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9992855976485957,
+              "turnover_proxy": 1.4143349603385805e-05
+            },
+            {
+              "threshold": 0.55,
+              "score": 0.07842137051302796,
+              "action_macro_f1": 0.08990797860854155,
+              "target_exposure_mae": 0.0009393690862528418,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9996121815806662,
+              "turnover_proxy": 7.55591226282256e-06
+            },
+            {
+              "threshold": 0.65,
+              "score": 0.07718190653669378,
+              "action_macro_f1": 0.08875012941421191,
+              "target_exposure_mae": 0.0009362207714776694,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9999387655127367,
+              "turnover_proxy": 1.4891645461693e-06
+            },
+            {
+              "threshold": 0.75,
+              "score": 0.07718190653669378,
+              "action_macro_f1": 0.08875012941421191,
+              "target_exposure_mae": 0.0009362207714776694,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9999387655127367,
+              "turnover_proxy": 1.4891645461693e-06
+            },
+            {
+              "threshold": 0.85,
+              "score": 0.07717365238427921,
+              "action_macro_f1": 0.08875207414590779,
+              "target_exposure_mae": 0.0009348861756673999,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9999795885042456,
+              "turnover_proxy": 1.5456873589991007e-07
+            },
+            {
+              "threshold": 0.95,
+              "score": 0.07717365238427921,
+              "action_macro_f1": 0.08875207414590779,
+              "target_exposure_mae": 0.0009348861756673999,
+              "observed_no_trade_rate": 0.9536659046374918,
+              "predicted_no_trade_rate": 0.9999795885042456,
+              "turnover_proxy": 1.5456873589991007e-07
+            }
+          ],
+          "selection_data_rows": 48992,
+          "selection_contract": "train-only chronological tail; macro-F1 minus no-trade-rate mismatch and fee turnover proxy"
+        }
+      },
+      "test_probability_metrics": {
+        "rows": 4773,
+        "nll": 0.30869249904354634,
+        "brier": 0.09629151834098554,
+        "ece": 0.17203522785141923
+      },
+      "per_symbol_stability": {
+        "window": "WF3",
+        "stable_symbol_count": 1,
+        "venue_count": 1,
+        "venues": [
+          "BITMEX"
+        ],
+        "positive_net_fraction": 0.0,
+        "profit_factor_gt_one_fraction": null,
+        "median_net_return": 0.0,
+        "minimum_net_return": 0.0,
+        "maximum_net_return": 0.0
+      }
+    }
+  ],
+  "behavior_results": [
+    {
+      "window": "WF1",
+      "model": "V3.6",
+      "track": "CONDITIONAL_BEHAVIOR",
+      "rows_seen": 17561,
+      "labeled_rows": 17561,
+      "action_macro_f1": 0.133066926908834,
+      "target_exposure_mae": 0.006341729126123848,
+      "target_exposure_correlation": 0.9964270106531624,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.5935672514619883,
+      "reduce_recall": 0.5764925373134329,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 16294,
+      "predicted_no_trade_rows": 9958,
+      "observed_no_trade_rate": 0.927851489095154,
+      "predicted_no_trade_rate": 0.5670519902055692
+    },
+    {
+      "window": "WF1",
+      "model": "V3.6",
+      "track": "STRICT_AUTONOMOUS",
+      "rows_seen": 17561,
+      "labeled_rows": 17561,
+      "action_macro_f1": 0.0875068809495039,
+      "target_exposure_mae": 0.09012391502127873,
+      "target_exposure_correlation": null,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.0,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 16294,
+      "predicted_no_trade_rows": 17561,
+      "observed_no_trade_rate": 0.927851489095154,
+      "predicted_no_trade_rate": 1.0,
+      "teacher_state_fields_consumed": 0
+    },
+    {
+      "window": "WF2",
+      "model": "V3.6",
+      "track": "CONDITIONAL_BEHAVIOR",
+      "rows_seen": 8760,
+      "labeled_rows": 8760,
+      "action_macro_f1": 0.13159524537342285,
+      "target_exposure_mae": 0.001985995391580259,
+      "target_exposure_correlation": 0.9935320852252302,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.03006012024048096,
+      "reduce_recall": 0.028225806451612902,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 7759,
+      "predicted_no_trade_rows": 8582,
+      "observed_no_trade_rate": 0.8857305936073059,
+      "predicted_no_trade_rate": 0.9796803652968037
+    },
+    {
+      "window": "WF2",
+      "model": "V3.6",
+      "track": "STRICT_AUTONOMOUS",
+      "rows_seen": 8760,
+      "labeled_rows": 8760,
+      "action_macro_f1": 0.10437812350761076,
+      "target_exposure_mae": 0.21939453906440579,
+      "target_exposure_correlation": null,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.0,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 7759,
+      "predicted_no_trade_rows": 8760,
+      "observed_no_trade_rate": 0.8857305936073059,
+      "predicted_no_trade_rate": 1.0,
+      "teacher_state_fields_consumed": 0
+    },
+    {
+      "window": "WF3",
+      "model": "V3.6",
+      "track": "CONDITIONAL_BEHAVIOR",
+      "rows_seen": 4773,
+      "labeled_rows": 4773,
+      "action_macro_f1": 0.13765096179794345,
+      "target_exposure_mae": 0.0003001632922499481,
+      "target_exposure_correlation": 0.9995751284608853,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.018867924528301886,
+      "reduce_recall": 0.037037037037037035,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 4661,
+      "predicted_no_trade_rows": 4737,
+      "observed_no_trade_rate": 0.9765346742090928,
+      "predicted_no_trade_rate": 0.9924575738529227
+    },
+    {
+      "window": "WF3",
+      "model": "V3.6",
+      "track": "STRICT_AUTONOMOUS",
+      "rows_seen": 4773,
+      "labeled_rows": 4773,
+      "action_macro_f1": 0.10979200527642334,
+      "target_exposure_mae": 0.13818392429938087,
+      "target_exposure_correlation": null,
+      "open_recall": 0.0,
+      "close_recall": 0.0,
+      "add_recall": 0.0,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "observed_no_trade_rows": 4661,
+      "predicted_no_trade_rows": 4773,
+      "observed_no_trade_rate": 0.9765346742090928,
+      "predicted_no_trade_rate": 1.0,
+      "teacher_state_fields_consumed": 0
+    }
+  ],
+  "performance_results": [
+    {
+      "window": "WF1",
+      "model": "V3.6",
+      "track": "STRICT_AUTONOMOUS",
+      "cost_profile": "BASE",
+      "target_coefficient_max_abs": 0.16555614306901872,
+      "status": "PASS",
+      "active_symbols": 3,
+      "net_return": 0.0,
+      "gross_profit": 0.0,
+      "gross_loss": 0.0,
+      "profit_factor": null,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "turnover": 0.0,
+      "executed_adjustments": 0,
+      "signal_count": 17560,
+      "funding_events_observed": 1098,
+      "funding_events_missing": 16467
+    },
+    {
+      "window": "WF2",
+      "model": "V3.6",
+      "track": "STRICT_AUTONOMOUS",
+      "cost_profile": "BASE",
+      "target_coefficient_max_abs": 0.18360698759167204,
+      "status": "PASS",
+      "active_symbols": 1,
+      "net_return": 0.0,
+      "gross_profit": 0.0,
+      "gross_loss": 0.0,
+      "profit_factor": null,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "turnover": 0.0,
+      "executed_adjustments": 0,
+      "signal_count": 8759,
+      "funding_events_observed": 0,
+      "funding_events_missing": 8760
+    },
+    {
+      "window": "WF3",
+      "model": "V3.6",
+      "track": "STRICT_AUTONOMOUS",
+      "cost_profile": "BASE",
+      "target_coefficient_max_abs": 0.18057249278356616,
+      "status": "PASS",
+      "active_symbols": 1,
+      "net_return": 0.0,
+      "gross_profit": 0.0,
+      "gross_loss": 0.0,
+      "profit_factor": null,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "turnover": 0.0,
+      "executed_adjustments": 0,
+      "signal_count": 4773,
+      "funding_events_observed": 0,
+      "funding_events_missing": 4774
+    }
+  ],
+  "per_symbol_results": [
+    {
+      "window": "WF1",
+      "state_key": "BITMEX:BTC-PERP",
+      "source_venue": "BITMEX",
+      "canonical_asset": "BTC-PERP",
+      "rows": 8784,
+      "prediction_rows": 8784,
+      "action_count": 0,
+      "mean_confidence": 0.40521137917679406,
+      "net_return": 0.0,
+      "profit_factor": null,
+      "executed_adjustments": 0,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "action_macro_f1": 0.0846242365229707,
+      "target_exposure_mae": 0.14625862373008156,
+      "predicted_no_trade_rate": 1.0,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF1",
+      "state_key": "BITMEX:DOGEUSD",
+      "source_venue": "BITMEX",
+      "canonical_asset": "DOGEUSD",
+      "rows": 7414,
+      "prediction_rows": 7414,
+      "action_count": 0,
+      "mean_confidence": 0.6595872058634525,
+      "net_return": 0.0,
+      "profit_factor": null,
+      "executed_adjustments": 0,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "action_macro_f1": 0.19865571321882,
+      "target_exposure_mae": 0.03875866163690999,
+      "predicted_no_trade_rate": 1.0,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF1",
+      "state_key": "BITMEX:ETHUSD",
+      "source_venue": "BITMEX",
+      "canonical_asset": "ETHUSD",
+      "rows": 1363,
+      "prediction_rows": 1363,
+      "action_count": 0,
+      "mean_confidence": 0.641045613817697,
+      "net_return": 0.0,
+      "profit_factor": null,
+      "executed_adjustments": 0,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "action_macro_f1": 0.19762435040831478,
+      "target_exposure_mae": 0.007757596087739368,
+      "predicted_no_trade_rate": 1.0,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF2",
+      "state_key": "BITMEX:BTC-PERP",
+      "source_venue": "BITMEX",
+      "canonical_asset": "BTC-PERP",
+      "rows": 8760,
+      "prediction_rows": 8760,
+      "action_count": 0,
+      "mean_confidence": 0.9305140895827761,
+      "net_return": 0.0,
+      "profit_factor": null,
+      "executed_adjustments": 0,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "action_macro_f1": 0.10437812350761076,
+      "target_exposure_mae": 0.21939453906440579,
+      "predicted_no_trade_rate": 1.0,
+      "status": "STABLE_SAMPLE"
+    },
+    {
+      "window": "WF3",
+      "state_key": "BITMEX:BTC-PERP",
+      "source_venue": "BITMEX",
+      "canonical_asset": "BTC-PERP",
+      "rows": 4773,
+      "prediction_rows": 4773,
+      "action_count": 0,
+      "mean_confidence": 0.9192646554549955,
+      "net_return": 0.0,
+      "profit_factor": null,
+      "executed_adjustments": 0,
+      "fees": 0.0,
+      "funding": 0.0,
+      "slippage": 0.0,
+      "action_macro_f1": 0.10979200527642334,
+      "target_exposure_mae": 0.13818392429938087,
+      "predicted_no_trade_rate": 1.0,
+      "status": "STABLE_SAMPLE"
+    }
+  ],
+  "venue_coverage": {
+    "BITMEX": {
+      "rows": 258492,
+      "first_decision_time": "2020-05-02T00:00:00.000Z",
+      "last_decision_time": "2026-07-18T20:00:00.000Z",
+      "global_test_rows": {
+        "WF1": 24671,
+        "WF2": 8760,
+        "WF3": 4773
+      },
+      "global_model_test_rows": {
+        "WF1": 17561,
+        "WF2": 8760,
+        "WF3": 4773
+      }
+    },
+    "HYPERLIQUID": {
+      "rows": 5796,
+      "first_decision_time": "2025-11-15T18:00:00.000Z",
+      "last_decision_time": "2026-07-15T05:00:00.000Z",
+      "global_test_rows": {
+        "WF1": 0,
+        "WF2": 1110,
+        "WF3": 4686
+      },
+      "global_model_test_rows": {
+        "WF1": 0,
+        "WF2": 0,
+        "WF3": 0
+      }
+    }
+  },
+  "native_venue_diagnostics": [
+    {
+      "source_venue": "HYPERLIQUID",
+      "status": "DIAGNOSTIC_ONLY",
+      "train_rows": 4636,
+      "test_rows": 1160,
+      "nested_stages": {
+        "fit_rows": 2781,
+        "calibration_rows": 927,
+        "threshold_rows": 928,
+        "probability_calibration": {
+          "calibration_rows": 927,
+          "unseen_label_rows": 0,
+          "nll_before": 0.23561195089659667,
+          "nll_after": 0.08714563316804878,
+          "temperature": 0.6426490809067347,
+          "bias_l1": 1.7968753999240943,
+          "evaluation": {
+            "rows": 927,
+            "nll": 0.08714563316804878,
+            "brier": 0.029727591686535174,
+            "ece": 0.0033580455201677956
+          }
+        },
+        "threshold_selection": {
+          "selected": {
+            "threshold": 0.0,
+            "score": 0.1975177414565894,
+            "action_macro_f1": 0.19913419913419914,
+            "target_exposure_mae": 0.00020951694959584846,
+            "observed_no_trade_rate": 0.9924568965517241,
+            "predicted_no_trade_rate": 0.9989224137931034,
+            "turnover_proxy": 1.523778807611168e-05
+          },
+          "candidates": [
+            {
+              "threshold": 0.0,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.01,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.02,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.03,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.04,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.05,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.06,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.07,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.08,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.09,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.1,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.11,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.12,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.13,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.14,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.15,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.16,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.17,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.18,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.19,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.2,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.21,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.22,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.23,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.24,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.25,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.26,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.27,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.28,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.29,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.3,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.31,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.32,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.33,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.34,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.35,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.36,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.37,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.38,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.39,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.4,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.41,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.42,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.43,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.44,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.45,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.46,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.47,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.48,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.49,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.5,
+              "score": 0.1975177414565894,
+              "action_macro_f1": 0.19913419913419914,
+              "target_exposure_mae": 0.00020951694959584846,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 0.9989224137931034,
+              "turnover_proxy": 1.523778807611168e-05
+            },
+            {
+              "threshold": 0.55,
+              "score": 0.19735705810223605,
+              "action_macro_f1": 0.19924283396430503,
+              "target_exposure_mae": 0.00019427916151973677,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.65,
+              "score": 0.19735705810223605,
+              "action_macro_f1": 0.19924283396430503,
+              "target_exposure_mae": 0.00019427916151973677,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.75,
+              "score": 0.19735705810223605,
+              "action_macro_f1": 0.19924283396430503,
+              "target_exposure_mae": 0.00019427916151973677,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.85,
+              "score": 0.19735705810223605,
+              "action_macro_f1": 0.19924283396430503,
+              "target_exposure_mae": 0.00019427916151973677,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            },
+            {
+              "threshold": 0.95,
+              "score": 0.19735705810223605,
+              "action_macro_f1": 0.19924283396430503,
+              "target_exposure_mae": 0.00019427916151973677,
+              "observed_no_trade_rate": 0.9924568965517241,
+              "predicted_no_trade_rate": 1.0,
+              "turnover_proxy": 0.0
+            }
+          ],
+          "selection_data_rows": 928,
+          "selection_contract": "train-only chronological tail; macro-F1 minus no-trade-rate mismatch and fee turnover proxy"
+        }
+      },
+      "behavior": {
+        "conditional": {
+          "rows_seen": 1160,
+          "labeled_rows": 1160,
+          "action_macro_f1": 0.3297022512708787,
+          "target_exposure_mae": 0.0013371669982640663,
+          "target_exposure_correlation": 0.9980720360491463,
+          "open_recall": null,
+          "close_recall": null,
+          "add_recall": 0.0,
+          "reduce_recall": 0.0,
+          "flip_recall": null,
+          "observed_no_trade_rows": 1135,
+          "predicted_no_trade_rows": 1160,
+          "observed_no_trade_rate": 0.978448275862069,
+          "predicted_no_trade_rate": 1.0
+        },
+        "strict_autonomous": {
+          "rows_seen": 1160,
+          "labeled_rows": 1160,
+          "action_macro_f1": 0.35386412390354577,
+          "target_exposure_mae": 0.34532899104982034,
+          "target_exposure_correlation": 0.7077353710008648,
+          "open_recall": null,
+          "close_recall": null,
+          "add_recall": 0.06666666666666667,
+          "reduce_recall": 0.0,
+          "flip_recall": null,
+          "observed_no_trade_rows": 1135,
+          "predicted_no_trade_rows": 1148,
+          "observed_no_trade_rate": 0.978448275862069,
+          "predicted_no_trade_rate": 0.9896551724137931
+        }
+      },
+      "performance": {
+        "status": "PASS",
+        "active_symbols": 1,
+        "net_return": 0.0029506384214426085,
+        "gross_profit": 0.30833295714791853,
+        "gross_loss": 0.3049636386536294,
+        "profit_factor": 1.011048263029534,
+        "fees": 9.445385862268827e-05,
+        "funding": 4.043066146793135e-05,
+        "slippage": 2.8465169193708863e-07,
+        "turnover": 0.18365677078475323,
+        "executed_adjustments": 12,
+        "signal_count": 1159,
+        "funding_events_observed": 23,
+        "funding_events_missing": 1137
+      }
+    }
+  ],
+  "previous_v3_5_comparison": {
+    "WF1": {
+      "net_return": 0.01814970176011821,
+      "profit_factor": 1.0401707038912076
+    },
+    "WF2": {
+      "net_return": -0.13590674967696248,
+      "profit_factor": 0.995126221045134
+    },
+    "WF3": {
+      "net_return": -0.002102109687904141,
+      "profit_factor": 0.9946160331942886
+    }
+  },
+  "gates": {
+    "causal_audit_pass": true,
+    "all_walk_forward_windows_available": true,
+    "calibration_nll_not_worse_on_training_holdouts": true,
+    "target_coefficients_finite_and_bounded": true,
+    "global_cross_venue_test_coverage": false,
+    "strict_autonomous_positive_all_windows": false,
+    "strict_autonomous_profit_factor_gt_one_all_windows": false,
+    "per_symbol_results_complete": true
+  },
+  "calibration_contract": "fit first 60% of each training window; calibrate probabilities on next 20%; select abstention threshold on final 20%; evaluate only on untouched test window",
+  "conclusion": "Probability calibration and per-symbol stability remain research-only. No Demo switch or order is authorized unless every strict autonomous promotion gate passes."
+}
