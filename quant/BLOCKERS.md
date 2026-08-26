@@ -106,3 +106,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The active v3/v3.1 target regression was numerically unstable: near-collinear standardized features yielded very large target coefficients and invalid zero-start extrapolation.
 - Candidate `behavioral-distillation-v3.2-stable-target` fixes coefficient stability, but strict autonomous, costed WF1/WF2/WF3 results are still negative (`-0.1778`, `-0.0367`, `-0.0488` normalized return). Profit factor is below `1` in all three windows.
 - This is a model-quality blocker, not a credentials or network blocker. The candidate remains non-active and Demo order generation remains unchanged.
+
+## 2026-08-26 — Temporal supervision candidates remain blocked
+
+- The market-clock dataset is causally valid (`264609` rows, `66` groups, `95.12%` explicit `NO_TRADE`, zero future-observation violations), but the unweighted candidate predicts `NO_TRADE` for `100%` of all three strict autonomous test windows.
+- The inverse-frequency balanced candidate produces nonzero actions but overtrades: strict costed normalized returns are `-3.233831`, `-0.195200`, and `-0.253852` for WF1/WF2/WF3, and it does not beat the event baseline in every window.
+- This is a model calibration and action-frequency blocker, not a credentials or exchange connectivity blocker. Keep the active Demo model unchanged and do not add Demo orders.

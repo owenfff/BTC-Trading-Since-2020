@@ -213,3 +213,10 @@
 - Add an opt-in ridge penalty (`target_l2`) while preserving `target_l2=0` for legacy artifact compatibility. Build the independent candidate `behavioral-distillation-v3.2-stable-target` with `λ=1.0` and record its artifact/model hash.
 - The candidate artifact loads successfully and reduces strict-autonomous target MAE to approximately `0.19–0.20`, but costed WF1/WF2/WF3 net returns remain negative and the promotion gates fail. Keep the active Demo model unchanged; no new Demo orders are authorized.
 - The next model-research task is bar-clock/temporal supervision and explicit no-trade frequency alignment. This is required before claiming the model has learned a deployable signal policy.
+
+## 2026-08-26 — Add market-clock temporal supervision; keep candidates blocked
+
+- Event-driven rows were expanded into a deterministic one-row-per-available-closed-1h-bar dataset across 66 venue/instrument behavior groups. The dataset contains `264609` rows, `264288` indicator-eligible rows, and an explicit `NO_TRADE` rate of `95.12%`.
+- The batch indicator implementation was checked against the reference causal implementation for `1440` sampled fields with zero mismatches. The full temporal dataset audit has zero future-bar, future-funding, non-strict clock-order, and non-future-label violations.
+- The ordinary temporal candidate avoids the event-frequency mismatch but collapses to `NO_TRADE=100%` in all strict autonomous windows. The explicit inverse-frequency balanced candidate avoids that collapse but overtrades and remains negative after fees/slippage; neither candidate is promoted.
+- Keep the existing Demo model unchanged. These reports demonstrate why event similarity, indicator presence, or better relative performance is insufficient without calibrated action frequency and positive costed autonomous validation.

@@ -238,3 +238,14 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Target regression uses opt-in ridge `λ=1.0`; legacy models retain `λ=0` when loaded from existing artifacts. Candidate model SHA256: `7d8a12e97cb90f1e71f3d94087cfc5069c0a4c90a3fa928fcf989c62e06f8d07`.
 - Validation report: `quant/reports/cross_asset_v32_stable_target_audit.md` and `.json`. Candidate coefficients are bounded (`max abs ≈ 0.2754`) and artifact loading passes, but strict autonomous costed returns remain negative in all three windows; candidate was not promoted.
 - No raw account CSV/JSON was changed. No private API, credential, mainnet endpoint, or order was used.
+
+## M15.3 temporal market-clock supervision
+
+- Code commit: `9240672` (`Add market-clock temporal replay candidate`).
+- Input dataset: `quant/outputs/cross_venue_model_dataset_v3.csv`, SHA256 `e131e08e45883664242f9443b2d4847341792a5df020aa31cb65eea05ade02e9`.
+- Market context: `quant/outputs/cross_asset_market_context.csv`, SHA256 `976cb1bb83d72012f3753585bbc3f969587ced3127d5430f02d6ff7c27ddb807`.
+- Derived ignored output: `quant/outputs/cross_venue_temporal_dataset_v3.csv`; manifest: `quant/reports/cross_venue_temporal_dataset_v3_manifest.json`. It contains `264609` deterministic hourly rows across `66` venue/instrument groups, `264288` eligible rows, and `95.12%` explicit `NO_TRADE` labels.
+- Causal temporal audit: `quant/reports/cross_venue_temporal_autonomous_audit.md` and `.json`; ordinary temporal candidate is blocked because strict autonomous costed net returns are negative and it predicts no trade in all windows.
+- Balanced candidate audit: `quant/reports/cross_venue_temporal_balanced_autonomous_audit.md` and `.json`; it is blocked because it overtrades, remains negative after costs, and fails the event-baseline comparison gate.
+- Batch indicator equivalence: `1440` sampled reference fields compared with zero mismatches; full suite `365 passed`.
+- No raw account CSV/JSON was modified. No private API, credential, mainnet endpoint, or order was used. The active Demo model remains unchanged.
