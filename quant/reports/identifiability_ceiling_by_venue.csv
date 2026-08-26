@@ -1,0 +1,3 @@
+venue,train_event_rows,test_event_rows,conditional_action_macro_f1,conditional_target_exposure_mae,autonomous_timing_f1,conditional_minus_autonomous_timing_f1,status
+BITMEX,8006,2923,0.38204719676397214,0.0550414607465485,0.0,0.38204719676397214,DIAGNOSTIC_ONLY
+HYPERLIQUID,117,25,0.5857142857142857,0.047232652781633994,0.0,0.5857142857142857,DIAGNOSTIC_ONLY

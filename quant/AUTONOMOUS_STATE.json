@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15.13-shared-intent-timing-diagnostics",
+  "current_work_package": "M15.14-public-record-identifiability-ceiling",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "c2d7eef2b1db19d01ea55af32504b91834e2b194",
+  "last_code_commit": "74ce3fbc13728bfd39b124f61f418a0a21a75c42",
   "last_report_commit": "68c3d9ba312ab9d090e5c43f99ef144cdbdf607a",
-  "test_count": 389,
-  "last_test_status": "FULL_SUITE_389_PASSED;SHARED_TIMING_CAUSAL_PASS;SHARED_TIMING_BITMEX_TWO_ACTIONS_F1_ZERO;SHARED_TIMING_HYPERLIQUID_ZERO_ACTION;V4.3_DIAGNOSTIC_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
+  "test_count": 391,
+  "last_test_status": "FULL_SUITE_391_PASSED;IDENTIFIABILITY_CEILING_DIAGNOSTIC;CONDITIONAL_ACTION_TYPE_PARTIAL;AUTONOMOUS_TIMING_F1_ZERO_BOTH_VENUES;V4.4_DIAGNOSTIC_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -64,7 +64,8 @@
     "Shared-intent v4.2 passes causal checks but predicts 100% NO_TRADE on both untouched venue holdouts; native exposure slopes collapse to 0.0.",
     "Autonomous action timing/state generalization remains unresolved after separating shared intent from venue-native exposure scaling.",
     "Venue-neutral v4.3 timing head predicts only 2 BitMEX holdout actions and 0 Hyperliquid actions; timing F1 is zero on both untouched holdouts.",
-    "BitMEX v4.3 costed holdout is -0.004365 with PF 0.964532; Hyperliquid executes no adjustment."
+    "BitMEX v4.3 costed holdout is -0.004365 with PF 0.964532; Hyperliquid executes no adjustment.",
+    "The v4.4 conditional event-type benchmark reaches Macro-F1 0.382047 (BitMEX) and 0.585714 (Hyperliquid) only with an oracle event trigger and teacher dynamic state; autonomous timing F1 remains 0."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -78,6 +79,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model unchanged; do not promote v4.3 or add Demo orders. The venue-neutral timing head is causally clean but still predicts almost no actions and has zero timing F1 on untouched venue holdouts. Next research: quantify the public-record identifiability ceiling and compare event-conditioned causal policies against the sparse hourly clock without using future teacher state; no exact-strategy claim is authorized.",
-  "updated_at_utc": "2026-08-26T13:42:00Z"
+  "next_action": "Keep the current Demo model unchanged; do not promote v4.4 or add Demo orders. The public-record ceiling is now quantified: action type is partially predictable once an event is known, but autonomous timing is not. Next research: verify whether complete public order-intent/cancel/order-book context exists before attempting another timing model; otherwise treat exact strategy recovery as unidentifiable and keep only the auditable approximation.",
+  "updated_at_utc": "2026-08-26T14:15:00Z"
 }

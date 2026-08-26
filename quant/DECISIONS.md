@@ -289,3 +289,10 @@
 - Candidate `behavioral-distillation-v4.3-shared-intent-timing` separates the binary action-timing head from action family and target size. It uses venue-neutral features, a causal zero-start state path, a 60% fit / 20% calibration / 20% untouched test split, and train-only probability calibration.
 - On the untouched BitMEX holdout, selected threshold `0.05` produced only `2` predicted actions, timing F1 `0.000000`, and costed net return `-0.004365` (PF `0.964532`). On Hyperliquid, threshold `0.15` produced `0` actions and timing F1 `0.000000`.
 - The separated timing head therefore does not recover executable action timing. Keep the active Demo model unchanged; no candidate promotion or new Demo orders are authorized.
+
+## 2026-08-26 — Public-record identifiability ceiling is measurable
+
+- Candidate `behavioral-distillation-v4.4-identifiability-ceiling` trains only on non-idle event rows and evaluates only on non-idle events in the final chronological slice. It intentionally gives the benchmark an oracle event trigger and historical dynamic state, so it is a conditional upper-bound diagnostic rather than a deployable policy.
+- Conditional action-type Macro-F1 is `0.382047` on BitMEX and `0.585714` on Hyperliquid, with target exposure MAE `0.055041` and `0.047233` respectively. The corresponding strict autonomous timing F1 is `0.000000` on both venues.
+- The large gap shows that the public record contains some information about how an observed action was sized/classified, but does not identify when the action should begin. This is a data/identifiability limit, not evidence that another indicator will recover the private trigger.
+- Keep the active Demo model unchanged. No exact-strategy or full-learning claim is authorized.

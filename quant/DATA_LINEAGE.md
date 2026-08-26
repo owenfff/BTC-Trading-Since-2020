@@ -336,3 +336,12 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - BitMEX: test `41996` rows, threshold `0.05`, `2` predicted actions, timing F1 `0.000000`, net return `-0.004365`, PF `0.964532`.
 - Hyperliquid: test `1160` rows, threshold `0.15`, `0` predicted actions, timing F1 `0.000000`, net return `0.000000`.
 - Status: diagnostic-only; active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential, private endpoint, mainnet connection, or order was used.
+
+## M15.14 public-record identifiability ceiling
+
+- Code commit: `74ce3fb` (`Add public record identifiability audit`); tests: `quant/tests/test_identifiability_ceiling.py`; full suite: `391 passed`.
+- Candidate: `behavioral-distillation-v4.4-identifiability-ceiling`. Reports: `quant/reports/identifiability_ceiling_audit.md`, `.json`, and `identifiability_ceiling_by_venue.csv`.
+- Benchmark: train on non-idle events in the first 60% chronological segment and evaluate on non-idle events in the final untouched 20%. The event occurrence and historical teacher state are intentionally available and explicitly marked as conditional-only.
+- BitMEX: `8006` train events / `2923` untouched events; conditional action Macro-F1 `0.382047`, target MAE `0.055041`; strict autonomous timing F1 reference `0.000000`.
+- Hyperliquid: `117` train events / `25` untouched events; conditional action Macro-F1 `0.585714`, target MAE `0.047233`; strict autonomous timing F1 reference `0.000000`.
+- Status: diagnostic-only; the conditional benchmark is not a signal, active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential, private endpoint, mainnet connection, or order was used.

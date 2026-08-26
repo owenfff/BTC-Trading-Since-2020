@@ -171,3 +171,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - v4.3 is causally clean but predicts only `2` actions on the BitMEX untouched holdout and `0` on Hyperliquid; timing F1 is `0.000000` on both.
 - BitMEX costed net return is `-0.004365` with PF `0.964532`; Hyperliquid has no executed adjustment. The all-NO_TRADE baseline is not treated as learned behavior.
 - Autonomous action timing and sparse-label identifiability remain unresolved. Do not promote v4.3, switch the active Demo model, or add Demo orders.
+
+## 2026-08-26 — Conditional ceiling exposes missing private trigger information
+
+- The event-conditioned benchmark reaches action-type Macro-F1 `0.382047` (BitMEX) and `0.585714` (Hyperliquid) only after an oracle tells it that a non-idle event occurred and allows historical state. Strict autonomous timing F1 remains `0.000000` on both venues.
+- This gap means the public exports do not identify the trader's pre-action trigger well enough for autonomous imitation. Treating the conditional score as a deployable result would be leakage.
+- Unless additional public pre-decision information (such as complete order intent/cancel/order-book context) is verified, exact strategy recovery is not identifiable. Keep the active Demo model unchanged and do not add Demo orders.

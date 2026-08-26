@@ -1,0 +1,128 @@
+{
+  "report_version": "M15-IDENTIFIABILITY-CEILING-1.0",
+  "status": "DIAGNOSTIC_ONLY",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "candidate_model_version": "behavioral-distillation-v4.4-identifiability-ceiling",
+  "dataset": "quant\\outputs\\cross_venue_temporal_dataset_v3.csv",
+  "dataset_rows": 264288,
+  "label_distribution_non_idle": {
+    "BITMEX": {
+      "ADD_LONG": 3688,
+      "ADD_SHORT": 2484,
+      "CLOSE_LONG": 681,
+      "CLOSE_SHORT": 232,
+      "FLIP_LONG": 111,
+      "FLIP_SHORT": 102,
+      "OPEN_LONG": 663,
+      "OPEN_SHORT": 248,
+      "REDUCE_LONG": 2596,
+      "REDUCE_SHORT": 1904
+    },
+    "HYPERLIQUID": {
+      "ADD_LONG": 66,
+      "ADD_SHORT": 4,
+      "FLIP_LONG": 4,
+      "FLIP_SHORT": 4,
+      "REDUCE_LONG": 75,
+      "REDUCE_SHORT": 4
+    }
+  },
+  "benchmark_definition": "Train on non-idle historical events and evaluate only on non-idle events in the final untouched chronological slice; the event occurrence is an oracle and historical dynamic state is intentionally available.",
+  "timing_reference": "quant\\reports\\shared_intent_timing_audit.json",
+  "venue_results": [
+    {
+      "venue": "BITMEX",
+      "status": "DIAGNOSTIC_ONLY",
+      "candidate_model_version": "behavioral-distillation-v4.4-identifiability-ceiling",
+      "train_event_rows": 8006,
+      "test_event_rows": 2923,
+      "conditional_event_type": {
+        "rows_seen": 2923,
+        "labeled_rows": 2923,
+        "action_macro_f1": 0.38204719676397214,
+        "target_exposure_mae": 0.0550414607465485,
+        "target_exposure_correlation": 0.9243784654384902,
+        "open_recall": 0.8780487804878049,
+        "close_recall": 0.275,
+        "add_recall": 0.6768617021276596,
+        "reduce_recall": 0.5654169854628921,
+        "flip_recall": 0.41935483870967744,
+        "benchmark": "oracle_non_idle_event_given; historical teacher state fields intentionally available",
+        "teacher_state_fields_consumed": [
+          "feature_current_normalized_exposure",
+          "feature_cycle_duration_seconds",
+          "feature_latest_action",
+          "feature_action_lag_1/2/3",
+          "feature_recent_*",
+          "feature_realised_*",
+          "feature_fee_accumulation_raw",
+          "feature_funding_accumulation_raw"
+        ]
+      },
+      "strict_autonomous_timing_reference": {
+        "rows": 41996,
+        "true_action_rows": 2923,
+        "predicted_action_rows": 2,
+        "observed_action_rate": 0.06960186684446137,
+        "predicted_action_rate": 4.7623583198399846e-05,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "all_no_trade_baseline_f1": 0.0,
+        "all_no_trade_baseline_accuracy": 0.9303981331555387
+      },
+      "conditional_minus_autonomous_timing_f1": 0.38204719676397214,
+      "active_model_unchanged": true,
+      "promotion_allowed": false
+    },
+    {
+      "venue": "HYPERLIQUID",
+      "status": "DIAGNOSTIC_ONLY",
+      "candidate_model_version": "behavioral-distillation-v4.4-identifiability-ceiling",
+      "train_event_rows": 117,
+      "test_event_rows": 25,
+      "conditional_event_type": {
+        "rows_seen": 25,
+        "labeled_rows": 25,
+        "action_macro_f1": 0.5857142857142857,
+        "target_exposure_mae": 0.047232652781633994,
+        "target_exposure_correlation": 0.9380327532146633,
+        "open_recall": null,
+        "close_recall": null,
+        "add_recall": 0.8,
+        "reduce_recall": 0.9,
+        "flip_recall": null,
+        "benchmark": "oracle_non_idle_event_given; historical teacher state fields intentionally available",
+        "teacher_state_fields_consumed": [
+          "feature_current_normalized_exposure",
+          "feature_cycle_duration_seconds",
+          "feature_latest_action",
+          "feature_action_lag_1/2/3",
+          "feature_recent_*",
+          "feature_realised_*",
+          "feature_fee_accumulation_raw",
+          "feature_funding_accumulation_raw"
+        ]
+      },
+      "strict_autonomous_timing_reference": {
+        "rows": 1160,
+        "true_action_rows": 25,
+        "predicted_action_rows": 0,
+        "observed_action_rate": 0.021551724137931036,
+        "predicted_action_rate": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "all_no_trade_baseline_f1": 0.0,
+        "all_no_trade_baseline_accuracy": 0.978448275862069
+      },
+      "conditional_minus_autonomous_timing_f1": 0.5857142857142857,
+      "active_model_unchanged": true,
+      "promotion_allowed": false
+    }
+  ],
+  "raw_inputs_untouched": true,
+  "active_demo_unchanged": true,
+  "promotion_allowed": false,
+  "conclusion": "The conditional benchmark measures action-type information after removing the timing problem. Its score is not an autonomous signal and cannot prove exact strategy recovery; the gap to strict autonomous timing is the public-record identifiability shortfall."
+}
