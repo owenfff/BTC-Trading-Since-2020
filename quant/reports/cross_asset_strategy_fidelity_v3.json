@@ -1,0 +1,73 @@
+{
+  "report_version": "M13-CROSS-ASSET-STRATEGY_v3-1.0",
+  "analysis_commit": "e90499470c82f25804687c829ca6c5ddb0f79d84",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "strategy_version": "behavioral-distillation-v3-cross-asset-indicators",
+  "dataset_rows": 10630,
+  "train_rows": 8879,
+  "models": [
+    "frequency_baseline",
+    "distilled_rules",
+    "cross_asset_logistic"
+  ],
+  "global_metrics": {
+    "frequency_baseline": {
+      "rows_seen": 10630,
+      "rows_with_future_label": 10577,
+      "action_accuracy": 0.5194289496076392,
+      "direction_accuracy": 0.893731681951404,
+      "action_macro_f1": 0.12232816149419001,
+      "action_weighted_f1": 0.365725945282001,
+      "target_exposure_mae": 0.154024668906334,
+      "target_exposure_correlation": 0.43620665138599873,
+      "open_timing_error_seconds": 658887.9054783306,
+      "close_timing_error_seconds": 33581.75719651801,
+      "add_recall": 1.0,
+      "reduce_recall": 0.0,
+      "flip_recall": 0.0,
+      "cycle_direction_match": 0.9518678884301681,
+      "confidence_calibration_gap": 0.018826557898013203
+    },
+    "distilled_rules": {
+      "rows_seen": 10630,
+      "rows_with_future_label": 10577,
+      "action_accuracy": 0.2627399073461284,
+      "direction_accuracy": 0.7661907913396994,
+      "action_macro_f1": 0.13192453527134204,
+      "action_weighted_f1": 0.3140227160377507,
+      "target_exposure_mae": 0.10640105915203225,
+      "target_exposure_correlation": 0.7611156202476375,
+      "open_timing_error_seconds": 523182.029187801,
+      "close_timing_error_seconds": 20617.367302647268,
+      "add_recall": 0.238579555249095,
+      "reduce_recall": 0.3567151411462789,
+      "flip_recall": 0.0,
+      "cycle_direction_match": 0.8051555734568523,
+      "confidence_calibration_gap": 0.4183313691870952
+    },
+    "cross_asset_logistic": {
+      "rows_seen": 10630,
+      "rows_with_future_label": 10577,
+      "action_accuracy": 0.6516970785667013,
+      "direction_accuracy": 0.8860735558286849,
+      "action_macro_f1": 0.17626923053037677,
+      "action_weighted_f1": 0.5868582201961542,
+      "target_exposure_mae": 0.0631536067347221,
+      "target_exposure_correlation": 0.8835931348447288,
+      "open_timing_error_seconds": 658887.9054783306,
+      "close_timing_error_seconds": 20893.22825828762,
+      "add_recall": 0.8843302878813998,
+      "reduce_recall": 0.6552609067579127,
+      "flip_recall": 0.0,
+      "cycle_direction_match": 0.9437116101097573,
+      "confidence_calibration_gap": 0.05937829917698441
+    }
+  },
+  "per_symbol_metric_rows": 159,
+  "walk_forward_rows": 18,
+  "sensitivity_rows": 27,
+  "market_data_policy": "public no-key hourly bars; no synthetic market data",
+  "profitability_claim": false,
+  "raw_account_inputs_unchanged": true,
+  "next_stage": "paper replay only after model review; no private exchange connectivity"
+}

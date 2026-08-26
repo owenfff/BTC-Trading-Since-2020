@@ -1,0 +1,129 @@
+{
+  "report_version": "M13-CROSS-ASSET-INDICATOR-ABLATION-1.0",
+  "feature_contract_version": "m13-v3-cross-asset-indicators",
+  "v2_model_version": "behavioral-distillation-v2-cross-asset-logistic",
+  "v3_model_version": "behavioral-distillation-v3-cross-asset-indicators",
+  "status": "APPROVED_FOR_DEMO_SWITCH",
+  "v2_global": {
+    "action_macro_f1": 0.17591013164343902,
+    "target_exposure_mae": 0.06330365719822723
+  },
+  "v3_global": {
+    "action_macro_f1": 0.17626923053037677,
+    "target_exposure_mae": 0.0631536067347221
+  },
+  "global_checks": {
+    "macro_f1_not_below_v2": true,
+    "mae_not_above_v2": true
+  },
+  "walk_forward_checks": [
+    {
+      "window": "WF1",
+      "v2_action_macro_f1": 0.1061466703611342,
+      "v3_action_macro_f1": 0.10723551950139434,
+      "macro_f1_delta": 0.0010888491402601397,
+      "macro_f1_pass": true,
+      "v2_target_exposure_mae": 0.033448633599383534,
+      "v3_target_exposure_mae": 0.03456522750946228,
+      "mae_delta": 0.0011165939100787475,
+      "mae_pass": true,
+      "strict_mae_not_higher": false
+    },
+    {
+      "window": "WF2",
+      "v2_action_macro_f1": 0.1580100470265013,
+      "v3_action_macro_f1": 0.1706084685537217,
+      "macro_f1_delta": 0.012598421527220405,
+      "macro_f1_pass": true,
+      "v2_target_exposure_mae": 0.028988146996388308,
+      "v3_target_exposure_mae": 0.02938578242953084,
+      "mae_delta": 0.0003976354331425326,
+      "mae_pass": true,
+      "strict_mae_not_higher": false
+    },
+    {
+      "window": "WF3",
+      "v2_action_macro_f1": 0.31578249336870023,
+      "v3_action_macro_f1": 0.34581320450885666,
+      "macro_f1_delta": 0.03003071114015643,
+      "macro_f1_pass": true,
+      "v2_target_exposure_mae": 0.033710432616184886,
+      "v3_target_exposure_mae": 0.03443951854269301,
+      "mae_delta": 0.0007290859265081245,
+      "mae_pass": true,
+      "strict_mae_not_higher": false
+    }
+  ],
+  "leakage_check": {
+    "status": "PASS",
+    "future_observation_violations": 0
+  },
+  "indicator_coverage": {
+    "rsi14": {
+      "field": "feature_rsi_14",
+      "present_rows": 10621,
+      "eligible_rows": 10630,
+      "coverage": 0.9991533396048918,
+      "missing_rows": 9
+    },
+    "macd_line": {
+      "field": "feature_macd_line_12_26",
+      "present_rows": 10607,
+      "eligible_rows": 10630,
+      "coverage": 0.9978363123236124,
+      "missing_rows": 23
+    },
+    "macd_signal": {
+      "field": "feature_macd_signal_9",
+      "present_rows": 10594,
+      "eligible_rows": 10630,
+      "coverage": 0.9966133584195672,
+      "missing_rows": 36
+    },
+    "macd_histogram": {
+      "field": "feature_macd_histogram",
+      "present_rows": 10594,
+      "eligible_rows": 10630,
+      "coverage": 0.9966133584195672,
+      "missing_rows": 36
+    },
+    "bollinger_zscore": {
+      "field": "feature_bollinger_zscore_20",
+      "present_rows": 10613,
+      "eligible_rows": 10630,
+      "coverage": 0.9984007525870179,
+      "missing_rows": 17
+    },
+    "bollinger_percent_b": {
+      "field": "feature_bollinger_percent_b_20",
+      "present_rows": 10613,
+      "eligible_rows": 10630,
+      "coverage": 0.9984007525870179,
+      "missing_rows": 17
+    },
+    "volume_percentile_72": {
+      "field": "feature_volume_percentile_72bar",
+      "present_rows": 10575,
+      "eligible_rows": 10630,
+      "coverage": 0.9948259642521167,
+      "missing_rows": 55
+    },
+    "funding_rate": {
+      "field": "feature_funding_rate",
+      "present_rows": 8001,
+      "eligible_rows": 10630,
+      "coverage": 0.7526810912511759,
+      "missing_rows": 2629
+    },
+    "mark_index_basis": {
+      "field": "feature_mark_index_basis",
+      "present_rows": 0,
+      "eligible_rows": 10630,
+      "coverage": 0.0,
+      "missing_rows": 10630
+    }
+  },
+  "raw_account_inputs_unchanged": true,
+  "deployment_action": "switch_to_v3_after_safe_stop_and_reconciliation",
+  "interpretation": "Indicators are model inputs for behavioral approximation, not evidence of the original trader's exact indicators or future profitability."
+}
