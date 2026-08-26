@@ -127,6 +127,9 @@ def test_runtime_persists_pre_action_context_before_order_submission(tmp_path: P
     assert audit[0]["pre_action"]["quote"]["bid"] == "99.9"
     assert audit[0]["pre_action"]["features"]["feature_latest_bar_time"]
     assert "secret" not in str(audit[0]).lower()
+    journal_files = list((tmp_path / "decision_audit").glob("*.jsonl"))
+    assert len(journal_files) == 1
+    assert "secret" not in journal_files[0].read_text(encoding="utf-8").lower()
 
 
 def test_runtime_restores_bounded_pre_action_context(tmp_path: Path) -> None:

@@ -14,6 +14,7 @@ from typing import Any
 from quant_bot.domain.instrument import Instrument, InstrumentType
 from quant_bot.domain.market_data import MarketContext, MarketQuote
 from quant_bot.domain.order import Order
+from quant_bot.decision_audit_journal import DecisionAuditJournal, DecisionAuditJournalError
 from quant_bot.exchanges.binance import BinanceSpotAdapter
 from quant_bot.exchanges.binance_futures import BinanceFuturesAdapter
 from quant_bot.exchanges.http import AdapterError
@@ -244,8 +245,10 @@ class VenueRuntime:
     latest_feedback_at: str | None = None
     orphans_checked: bool = False
     decision_audit: list[dict[str, Any]] = field(default_factory=list)
+    decision_journal: DecisionAuditJournal = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        self.decision_journal = DecisionAuditJournal(self.output_path.parent / "decision_audit")
         self._restore_runtime_state()
         if KILL_SWITCH_PATH.exists():
             self.risk_state.engage_kill_switch()
@@ -514,7 +517,7 @@ class VenueRuntime:
         context: MarketContext,
         strategy_input: Any,
         signal: Any,
-    ) -> None:
+    ) -> bool:
         """Persist bounded, pre-order context for prospective replay analysis.
 
         This is written before order cancellation or submission. It records
@@ -528,7 +531,7 @@ class VenueRuntime:
             str(key): _audit_value(value)
             for key, value in dict(getattr(strategy_input, "features", {}) or {}).items()
         }
-        self.decision_audit.append({
+        snapshot = {
             "decision_time": decision_time.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
             "historical_symbol": historical_symbol,
             "venue_symbol": venue_symbol,
@@ -557,9 +560,17 @@ class VenueRuntime:
                 "valid_until": _audit_value(getattr(signal, "valid_until", None)),
                 "risk_tags": [_audit_value(item) for item in getattr(signal, "risk_tags", ())],
             },
-        })
+        }
+        try:
+            self.decision_journal.append(snapshot)
+        except DecisionAuditJournalError as error:
+            self.last_error = f"DECISION_AUDIT_PERSISTENCE_FAILED: {error}"
+            self._engage_safety("DECISION_AUDIT_PERSISTENCE_FAILED")
+            return False
+        self.decision_audit.append(snapshot)
         if len(self.decision_audit) > MAX_DECISION_AUDIT_ROWS:
             self.decision_audit = self.decision_audit[-MAX_DECISION_AUDIT_ROWS:]
+        return True
 
     def on_private_message(self, message: dict[str, Any]) -> None:
         if message.get("success") is False or str(message.get("code", "0")) not in {"0", ""}:
@@ -674,7 +685,7 @@ class VenueRuntime:
         engine.attach_market_context(funding_rate=float(context.funding_rate) if context.funding_rate is not None else None, funding_source_time=context.funding_source_time, mark_price=float(context.mark_price) if context.mark_price is not None else None, index_price=float(context.index_price) if context.index_price is not None else None, status=context.coverage)
         strategy_input = engine.build_input(decision_time=decision_time, current_qty=current, current_equity=equity)
         signal = self.bundle.model.predict(strategy_input)
-        self._record_decision_snapshot(
+        recorded = self._record_decision_snapshot(
             historical_symbol=historical_symbol,
             venue_symbol=venue_symbol,
             decision_time=decision_time,
@@ -684,6 +695,8 @@ class VenueRuntime:
             strategy_input=strategy_input,
             signal=signal,
         )
+        if not recorded:
+            return None
         bid, ask = context.quote.bid, context.quote.ask
         self._cancel_replaced_order(venue_symbol, Decimal(str(signal.target_exposure)), current, bid, ask)
         limit = risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol)
@@ -896,6 +909,11 @@ class VenueRuntime:
                 "order_context": self.order_context,
                 "latest_feedback_at": self.latest_feedback_at,
                 "decision_audit": self.decision_audit,
+                "decision_audit_journal": {
+                    "format": "JSONL_APPEND_ONLY_UTC_DAILY",
+                    "runtime_state_ring_rows": MAX_DECISION_AUDIT_ROWS,
+                    "max_record_bytes": 128 * 1024,
+                },
             },
             "oldest_active_order_age_seconds": max(ages) if ages else None,
             "stop_reason": self.stop_reason,
