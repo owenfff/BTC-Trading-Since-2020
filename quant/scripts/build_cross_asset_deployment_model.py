@@ -186,7 +186,9 @@ def build(
     artifact_path = artifact_path or (outputs / "cross_asset_deployment_model.json")
     save_deployment_bundle(bundle, artifact_path)
     rollout_status = (
-        "CANDIDATE_PENDING_TIME_OUT_VALIDATION"
+        "CANDIDATE_NOT_PROMOTED_PENDING_STRICT_AUTONOMOUS_VALIDATION"
+        if "v3.2" in model_version
+        else "CANDIDATE_PENDING_TIME_OUT_VALIDATION"
         if "v3.1" in model_version
         else "ACTIVE_BASELINE_FOR_DEMO"
     )
