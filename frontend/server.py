@@ -362,6 +362,14 @@ def status_payload() -> dict[str, Any]:
     has_feed = bool(preflight or runtime or mapping)
     account = _account_payload(runtime, preflight)
     mapping_rows = mapping.get("symbols", []) if isinstance(mapping.get("symbols"), list) else []
+    blocked_by_symbol = runtime.get("blocked", {}) if isinstance(runtime.get("blocked", {}), dict) else {}
+    order_block_reasons = sorted({
+        str(reason)
+        for reasons in blocked_by_symbol.values()
+        if isinstance(reasons, list)
+        for reason in reasons
+    })
+    blocked_symbols = sorted(str(symbol) for symbol in blocked_by_symbol)
     deployment_path = PROJECT_ROOT / "quant" / "outputs" / "cross_asset_deployment_model_v3.json"
     if not deployment_path.exists():
         deployment_path = PROJECT_ROOT / "quant" / "outputs" / "cross_asset_deployment_model.json"
@@ -427,20 +435,15 @@ def status_payload() -> dict[str, Any]:
             "market_connection": runtime.get("market_connection", "NONE"),
             "market_connected": runtime.get("market_connected", runtime.get("websocket_connected", False)),
             "private_stream_seen": runtime.get("private_stream_seen", runtime.get("websocket_connected", False)),
-            "order_submission_enabled": runtime.get("order_submission_enabled", False),
+            "order_submission_enabled": bool(runtime.get("order_submission_enabled", False) and not order_block_reasons),
             "plans": runtime.get("plans", 0),
             "portfolio_target_scale": runtime.get("portfolio_target_scale", "1"),
             "order_errors": runtime.get("order_errors", {}),
             "stop_reason": runtime.get("stop_reason"),
             "last_error": runtime.get("last_error"),
             "risk": runtime.get("risk", {}),
-            "order_block_reasons": sorted({
-                str(reason)
-                for reasons in dict(runtime.get("blocked", {})).values()
-                if isinstance(reasons, list)
-                for reason in reasons
-            }),
-            "blocked_symbols": sorted(str(symbol) for symbol in dict(runtime.get("blocked", {}))),
+            "order_block_reasons": order_block_reasons,
+            "blocked_symbols": blocked_symbols,
             "clock_drift_seconds": runtime.get("clock_drift_seconds"),
             "market_context": runtime.get("market_context", {}),
             "latest_feedback_at": (runtime.get("behavior_state") or {}).get("latest_feedback_at"),
