@@ -361,3 +361,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Inputs are the frozen report artifacts `strategy_behavior_profile_v4.json`, `pre_action_observability_audit.json`, and `identifiability_ceiling_audit.json`; their SHA256 values are embedded in the output JSON.
 - The specification preserves the source boundary: `OBSERVED_FACT`, `SUPPORTED_APPROXIMATION`, and `UNIDENTIFIABLE` are separate classifications; external replay/analysis URLs are recorded with their limitations.
 - No raw root CSV/JSON was read-write transformed. No credentials, private endpoint, mainnet connection, order, model promotion, or Demo change was performed.
+
+## M15.17 strategy-learning completion audit
+
+- Builder: `quant/scripts/audit_strategy_completion.py`; tests: `quant/tests/test_strategy_completion_audit.py`.
+- Outputs: `quant/reports/strategy_completion_audit.md` and `quant/reports/strategy_completion_audit.json`.
+- The audit consumes the existing frozen state/profile/pre-action/identifiability/native/shared-intent reports and returns `NOT_COMPLETE` unless every completion gate is explicitly `PASS`.
+- Current result: `5` failed gates and `2` passing gates; the result distinguishes strategy fidelity from causal feature correctness and test health.
+- No raw root CSV/JSON, credentials, private endpoint, mainnet connection, Demo order, or active model was changed.

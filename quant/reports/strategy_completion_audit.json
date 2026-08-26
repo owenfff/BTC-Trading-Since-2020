@@ -1,0 +1,75 @@
+{
+  "report_version": "M15-STRATEGY-COMPLETION-AUDIT-1.0",
+  "status": "NOT_COMPLETE",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "generated_at_utc": "2026-08-26T13:28:14.208957Z",
+  "objective": "Determine whether the robot has fully learned the original trader's complete strategy from the available public records.",
+  "completion_definition": [
+    "exact private strategy recovery",
+    "autonomous pre-action timing",
+    "stable out-of-time validation",
+    "authorized deployable model promotion"
+  ],
+  "gates": [
+    {
+      "id": "exact_strategy_recovery",
+      "status": "FAIL",
+      "evidence": "behavior_spec.strategy_fidelity",
+      "detail": "The evidence contract is BEHAVIORAL_APPROXIMATION, not an exact private-rule recovery."
+    },
+    {
+      "id": "pre_action_trigger_context",
+      "status": "FAIL",
+      "evidence": "pre_action.pre_action_trigger_assessment.complete_pre_action_trigger_context_available",
+      "detail": "Complete pre-action trigger, cancellation intent and order-book context are absent from the current public export."
+    },
+    {
+      "id": "strict_autonomous_timing",
+      "status": "FAIL",
+      "evidence": "identifiability.venue_results[*].strict_autonomous_timing_reference.f1",
+      "detail": "Strict autonomous timing F1 by venue: {'BITMEX': 0.0, 'HYPERLIQUID': 0.0}."
+    },
+    {
+      "id": "causal_closed_bar_features",
+      "status": "PASS",
+      "evidence": "pre_action.market_context",
+      "detail": "264288 rows use a strictly prior closed bar; equal/after rows: 0."
+    },
+    {
+      "id": "candidate_promotion",
+      "status": "FAIL",
+      "evidence": "venue_native/shared_intent/shared_timing.status",
+      "detail": "3/3 latest venue-generalization candidates remain diagnostic or blocked; active model is unchanged."
+    },
+    {
+      "id": "autonomous_demo_authorization",
+      "status": "FAIL",
+      "evidence": "behavior_spec.active_runtime.promotion_allowed",
+      "detail": "The specification does not authorize Demo order additions or automatic model promotion."
+    },
+    {
+      "id": "regression_verification",
+      "status": "PASS",
+      "evidence": "state.test_count",
+      "detail": "Current recorded full-suite count is 397; this verifies code regressions, not strategy fidelity."
+    }
+  ],
+  "observed_behavior": {
+    "eligible_rows": 264288,
+    "non_idle_rows": 12866,
+    "non_idle_rate": 0.04868174113088752,
+    "venues": [
+      "BITMEX",
+      "HYPERLIQUID"
+    ],
+    "description": "Sparse, stateful inventory adjustment with explicit NO_TRADE and open/add/reduce/close/flip actions."
+  },
+  "current_runtime": {
+    "active_model_unchanged": true,
+    "research_status": "RESEARCH_ONLY",
+    "promotion_allowed": false,
+    "new_demo_orders_authorized": false
+  },
+  "next_action": "Keep the active Demo model unchanged. To pursue exact imitation, obtain a verified public source with pre-action quote/order-book and order-intent context; otherwise treat the auditable behavioral approximation as the honest ceiling and develop any standalone trading strategy as a separate objective.",
+  "raw_inputs_untouched": true
+}

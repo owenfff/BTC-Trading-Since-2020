@@ -189,3 +189,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - M15.16 produces an auditable strategy contract, but it does not remove the public-record identifiability ceiling: the exact trigger that starts an action is still absent.
 - The website replay supplies a useful visual/public-state cross-check, while the independent TradeTrace write-up supplies hypotheses about inventory and execution patterns; neither is a disclosure of private decision rules.
 - Do not treat the strategy specification, indicator association, or conditional event-type score as an autonomous signal. The active Demo model remains unchanged and no new Demo orders are authorized.
+
+## 2026-08-26 — Full strategy-learning objective remains incomplete
+
+- The M15.17 completion audit records `NOT_COMPLETE` with five failed gates: exact strategy recovery, pre-action trigger context, strict autonomous timing, candidate promotion, and autonomous Demo authorization.
+- The passing gates cover causal closed-bar ordering and software regression only; they cannot prove that the robot has learned the trader's complete private strategy.
+- No additional implementation can recover missing information from the same public fills/orders alone. Continue only with a verified source that adds pre-action context, or explicitly switch to a separate standalone-strategy research goal.

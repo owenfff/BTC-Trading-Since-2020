@@ -310,3 +310,9 @@
 - The strongest defensible strategy description is a sparse, stateful inventory-adjustment process: explicit `NO_TRADE`, then open/add/reduce/close/flip actions conditioned primarily on the robot's own reconciled position and venue-native execution state.
 - Layered passive limits and bounded urgency overrides are retained as `SUPPORTED_APPROXIMATION` hypotheses from independent public analysis, not as proven private rules. RSI/MACD/Bollinger features remain causal input candidates with association-only interpretation.
 - Exact pre-action timing, private trigger logic, cancellation intent, and order-book context remain `UNIDENTIFIABLE`; the specification cannot authorize model promotion, Demo orders, mainnet access, or profitability claims.
+
+## 2026-08-26 — Add an explicit strategy-learning completion gate
+
+- M15.17 adds `quant/scripts/audit_strategy_completion.py` and `quant/reports/strategy_completion_audit.*` to test the user's full-learning claim against the available evidence rather than infer completion from passing software tests.
+- The audit status is `NOT_COMPLETE`: causal closed-bar features and code regression checks pass, while exact private-rule recovery, pre-action trigger context, strict autonomous timing, candidate promotion, and Demo authorization fail.
+- This is an evidence result, not a software crash. Keep the active Demo model unchanged; the next valid path for exact imitation requires a verified public source with pre-action quote/order-book/order-intent context. A standalone profitable strategy would be a different research objective.
