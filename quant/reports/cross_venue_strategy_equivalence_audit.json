@@ -1,0 +1,262 @@
+{
+  "report_version": "M15-CROSS-VENUE-STRATEGY-EQUIVALENCE-1.0",
+  "status": "SHARED_INTENT_SUPPORTED_VENUE_NATIVE_POLICY_REQUIRED",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "generated_at_utc": "2026-08-26T13:59:31.749592Z",
+  "scope": {
+    "venues": [
+      "BITMEX",
+      "HYPERLIQUID"
+    ],
+    "records_merged": false,
+    "hyperliquid_used_as_training_label": false,
+    "identity_assumption": "The requester states that the public accounts represent the same trader; this is treated as a research premise, not as a data-derived fact."
+  },
+  "venue_profiles": {
+    "BITMEX": {
+      "venue": "BITMEX",
+      "source_role": "teacher_behavior_profile",
+      "source_report": "strategy_behavior_profile_v4.json",
+      "rows_or_clock_rows": 258492,
+      "action_events": 12709,
+      "action_event_rate": 0.049165931634247866,
+      "action_family_counts": {
+        "OPEN": 911,
+        "ADD": 6172,
+        "REDUCE": 4500,
+        "CLOSE": 913,
+        "FLIP": 213,
+        "NO_TRADE": 245783
+      },
+      "action_family_shares_among_rows": {
+        "OPEN": 0.003524287018553766,
+        "ADD": 0.023876947835909816,
+        "REDUCE": 0.01740866255048512,
+        "CLOSE": 0.0035320242019095368,
+        "FLIP": 0.0008240100273896291,
+        "NO_TRADE": 0.9508340683657521
+      },
+      "action_family_shares_among_non_idle": {
+        "OPEN": 0.07168148556141317,
+        "ADD": 0.4856400975686521,
+        "REDUCE": 0.3540797859784405,
+        "CLOSE": 0.07183885435518136,
+        "FLIP": 0.01675977653631285,
+        "NO_TRADE": 19.33928711936423
+      },
+      "holding_period_observed": {
+        "rows": 142170,
+        "mean_hours": 49.92728832392948,
+        "p95_hours": 223.26404194444444
+      },
+      "action_interval_observed": {
+        "series_count": 64,
+        "interval_count": 12802,
+        "mean_hours": 20.183877519137635,
+        "p95_hours": 64.0
+      }
+    },
+    "HYPERLIQUID": {
+      "venue": "HYPERLIQUID",
+      "source_role": "external_public_reference",
+      "source_report": "external_hyperliquid_paul_audit.json",
+      "rows_or_clock_rows": null,
+      "fill_events": 341,
+      "action_events": 341,
+      "action_event_rate_over_fills": 1.0,
+      "action_family_counts": {
+        "OPEN": 1,
+        "ADD": 151,
+        "REDUCE": 179,
+        "CLOSE": 0,
+        "FLIP": 10,
+        "NO_TRADE": 0
+      },
+      "action_family_shares_among_action_events": {
+        "OPEN": 0.002932551319648094,
+        "ADD": 0.44281524926686217,
+        "REDUCE": 0.5249266862170088,
+        "CLOSE": 0.0,
+        "FLIP": 0.02932551319648094,
+        "NO_TRADE": 0.0
+      },
+      "position_episodes": {
+        "episode_count": 11,
+        "closed_episode_count": 10,
+        "open_at_end_count": 1,
+        "long_episode_count": 6,
+        "short_episode_count": 5,
+        "duration_ms_median": "903551733",
+        "duration_ms_max": "8243746527",
+        "fills_per_episode_median": "12",
+        "episodes": [
+          {
+            "start_time_ms": 1763228044580,
+            "side": "LONG",
+            "fills": 74,
+            "maximum_abs_position": "0.99353",
+            "end_time_ms": 1764687798595,
+            "duration_ms": 1459754015,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1764687798595,
+            "side": "SHORT",
+            "fills": 4,
+            "maximum_abs_position": "0.89486",
+            "end_time_ms": 1764689322560,
+            "duration_ms": 1523965,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1764689322560,
+            "side": "LONG",
+            "fills": 62,
+            "maximum_abs_position": "0.40336",
+            "end_time_ms": 1767734136754,
+            "duration_ms": 3044814194,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1767734136754,
+            "side": "SHORT",
+            "fills": 3,
+            "maximum_abs_position": "0.02141",
+            "end_time_ms": 1767853034079,
+            "duration_ms": 118897325,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1767853034079,
+            "side": "LONG",
+            "fills": 7,
+            "maximum_abs_position": "0.05736",
+            "end_time_ms": 1768315385423,
+            "duration_ms": 462351344,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1768315385423,
+            "side": "SHORT",
+            "fills": 12,
+            "maximum_abs_position": "0.05901",
+            "end_time_ms": 1768780969761,
+            "duration_ms": 465584338,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1768780969761,
+            "side": "LONG",
+            "fills": 86,
+            "maximum_abs_position": "2.07997",
+            "end_time_ms": 1776438730674,
+            "duration_ms": 7657760913,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1776438730674,
+            "side": "SHORT",
+            "fills": 22,
+            "maximum_abs_position": "1.39973",
+            "end_time_ms": 1776445881185,
+            "duration_ms": 7150511,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1776445881185,
+            "side": "LONG",
+            "fills": 6,
+            "maximum_abs_position": "0.09706",
+            "end_time_ms": 1778012014340,
+            "duration_ms": 1566133155,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1778012014340,
+            "side": "SHORT",
+            "fills": 2,
+            "maximum_abs_position": "0.03294",
+            "end_time_ms": 1778915566073,
+            "duration_ms": 903551733,
+            "open_at_end": false
+          },
+          {
+            "start_time_ms": 1778915566073,
+            "side": "LONG",
+            "fills": 73,
+            "maximum_abs_position": "1.60557",
+            "end_time_ms": 1787159312600,
+            "duration_ms": 8243746527,
+            "open_at_end": true
+          }
+        ]
+      },
+      "order_execution_style": {
+        "unique_order_ids": 1343,
+        "orders_with_filled_event": 203,
+        "orders_with_canceled_event": 1126,
+        "all_limit_orders": true,
+        "all_gtc_orders": true,
+        "reduce_only_event_count": 0,
+        "crossed_fill_fraction": "0.16129032",
+        "fill_latency_ms_median": "50008004"
+      },
+      "partial_pre_action_intent": {
+        "status": "PARTIAL_PRE_ACTION_CONTEXT",
+        "order_records": 2649,
+        "unique_order_ids": 1343,
+        "filled_status_fill_overlap": 203,
+        "complete_pre_action_trigger_context_available": false
+      }
+    }
+  },
+  "shared_behavior_evidence": {
+    "common_action_families": [
+      "ADD",
+      "FLIP",
+      "OPEN",
+      "REDUCE"
+    ],
+    "supported_high_level_intent": [
+      "stateful inventory adjustment",
+      "open/add/reduce/flip vocabulary",
+      "position episodes rather than isolated fills"
+    ]
+  },
+  "venue_native_execution_boundary": [
+    "contract_multiplier_and_settlement_currency",
+    "symbol_and_market_availability",
+    "fee_funding_margin_and_leverage_rules",
+    "quote_depth_latency_and_order_queue",
+    "order_lifecycle_and_fill_semantics"
+  ],
+  "gates": {
+    "shared_action_vocabulary": {
+      "status": "SUPPORTED_APPROXIMATION",
+      "common_action_families": [
+        "ADD",
+        "FLIP",
+        "OPEN",
+        "REDUCE"
+      ],
+      "detail": "The two sources share several high-level position-adjustment actions; this supports a shared vocabulary, not identical rules."
+    },
+    "same_executable_policy": {
+      "status": "NOT_ESTABLISHED",
+      "detail": "Venue-native contract, market, cost, liquidity and execution context differ; records must remain separated."
+    },
+    "same_trader_identity": {
+      "status": "USER_PROVIDED_PREMISE_NOT_DATA_VERIFIED",
+      "detail": "The audit accepts the research premise that the accounts are one trader, but the repository does not cryptographically prove identity from these reports."
+    },
+    "exact_private_trigger_recovery": {
+      "status": "BLOCKED",
+      "detail": "The available sources do not contain complete pre-action quote/order-book state and private trigger intent for both venues."
+    }
+  },
+  "modeling_rule": "Use a shared high-level intent layer with independent venue adapters/calibration; never combine positions, units, fees, funding or order books across venues.",
+  "promotion_allowed": false,
+  "active_demo_unchanged": true,
+  "raw_inputs_untouched": true,
+  "conclusion": "The evidence supports a common behavioral skeleton, but not an identical executable policy or complete recovery of the trader's private strategy."
+}

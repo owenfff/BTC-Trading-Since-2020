@@ -207,3 +207,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - Four no-download probes to representative Hyperliquid archive keys returned `403`. This is ambiguous between requester-pays and object authorization; it does not establish availability or absence.
 - The archive may require requester-pays transfer and may have gaps. Do not download or incur transfer costs without explicit authorization and a coverage plan.
 - Historical L2 context is therefore not verified or integrated; the full strategy-learning audit remains `NOT_COMPLETE`.
+
+## 2026-08-26 — Cross-venue equivalence is bounded, not complete
+
+- M15.20 finds shared `OPEN`/`ADD`/`REDUCE`/`FLIP` action families, but this is only a behavioral approximation. BitMEX clock-row rates and Hyperliquid fill/event rates cannot be compared as if they were the same denominator.
+- The same-trader premise does not remove venue-native contract, cost, funding, liquidity, order-queue or lifecycle differences. Do not merge positions, units, fees, funding or order-book context across venues.
+- Exact private trigger recovery remains blocked because complete pre-action quote/order-book and cancellation-intent context is unavailable or unverified. Keep the active Demo model unchanged and do not add Demo orders.

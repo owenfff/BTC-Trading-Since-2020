@@ -328,3 +328,11 @@
 - M15.19 performed HTTP `HEAD`-only probes for four representative official Hyperliquid L2 archive object keys covering the observed source period; all returned `403` without a requester-pays header.
 - The result is recorded as `REQUESTER_OR_OBJECT_ACCESS_BLOCKED`, not as proof that the objects are absent. No market-file body was downloaded and no potentially billable requester-pays access was attempted.
 - Until access, cost, and coverage are independently verified, historical L2 cannot be added to the reproducible model dataset. Exact autonomous trigger recovery remains incomplete.
+
+## 2026-08-26 — Shared behavior is supported; executable policy stays venue-native
+
+- M15.20 adds `quant/scripts/audit_cross_venue_strategy_equivalence.py` and the reports `quant/reports/cross_venue_strategy_equivalence_audit.md` / `.json`.
+- The frozen BitMEX profile contains `258,492` clock rows and `12,709` non-idle action events. The pinned Hyperliquid public reference contains `341` fills and `1,343` historical order IDs; its snapshot records all observed orders as Limit/GTC.
+- Both sources expose a common high-level action vocabulary (`OPEN`, `ADD`, `REDUCE`, `FLIP`), supporting a shared intent layer. Their denominators and source scopes are not interchangeable, so records remain separate and Hyperliquid is not silently used as a BitMEX label.
+- Contract scale, settlement currency, market availability, costs, funding, margin, liquidity, order queue and lifecycle semantics remain venue-native. The report does not establish identical executable rules or the trader's private trigger.
+- Full suite after this package: `409 passed`. Active Demo remains unchanged; no model promotion, new Demo order, credential, private endpoint, mainnet connection or raw CSV/JSON modification occurred.

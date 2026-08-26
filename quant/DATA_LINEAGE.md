@@ -384,3 +384,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Outputs: `quant/reports/hyperliquid_l2_archive_access.md` and `quant/reports/hyperliquid_l2_archive_access.json`.
 - Four representative `market_data/[date]/[hour]/l2Book/BTC.lz4` keys were probed with HTTP `HEAD` only; all returned `403`. `requester_pays_header_sent=false` and `download_performed=false` are recorded in the JSON.
 - This is an access/coverage diagnostic, not a market-data import. No credentials, paid request, private endpoint, mainnet connection, order, or raw root CSV/JSON change occurred.
+
+## M15.20 cross-venue strategy equivalence boundary
+
+- Builder: `quant/scripts/audit_cross_venue_strategy_equivalence.py`; tests: `quant/tests/test_cross_venue_strategy_equivalence.py`.
+- Inputs: frozen `quant/reports/strategy_behavior_profile_v4.json`, `quant/reports/external_hyperliquid_paul_audit.json`, and `quant/reports/hyperliquid_order_intent_audit.json`. Outputs: `quant/reports/cross_venue_strategy_equivalence_audit.md` and `.json`.
+- The audit normalizes only high-level action families for comparison; it does not merge source records or create Hyperliquid training labels. Common families are `OPEN`, `ADD`, `REDUCE`, and `FLIP`.
+- BitMEX evidence is a clock-row behavior profile (`258492` rows / `12709` non-idle actions); Hyperliquid evidence is a partial public snapshot (`341` fills / `1343` order IDs). All observed Hyperliquid orders in that snapshot are Limit/GTC, but pre-action trigger context is incomplete.
+- Status: `SHARED_INTENT_SUPPORTED_VENUE_NATIVE_POLICY_REQUIRED`; promotion is false. Full suite: `409 passed`; raw root CSV/JSON remained unchanged; active Demo remained unchanged.
