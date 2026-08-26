@@ -337,7 +337,15 @@ class OKXAdapter:
     async def stream_messages(self, stop: Any, on_message: Any, on_error: Any | None = None) -> None:
         if self.websocket is None:
             raise AdapterError(self.name, "WEBSOCKET_NOT_CONFIGURED", "OKX Demo private WebSocket is not configured")
-        await self.websocket.run(on_message, stop, ["account", "positions", "orders", "fills"], on_error=on_error)
+        # OKX requires instType on position/order subscriptions. The Demo
+        # account may not be entitled to the fills channel; executions are
+        # still reconciled from the authenticated REST fills endpoint.
+        channels = [
+            {"channel": "account"},
+            {"channel": "positions", "instType": "SWAP"},
+            {"channel": "orders", "instType": "SWAP"},
+        ]
+        await self.websocket.run(on_message, stop, channels, on_error=on_error)
 
 
 __all__ = ["OKXAdapter"]

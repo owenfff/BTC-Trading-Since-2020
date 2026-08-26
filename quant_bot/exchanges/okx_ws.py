@@ -51,7 +51,7 @@ class OKXDemoWebSocket:
             self.latest[channel] = [dict(item) for item in data if isinstance(item, dict)]
         return True
 
-    async def connect(self, channels: list[str]) -> None:
+    async def connect(self, channels: list[Any]) -> None:
         try:
             import websockets
         except ImportError as error:
@@ -74,7 +74,8 @@ class OKXDemoWebSocket:
         if login_message.get("event") != "login" or str(login_message.get("code", "0")) != "0":
             raise AdapterError("okx-demo", "WEBSOCKET_AUTH_FAILED", str(login_message.get("msg") or login_message.get("code") or "OKX private WebSocket login failed"))
         if channels:
-            await self.socket.send(json.dumps({"op": "subscribe", "args": [{"channel": channel} for channel in channels]}, separators=(",", ":")))
+            arguments = [dict(channel) if isinstance(channel, dict) else {"channel": str(channel)} for channel in channels]
+            await self.socket.send(json.dumps({"op": "subscribe", "args": arguments}, separators=(",", ":")))
         self.connected = True
 
     async def receive(self) -> dict[str, Any]:
@@ -96,7 +97,7 @@ class OKXDemoWebSocket:
             await self.socket.close()
             self.socket = None
 
-    async def run(self, on_message: Callable[[dict[str, Any]], Any], stop: asyncio.Event, channels: list[str] | None = None, *, reconnect_delay: float = 2.0, on_error: Callable[[BaseException], Any] | None = None) -> None:
+    async def run(self, on_message: Callable[[dict[str, Any]], Any], stop: asyncio.Event, channels: list[Any] | None = None, *, reconnect_delay: float = 2.0, on_error: Callable[[BaseException], Any] | None = None) -> None:
         channels = channels or ["account", "positions", "orders", "fills"]
         while not stop.is_set():
             try:
