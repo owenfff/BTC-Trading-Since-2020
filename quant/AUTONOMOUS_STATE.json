@@ -5,7 +5,7 @@
   "current_work_package": "M15-v3.4-calibrated-action-target-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "5968c343cb9c7a32fff4174d9e7c1a21903b7437",
-  "last_report_commit": "7b25effbe297a2925a04d957640dd8fb9350b549",
+  "last_report_commit": "c637156c8f370f1de411bc7306e461478261f9f0",
   "test_count": 366,
   "last_test_status": "FULL_SUITE_366_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_CAUSAL_AUDIT_PASS;CALIBRATED_TEMPORAL_CANDIDATE_PROMOTION_BLOCKED;ACTION_TARGET_CONSISTENCY_TESTED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -61,5 +61,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep the current Demo model; do not promote temporal, balanced, or calibrated candidates. The next research task is train-only probability calibration and cost-aware action threshold selection, followed by strict autonomous replay. No candidate promotion or new Demo orders are authorized by this phase.",
-  "updated_at_utc": "2026-08-26T08:43:52Z"
+  "updated_at_utc": "2026-08-26T08:52:25Z"
 }
