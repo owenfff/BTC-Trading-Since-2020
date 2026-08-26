@@ -5,7 +5,7 @@
   "current_work_package": "M15.21-prospective-decision-context-capture",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "b3ccf395a905a0d8cac679307c1e66e110f7a965",
-  "last_report_commit": "e6cf3ee8ef3271bb063a52331086926a8d718316",
+  "last_report_commit": "1acb3ba34ac9064e51b2e92044c08af810b188e3",
   "test_count": 411,
   "last_test_status": "FULL_SUITE_411_PASSED;PROSPECTIVE_DECISION_CONTEXT_CAPTURE;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
