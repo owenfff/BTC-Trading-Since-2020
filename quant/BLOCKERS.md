@@ -183,3 +183,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - The source audit found no independent historical quote/order-book stream. All `31,702` non-idle decision episodes align with the first recorded order event, so the order fields are contemporaneous rather than pre-action observations.
 - The current indicator set is causally valid (`264,288/264,288` closed bars strictly before decisions), but it cannot supply absent order intent, cancellation-before-fill context, or microstructure history.
 - Exact strategy recovery from this export is not identifiable without an additional verified public source containing pre-action context. Keep the active Demo model unchanged; do not promote v4.5 or add Demo orders.
+
+## 2026-08-26 — Behavioral strategy specification is approximation-only
+
+- M15.16 produces an auditable strategy contract, but it does not remove the public-record identifiability ceiling: the exact trigger that starts an action is still absent.
+- The website replay supplies a useful visual/public-state cross-check, while the independent TradeTrace write-up supplies hypotheses about inventory and execution patterns; neither is a disclosure of private decision rules.
+- Do not treat the strategy specification, indicator association, or conditional event-type score as an autonomous signal. The active Demo model remains unchanged and no new Demo orders are authorized.

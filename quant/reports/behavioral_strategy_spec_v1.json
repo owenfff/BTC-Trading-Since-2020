@@ -1,0 +1,257 @@
+{
+  "spec_version": "behavioral-strategy-spec-v1.0",
+  "status": "APPROXIMATION_ONLY",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "generated_at_utc": "2026-08-26T13:18:27.966834Z",
+  "purpose": "Evidence-bounded behavioral strategy contract; not a model artifact and not an order authorization.",
+  "active_runtime": {
+    "status": "UNCHANGED",
+    "research_status": "RESEARCH_ONLY",
+    "promotion_allowed": false,
+    "new_demo_orders_authorized": false
+  },
+  "data_scope": {
+    "eligible_rows": 264288,
+    "non_idle_rows": 12866,
+    "non_idle_rate": 0.04868174113088752,
+    "venues": [
+      "BITMEX",
+      "HYPERLIQUID"
+    ],
+    "teacher_data_type": "TRADE_RECORDS_ONLY"
+  },
+  "layers": [
+    {
+      "id": "inventory_state",
+      "name": "目标库存 / 当前仓位状态",
+      "classification": "OBSERVED_FACT",
+      "confidence": "HIGH",
+      "claim": "Non-idle behavior is strongly conditioned by current exposure and position state; the public record supports a stateful position-adjustment description.",
+      "implementation_boundary": "Use the robot's own reconciled position and history only; never use the teacher's future or post-action state during autonomous replay.",
+      "evidence": {
+        "profile_non_idle_rate": 0.04868174113088752,
+        "profile_by_venue": {
+          "BITMEX": {
+            "rows": 258492,
+            "non_idle_rate": 0.049165931634247866,
+            "target_abs_mean": 0.10056617428394803
+          },
+          "HYPERLIQUID": {
+            "rows": 5796,
+            "non_idle_rate": 0.027087646652864044,
+            "target_abs_mean": 0.33266227979816226
+          }
+        },
+        "profile_source": "strategy_behavior_profile_v4.json"
+      }
+    },
+    {
+      "id": "sparse_adjustment_actions",
+      "name": "稀疏的开仓 / 加仓 / 减仓 / 平仓 / 反手调整",
+      "classification": "OBSERVED_FACT",
+      "confidence": "HIGH",
+      "claim": "Most eligible clock rows are NO_TRADE; observed non-idle rows contain directional opens, adds, reductions, closes and flips.",
+      "implementation_boundary": "A candidate must preserve an explicit NO_TRADE path and must not turn every indicator fluctuation into an order.",
+      "evidence": {
+        "eligible_rows": 264288,
+        "non_idle_rows": 12866,
+        "non_idle_rate": 0.04868174113088752,
+        "action_counts": {
+          "ADD_LONG": 3754,
+          "ADD_SHORT": 2488,
+          "CLOSE_LONG": 681,
+          "CLOSE_SHORT": 232,
+          "FLIP_LONG": 115,
+          "FLIP_SHORT": 106,
+          "NO_TRADE": 251422,
+          "OPEN_LONG": 663,
+          "OPEN_SHORT": 248,
+          "REDUCE_LONG": 2671,
+          "REDUCE_SHORT": 1908
+        }
+      }
+    },
+    {
+      "id": "passive_inventory_execution",
+      "name": "被动挂单表达目标库存",
+      "classification": "SUPPORTED_APPROXIMATION",
+      "confidence": "MEDIUM",
+      "claim": "Layered limit/GTC execution is a plausible implementation of the observed inventory-adjustment behavior, supported by an independent public analysis, but it is not proven to be the trader's private rule.",
+      "implementation_boundary": "Use venue-native price, tick, lot, fee and post-only semantics; one net target per venue instrument and at most one active bot order.",
+      "evidence": {
+        "source_type": "independent_secondary_analysis",
+        "source_claim": "planned inventory was associated with limit orders in the public execution record",
+        "source_url": "https://github.com/AaronL725/TradeTrace/blob/main/reports/paulwei-analysis.md",
+        "not_proof_of_private_rule": true
+      }
+    },
+    {
+      "id": "urgency_override",
+      "name": "必要时的主动纠偏",
+      "classification": "SUPPORTED_APPROXIMATION",
+      "confidence": "MEDIUM",
+      "claim": "Market/IOC-style execution can be used only as a bounded urgency override when passive execution cannot safely correct the target; this is an implementation hypothesis, not an identified trigger.",
+      "implementation_boundary": "Require explicit urgency and risk checks, keep ReduceOnly for reductions, and fail closed when market context, account reconciliation or order state is stale.",
+      "evidence": {
+        "source_type": "independent_secondary_analysis",
+        "source_claim": "urgent corrections were associated with active fills",
+        "source_url": "https://github.com/AaronL725/TradeTrace/blob/main/reports/paulwei-analysis.md",
+        "not_proven_causal": true
+      }
+    },
+    {
+      "id": "position_episode_risk",
+      "name": "仓位周期与风险包络",
+      "classification": "OBSERVED_FACT",
+      "confidence": "HIGH",
+      "claim": "The record is better described as position episodes with repeated adjustments than as isolated independent trades; holding duration and action interval are measurable, while the private risk limits are not.",
+      "implementation_boundary": "Use observed historical distributions only as bounded risk references; do not infer unlimited leverage or assume past exposure is a safe future limit.",
+      "evidence": {
+        "holding_period_observed": {
+          "rows": 142170,
+          "mean_hours": 49.92728832392948,
+          "p95_hours": 223.26404194444444
+        },
+        "action_interval_observed": {
+          "series_count": 64,
+          "interval_count": 12802,
+          "mean_hours": 20.183877519137635,
+          "p95_hours": 64.0
+        },
+        "external_source_url": "https://github.com/AaronL725/TradeTrace/blob/main/reports/paulwei-analysis.md"
+      }
+    },
+    {
+      "id": "indicator_inputs",
+      "name": "RSI / MACD / 布林带等指标",
+      "classification": "SUPPORTED_APPROXIMATION",
+      "confidence": "LOW",
+      "claim": "Indicators are valid causal model inputs when computed from already-closed bars, but correlations and bucket lifts do not establish that the original trader used these indicators or that they caused an action.",
+      "implementation_boundary": "Keep indicator features leakage-safe and explicitly label them as model-input evidence; missing funding, mark/index or microstructure context must remain missing.",
+      "evidence": {
+        "indicator_fields": [
+          "feature_rsi_14",
+          "feature_macd_histogram",
+          "feature_bollinger_percent_b_20",
+          "feature_volume_percentile_72bar"
+        ],
+        "closed_bar_strictly_before_decision": 264288,
+        "bar_equal_or_after_decision": 0,
+        "interpretation": "association_only"
+      }
+    },
+    {
+      "id": "pre_action_timing",
+      "name": "下单前精确触发时机",
+      "classification": "UNIDENTIFIABLE",
+      "confidence": "BLOCKED",
+      "claim": "The current public export does not identify the exact pre-action trigger, quote state, order-book condition, cancellation intent or private decision rule.",
+      "implementation_boundary": "Do not convert the conditional event benchmark into a deployable timing signal; any autonomous timing model remains research-only until independently observed pre-action context is available.",
+      "evidence": {
+        "complete_pre_action_trigger_context_available": false,
+        "independent_quote_orderbook_history_present": false,
+        "non_idle_decisions_matched": 31702,
+        "decision_time_equal_first_order_event": 31702,
+        "conditional_vs_autonomous": [
+          {
+            "venue": "BITMEX",
+            "conditional_action_macro_f1": 0.38204719676397214,
+            "autonomous_timing_f1": 0.0
+          },
+          {
+            "venue": "HYPERLIQUID",
+            "conditional_action_macro_f1": 0.5857142857142857,
+            "autonomous_timing_f1": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "cross_venue_execution",
+      "name": "跨交易所统一行为层 + 原生执行层",
+      "classification": "SUPPORTED_APPROXIMATION",
+      "confidence": "MEDIUM",
+      "claim": "The same trader identity can support a shared high-level intent vocabulary, but executable behavior remains venue-native because contract scale, funding, liquidity, symbol coverage and order semantics differ.",
+      "implementation_boundary": "Keep BitMEX and Hyperliquid evidence separated; share only venue-neutral intent features, then calibrate exposure and execution per venue.",
+      "evidence": {
+        "venues_in_profile": [
+          "BITMEX",
+          "HYPERLIQUID"
+        ],
+        "same_trader_not_same_policy": true,
+        "source_report": "venue_native_behavior_audit / shared_intent_native_layer_audit"
+      }
+    }
+  ],
+  "operational_policy": {
+    "mode": "RESEARCH_AND_BOUNDED_DEMO_ONLY",
+    "signal_contract": [
+      "action",
+      "target_exposure",
+      "confidence",
+      "risk_tags",
+      "valid_until"
+    ],
+    "requires": [
+      "causal_closed_bar_features",
+      "venue_native_contract_and_unit_normalization",
+      "reconciled_account_and_position_state",
+      "fresh_market_and_private_streams",
+      "risk_gates_and_single_active_order_guard",
+      "strict_autonomous_walk_forward_validation"
+    ],
+    "forbids": [
+      "teacher_future_state_in_autonomous_replay",
+      "unbounded_exposure",
+      "synthetic_market_data_substitution",
+      "silent_missing_value_to_zero_forcing",
+      "automatic_model_promotion"
+    ]
+  },
+  "prohibited_claims": [
+    "The robot has exactly recovered the original trader's private strategy.",
+    "The trader definitely used RSI, MACD, Bollinger Bands or any other named indicator.",
+    "Historical replay results guarantee future profitability.",
+    "BitMEX and Hyperliquid are executable-policy interchangeable.",
+    "The specification itself authorizes live or mainnet orders."
+  ],
+  "sources": [
+    {
+      "path": "quant\\reports\\strategy_behavior_profile_v4.json",
+      "sha256": "867efac94e5c559e7b46a142a5201970d6d0455bcb9be11742b8356981ddb49c",
+      "report_version": "STRATEGY-BEHAVIOR-PROFILE-V4",
+      "status": null,
+      "strategy_fidelity": null
+    },
+    {
+      "path": "quant\\reports\\pre_action_observability_audit.json",
+      "sha256": "0c9ab309670e4de538578be03b710f8f8eaed96e607cfec4defaf9241382240c",
+      "report_version": "M15-PRE-ACTION-OBSERVABILITY-1.0",
+      "status": "DIAGNOSTIC_ONLY",
+      "strategy_fidelity": "BEHAVIORAL_APPROXIMATION"
+    },
+    {
+      "path": "quant\\reports\\identifiability_ceiling_audit.json",
+      "sha256": "a5ac9a3e07c7811d06eb2f6627ad14205f9f63f34490539eae5db30cb5d4ebc5",
+      "report_version": "M15-IDENTIFIABILITY-CEILING-1.0",
+      "status": "DIAGNOSTIC_ONLY",
+      "strategy_fidelity": "BEHAVIORAL_APPROXIMATION"
+    },
+    {
+      "kind": "PUBLIC_REPLAY_WEBSITE",
+      "name": "Paul Wei Hyperliquid BTC tracker",
+      "url": "https://paul.catseye.today/",
+      "role": "visual replay and public-state cross-check",
+      "limitations": "A replay of public candles, fills, orders and state snapshots; it does not by itself expose a complete pre-action quote/order-book history or private decision rule."
+    },
+    {
+      "kind": "INDEPENDENT_SECONDARY_ANALYSIS",
+      "name": "TradeTrace Paul Wei trading pattern research",
+      "url": "https://github.com/AaronL725/TradeTrace/blob/main/reports/paulwei-analysis.md",
+      "role": "independent interpretation of observable execution and inventory patterns",
+      "limitations": "Secondary analysis, not a private strategy disclosure or proof of causality; its conservative rules remain hypotheses."
+    }
+  ],
+  "conclusion": "The strongest defensible result is a sparse, stateful inventory-adjustment approximation with venue-native execution. Action type and sizing are partly observable once an event is known, but exact autonomous timing and the trader's private trigger remain unidentifiable from the current public record.",
+  "raw_inputs_untouched": true
+}

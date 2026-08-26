@@ -303,3 +303,10 @@
 - The repository has no independent historical quote, level-2, order-book, or pre-order intent stream. Submission fields are contemporaneous with the action; fill/lifecycle fields such as average price, cumulative quantity, leaves quantity, and fees are post-action-sensitive.
 - All `264,288` temporal rows have a closed bar strictly before the decision and indicator coverage, but adding those hourly indicators cannot recreate missing pre-action order intent or order-book context.
 - Exact autonomous recovery from the current public export is therefore not identifiable. Keep the auditable approximation and the active Demo model unchanged; do not promote a candidate or add Demo orders.
+
+## 2026-08-26 — Freeze the evidence-bounded behavioral strategy specification
+
+- M15.16 compiles the completed profile, identifiability ceiling, and pre-action observability audits into `quant/reports/behavioral_strategy_spec_v1.json` and `.md`.
+- The strongest defensible strategy description is a sparse, stateful inventory-adjustment process: explicit `NO_TRADE`, then open/add/reduce/close/flip actions conditioned primarily on the robot's own reconciled position and venue-native execution state.
+- Layered passive limits and bounded urgency overrides are retained as `SUPPORTED_APPROXIMATION` hypotheses from independent public analysis, not as proven private rules. RSI/MACD/Bollinger features remain causal input candidates with association-only interpretation.
+- Exact pre-action timing, private trigger logic, cancellation intent, and order-book context remain `UNIDENTIFIABLE`; the specification cannot authorize model promotion, Demo orders, mainnet access, or profitability claims.

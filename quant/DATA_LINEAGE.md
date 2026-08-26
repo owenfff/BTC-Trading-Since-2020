@@ -353,3 +353,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Raw source: `api-v1-order.csv` (`43,251` rows), `quant/outputs/order_episodes.csv` (`31,702` episodes), `quant/outputs/decision_episodes.csv`, and `quant/outputs/cross_venue_temporal_dataset_v3.csv` (`264,288` rows).
 - Findings: order IDs are lifecycle-repeated; `31,702/31,702` non-idle decisions match an order episode and have decision time equal to its first recorded order event. No independent quote/order-book history was found. All temporal rows have a closed market bar strictly before the decision (`264,288/264,288`).
 - Status: source-sufficiency diagnostic only; exact autonomous trigger context is absent, active Demo remains unchanged, raw CSV/JSON remained unchanged, and no credential, private endpoint, mainnet connection, or order was used.
+
+## M15.16 behavioral strategy specification
+
+- Builder: `quant/scripts/build_behavioral_strategy_spec.py`; tests: `quant/tests/test_behavioral_strategy_spec.py`.
+- Outputs: `quant/reports/behavioral_strategy_spec_v1.md` and `quant/reports/behavioral_strategy_spec_v1.json`.
+- Inputs are the frozen report artifacts `strategy_behavior_profile_v4.json`, `pre_action_observability_audit.json`, and `identifiability_ceiling_audit.json`; their SHA256 values are embedded in the output JSON.
+- The specification preserves the source boundary: `OBSERVED_FACT`, `SUPPORTED_APPROXIMATION`, and `UNIDENTIFIABLE` are separate classifications; external replay/analysis URLs are recorded with their limitations.
+- No raw root CSV/JSON was read-write transformed. No credentials, private endpoint, mainnet connection, order, model promotion, or Demo change was performed.
