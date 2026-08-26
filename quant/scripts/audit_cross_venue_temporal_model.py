@@ -39,6 +39,7 @@ REPORT = ROOT / "quant" / "reports" / "cross_venue_temporal_autonomous_audit.jso
 REPORT_MD = ROOT / "quant" / "reports" / "cross_venue_temporal_autonomous_audit.md"
 TEMPORAL_VERSION = "behavioral-distillation-v3-cross-venue-temporal-clock"
 BALANCED_TEMPORAL_VERSION = "behavioral-distillation-v3-cross-venue-temporal-balanced"
+CALIBRATED_TEMPORAL_VERSION = "behavioral-distillation-v3.4-calibrated-action-target"
 EVENT_BASELINE_VERSION = "behavioral-distillation-v3.2-event-supervision-baseline"
 
 
@@ -72,10 +73,14 @@ def _read_temporal(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _fit_temporal(rows: list[dict[str, Any]], *, balanced: bool = False) -> CrossAssetNumpyLogisticStrategy:
+def _fit_temporal(rows: list[dict[str, Any]], *, balanced: bool = False, calibrated: bool = False) -> CrossAssetNumpyLogisticStrategy:
     train = [dict(row, dataset_split="TRAIN") for row in rows if str(row.get("label_status")) == "AVAILABLE"]
-    model = CrossAssetNumpyLogisticStrategy(target_l2=1.0, class_weighting="balanced" if balanced else None).fit(train)
-    model.version = BALANCED_TEMPORAL_VERSION if balanced else TEMPORAL_VERSION
+    model = CrossAssetNumpyLogisticStrategy(
+        target_l2=1.0,
+        class_weighting="sqrt_balanced" if calibrated else ("balanced" if balanced else None),
+        enforce_action_target_consistency=calibrated,
+    ).fit(train)
+    model.version = CALIBRATED_TEMPORAL_VERSION if calibrated else (BALANCED_TEMPORAL_VERSION if balanced else TEMPORAL_VERSION)
     return model
 
 
@@ -149,9 +154,9 @@ def _causal_audit(rows: list[Mapping[str, Any]]) -> dict[str, Any]:
     return {"status": "PASS" if not any(values.values()) else "BLOCKED", "checks": values}
 
 
-def build(*, dataset_path: Path = DATASET_TEMPORAL, balanced: bool = False, report_path: Path = REPORT, report_md_path: Path = REPORT_MD) -> dict[str, Any]:
+def build(*, dataset_path: Path = DATASET_TEMPORAL, balanced: bool = False, calibrated: bool = False, report_path: Path = REPORT, report_md_path: Path = REPORT_MD) -> dict[str, Any]:
     rows = _read_temporal(dataset_path)
-    candidate_version = BALANCED_TEMPORAL_VERSION if balanced else TEMPORAL_VERSION
+    candidate_version = CALIBRATED_TEMPORAL_VERSION if calibrated else (BALANCED_TEMPORAL_VERSION if balanced else TEMPORAL_VERSION)
     causal = _causal_audit(rows)
     bars, opens = _load_bars()
     behavior: list[dict[str, Any]] = []
@@ -168,7 +173,7 @@ def build(*, dataset_path: Path = DATASET_TEMPORAL, balanced: bool = False, repo
             windows.append({"window": window.name, "status": "NO_DATA", "train_rows": len(train), "test_rows": len(test)})
             continue
 
-        temporal_model = _fit_temporal(train, balanced=balanced)
+        temporal_model = _fit_temporal(train, balanced=balanced, calibrated=calibrated)
         event_train, event_test, event_scales = _event_baseline_rows(rows, window)
         event_model = _fit_event_baseline(event_train)
         event_test_on_temporal, _ = normalize_window_rows(test_raw, event_train)
@@ -293,11 +298,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", type=Path, default=DATASET_TEMPORAL)
     parser.add_argument("--balanced", action="store_true", help="use explicit inverse-frequency class weighting")
+    parser.add_argument("--calibrated", action="store_true", help="use sqrt-balanced weighting and action-target consistency")
     args = parser.parse_args()
     try:
-        report_path = REPORT if not args.balanced else ROOT / "quant" / "reports" / "cross_venue_temporal_balanced_autonomous_audit.json"
-        report_md_path = REPORT_MD if not args.balanced else ROOT / "quant" / "reports" / "cross_venue_temporal_balanced_autonomous_audit.md"
-        result = build(dataset_path=args.dataset.resolve(), balanced=args.balanced, report_path=report_path, report_md_path=report_md_path)
+        if args.calibrated:
+            report_path = ROOT / "quant" / "reports" / "cross_venue_temporal_calibrated_autonomous_audit.json"
+            report_md_path = ROOT / "quant" / "reports" / "cross_venue_temporal_calibrated_autonomous_audit.md"
+        elif args.balanced:
+            report_path = ROOT / "quant" / "reports" / "cross_venue_temporal_balanced_autonomous_audit.json"
+            report_md_path = ROOT / "quant" / "reports" / "cross_venue_temporal_balanced_autonomous_audit.md"
+        else:
+            report_path = REPORT
+            report_md_path = REPORT_MD
+        result = build(dataset_path=args.dataset.resolve(), balanced=args.balanced, calibrated=args.calibrated, report_path=report_path, report_md_path=report_md_path)
     except (FileNotFoundError, OSError, ValueError) as error:
         print(json.dumps({"status": "BLOCKED", "error_code": "TEMPORAL_AUDIT_FAILED", "message": str(error)}, ensure_ascii=False))
         return 2

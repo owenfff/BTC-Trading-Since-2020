@@ -182,6 +182,36 @@ def test_balanced_class_weighting_is_explicit_and_round_trips() -> None:
     assert restored.class_weighting == "balanced"
 
 
+def test_action_target_consistency_prevents_no_trade_from_repositioning() -> None:
+    rows = []
+    for index in range(12):
+        row = {key: None for key in FEATURE_COLUMNS}
+        row.update({
+            "decision_time": f"2020-01-01T{index:02d}:00:00Z",
+            "dataset_split": "TRAIN",
+            "label_status": "AVAILABLE",
+            "label_next_action": "NO_TRADE",
+            "label_next_target_exposure": "0.0",
+            "feature_symbol": "A",
+            "feature_instrument_class": "DERIVATIVE",
+            "feature_payout_model": "LINEAR",
+            "feature_quote_currency": "USD",
+            "feature_settlement_currency": "USD",
+            "feature_market_bar_interval": "1h",
+            "feature_market_data_available": True,
+            "feature_mark_index_missing": False,
+            "feature_market_regime": "RANGE_OR_MIXED",
+            "feature_contract_lot_size": 1.0,
+            "feature_multiplier_major": 1.0,
+            "feature_current_normalized_exposure": 0.0,
+        })
+        rows.append(row)
+    model = CrossAssetNumpyLogisticStrategy(target_l2=1.0, enforce_action_target_consistency=True).fit(rows)
+    signal = model.predict(StrategyInput(datetime(2020, 1, 2, tzinfo=UTC), rows[0], current_strategy_position=0.37))
+    assert signal.action == "NO_TRADE"
+    assert signal.target_exposure == 0.37
+
+
 def test_market_coverage_audit_marks_out_of_range_series_insufficient() -> None:
     first = datetime(2020, 1, 1, tzinfo=UTC)
     last = datetime(2020, 1, 2, tzinfo=UTC)

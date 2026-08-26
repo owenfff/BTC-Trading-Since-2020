@@ -138,11 +138,11 @@ class NumpyLogisticStrategy:
 
     version = "behavioral-distillation-v1-logistic-numpy"
 
-    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3, target_l2: float = 0.0, class_weighting: str | None = None) -> None:
+    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3, target_l2: float = 0.0, class_weighting: str | None = None, enforce_action_target_consistency: bool = False) -> None:
         if target_l2 < 0:
             raise ValueError("target_l2 must be non-negative")
-        if class_weighting not in {None, "balanced"}:
-            raise ValueError("class_weighting must be None or 'balanced'")
+        if class_weighting not in {None, "balanced", "sqrt_balanced"}:
+            raise ValueError("class_weighting must be None, 'balanced', or 'sqrt_balanced'")
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.l2 = l2
@@ -152,6 +152,7 @@ class NumpyLogisticStrategy:
         # near-collinear instrument and indicator columns.
         self.target_l2 = target_l2
         self.class_weighting = class_weighting
+        self.enforce_action_target_consistency = enforce_action_target_consistency
         self.encoder = FeatureEncoder()
         self.actions: list[str] = []
         self.weights: np.ndarray | None = None
@@ -182,6 +183,9 @@ class NumpyLogisticStrategy:
         if self.class_weighting == "balanced":
             counts = np.bincount(labels, minlength=class_count).astype(float)
             sample_weights = np.asarray([len(train) / (class_count * counts[label]) if counts[label] else 1.0 for label in labels], dtype=float)
+        elif self.class_weighting == "sqrt_balanced":
+            counts = np.bincount(labels, minlength=class_count).astype(float)
+            sample_weights = np.asarray([np.sqrt(len(train) / (class_count * counts[label])) if counts[label] else 1.0 for label in labels], dtype=float)
         weight_sum = float(sample_weights.sum())
         if self.target_l2:
             # Equivalent to X'X + λI for X=[1, matrix], but without materializing
@@ -221,6 +225,10 @@ class NumpyLogisticStrategy:
         class_index = int(np.argmax(probabilities))
         augmented = np.concatenate(([1.0], vector))
         target = float(np.clip(augmented @ self.target_coef, -1.0, 1.0))
+        if self.enforce_action_target_consistency and self.actions[class_index] in {"NO_TRADE", "HOLD_LONG", "HOLD_SHORT"}:
+            # A hold/no-trade action must not secretly generate a new target
+            # position from the independent regression head.
+            target = float(np.clip(strategy_input.current_strategy_position, -1.0, 1.0))
         tags = ["TRAIN_NUMPY_LOGISTIC"]
         if str(strategy_input.features.get("feature_mark_index_missing")) in {"True", "true", "1"}:
             tags.append("MARK_INDEX_MISSING")
@@ -246,6 +254,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             "l2": self.l2,
             "target_l2": self.target_l2,
             "class_weighting": self.class_weighting,
+            "enforce_action_target_consistency": self.enforce_action_target_consistency,
             "fit_row_count": self.fit_row_count,
             "actions": list(self.actions),
             "weights": self.weights.tolist(),
@@ -264,6 +273,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             l2=float(payload.get("l2", 1e-3)),
             target_l2=float(payload.get("target_l2", 0.0)),
             class_weighting=payload.get("class_weighting"),
+            enforce_action_target_consistency=bool(payload.get("enforce_action_target_consistency", False)),
         )
         model.version = str(payload.get("version", cls.version))
         model.actions = [str(item) for item in payload.get("actions", [])]
