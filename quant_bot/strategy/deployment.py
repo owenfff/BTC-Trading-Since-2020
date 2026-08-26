@@ -14,7 +14,8 @@ from .supervised_models import CrossAssetNumpyLogisticStrategy
 LEGACY_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v2-cross-asset-deploy"
 DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3-cross-asset-indicators"
 OPERATIONAL_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3.1-operational-parity"
-SUPPORTED_DEPLOYMENT_MODEL_VERSIONS = {LEGACY_DEPLOYMENT_MODEL_VERSION, DEPLOYMENT_MODEL_VERSION, OPERATIONAL_DEPLOYMENT_MODEL_VERSION}
+STABLE_TARGET_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3.2-stable-target"
+SUPPORTED_DEPLOYMENT_MODEL_VERSIONS = {LEGACY_DEPLOYMENT_MODEL_VERSION, DEPLOYMENT_MODEL_VERSION, OPERATIONAL_DEPLOYMENT_MODEL_VERSION, STABLE_TARGET_DEPLOYMENT_MODEL_VERSION}
 
 
 @dataclass(frozen=True)
@@ -37,7 +38,7 @@ class DeploymentBundle:
     def validate(self) -> None:
         if self.model_version not in SUPPORTED_DEPLOYMENT_MODEL_VERSIONS:
             raise ValueError(f"unexpected deployment model version: {self.model_version}")
-        expected_contract = LEGACY_FEATURE_CONTRACT_VERSION if self.model_version == LEGACY_DEPLOYMENT_MODEL_VERSION else OPERATIONAL_FEATURE_CONTRACT_VERSION if self.model_version == OPERATIONAL_DEPLOYMENT_MODEL_VERSION else FEATURE_CONTRACT_VERSION
+        expected_contract = LEGACY_FEATURE_CONTRACT_VERSION if self.model_version == LEGACY_DEPLOYMENT_MODEL_VERSION else OPERATIONAL_FEATURE_CONTRACT_VERSION if self.model_version in {OPERATIONAL_DEPLOYMENT_MODEL_VERSION, STABLE_TARGET_DEPLOYMENT_MODEL_VERSION} else FEATURE_CONTRACT_VERSION
         if self.feature_contract_version != expected_contract:
             raise ValueError("deployment feature contract does not match runtime contract")
         if not self.training_data_sha256 or len(self.training_data_sha256) != 64:
@@ -125,6 +126,7 @@ def utc_now() -> str:
 __all__ = [
     "DEPLOYMENT_MODEL_VERSION",
     "OPERATIONAL_DEPLOYMENT_MODEL_VERSION",
+    "STABLE_TARGET_DEPLOYMENT_MODEL_VERSION",
     "DeploymentBundle",
     "load_deployment_bundle",
     "save_deployment_bundle",

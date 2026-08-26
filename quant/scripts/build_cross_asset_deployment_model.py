@@ -113,6 +113,7 @@ def build(
     model_version: str = LEGACY_DEPLOYMENT_MODEL_VERSION,
     feature_contract_version: str = LEGACY_FEATURE_CONTRACT_VERSION,
     strategy_version: str = "behavioral-distillation-v2-cross-asset-logistic",
+    target_l2: float = 0.0,
 ) -> dict[str, Any]:
     dataset_path = dataset_path or (ROOT / "quant" / "outputs" / "cross_asset_model_dataset.csv")
     if not dataset_path.exists():
@@ -150,7 +151,7 @@ def build(
             row["feature_funding_rate_missing"] = "0" if funding_raw not in (None, "") else "1"
             row["feature_mark_index_basis_missing"] = "1" if mark_missing or row.get("feature_mark_index_basis") in (None, "") else "0"
         fit_rows.append(row)
-    model = CrossAssetNumpyLogisticStrategy().fit(fit_rows)
+    model = CrossAssetNumpyLogisticStrategy(target_l2=target_l2).fit(fit_rows)
     model.version = strategy_version
     symbols = sorted({str(row["symbol"]) for row in source_rows if row.get("symbol")})
     policy: dict[str, dict[str, Any]] = {}
@@ -208,6 +209,7 @@ def build(
         "risk_envelope": bundle.risk_envelope,
         "artifact": f"{artifact_path.as_posix()} (tracked deployment artifact)",
         "rollout_status": rollout_status,
+        "target_regression_l2": target_l2,
     }
     reports.mkdir(parents=True, exist_ok=True)
     (reports / f"{report_stem}.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -224,6 +226,7 @@ def build(
             f"- model SHA256: `{bundle.model_sha256}`",
             f"- code commit: `{bundle.code_commit}`",
             f"- rollout status: **{rollout_status}**",
+            f"- target regression ridge λ: `{target_l2}`",
             "- runtime training: **disabled**",
             "- Spot: **monitor-only**",
             "",

@@ -111,6 +111,47 @@ def test_cross_asset_signal_can_be_consumed_by_local_paper_engine() -> None:
     assert engine.state.position > 0
 
 
+def test_stable_target_regression_uses_ridge_without_changing_legacy_default() -> None:
+    rows = []
+    for index in range(24):
+        row = {key: None for key in FEATURE_COLUMNS}
+        row.update({
+            "decision_time": f"2020-01-{index + 1:02d}T00:00:00Z",
+            "dataset_split": "TRAIN",
+            "label_status": "AVAILABLE",
+            "label_next_action": "OPEN_LONG" if index % 2 == 0 else "OPEN_SHORT",
+            "label_next_target_exposure": "0.25" if index % 2 == 0 else "-0.25",
+            "feature_symbol": "A",
+            "feature_instrument_class": "DERIVATIVE",
+            "feature_payout_model": "LINEAR",
+            "feature_quote_currency": "USD",
+            "feature_settlement_currency": "USD",
+            "feature_market_bar_interval": "1h",
+            "feature_market_data_available": True,
+            "feature_mark_index_missing": False,
+            "feature_market_regime": "RANGE_OR_MIXED",
+            "feature_contract_lot_size": 1.0,
+            "feature_multiplier_major": 1.0,
+            "feature_current_normalized_exposure": 0.0,
+            # Deliberately collinear with the next field, as in instrument
+            # metadata plus indicator columns in the historical dataset.
+            "feature_rsi_14": 50.0,
+            "feature_macd_line_12_26": 0.0,
+            "feature_macd_signal_9": 0.0,
+            "feature_macd_histogram": 0.0,
+            "feature_bollinger_zscore_20": 0.0,
+            "feature_bollinger_percent_b_20": 0.5,
+        })
+        rows.append(row)
+    legacy = CrossAssetNumpyLogisticStrategy().fit(rows)
+    stable = CrossAssetNumpyLogisticStrategy(target_l2=1.0).fit(rows)
+    assert stable.target_l2 == 1.0
+    assert stable.target_coef is not None
+    assert all(float(value) == float(value) for value in stable.target_coef)
+    assert max(abs(float(value)) for value in stable.target_coef) < 100.0
+    assert legacy.target_l2 == 0.0
+
+
 def test_market_coverage_audit_marks_out_of_range_series_insufficient() -> None:
     first = datetime(2020, 1, 1, tzinfo=UTC)
     last = datetime(2020, 1, 2, tzinfo=UTC)

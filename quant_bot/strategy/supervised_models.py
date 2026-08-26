@@ -138,10 +138,17 @@ class NumpyLogisticStrategy:
 
     version = "behavioral-distillation-v1-logistic-numpy"
 
-    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3) -> None:
+    def __init__(self, epochs: int = 60, learning_rate: float = 0.18, l2: float = 1e-3, target_l2: float = 0.0) -> None:
+        if target_l2 < 0:
+            raise ValueError("target_l2 must be non-negative")
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.l2 = l2
+        # ``0`` preserves the historical artifact contract.  New candidate
+        # models can opt into ridge-stabilised target regression; this is
+        # important because the standardized feature matrix still contains
+        # near-collinear instrument and indicator columns.
+        self.target_l2 = target_l2
         self.encoder = FeatureEncoder()
         self.actions: list[str] = []
         self.weights: np.ndarray | None = None
@@ -161,7 +168,16 @@ class NumpyLogisticStrategy:
         self.bias = np.zeros(class_count, dtype=float)
         targets = np.asarray([float(row["label_next_target_exposure"]) for row in train], dtype=float)
         augmented = np.column_stack([np.ones(matrix.shape[0]), matrix])
-        self.target_coef = np.linalg.pinv(augmented) @ targets
+        if self.target_l2:
+            penalty = np.eye(augmented.shape[1], dtype=float)
+            penalty[0, 0] = 0.0
+            gram = augmented.T @ augmented + self.target_l2 * penalty
+            try:
+                self.target_coef = np.linalg.solve(gram, augmented.T @ targets)
+            except np.linalg.LinAlgError:
+                self.target_coef = np.linalg.pinv(gram) @ (augmented.T @ targets)
+        else:
+            self.target_coef = np.linalg.pinv(augmented) @ targets
         one_hot = np.eye(class_count)[labels]
         for _ in range(self.epochs):
             probabilities = _softmax(matrix @ self.weights + self.bias)
@@ -202,6 +218,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             "epochs": self.epochs,
             "learning_rate": self.learning_rate,
             "l2": self.l2,
+            "target_l2": self.target_l2,
             "fit_row_count": self.fit_row_count,
             "actions": list(self.actions),
             "weights": self.weights.tolist(),
@@ -218,6 +235,7 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             epochs=int(payload.get("epochs", 60)),
             learning_rate=float(payload.get("learning_rate", 0.18)),
             l2=float(payload.get("l2", 1e-3)),
+            target_l2=float(payload.get("target_l2", 0.0)),
         )
         model.version = str(payload.get("version", cls.version))
         model.actions = [str(item) for item in payload.get("actions", [])]
