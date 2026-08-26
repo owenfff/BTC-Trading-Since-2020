@@ -27,6 +27,7 @@ REQUIRED_REPORTS = {
     "pre_action": REPORT_DIR / "pre_action_observability_audit.json",
     "identifiability": REPORT_DIR / "identifiability_ceiling_audit.json",
     "behavior_spec": REPORT_DIR / "behavioral_strategy_spec_v1.json",
+    "hyperliquid_order_intent": REPORT_DIR / "hyperliquid_order_intent_audit.json",
     "native": REPORT_DIR / "venue_native_behavior_audit.json",
     "shared_intent": REPORT_DIR / "shared_intent_native_layer_audit.json",
     "shared_timing": REPORT_DIR / "shared_intent_timing_audit.json",
@@ -64,6 +65,7 @@ def build_payload(*, sources: Mapping[str, Mapping[str, Any]], generated_at_utc:
     pre_action = sources["pre_action"]
     identifiability = sources["identifiability"]
     behavior_spec = sources["behavior_spec"]
+    hyperliquid_order_intent = sources["hyperliquid_order_intent"]
     native = sources["native"]
     shared_intent = sources["shared_intent"]
     shared_timing = sources["shared_timing"]
@@ -92,6 +94,12 @@ def build_payload(*, sources: Mapping[str, Mapping[str, Any]], generated_at_utc:
             "FAIL" if not assessment.get("complete_pre_action_trigger_context_available") else "PASS",
             "pre_action.pre_action_trigger_assessment.complete_pre_action_trigger_context_available",
             "Complete pre-action trigger, cancellation intent and order-book context are absent from the current public export.",
+        ),
+        _gate(
+            "hyperliquid_partial_order_intent",
+            "PASS" if hyperliquid_order_intent.get("status") == "PARTIAL_PRE_ACTION_CONTEXT" and hyperliquid_order_intent.get("quality_checks", {}).get("filled_order_join_rate") == 1.0 else "WARNING",
+            "hyperliquid_order_intent.order_intent",
+            "Hyperliquid submitted order terms are available for a recent snapshot and all filled-status order IDs in that snapshot join to fills; this improves execution analysis but is not complete trigger context.",
         ),
         _gate(
             "strict_autonomous_timing",
