@@ -6,6 +6,13 @@ from decimal import Decimal
 from typing import Any, Mapping
 
 
+PERSISTED_BLOCK_REASONS = frozenset({
+    "DAILY_LOSS_LIMIT",
+    "PEAK_DRAWDOWN_LIMIT",
+    "CONSECUTIVE_ORDER_REJECTS",
+})
+
+
 def _utc(value: datetime | None = None) -> datetime:
     result = value or datetime.now(timezone.utc)
     if result.tzinfo is None:
@@ -112,7 +119,12 @@ class RuntimeRiskState:
                 setattr(self, name, _dec(data[name], getattr(self, name)))
         self.day_key = str(data.get("day_key") or self.day_key)
         self.updated_at = str(data.get("updated_at")) if data.get("updated_at") else self.updated_at
-        self.block_reasons = [str(item) for item in data.get("block_reasons", [])]
+        # Operational failures are re-evaluated on a fresh start. Persisting
+        # them would make a recovered WebSocket or clock remain blocked
+        # forever. Hard loss/reject limits remain sticky until an operator
+        # explicitly handles them; the file-backed manual kill switch is
+        # re-engaged by VenueRuntime when its file is present.
+        self.block_reasons = [str(item) for item in data.get("block_reasons", []) if str(item) in PERSISTED_BLOCK_REASONS]
         self.kill_switch_engaged = bool(data.get("kill_switch_engaged", False))
 
 

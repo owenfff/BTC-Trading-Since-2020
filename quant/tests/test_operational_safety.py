@@ -31,6 +31,15 @@ def test_runtime_risk_blocks_daily_loss_and_preserves_positions() -> None:
     assert state.snapshot()["kill_switch_engaged"] is False
 
 
+def test_runtime_risk_rechecks_transient_failures_after_restart() -> None:
+    state = RuntimeRiskState()
+    state.trigger("PRIVATE_WEBSOCKET_ERROR")
+    state.trigger("CONSECUTIVE_ORDER_REJECTS")
+    state.restore(state.snapshot())
+    assert "PRIVATE_WEBSOCKET_ERROR" not in state.block_reasons
+    assert "CONSECUTIVE_ORDER_REJECTS" in state.block_reasons
+
+
 def test_risk_gate_blocks_stale_market_clock_and_kill_switch() -> None:
     decision = check_testnet_order(
         enable_orders=True,
