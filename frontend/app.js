@@ -376,9 +376,11 @@ function renderAccount(payload) {
   setText("#fill-count", fills.length);
   setText("#runtime-status", (runtime.status || "NOT RUNNING").toUpperCase());
   const riskReasons = Array.isArray(risk.block_reasons) ? risk.block_reasons : [];
+  const orderBlockReasons = Array.isArray(runtime.order_block_reasons) ? runtime.order_block_reasons : [];
+  const allRiskReasons = [...new Set([...riskReasons, ...orderBlockReasons])];
   const feedback = runtime.latest_feedback_at ? ` · 最新成交反馈 ${runtime.latest_feedback_at}` : "";
   const orderAge = runtime.oldest_active_order_age_seconds == null ? "" : ` · 最老活动订单 ${displayNumber(runtime.oldest_active_order_age_seconds, "0")} 秒`;
-  setText("#runtime-safety", riskReasons.length ? `风控阻断：${riskReasons.join("、")}${feedback}${orderAge}` : `风控正常 · 时钟偏移 ${displayNumber(runtime.clock_drift_seconds, "—")} 秒${feedback}${orderAge}`);
+  setText("#runtime-safety", allRiskReasons.length ? `下单阻断：${allRiskReasons.join("、")}${feedback}${orderAge}` : `风控正常 · 时钟偏移 ${displayNumber(runtime.clock_drift_seconds, "—")} 秒${feedback}${orderAge}`);
 
   const balanceList = $("#balance-list");
   balanceList.replaceChildren();

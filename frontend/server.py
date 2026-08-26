@@ -434,6 +434,13 @@ def status_payload() -> dict[str, Any]:
             "stop_reason": runtime.get("stop_reason"),
             "last_error": runtime.get("last_error"),
             "risk": runtime.get("risk", {}),
+            "order_block_reasons": sorted({
+                str(reason)
+                for reasons in dict(runtime.get("blocked", {})).values()
+                if isinstance(reasons, list)
+                for reason in reasons
+            }),
+            "blocked_symbols": sorted(str(symbol) for symbol in dict(runtime.get("blocked", {}))),
             "clock_drift_seconds": runtime.get("clock_drift_seconds"),
             "market_context": runtime.get("market_context", {}),
             "latest_feedback_at": (runtime.get("behavior_state") or {}).get("latest_feedback_at"),
