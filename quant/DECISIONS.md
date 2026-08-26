@@ -268,3 +268,11 @@
 - Candidate `behavioral-distillation-v4.0-sequence-memory` was evaluated with the existing state-robust training protocol and untouched chronological test windows. Strict costed returns were `0.000000`, `-0.000028`, and `+0.004218` in WF1/WF2/WF3; it remains blocked.
 - Sequence memory improves the causal representation and prevents the model from reading teacher action history during autonomous replay, but it does not establish stable strategy recovery. The active Demo model remains unchanged.
 - Full test suite after the change: `380 passed`. No claim of exact learning or future profitability is permitted.
+
+## 2026-08-26 — Venue-native calibration confirms platform divergence
+
+- Candidate `behavioral-distillation-v4.1-venue-native-calibration` split BitMEX and Hyperliquid independently in chronological 80/20 windows and fitted each venue with train-only normalization and calibration.
+- BitMEX used `206793` train rows and `42624` holdout rows. Strict autonomous net return was `-0.004768`, profit factor `0.971626`, and predicted action rate `57.43%`, indicating overtrading after costs.
+- Hyperliquid used `4636` train rows and `1160` holdout rows. Strict autonomous replay made no effective adjustment, with `0.000000` net return and a `0.00%` action rate; its coverage is materially smaller and funding context is mostly missing.
+- The same trader across venues does not imply one identical executable policy: contract scale, funding, liquidity, symbol coverage, and execution rules are venue-specific. Preserve a shared behavior layer plus venue-native scale/execution/calibration rather than silently treating platforms as interchangeable.
+- Both results are `DIAGNOSTIC_ONLY`; the active Demo model remains unchanged. No exact-strategy, full-learning, or profitability claim is authorized.

@@ -307,3 +307,12 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Candidate: `behavioral-distillation-v4.0-sequence-memory`; report: `quant/reports/cross_venue_sequence_memory_autonomous_audit.md` and `.json`; per-symbol detail: `cross_venue_sequence_memory_by_symbol.csv`.
 - Strict autonomous costed returns: `0.000000`, `-0.000028`, `+0.004218` for WF1/WF2/WF3; candidate remains `DEMO_CONTINUE_LIVE_BLOCKED` and active Demo is unchanged.
 - The temporal dataset remains `264609` rows / `264288` eligible after rebuild; temporal label audit remains `PASS_WITH_WARNINGS` with no hard failures. Full suite: `380 passed`. Raw account CSV/JSON was not modified; no credentials, private endpoints, mainnet connection, or order was used.
+
+## M15.11 venue-native behavior diagnostics
+
+- Code: `quant/scripts/audit_venue_native_behavior.py`; tests: `quant/tests/test_venue_native_behavior.py`.
+- Candidate: `behavioral-distillation-v4.1-venue-native-calibration`. Reports: `quant/reports/venue_native_behavior_audit.md`, `.json`, and `venue_native_behavior_by_symbol.csv`.
+- Source: `quant/outputs/cross_venue_temporal_dataset_v3.csv`, `264609` rows / `264288` model-eligible rows. Each venue was split chronologically with an 80/20 train/holdout boundary and train-only normalization/calibration.
+- BitMEX: `206793` train / `42624` holdout; strict autonomous net return `-0.004768`, PF `0.971626`, action rate `57.43%`.
+- Hyperliquid: `4636` train / `1160` holdout; strict autonomous net return `0.000000`, no effective adjustments, action rate `0.00%`.
+- Status: diagnostic evidence only; no model promotion, Demo change, order, credential, private endpoint, or mainnet connection. Raw account CSV/JSON remained unchanged.

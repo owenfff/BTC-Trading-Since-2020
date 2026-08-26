@@ -153,3 +153,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 
 - The v4.0 candidate adds causal last-three-action memory and uses autonomous executed history at replay time, but strict costed returns are `0.000000`, `-0.000028`, and `+0.004218` for WF1/WF2/WF3; WF1 makes no adjustments and the global Hyperliquid coverage gate still fails.
 - This is a model-identifiability/generalization blocker, not a missing indicator or exchange-connection problem. Keep the active Demo model unchanged; do not promote v4.0 or add Demo orders.
+
+## 2026-08-26 — Venue-native diagnostics do not clear blocker
+
+- The independent BitMEX holdout is negative after costs (`-0.004768`, PF `0.971626`) and predicts actions on `57.43%` of rows, which is materially overactive for this replay.
+- The independent Hyperliquid holdout produces no autonomous adjustments (`0.00%` action rate) and has only `1160` test rows, with incomplete funding context. It is not evidence of a deployable policy.
+- The remaining blocker is executable-policy calibration and cross-venue generalization, not a missing indicator or exchange-connection problem. Keep the active Demo model unchanged; do not promote v4.1 or add Demo orders.
