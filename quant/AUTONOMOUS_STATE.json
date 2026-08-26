@@ -5,7 +5,7 @@
   "current_work_package": "M15.18-hyperliquid-partial-order-intent-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "53be35c070bce054d6d9e7007ce71d3a4c4d6e52",
-  "last_report_commit": "dfa4b7feeca8c9dbaed44cb98bc014f8b6e49795",
+  "last_report_commit": "fa7a76b4e8d09a14cb8b9fbf5a48efb09d6ec4c6",
   "test_count": 403,
   "last_test_status": "FULL_SUITE_403_PASSED;HYPERLIQUID_PARTIAL_ORDER_INTENT_AUDIT;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
