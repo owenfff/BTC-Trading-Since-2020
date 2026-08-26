@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15-v3.2-stable-target-audit",
-  "last_completed_phase": "PHASE_13_CROSS_ASSET_BEHAVIOR",
-  "last_code_commit": "14f11b14e77190457f2af5ccb96806d15037fce1",
-  "last_report_commit": "1a1766e2767164f9b824069b9572e56230c871cb",
-  "test_count": 361,
-  "last_test_status": "FULL_SUITE_361_PASSED;V3.2_STABLE_TARGET_BUILD_PASS;V3.2_ARTIFACT_LOAD_PASS;STRICT_AUTONOMOUS_AUDIT_PROMOTION_BLOCKED;TARGET_REGRESSION_COEFFICIENT_STABILIZED;PUBLIC_API_REFRESH_TLS_BLOCKED;NO_CREDENTIALS_USED",
+  "current_work_package": "M15-v3.3-temporal-clock-audit",
+  "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
+  "last_code_commit": "92406728b92eacfecc8156b44029f69581258a32",
+  "last_report_commit": "7b25effbe297a2925a04d957640dd8fb9350b549",
+  "test_count": 365,
+  "last_test_status": "FULL_SUITE_365_PASSED;TEMPORAL_DATASET_PASS_264609_ROWS;TEMPORAL_CAUSAL_AUDIT_PASS;TEMPORAL_STRICT_AUTONOMOUS_PROMOTION_BLOCKED;BALANCED_TEMPORAL_CANDIDATE_PROMOTION_BLOCKED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -43,7 +43,9 @@
     "The public Hyperliquid reference website snapshot is pinned by its own manifest; all seven compared source files differed from a separate checkout with the same-named GitHub revision, so the datasets remain separate.",
     "Cross-venue strict autonomous candidate is DEMO_CONTINUE_LIVE_BLOCKED: costed WF1/WF2/WF3 results do not satisfy positive, profit-factor and equal-weight-hold promotion gates; current Demo model remains unchanged.",
     "Hyperliquid official public info refresh is credential-free but currently fails closed on this workstation with TLS UNEXPECTED_EOF; the pinned website snapshot remains the reproducible historical source.",
-    "The v3.2 stable-target candidate removes target-regression coefficient explosion caused by near-collinear features, but its costed strict autonomous replay remains negative in WF1/WF2/WF3; it is not promoted and the active Demo model is unchanged."
+    "The v3.2 stable-target candidate removes target-regression coefficient explosion caused by near-collinear features, but its costed strict autonomous replay remains negative in WF1/WF2/WF3; it is not promoted and the active Demo model is unchanged.",
+    "The M15.3 temporal market-clock dataset contains 264609 rows across 66 venue/instrument groups, with 95.12% explicit NO_TRADE labels and zero causal timestamp violations; the ordinary temporal candidate predicts NO_TRADE for 100% of the three test windows and is not deployable.",
+    "The balanced temporal candidate avoids the all-NO_TRADE collapse but overtrades and remains negative after costs in WF1/WF2/WF3; it does not beat the event baseline and no model switch or new Demo order is authorized."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -57,6 +59,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model; do not promote v3.2. The next research task is a bar-clock/temporal supervision audit so signal timing and no-trade frequency match the runtime. No candidate promotion or new Demo orders are authorized by this phase.",
-  "updated_at_utc": "2026-08-26T08:00:00Z"
+  "next_action": "Keep the current Demo model; do not promote temporal or balanced temporal candidates. The next research task is calibrated action/target supervision with explicit no-trade and execution-cost validation. No candidate promotion or new Demo orders are authorized by this phase.",
+  "updated_at_utc": "2026-08-26T08:43:52Z"
 }
