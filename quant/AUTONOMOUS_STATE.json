@@ -5,7 +5,7 @@
   "current_work_package": "M15.20-cross-venue-strategy-equivalence-boundary",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "2ca629f857f12dd36ee014413ca6329c7de44726",
-  "last_report_commit": "e4e129b4f385ee995d76827594de71b231de7a81",
+  "last_report_commit": "e47ca74c1af80b2b845268f0fd68067afed85f73",
   "test_count": 409,
   "last_test_status": "FULL_SUITE_409_PASSED;CROSS_VENUE_EQUIVALENCE_BOUNDARY;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -86,5 +86,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Use the shared-intent/venue-native boundary for future replay, and do not claim exact learning without verified pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
-  "updated_at_utc": "2026-08-26T13:52:28Z"
+  "updated_at_utc": "2026-08-26T14:05:39Z"
 }
