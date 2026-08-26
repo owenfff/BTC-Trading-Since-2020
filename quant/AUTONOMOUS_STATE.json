@@ -5,7 +5,7 @@
   "current_work_package": "M15.15-pre-action-observability-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "aaf015a0f23ae470b42a379e04c28bee5b6382fb",
-  "last_report_commit": "126a9f918ebab03f4c3b71c11654ebbae4450fd8",
+  "last_report_commit": "85a908882c9725fe7c50ead50ffc2501594fdb14",
   "test_count": 393,
   "last_test_status": "FULL_SUITE_393_PASSED;PRE_ACTION_OBSERVABILITY_DIAGNOSTIC;NO_QUOTE_ORDERBOOK_HISTORY;ALL_DECISIONS_CONTEMPORANEOUS_WITH_ORDER_EVENT;V4.5_SOURCE_SUFFICIENCY_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
