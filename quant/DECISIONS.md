@@ -239,3 +239,9 @@
 - Causal checks pass and the full suite passes (`368` tests), but the candidate produced zero strict autonomous adjustments and zero net return in WF1/WF2/WF3. It is not a learned deployable policy.
 - The global cross-venue coverage gate fails: Hyperliquid contributes `5796` rows from `2025-11-15` onward, but `0` model-eligible rows enter the global test windows because no earlier training position scale exists. A `1160`-row Hyperliquid native holdout is recorded as diagnostic-only.
 - Keep the active Demo model unchanged and do not interpret the small positive native Hyperliquid diagnostic as proof of cross-venue generalization.
+
+## 2026-08-26 — Two-stage action-timing candidate remains blocked
+
+- Candidate `behavioral-distillation-v3.7-two-stage-action-target` separates the timing decision (`ACTION` versus idle) from action type and target exposure. The timing head is trained on every causal hourly row; the action head is trained only on non-idle rows.
+- Train-only threshold selection yields predicted action rates near the observed training-tail rates, but strict autonomous test results are `0.000000`, `-0.048936`, and `0.000000` for WF1/WF2/WF3; WF2 profit factor is `0.933678`.
+- Keep the active Demo model unchanged. The two-stage structure improves diagnosis of timing versus sizing, but does not establish that the original trader's strategy has been learned or that a deployable signal exists.

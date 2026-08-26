@@ -129,3 +129,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - Candidate `behavioral-distillation-v3.6-probability-calibrated` passes causal checks, calibration-holdout improvement, coefficient bounds, and `368` tests, but strict autonomous replay makes zero adjustments in WF1/WF2/WF3 and has zero net return.
 - Hyperliquid coverage is not globally validated: its `5796` rows start at `2025-11-15`, while the global walk-forward normalizer has no pre-2025 training scale for `HYPERLIQUID:BTC-PERP`; therefore all `4686` raw WF3 rows are excluded from model-eligible testing. The `1160`-row native holdout is explicitly diagnostic-only.
 - This is a data-coverage and model-generalization blocker. Do not promote v3.6, switch the active Demo model, or add Demo orders.
+
+## 2026-08-26 — Two-stage action/target candidate remains blocked
+
+- Candidate `behavioral-distillation-v3.7-two-stage-action-target` improves model decomposition but does not pass strict autonomous costed replay: WF1/WF2/WF3 net returns are `0.000000`, `-0.048936`, and `0.000000`, with WF2 PF `0.933678`.
+- WF1 and WF3 predicted no-trade rates are `100%`; the candidate still cannot produce a stable autonomous action policy across time. Hyperliquid remains excluded from the global test because its model-eligible global test coverage is zero.
+- This is a model-quality, label-timing, and cross-venue-coverage blocker. Do not promote v3.7, switch the active Demo model, or add Demo orders.

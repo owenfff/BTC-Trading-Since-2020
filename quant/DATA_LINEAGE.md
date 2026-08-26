@@ -273,3 +273,12 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Global report: `264288` rows, causal checks pass, calibration NLL does not worsen, and the full suite passes with `368` tests. The candidate makes zero strict autonomous adjustments in WF1/WF2/WF3 and is not promoted.
 - Venue coverage: BitMEX has model-eligible global test rows; Hyperliquid has `5796` rows from `2025-11-15` to `2026-07-15` but `0` model-eligible global test rows due to missing pre-2025 training position scale. Its `1160`-row within-venue holdout is diagnostic-only (`net ≈ 0.002951`, `PF ≈ 1.011`) and not a cross-venue promotion result.
 - No raw CSV/JSON was modified; no credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.
+
+## M15.7 two-stage action-timing and target-size candidate
+
+- Code commit: `852175f` (`Add two-stage action timing model`).
+- Candidate version: `behavioral-distillation-v3.7-two-stage-action-target`; timing and action/target heads use deterministic NumPy models under the shared Strategy Core contract.
+- Report: `quant/reports/cross_venue_two_stage_autonomous_audit.md` and `.json`; per-symbol detail: `quant/reports/cross_venue_two_stage_by_symbol.csv`.
+- The timing head is trained on idle and non-idle rows; the action head is trained only on non-idle rows. Train-only timing thresholds are `WF1=0.57`, `WF2=0.19`, `WF3=0.26`.
+- Strict autonomous costed returns are `0.000000`, `-0.048936`, and `0.000000` for WF1/WF2/WF3; the candidate is blocked. Full suite after the change: `369 passed`.
+- Global model-eligible test coverage remains BitMEX-only (`HYPERLIQUID=0` in WF1/WF2/WF3). No raw CSV/JSON was modified; no credential, private endpoint, mainnet endpoint, or order was used. Active Demo model remains unchanged.
