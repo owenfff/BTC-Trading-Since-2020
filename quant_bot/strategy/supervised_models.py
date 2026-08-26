@@ -161,12 +161,20 @@ class NumpyLogisticStrategy:
         self.weights: np.ndarray | None = None
         self.bias: np.ndarray | None = None
         self.target_coef: np.ndarray | None = None
+        self.probability_temperature = 1.0
+        self.probability_bias: np.ndarray | None = None
+        self.calibration_row_count = 0
         self.fit_row_count = 0
 
     def fit(self, rows: Iterable[Mapping[str, Any]]) -> "NumpyLogisticStrategy":
         train = _train_rows(rows)
         if not train:
             raise ValueError("NumpyLogisticStrategy requires TRAIN labels")
+        # Fitting a model starts a new artifact; do not accidentally carry a
+        # calibrator from an earlier fit into a different chronological split.
+        self.probability_temperature = 1.0
+        self.probability_bias = None
+        self.calibration_row_count = 0
         self.encoder.fit(train)
         # Preallocate instead of building a Python list of one NumPy array per
         # row.  Temporal market-clock datasets can contain hundreds of
@@ -220,11 +228,105 @@ class NumpyLogisticStrategy:
         self.fit_row_count = len(train)
         return self
 
+    def _base_logits(self, vector: np.ndarray) -> np.ndarray:
+        if self.weights is None or self.bias is None:
+            raise RuntimeError("NumpyLogisticStrategy must be fit before predicting")
+        return vector.reshape(1, -1) @ self.weights + self.bias
+
+    def predict_proba(self, strategy_input: StrategyInput) -> np.ndarray:
+        """Return the action probabilities after the frozen calibrator.
+
+        The optional calibrator is fitted only by research callers on a
+        chronological training holdout.  Legacy artifacts have temperature
+        ``1`` and no bias, so their predictions remain byte-compatible apart
+        from normal NumPy evaluation.
+        """
+
+        vector = self.encoder.transform(strategy_input.features)
+        logits = self._base_logits(vector)
+        bias = self.probability_bias
+        if bias is not None:
+            logits = logits + bias.reshape(1, -1)
+        temperature = max(0.25, min(10.0, float(self.probability_temperature)))
+        return _softmax(logits / temperature)[0]
+
+    def calibrate_probabilities(self, rows: Iterable[Mapping[str, Any]], *, epochs: int = 240, learning_rate: float = 0.08) -> dict[str, float | int]:
+        """Fit a deterministic temperature-plus-class-bias calibrator.
+
+        ``rows`` must be a training-only chronological holdout.  The base
+        model weights are never changed.  A small class-bias vector handles
+        prior shift while temperature handles confidence sharpness; both are
+        regularised and bounded so calibration cannot become an unrestricted
+        second classifier.
+        """
+
+        if self.weights is None or self.bias is None or not self.actions:
+            raise RuntimeError("NumpyLogisticStrategy must be fit before calibration")
+        source_rows = list(rows)
+        candidates = [row for row in source_rows if row.get("label_status") == "AVAILABLE" and str(row.get("label_next_action") or "") in self.actions]
+        if not candidates:
+            raise ValueError("probability calibration requires known labeled rows")
+        first_vector = self.encoder.transform(candidates[0])
+        matrix = np.empty((len(candidates), first_vector.shape[0]), dtype=float)
+        matrix[0] = first_vector
+        for index, row in enumerate(candidates[1:], start=1):
+            matrix[index] = self.encoder.transform(row)
+        logits = matrix @ self.weights + self.bias
+        label_index = {action: index for index, action in enumerate(self.actions)}
+        labels = np.asarray([label_index[str(row["label_next_action"])] for row in candidates], dtype=int)
+        one_hot = np.eye(len(self.actions), dtype=float)[labels]
+
+        def loss(probabilities: np.ndarray) -> float:
+            return float(-np.mean(np.log(np.clip(probabilities[np.arange(len(labels)), labels], 1e-12, 1.0))))
+
+        base_probabilities = _softmax(logits)
+        before = loss(base_probabilities)
+        class_bias = np.zeros(len(self.actions), dtype=float)
+        log_temperature = 0.0
+        current_loss = before
+        step = max(1e-4, float(learning_rate))
+        for _ in range(max(1, int(epochs))):
+            temperature = float(np.exp(np.clip(log_temperature, np.log(0.25), np.log(10.0))))
+            calibrated_logits = (logits + class_bias) / temperature
+            probabilities = _softmax(calibrated_logits)
+            error = probabilities - one_hot
+            # d((logits+bias)/T)/d bias is 1/T.  Use a backtracking step so
+            # an unusually sharp training slice cannot make calibration worse
+            # than the uncalibrated model.
+            grad_bias = error.mean(axis=0) / temperature + 1e-3 * class_bias
+            grad_log_temperature = float(np.mean(-np.sum(error * (logits + class_bias), axis=1) / temperature))
+            trial_bias = np.clip(class_bias - step * grad_bias, -4.0, 4.0)
+            trial_log_temperature = float(np.clip(log_temperature - step * grad_log_temperature, np.log(0.25), np.log(10.0)))
+            trial_temperature = float(np.exp(trial_log_temperature))
+            trial_probabilities = _softmax((logits + trial_bias) / trial_temperature)
+            trial_loss = loss(trial_probabilities)
+            if trial_loss + 1e-12 < current_loss:
+                class_bias = trial_bias
+                log_temperature = trial_log_temperature
+                current_loss = trial_loss
+                step = min(step * 1.02, 0.5)
+            else:
+                step *= 0.5
+                if step < 1e-8:
+                    break
+        self.probability_temperature = float(np.exp(log_temperature))
+        self.probability_bias = class_bias
+        self.calibration_row_count = len(candidates)
+        after = current_loss
+        return {
+            "calibration_rows": len(candidates),
+            "unseen_label_rows": sum(str(row.get("label_next_action") or "") not in self.actions for row in source_rows),
+            "nll_before": before,
+            "nll_after": after,
+            "temperature": self.probability_temperature,
+            "bias_l1": float(np.abs(class_bias).sum()),
+        }
+
     def predict(self, strategy_input: StrategyInput) -> StrategySignal:
         if self.weights is None or self.bias is None or self.target_coef is None:
             raise RuntimeError("NumpyLogisticStrategy must be fit before predict")
         vector = self.encoder.transform(strategy_input.features)
-        probabilities = _softmax((vector.reshape(1, -1) @ self.weights) + self.bias)[0]
+        probabilities = self.predict_proba(strategy_input)
         class_index = int(np.argmax(probabilities))
         action = self.actions[class_index]
         if self.min_action_confidence is not None and float(probabilities[class_index]) < self.min_action_confidence and "NO_TRADE" in self.actions:
@@ -262,6 +364,9 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
             "class_weighting": self.class_weighting,
             "enforce_action_target_consistency": self.enforce_action_target_consistency,
             "min_action_confidence": self.min_action_confidence,
+            "probability_temperature": self.probability_temperature,
+            "probability_bias": self.probability_bias.tolist() if self.probability_bias is not None else None,
+            "calibration_row_count": self.calibration_row_count,
             "fit_row_count": self.fit_row_count,
             "actions": list(self.actions),
             "weights": self.weights.tolist(),
@@ -288,6 +393,14 @@ class CrossAssetNumpyLogisticStrategy(NumpyLogisticStrategy):
         model.weights = np.asarray(payload.get("weights", []), dtype=float)
         model.bias = np.asarray(payload.get("bias", []), dtype=float)
         model.target_coef = np.asarray(payload.get("target_coef", []), dtype=float)
+        model.probability_temperature = float(payload.get("probability_temperature", 1.0))
+        if not 0.25 <= model.probability_temperature <= 10.0:
+            raise ValueError("invalid probability calibration temperature")
+        calibration_bias = payload.get("probability_bias")
+        model.probability_bias = np.asarray(calibration_bias, dtype=float) if calibration_bias is not None else None
+        if model.probability_bias is not None and model.probability_bias.shape != (len(model.actions),):
+            raise ValueError("probability calibration bias dimensions do not match actions")
+        model.calibration_row_count = int(payload.get("calibration_row_count", 0))
         model.encoder = FeatureEncoder.from_dict(payload.get("encoder", {}))
         model.fit_row_count = int(payload.get("fit_row_count", 0))
         if not model.actions or model.weights.ndim != 2 or model.bias.ndim != 1 or model.target_coef.ndim != 1:

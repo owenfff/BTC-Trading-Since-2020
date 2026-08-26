@@ -183,6 +183,59 @@ def test_balanced_class_weighting_is_explicit_and_round_trips() -> None:
     assert restored.min_action_confidence == 0.73
 
 
+def test_probability_calibration_is_train_only_serializable_and_bounded() -> None:
+    rows = []
+    actions = ("NO_TRADE", "OPEN_LONG", "OPEN_SHORT")
+    targets = ("0.0", "0.25", "-0.25")
+    for index in range(36):
+        action_index = index % len(actions)
+        day = index + 1 if index < 24 else index - 23
+        month = "01" if index < 24 else "02"
+        row = {key: None for key in FEATURE_COLUMNS}
+        row.update({
+            "decision_time": f"2020-{month}-{day:02d}T00:00:00Z",
+            "dataset_split": "TRAIN",
+            "label_status": "AVAILABLE",
+            "label_next_action": actions[action_index],
+            "label_next_target_exposure": targets[action_index],
+            "feature_symbol": "A",
+            "feature_instrument_class": "DERIVATIVE",
+            "feature_payout_model": "LINEAR",
+            "feature_quote_currency": "USD",
+            "feature_settlement_currency": "USD",
+            "feature_market_bar_interval": "1h",
+            "feature_market_data_available": True,
+            "feature_mark_index_missing": False,
+            "feature_market_regime": "RANGE_OR_MIXED",
+            "feature_contract_lot_size": 1.0,
+            "feature_multiplier_major": 1.0,
+            "feature_current_normalized_exposure": 0.0,
+            "feature_return_1bar": (index % 5 - 2) / 100.0,
+        })
+        rows.append(row)
+    model = CrossAssetNumpyLogisticStrategy(target_l2=1.0, class_weighting="sqrt_balanced").fit(rows[:24])
+    stats = model.calibrate_probabilities(rows[24:])
+    assert stats["calibration_rows"] == 12
+    assert stats["nll_after"] <= stats["nll_before"] + 1e-9
+    assert 0.25 <= model.probability_temperature <= 10.0
+    restored = CrossAssetNumpyLogisticStrategy.from_dict(model.to_dict())
+    assert restored.calibration_row_count == 12
+    assert restored.probability_temperature == model.probability_temperature
+    assert restored.probability_bias is not None
+
+
+def test_nested_probability_split_is_chronological_and_non_overlapping() -> None:
+    from audit_cross_venue_probability_calibrated_stability import _split_training_rows
+
+    rows = [{"decision_time": f"2020-01-01T{index:02d}:00:00Z"} for index in range(10)]
+    fit, calibration, threshold = _split_training_rows(rows)
+    assert len(fit) == 6
+    assert len(calibration) == 2
+    assert len(threshold) == 2
+    assert fit[-1]["decision_time"] < calibration[0]["decision_time"]
+    assert calibration[-1]["decision_time"] < threshold[0]["decision_time"]
+
+
 def test_action_target_consistency_prevents_no_trade_from_repositioning() -> None:
     rows = []
     for index in range(12):
