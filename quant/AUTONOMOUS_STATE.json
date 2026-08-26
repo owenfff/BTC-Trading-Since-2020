@@ -5,7 +5,7 @@
   "current_work_package": "M15.22-append-only-prospective-decision-audit-journal",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "808e837868f2ecca6cec7d09b28f82695a266ebf",
-  "last_report_commit": "1acb3ba34ac9064e51b2e92044c08af810b188e3",
+  "last_report_commit": "294f2b80801aa7348e03614395d93d45a5e42913",
   "test_count": 414,
   "last_test_status": "FULL_SUITE_414_PASSED;APPEND_ONLY_PROSPECTIVE_DECISION_AUDIT_JOURNAL;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -88,5 +88,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Run the prospective decision journal during an explicitly authorized Demo observation, then audit its daily files; do not claim exact learning without verified historical pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
-  "updated_at_utc": "2026-08-26T16:23:26Z"
+  "updated_at_utc": "2026-08-26T16:29:54Z"
 }
