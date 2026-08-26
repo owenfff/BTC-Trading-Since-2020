@@ -28,6 +28,7 @@ REQUIRED_REPORTS = {
     "identifiability": REPORT_DIR / "identifiability_ceiling_audit.json",
     "behavior_spec": REPORT_DIR / "behavioral_strategy_spec_v1.json",
     "hyperliquid_order_intent": REPORT_DIR / "hyperliquid_order_intent_audit.json",
+    "hyperliquid_l2_archive": REPORT_DIR / "hyperliquid_l2_archive_access.json",
     "native": REPORT_DIR / "venue_native_behavior_audit.json",
     "shared_intent": REPORT_DIR / "shared_intent_native_layer_audit.json",
     "shared_timing": REPORT_DIR / "shared_intent_timing_audit.json",
@@ -66,6 +67,7 @@ def build_payload(*, sources: Mapping[str, Mapping[str, Any]], generated_at_utc:
     identifiability = sources["identifiability"]
     behavior_spec = sources["behavior_spec"]
     hyperliquid_order_intent = sources["hyperliquid_order_intent"]
+    hyperliquid_l2_archive = sources["hyperliquid_l2_archive"]
     native = sources["native"]
     shared_intent = sources["shared_intent"]
     shared_timing = sources["shared_timing"]
@@ -100,6 +102,12 @@ def build_payload(*, sources: Mapping[str, Mapping[str, Any]], generated_at_utc:
             "PASS" if hyperliquid_order_intent.get("status") == "PARTIAL_PRE_ACTION_CONTEXT" and hyperliquid_order_intent.get("quality_checks", {}).get("filled_order_join_rate") == 1.0 else "WARNING",
             "hyperliquid_order_intent.order_intent",
             "Hyperliquid submitted order terms are available for a recent snapshot and all filled-status order IDs in that snapshot join to fills; this improves execution analysis but is not complete trigger context.",
+        ),
+        _gate(
+            "historical_l2_context_verified",
+            "PASS" if hyperliquid_l2_archive.get("status") == "FULL_IMPORT_VERIFIED" and hyperliquid_l2_archive.get("download_performed") else "FAIL",
+            "hyperliquid_l2_archive.status/download_performed",
+            "Historical L2 context is not verified in the reproducible pipeline; the current probe was HEAD-only and returned an access boundary without downloading market data.",
         ),
         _gate(
             "strict_autonomous_timing",

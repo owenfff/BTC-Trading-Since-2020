@@ -20,6 +20,7 @@ def _sources() -> dict[str, dict]:
         "identifiability": {"venue_results": [{"venue": "BITMEX", "strict_autonomous_timing_reference": {"f1": 0.0}}]},
         "behavior_spec": {"active_runtime": {"promotion_allowed": False}},
         "hyperliquid_order_intent": {"status": "PARTIAL_PRE_ACTION_CONTEXT", "quality_checks": {"filled_order_join_rate": 1.0}},
+        "hyperliquid_l2_archive": {"status": "REQUESTER_OR_OBJECT_ACCESS_BLOCKED", "download_performed": False},
         "native": {"status": "DIAGNOSTIC_ONLY"},
         "shared_intent": {"status": "DIAGNOSTIC_ONLY"},
         "shared_timing": {"status": "DIAGNOSTIC_ONLY"},
