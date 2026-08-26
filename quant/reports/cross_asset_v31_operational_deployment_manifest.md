@@ -1,14 +1,14 @@
 # Cross-Asset Deployment Model
 
-- model: **behavioral-distillation-v3-cross-asset-indicators**
+- model: **behavioral-distillation-v3.1-operational-parity**
 - fidelity: **BEHAVIORAL_APPROXIMATION**
 - source rows: `32231`; fit rows: `32165`
 - symbols: `66`
 - frozen cutoff: `2026-07-18T21:17:31.514Z`
 - training data SHA256: `2a38dbb79daae88bb49d1d998bf18b8aac6bc5de3bafb94481e0a71b574916c5`
-- model SHA256: `68d92b19622ffd70a76f7735f4dcafb5982d4673bd60d42d34ae1bb95f101ee7`
+- model SHA256: `7d86e18d7dd2be5123285bcdee03f18adde94da0c1912f9b192b26074f0a6739`
 - code commit: `a206238e16f9f56740b992c58e0de66d3f02abd8`
-- rollout status: **ACTIVE_BASELINE_FOR_DEMO**
+- rollout status: **CANDIDATE_PENDING_TIME_OUT_VALIDATION**
 - runtime training: **disabled**
 - Spot: **monitor-only**
 

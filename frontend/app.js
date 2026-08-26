@@ -363,6 +363,7 @@ function renderAccount(payload) {
   const orders = account.open_orders || [];
   const fills = account.recent_fills || [];
   const runtime = payload.runtime || {};
+  const risk = runtime.risk || {};
   const hasAccount = account.source && account.source !== "NONE";
 
   setText("#account-source", hasAccount ? `${runtime.plans || 0} 个信号` : "等待快照");
@@ -374,6 +375,10 @@ function renderAccount(payload) {
   setText("#order-count", orders.length);
   setText("#fill-count", fills.length);
   setText("#runtime-status", (runtime.status || "NOT RUNNING").toUpperCase());
+  const riskReasons = Array.isArray(risk.block_reasons) ? risk.block_reasons : [];
+  const feedback = runtime.latest_feedback_at ? ` · 最新成交反馈 ${runtime.latest_feedback_at}` : "";
+  const orderAge = runtime.oldest_active_order_age_seconds == null ? "" : ` · 最老活动订单 ${displayNumber(runtime.oldest_active_order_age_seconds, "0")} 秒`;
+  setText("#runtime-safety", riskReasons.length ? `风控阻断：${riskReasons.join("、")}${feedback}${orderAge}` : `风控正常 · 时钟偏移 ${displayNumber(runtime.clock_drift_seconds, "—")} 秒${feedback}${orderAge}`);
 
   const balanceList = $("#balance-list");
   balanceList.replaceChildren();
@@ -470,6 +475,8 @@ function render(payload) {
 
   setText("#updated-at", feed ? `状态源 · ${payload.updated_at_utc}` : "等待状态源");
   setText("#model-version", payload.model?.version || "—");
+  const modelSha = payload.model?.sha256 || "";
+  setText("#model-meta", modelSha ? modelSha.slice(0, 12) : "—");
   renderVenues(payload.venues || []);
   setText("#allowed-count", payload.mapping?.allowed_count ?? 0);
   setText("#reconciliation", payload.preflight?.reconciliation_ok ? "PASS" : "WAITING");

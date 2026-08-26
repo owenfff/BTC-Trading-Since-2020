@@ -20,7 +20,7 @@ from quant_bot.strategy.realtime_features import RealtimeFeatureEngine
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_ARTIFACT = ROOT / "quant" / "outputs" / "cross_asset_deployment_model.json"
+DEFAULT_ARTIFACT = ROOT / "quant" / "outputs" / "cross_asset_deployment_model_v3.json"
 VENUE_SYMBOL_ALIASES: dict[str, tuple[str, ...]] = {"XBTUSD": ("BTCUSD",)}
 
 
@@ -142,7 +142,7 @@ def build_symbol_mapping(bundle: DeploymentBundle, instruments: list[Any]) -> di
 
 
 def preflight(*, artifact_path: Path = DEFAULT_ARTIFACT, write_reports: bool = True) -> dict[str, Any]:
-    bundle = load_deployment_bundle(artifact_path)
+    bundle = load_deployment_bundle(artifact_path, require_model_sha256=True)
     adapter = BybitAdapter.from_environment()
     instruments = adapter.load_all_instruments()
     mapping = build_symbol_mapping(bundle, instruments)
@@ -410,7 +410,7 @@ class TestnetRuntime:
 
 
 def run_foreground(*, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: bool = False, confirm_testnet: bool = False, symbols: str = "auto", once: bool = False, poll_seconds: int = 60) -> dict[str, Any]:
-    bundle = load_deployment_bundle(artifact_path)
+    bundle = load_deployment_bundle(artifact_path, require_model_sha256=True)
     adapter = BybitAdapter.from_environment()
     live_instruments = adapter.load_all_instruments()
     mapping = build_symbol_mapping(bundle, live_instruments)

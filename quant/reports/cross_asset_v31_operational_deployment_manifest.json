@@ -1,12 +1,12 @@
 {
   "report_version": "M13-DEPLOYMENT-MODEL-1.0",
   "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
-  "model_version": "behavioral-distillation-v3-cross-asset-indicators",
-  "feature_contract_version": "m13-v3-cross-asset-indicators",
+  "model_version": "behavioral-distillation-v3.1-operational-parity",
+  "feature_contract_version": "m13-v3.1-operational-parity",
   "training_data_sha256": "2a38dbb79daae88bb49d1d998bf18b8aac6bc5de3bafb94481e0a71b574916c5",
-  "model_sha256": "68d92b19622ffd70a76f7735f4dcafb5982d4673bd60d42d34ae1bb95f101ee7",
+  "model_sha256": "7d86e18d7dd2be5123285bcdee03f18adde94da0c1912f9b192b26074f0a6739",
   "code_commit": "a206238e16f9f56740b992c58e0de66d3f02abd8",
-  "deployment_time": "2026-08-26T03:54:19Z",
+  "deployment_time": "2026-08-26T03:54:14Z",
   "frozen_cutoff": "2026-07-18T21:17:31.514Z",
   "source_row_count": 32231,
   "fit_row_count": 32165,
@@ -355,6 +355,6 @@
     "units": "normalized exposure; runtime converts through current settlement equity and instrument terms",
     "fail_closed_if_missing": true
   },
-  "artifact": "C:/Users/yhyzd/Documents/Codex/2026-08-19/m0-01-1-fork-text-fork/outputs/BTC-Trading-Since-2020/quant/outputs/cross_asset_deployment_model_v3.json (tracked deployment artifact)",
-  "rollout_status": "ACTIVE_BASELINE_FOR_DEMO"
+  "artifact": "C:/Users/yhyzd/Documents/Codex/2026-08-19/m0-01-1-fork-text-fork/outputs/BTC-Trading-Since-2020/quant/outputs/cross_asset_deployment_model_v31.json (tracked deployment artifact)",
+  "rollout_status": "CANDIDATE_PENDING_TIME_OUT_VALIDATION"
 }

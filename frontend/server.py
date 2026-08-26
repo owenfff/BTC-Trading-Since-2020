@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
@@ -35,6 +36,7 @@ CONTROL_LOCK = threading.RLock()
 CONTROL_PROCESS: subprocess.Popen[Any] | None = None
 CONTROL_META: dict[str, Any] = {}
 CONTROL_CREDENTIALS_PATH: Path | None = None
+KILL_SWITCH_PATH = PROJECT_ROOT / "quant" / "outputs" / "okx_demo_kill_switch.json"
 REPLAY_LOCK = threading.RLock()
 REPLAY_CACHE: dict[str, dict[str, Any]] = {}
 
@@ -51,6 +53,18 @@ def _read_json(path: Path) -> dict[str, Any]:
     except (FileNotFoundError, OSError, json.JSONDecodeError):
         return {}
     return payload if isinstance(payload, dict) else {}
+
+
+def _kill_switch_engaged() -> bool:
+    return KILL_SWITCH_PATH.exists()
+
+
+def _artifact_sha(path: Path) -> str | None:
+    try:
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+    return digest
 
 
 def _account_payload(runtime: dict[str, Any], preflight: dict[str, Any]) -> dict[str, Any]:
@@ -318,6 +332,10 @@ def _venue_payload(name: str, label: str, preflight: dict[str, Any], runtime: di
         "position_count": len(account.get("positions", [])),
         "fill_count": len(account.get("recent_fills", [])),
         "account": account,
+        "risk": runtime.get("risk", {}),
+        "clock_drift_seconds": runtime.get("clock_drift_seconds"),
+        "latest_feedback_at": (runtime.get("behavior_state") or {}).get("latest_feedback_at"),
+        "oldest_active_order_age_seconds": runtime.get("oldest_active_order_age_seconds"),
         "mapping": {
             "allowed_count": mapping.get("allowed_count", 0),
             "monitor_only_count": mapping.get("monitor_only_count", 0),
@@ -344,17 +362,25 @@ def status_payload() -> dict[str, Any]:
     has_feed = bool(preflight or runtime or mapping)
     account = _account_payload(runtime, preflight)
     mapping_rows = mapping.get("symbols", []) if isinstance(mapping.get("symbols"), list) else []
-    deployment = _read_json(PROJECT_ROOT / "quant" / "outputs" / "cross_asset_deployment_model.json")
+    deployment_path = PROJECT_ROOT / "quant" / "outputs" / "cross_asset_deployment_model_v3.json"
+    if not deployment_path.exists():
+        deployment_path = PROJECT_ROOT / "quant" / "outputs" / "cross_asset_deployment_model.json"
+    deployment = _read_json(deployment_path)
     active_model_version = (
-        preflight.get("model_version")
+        runtime.get("model_version")
         or deployment.get("model_version")
+        or preflight.get("model_version")
         or "behavioral-distillation-v2-cross-asset-deploy"
     )
     active_feature_contract = (
-        preflight.get("feature_contract_version")
+        runtime.get("feature_contract_version")
         or deployment.get("feature_contract_version")
+        or preflight.get("feature_contract_version")
         or "m13-v2-cross-asset"
     )
+    model_sha = runtime.get("model_sha256") or preflight.get("model_sha256") or deployment.get("model_sha256")
+    if not model_sha:
+        model_sha = _artifact_sha(deployment_path)
     return {
         "dashboard_role": "FRONTEND_ONLY",
         "exchange_connection": "NONE_FROM_THIS_SERVER",
@@ -366,6 +392,10 @@ def status_payload() -> dict[str, Any]:
             "feature_contract_version": active_feature_contract,
             "fidelity": "BEHAVIORAL_APPROXIMATION",
             "online_training": False,
+            "sha256": model_sha,
+            "data_frozen_cutoff": deployment.get("frozen_cutoff"),
+            "training_data_sha256": deployment.get("training_data_sha256"),
+            "code_commit": deployment.get("code_commit"),
         },
         "preflight": {
             "status": preflight.get("status", "NOT_RECEIVED"),
@@ -403,6 +433,12 @@ def status_payload() -> dict[str, Any]:
             "order_errors": runtime.get("order_errors", {}),
             "stop_reason": runtime.get("stop_reason"),
             "last_error": runtime.get("last_error"),
+            "risk": runtime.get("risk", {}),
+            "clock_drift_seconds": runtime.get("clock_drift_seconds"),
+            "market_context": runtime.get("market_context", {}),
+            "latest_feedback_at": (runtime.get("behavior_state") or {}).get("latest_feedback_at"),
+            "oldest_active_order_age_seconds": runtime.get("oldest_active_order_age_seconds"),
+            "behavior_state": {symbol: {key: value for key, value in state.items() if key in {"latest_action", "add_count", "reduce_count", "flip_count", "latest_decision", "latest_market_context_status"}} for symbol, state in dict((runtime.get("behavior_state") or {}).get("engine_state", {})).items()},
         },
         "account": account,
         "activity": {
@@ -421,7 +457,7 @@ def status_payload() -> dict[str, Any]:
         "operator_note": (
             "美国服务器可只托管这个只读面板；交易引擎和本机控制面板可运行在上海等能访问目标交易所的节点。"
         ),
-        "control": control_payload(),
+            "control": control_payload(),
     }
 
 
@@ -443,6 +479,7 @@ def control_payload() -> dict[str, Any]:
             "credential_setup_available": _file_credentials_supported(),
             "credential_status": _credential_status(CONTROL_META.get("venue") or "okx-demo"),
             "credential_statuses": {venue: _credential_status(venue) for venue in CREDENTIAL_NAMES},
+            "kill_switch_engaged": _kill_switch_engaged(),
         }
 
 
@@ -623,6 +660,8 @@ def start_control(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         return _json_error("MODE_MUST_BE_READONLY_OR_TESTNET")
     if mode == "testnet" and not confirm:
         return _json_error("TESTNET_CONFIRMATION_REQUIRED")
+    if _kill_switch_engaged():
+        return _json_error("MANUAL_KILL_SWITCH_ENGAGED", 409)
     if _file_credentials_supported() and mode == "testnet" and _credential_status(venue) != "CONFIGURED":
         return _json_error("LOCAL_CREDENTIALS_REQUIRED")
     with CONTROL_LOCK:
@@ -725,6 +764,31 @@ def stop_control() -> tuple[int, dict[str, Any]]:
     return 202, {"status": "STOP_REQUESTED", "control": control_payload()}
 
 
+def engage_kill_switch() -> tuple[int, dict[str, Any]]:
+    if not CONTROL_ENABLED or CONTROL_HOST not in {"127.0.0.1", "localhost", "::1"}:
+        return _json_error("LOCAL_CONTROL_DISABLED", 403)
+    try:
+        KILL_SWITCH_PATH.parent.mkdir(parents=True, exist_ok=True)
+        KILL_SWITCH_PATH.write_text(json.dumps({"engaged": True, "engaged_at": datetime.now(timezone.utc).isoformat()}, ensure_ascii=False) + "\n", encoding="utf-8")
+    except OSError:
+        return _json_error("KILL_SWITCH_WRITE_FAILED", 500)
+    with CONTROL_LOCK:
+        running = CONTROL_PROCESS is not None and CONTROL_PROCESS.poll() is None
+    if running:
+        stop_control()
+    return 202, {"status": "KILL_SWITCH_ENGAGED", "positions_preserved": True, "control": control_payload()}
+
+
+def clear_kill_switch() -> tuple[int, dict[str, Any]]:
+    if not CONTROL_ENABLED or CONTROL_HOST not in {"127.0.0.1", "localhost", "::1"}:
+        return _json_error("LOCAL_CONTROL_DISABLED", 403)
+    try:
+        KILL_SWITCH_PATH.unlink(missing_ok=True)
+    except OSError:
+        return _json_error("KILL_SWITCH_CLEAR_FAILED", 500)
+    return 200, {"status": "KILL_SWITCH_CLEARED", "control": control_payload()}
+
+
 def _stop_control_at_exit() -> None:
     if CONTROL_ENABLED:
         try:
@@ -758,10 +822,10 @@ class DashboardHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         path = self.path.split("?", 1)[0]
-        if path not in {"/api/control/start", "/api/control/stop", "/api/control/preflight", "/api/control/credentials"}:
+        if path not in {"/api/control/start", "/api/control/stop", "/api/control/preflight", "/api/control/credentials", "/api/control/kill-switch", "/api/control/kill-switch/clear"}:
             self.send_error(404)
             return
-        if path == "/api/control/credentials" and self.headers.get("X-Local-Control") != "1":
+        if path.startswith("/api/control/kill-switch") and self.headers.get("X-Local-Control") != "1":
             status, response = _json_error("LOCAL_CONTROL_HEADER_REQUIRED", 403)
             body = json.dumps(response, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
@@ -786,6 +850,10 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 status, response = stop_control()
             elif path.endswith("/preflight"):
                 status, response = preflight_control(payload)
+            elif path.endswith("/kill-switch/clear"):
+                status, response = clear_kill_switch()
+            elif path.endswith("/kill-switch"):
+                status, response = engage_kill_switch()
             else:
                 status, response = configure_credentials(payload)
         body = json.dumps(response, ensure_ascii=False).encode("utf-8")

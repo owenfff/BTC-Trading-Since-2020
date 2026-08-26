@@ -31,7 +31,7 @@ from quant_bot.strategy.deployment import (  # noqa: E402
     sha256_file,
     utc_now,
 )
-from quant_bot.strategy.feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION  # noqa: E402
+from quant_bot.strategy.feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION, OPERATIONAL_FEATURE_CONTRACT_VERSION  # noqa: E402
 from quant_bot.strategy.supervised_models import CrossAssetNumpyLogisticStrategy  # noqa: E402
 
 
@@ -144,6 +144,11 @@ def build(
         row["feature_position_scale_contracts"] = scale
         row["feature_current_normalized_exposure"] = (current_contracts / scale) if current_contracts is not None else ""
         row["label_next_target_exposure"] = (target_contracts / scale) if target_contracts is not None else ""
+        if feature_contract_version == OPERATIONAL_FEATURE_CONTRACT_VERSION:
+            funding_raw = row.get("feature_funding_rate")
+            mark_missing = str(row.get("feature_mark_index_missing", "")).strip().lower() in {"1", "true", "yes"}
+            row["feature_funding_rate_missing"] = "0" if funding_raw not in (None, "") else "1"
+            row["feature_mark_index_basis_missing"] = "1" if mark_missing or row.get("feature_mark_index_basis") in (None, "") else "0"
         fit_rows.append(row)
     model = CrossAssetNumpyLogisticStrategy().fit(fit_rows)
     model.version = strategy_version
@@ -159,6 +164,8 @@ def build(
         }
     parsed_times = [str(row.get("decision_time")) for row in source_rows if row.get("decision_time")]
     cutoff = max(parsed_times) if parsed_times else ""
+    model_payload = model.to_dict()
+    model_sha256 = __import__("hashlib").sha256(json.dumps(model_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     bundle = DeploymentBundle(
         model=model,
         model_version=model_version,
@@ -171,17 +178,24 @@ def build(
         position_scales=scales,
         risk_envelope=_risk_envelope(rows, scales),
         symbol_policy=policy,
+        model_sha256=model_sha256,
     )
     outputs = ROOT / "quant" / "outputs"
     reports = ROOT / "quant" / "reports"
     artifact_path = artifact_path or (outputs / "cross_asset_deployment_model.json")
     save_deployment_bundle(bundle, artifact_path)
+    rollout_status = (
+        "CANDIDATE_PENDING_TIME_OUT_VALIDATION"
+        if "v3.1" in model_version
+        else "ACTIVE_BASELINE_FOR_DEMO"
+    )
     report = {
         "report_version": "M13-DEPLOYMENT-MODEL-1.0",
         "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
         "model_version": model_version,
         "feature_contract_version": feature_contract_version,
         "training_data_sha256": bundle.training_data_sha256,
+        "model_sha256": bundle.model_sha256,
         "code_commit": bundle.code_commit,
         "deployment_time": bundle.deployment_time,
         "frozen_cutoff": bundle.frozen_cutoff,
@@ -192,7 +206,8 @@ def build(
         "position_scales_fit_on": "all historical rows before the frozen deployment cutoff; no online retraining",
         "spot_policy": "monitor-only; never mixed with derivative position semantics",
         "risk_envelope": bundle.risk_envelope,
-        "artifact": f"{artifact_path.as_posix()} (ignored runtime artifact)",
+        "artifact": f"{artifact_path.as_posix()} (tracked deployment artifact)",
+        "rollout_status": rollout_status,
     }
     reports.mkdir(parents=True, exist_ok=True)
     (reports / f"{report_stem}.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -206,11 +221,13 @@ def build(
             f"- symbols: `{len(symbols)}`",
             f"- frozen cutoff: `{bundle.frozen_cutoff}`",
             f"- training data SHA256: `{bundle.training_data_sha256}`",
+            f"- model SHA256: `{bundle.model_sha256}`",
             f"- code commit: `{bundle.code_commit}`",
+            f"- rollout status: **{rollout_status}**",
             "- runtime training: **disabled**",
             "- Spot: **monitor-only**",
             "",
-            "The artifact is intended for an explicitly configured Demo venue only; it is never a mainnet credential or endpoint. It is a behavioral approximation and is not a claim of exact strategy recovery or future profitability.",
+            "The artifact is tracked for reproducible Demo deployment only; it is never a mainnet credential or endpoint. It is a behavioral approximation and is not a claim of exact strategy recovery or future profitability.",
         ]) + "\n",
         encoding="utf-8",
     )

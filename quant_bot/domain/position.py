@@ -16,6 +16,8 @@ class Position:
     quantity: Decimal = Decimal("0")
     average_entry_price: Decimal | None = None
     realized_pnl: Decimal = Decimal("0")
+    leverage: Decimal | None = None
+    margin_mode: str | None = None
 
     def __post_init__(self) -> None:
         self.symbol = canonical_symbol(self.symbol)
@@ -24,6 +26,10 @@ class Position:
         self.realized_pnl = decimal(self.realized_pnl)
         if self.average_entry_price is not None:
             self.average_entry_price = decimal(self.average_entry_price)
+        if self.leverage is not None:
+            self.leverage = decimal(self.leverage)
+        if self.margin_mode is not None:
+            self.margin_mode = str(self.margin_mode).lower()
 
     def apply_fill(self, fill: Fill) -> None:
         signed = fill.quantity if fill.side == OrderSide.BUY else -fill.quantity
@@ -39,4 +45,3 @@ class Position:
         elif new_quantity == 0:
             self.average_entry_price = None
         self.quantity = new_quantity
-

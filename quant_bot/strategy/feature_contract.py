@@ -8,6 +8,7 @@ from .base import StrategyInput
 
 LEGACY_FEATURE_CONTRACT_VERSION = "m13-v2-cross-asset"
 FEATURE_CONTRACT_VERSION = "m13-v3-cross-asset-indicators"
+OPERATIONAL_FEATURE_CONTRACT_VERSION = "m13-v3.1-operational-parity"
 
 FEATURE_COLUMNS = (
     "feature_symbol",
@@ -37,7 +38,9 @@ FEATURE_COLUMNS = (
     "feature_distance_rolling_high_72bar",
     "feature_distance_rolling_low_72bar",
     "feature_funding_rate",
+    "feature_funding_rate_missing",
     "feature_mark_index_basis",
+    "feature_mark_index_basis_missing",
     "feature_rsi_14",
     "feature_macd_line_12_26",
     "feature_macd_signal_9",

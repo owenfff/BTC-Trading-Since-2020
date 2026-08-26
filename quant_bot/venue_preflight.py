@@ -38,7 +38,7 @@ def preflight_venue(venue: str, *, artifact_path: str | None = None) -> dict[str
     equity = adapter.fetch_equity()
     if equity <= 0:
         raise AdapterError(adapter.name, "EQUITY_UNRESOLVED", "venue returned non-positive quote equity")
-    bundle = load_deployment_bundle(artifact_path or DEFAULT_ARTIFACT)
+    bundle = load_deployment_bundle(artifact_path or DEFAULT_ARTIFACT, require_model_sha256=True)
     mapping = build_venue_symbol_mapping(bundle, adapter.name, instruments)
     result = {
         "status": "PASS",

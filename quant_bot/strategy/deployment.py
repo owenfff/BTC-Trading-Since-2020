@@ -7,13 +7,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from .feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION
+from .feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION, OPERATIONAL_FEATURE_CONTRACT_VERSION
 from .supervised_models import CrossAssetNumpyLogisticStrategy
 
 
 LEGACY_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v2-cross-asset-deploy"
 DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3-cross-asset-indicators"
-SUPPORTED_DEPLOYMENT_MODEL_VERSIONS = {LEGACY_DEPLOYMENT_MODEL_VERSION, DEPLOYMENT_MODEL_VERSION}
+OPERATIONAL_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3.1-operational-parity"
+SUPPORTED_DEPLOYMENT_MODEL_VERSIONS = {LEGACY_DEPLOYMENT_MODEL_VERSION, DEPLOYMENT_MODEL_VERSION, OPERATIONAL_DEPLOYMENT_MODEL_VERSION}
 
 
 @dataclass(frozen=True)
@@ -31,11 +32,12 @@ class DeploymentBundle:
     position_scales: Mapping[str, float]
     risk_envelope: Mapping[str, Any]
     symbol_policy: Mapping[str, Mapping[str, Any]]
+    model_sha256: str = ""
 
     def validate(self) -> None:
         if self.model_version not in SUPPORTED_DEPLOYMENT_MODEL_VERSIONS:
             raise ValueError(f"unexpected deployment model version: {self.model_version}")
-        expected_contract = LEGACY_FEATURE_CONTRACT_VERSION if self.model_version == LEGACY_DEPLOYMENT_MODEL_VERSION else FEATURE_CONTRACT_VERSION
+        expected_contract = LEGACY_FEATURE_CONTRACT_VERSION if self.model_version == LEGACY_DEPLOYMENT_MODEL_VERSION else OPERATIONAL_FEATURE_CONTRACT_VERSION if self.model_version == OPERATIONAL_DEPLOYMENT_MODEL_VERSION else FEATURE_CONTRACT_VERSION
         if self.feature_contract_version != expected_contract:
             raise ValueError("deployment feature contract does not match runtime contract")
         if not self.training_data_sha256 or len(self.training_data_sha256) != 64:
@@ -46,6 +48,8 @@ class DeploymentBundle:
             raise ValueError("deployment artifact contains no symbols")
         if not self.risk_envelope:
             raise ValueError("deployment artifact contains no risk envelope")
+        if self.model_sha256 and len(self.model_sha256) != 64:
+            raise ValueError("deployment artifact model SHA256 is malformed")
 
     def to_dict(self) -> dict[str, Any]:
         self.validate()
@@ -61,6 +65,7 @@ class DeploymentBundle:
             "position_scales": dict(self.position_scales),
             "risk_envelope": self.risk_envelope,
             "symbol_policy": self.symbol_policy,
+            "model_sha256": self.model_sha256,
             "model": self.model.to_dict(),
         }
 
@@ -78,14 +83,24 @@ class DeploymentBundle:
             position_scales={str(key): float(value) for key, value in dict(payload.get("position_scales", {})).items()},
             risk_envelope=dict(payload.get("risk_envelope", {})),
             symbol_policy={str(key): dict(value) for key, value in dict(payload.get("symbol_policy", {})).items()},
+            model_sha256=str(payload.get("model_sha256", "")),
         )
         bundle.validate()
         return bundle
 
 
-def load_deployment_bundle(path: str | Path) -> DeploymentBundle:
+def load_deployment_bundle(path: str | Path, *, expected_model_sha256: str | None = None, require_model_sha256: bool = False) -> DeploymentBundle:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    return DeploymentBundle.from_dict(payload)
+    bundle = DeploymentBundle.from_dict(payload)
+    if require_model_sha256 and not bundle.model_sha256:
+        raise ValueError("deployment artifact is missing model_sha256")
+    if expected_model_sha256 and bundle.model_sha256 != expected_model_sha256:
+        raise ValueError("deployment artifact model_sha256 does not match expected hash")
+    if bundle.model_sha256:
+        embedded = hashlib.sha256(json.dumps(payload.get("model", {}), sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        if embedded != bundle.model_sha256:
+            raise ValueError("deployment model payload hash mismatch")
+    return bundle
 
 
 def save_deployment_bundle(bundle: DeploymentBundle, path: str | Path) -> None:
@@ -109,6 +124,7 @@ def utc_now() -> str:
 
 __all__ = [
     "DEPLOYMENT_MODEL_VERSION",
+    "OPERATIONAL_DEPLOYMENT_MODEL_VERSION",
     "DeploymentBundle",
     "load_deployment_bundle",
     "save_deployment_bundle",

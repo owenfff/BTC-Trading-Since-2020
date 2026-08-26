@@ -8,7 +8,7 @@ from typing import Any
 from quant_bot.domain.balance import Balance
 from quant_bot.domain.fill import Fill
 from quant_bot.domain.instrument import Instrument, InstrumentType
-from quant_bot.domain.market_data import MarketBar
+from quant_bot.domain.market_data import MarketBar, MarketContext, MarketQuote
 from quant_bot.domain.order import Order, OrderSide, OrderStatus, OrderType
 from quant_bot.domain.position import Position
 
@@ -28,11 +28,17 @@ class OKXAdapter:
         self.websocket = websocket
         self._order_symbols: dict[str, str] = {}
         self._instrument_types: dict[str, str] = {}
+        self.margin_mode: str | None = None
+        self.required_margin_mode = "isolated"
+        self.order_margin_mode = "cross"
+        self.max_position_leverage: Decimal | None = None
 
     @classmethod
     def from_environment(cls) -> "OKXAdapter":
         credentials = OKXDemoCredentials.from_environment()
-        return cls(OKXDemoTransport(credentials), credentials=credentials, websocket=OKXDemoWebSocket(credentials))
+        adapter = cls(OKXDemoTransport(credentials), credentials=credentials, websocket=OKXDemoWebSocket(credentials))
+        adapter.order_margin_mode = "isolated"
+        return adapter
 
     def _private_guard(self) -> None:
         if self.credentials is None:
@@ -144,13 +150,23 @@ class OKXAdapter:
         response = self.transport.request("GET", "/api/v5/account/positions?instType=SWAP", private=True)
         self._check(response)
         result: list[Position] = []
+        modes: set[str] = set()
+        leverages: list[Decimal] = []
         for item in response.get("data", []):
             quantity = self._decimal(item.get("pos"))
             if quantity == 0 or not item.get("instId"):
                 continue
             if str(item.get("posSide", "net")).lower() == "short":
                 quantity = -abs(quantity)
-            result.append(Position(str(item["instId"]), str(item.get("settleCcy") or "USDT"), quantity, self._decimal(item.get("avgPx")) if item.get("avgPx") else None, self._decimal(item.get("realizedPnl"))))
+            margin_mode = str(item.get("mgnMode") or "").lower() or None
+            if margin_mode:
+                modes.add(margin_mode)
+            leverage = self._decimal(item.get("lever")) if item.get("lever") not in (None, "") else None
+            if leverage is not None and leverage > 0:
+                leverages.append(leverage)
+            result.append(Position(str(item["instId"]), str(item.get("settleCcy") or "USDT"), quantity, self._decimal(item.get("avgPx")) if item.get("avgPx") else None, self._decimal(item.get("realizedPnl")), leverage, margin_mode))
+        self.margin_mode = next(iter(modes)) if len(modes) == 1 else "MIXED" if modes else None
+        self.max_position_leverage = max(leverages) if leverages else None
         return result
 
     def _order(self, item: dict[str, Any]) -> Order:
@@ -195,21 +211,74 @@ class OKXAdapter:
         return result
 
     def fetch_quote(self, symbol: str) -> tuple[Decimal, Decimal]:
+        row = self._fetch_ticker(symbol)
+        bid, ask = self._decimal(row.get("bidPx")), self._decimal(row.get("askPx"))
+        if bid <= 0 or ask <= 0 or ask < bid:
+            raise AdapterError(self.name, "QUOTE_INVALID", f"invalid quote for {symbol}")
+        return bid, ask
+
+    def _fetch_ticker(self, symbol: str) -> dict[str, Any]:
         response = self.transport.request("GET", f"/api/v5/market/ticker?instId={symbol}")
         self._check(response)
         rows = response.get("data", [])
         if not rows or rows[0].get("bidPx") in (None, "") or rows[0].get("askPx") in (None, ""):
             raise AdapterError(self.name, "QUOTE_UNRESOLVED", f"no two-sided quote for {symbol}")
-        bid, ask = self._decimal(rows[0]["bidPx"]), self._decimal(rows[0]["askPx"])
-        if bid <= 0 or ask <= 0 or ask < bid:
-            raise AdapterError(self.name, "QUOTE_INVALID", f"invalid quote for {symbol}")
-        return bid, ask
+        return dict(rows[0])
+
+    def _optional_public(self, path: str) -> dict[str, Any] | None:
+        try:
+            response = self.transport.request("GET", path)
+            self._check(response)
+            rows = response.get("data", [])
+            return dict(rows[0]) if rows and isinstance(rows[0], dict) else None
+        except Exception:  # noqa: BLE001 - optional public coverage must not block quote retrieval
+            return None
+
+    def fetch_market_context(self, symbol: str, *, bars: list[MarketBar] | None = None) -> MarketContext:
+        """Read all as-of market inputs without turning unavailable data into zero."""
+
+        observed_at = datetime.now(timezone.utc)
+        ticker = self._fetch_ticker(symbol)
+        quote_time = self._timestamp(ticker.get("ts")) if ticker.get("ts") not in (None, "") else observed_at
+        quote = MarketQuote(symbol, self._decimal(ticker.get("bidPx")), self._decimal(ticker.get("askPx")), quote_time, "okx-demo-rest-ticker")
+        instrument_type = self._instrument_types.get(symbol, "SWAP")
+        funding_rate: Decimal | None = None
+        funding_time: datetime | None = None
+        mark_price: Decimal | None = None
+        index_price: Decimal | None = None
+        coverage: dict[str, str] = {"quote": "OK", "closed_bar": "OK" if bars else "MISSING"}
+        if instrument_type == "SPOT":
+            coverage.update({"funding": "NOT_APPLICABLE", "mark_price": "NOT_APPLICABLE", "index_price": "NOT_APPLICABLE"})
+        else:
+            funding = self._optional_public(f"/api/v5/public/funding-rate?instId={symbol}")
+            if funding and funding.get("fundingRate") not in (None, ""):
+                funding_rate = self._decimal(funding.get("fundingRate"))
+                funding_time = self._timestamp(funding.get("fundingTime") or funding.get("ts")) if funding.get("fundingTime") or funding.get("ts") else None
+                coverage["funding"] = "OK" if funding_time is None or funding_time <= observed_at else "FUTURE_REJECTED"
+                if coverage["funding"] == "FUTURE_REJECTED":
+                    funding_rate = None
+                    funding_time = None
+            else:
+                coverage["funding"] = "MISSING"
+            mark = self._optional_public(f"/api/v5/public/mark-price?instType=SWAP&instId={symbol}")
+            if mark and mark.get("markPx") not in (None, ""):
+                mark_price = self._decimal(mark.get("markPx"))
+                coverage["mark_price"] = "OK"
+            else:
+                coverage["mark_price"] = "MISSING"
+            index = self._optional_public(f"/api/v5/market/index-tickers?instId={symbol}")
+            if index and index.get("idxPx") not in (None, ""):
+                index_price = self._decimal(index.get("idxPx"))
+                coverage["index_price"] = "OK"
+            else:
+                coverage["index_price"] = "MISSING"
+        return MarketContext(symbol, quote, bars[-1].timestamp + __import__("datetime").timedelta(hours=1) if bars else None, funding_rate, funding_time, mark_price, index_price, observed_at, coverage)
 
     def place_order(self, order: Order) -> Order:
         self._private_guard()
         inst_type = self._instrument_types.get(order.symbol, "SPOT")
         client_order_id = self._client_order_id(order.client_order_id)
-        body: dict[str, Any] = {"instId": order.symbol, "tdMode": "cash" if inst_type == "SPOT" else "cross", "side": order.side.value.lower(), "ordType": "post_only" if order.post_only else "limit" if order.order_type == OrderType.LIMIT else "market", "sz": str(order.quantity), "clOrdId": client_order_id}
+        body: dict[str, Any] = {"instId": order.symbol, "tdMode": "cash" if inst_type == "SPOT" else self.order_margin_mode, "side": order.side.value.lower(), "ordType": "post_only" if order.post_only else "limit" if order.order_type == OrderType.LIMIT else "market", "sz": str(order.quantity), "clOrdId": client_order_id}
         if order.price is not None:
             body["px"] = str(order.price)
         if order.reduce_only:
@@ -236,7 +305,7 @@ class OKXAdapter:
     def reconcile_state(self) -> dict[str, Any]:
         return {"ok": True, "balances": self.fetch_balances(), "positions": self.fetch_positions(), "open_orders": self.fetch_open_orders(), "recent_fills": self.fetch_recent_fills()}
 
-    def get_server_time(self) -> datetime:
+    def _server_time_sample(self) -> tuple[datetime, Decimal]:
         before = datetime.now(timezone.utc)
         response = self.transport.request("GET", "/api/v5/public/time")
         after = datetime.now(timezone.utc)
@@ -245,12 +314,21 @@ class OKXAdapter:
         if not rows or not rows[0].get("ts"):
             raise AdapterError(self.name, "SCHEMA", "OKX returned no server time")
         server = self._timestamp(rows[0]["ts"])
+        midpoint = before + (after - before) / 2
+        drift = Decimal(str((server - midpoint).total_seconds()))
         if hasattr(self.transport, "set_clock_offset_ms"):
-            midpoint = before + (after - before) / 2
             offset_ms = int((server - midpoint).total_seconds() * 1000)
             self.transport.set_clock_offset_ms(offset_ms)
             if self.websocket is not None:
                 self.websocket.set_clock_offset_ms(offset_ms)
+        return server, drift
+
+    def get_server_time_drift_seconds(self) -> Decimal:
+        _server, drift = self._server_time_sample()
+        return drift
+
+    def get_server_time(self) -> datetime:
+        server, _drift = self._server_time_sample()
         return server
 
     def load_all_instruments_for_preflight(self) -> list[Instrument]:

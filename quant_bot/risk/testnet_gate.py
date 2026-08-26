@@ -41,6 +41,14 @@ def check_testnet_order(
     max_consecutive_rejects: int = 3,
     drawdown: Decimal = Decimal("0"),
     max_drawdown: Decimal = Decimal("0"),
+    daily_loss: Decimal = Decimal("0"),
+    max_daily_loss: Decimal = Decimal("0"),
+    risk_block_reasons: tuple[str, ...] | list[str] = (),
+    kill_switch_engaged: bool = False,
+    current_leverage: Decimal | None = None,
+    max_leverage: Decimal = Decimal("0"),
+    margin_mode: str | None = None,
+    required_margin_mode: str = "",
 ) -> TestnetRiskDecision:
     reasons: list[str] = []
     if not enable_orders:
@@ -67,6 +75,15 @@ def check_testnet_order(
         reasons.append("CONSECUTIVE_REJECTS")
     if max_drawdown > 0 and drawdown >= max_drawdown:
         reasons.append("DRAWDOWN_LIMIT")
+    if max_daily_loss > 0 and daily_loss >= max_daily_loss:
+        reasons.append("DAILY_LOSS_LIMIT")
+    reasons.extend(str(item) for item in risk_block_reasons if str(item))
+    if kill_switch_engaged:
+        reasons.append("MANUAL_KILL_SWITCH")
+    if max_leverage > 0 and (current_leverage is None or current_leverage > max_leverage):
+        reasons.append("LEVERAGE_LIMIT_OR_UNVERIFIED")
+    if required_margin_mode and str(margin_mode or "").lower() != required_margin_mode.lower():
+        reasons.append("MARGIN_MODE_NOT_ALLOWED")
     return TestnetRiskDecision(not reasons, tuple(reasons))
 
 

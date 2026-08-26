@@ -38,6 +38,11 @@ class RealtimeFeatureEngine:
         self.drawdown = 0.0
         self.fees = 0.0
         self.funding = 0.0
+        self.latest_funding_rate: float | None = None
+        self.latest_funding_source_time: datetime | None = None
+        self.latest_mark_price: float | None = None
+        self.latest_index_price: float | None = None
+        self.latest_market_context_status: dict[str, str] = {}
 
     def ingest_closed_bars(self, bars: list[MarketBar], *, now: datetime | None = None) -> None:
         current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
@@ -60,6 +65,63 @@ class RealtimeFeatureEngine:
         self.realised_outcome += realised_outcome
         self.fees += fee
         self.funding += funding
+
+    def attach_market_context(
+        self,
+        *,
+        funding_rate: float | None = None,
+        funding_source_time: datetime | None = None,
+        mark_price: float | None = None,
+        index_price: float | None = None,
+        status: dict[str, str] | None = None,
+    ) -> None:
+        """Attach as-of public context without converting missing values to zero."""
+
+        self.latest_funding_rate = funding_rate
+        self.latest_funding_source_time = funding_source_time
+        self.latest_mark_price = mark_price
+        self.latest_index_price = index_price
+        self.latest_market_context_status = dict(status or {})
+
+    def snapshot(self) -> dict[str, Any]:
+        return {
+            "latest_action": self.latest_action,
+            "add_count": self.add_count,
+            "reduce_count": self.reduce_count,
+            "flip_count": self.flip_count,
+            "realised_outcome": self.realised_outcome,
+            "drawdown": self.drawdown,
+            "fees": self.fees,
+            "funding": self.funding,
+            "latest_decision": self.latest_decision.isoformat() if self.latest_decision else None,
+            "latest_funding_rate": self.latest_funding_rate,
+            "latest_funding_source_time": self.latest_funding_source_time.isoformat() if self.latest_funding_source_time else None,
+            "latest_mark_price": self.latest_mark_price,
+            "latest_index_price": self.latest_index_price,
+            "latest_market_context_status": dict(self.latest_market_context_status),
+        }
+
+    def restore(self, payload: dict[str, Any]) -> None:
+        self.latest_action = str(payload.get("latest_action") or "UNKNOWN")
+        self.add_count = int(payload.get("add_count", 0) or 0)
+        self.reduce_count = int(payload.get("reduce_count", 0) or 0)
+        self.flip_count = int(payload.get("flip_count", 0) or 0)
+        self.realised_outcome = _f(payload.get("realised_outcome"))
+        self.drawdown = _f(payload.get("drawdown"))
+        self.fees = _f(payload.get("fees"))
+        self.funding = _f(payload.get("funding"))
+        for name in ("latest_decision", "latest_funding_source_time"):
+            value = payload.get(name)
+            if value:
+                try:
+                    parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+                    setattr(self, name, parsed.astimezone(timezone.utc))
+                except ValueError:
+                    pass
+        self.latest_funding_rate = payload.get("latest_funding_rate")
+        self.latest_mark_price = payload.get("latest_mark_price")
+        self.latest_index_price = payload.get("latest_index_price")
+        self.latest_market_context_status = dict(payload.get("latest_market_context_status") or {})
 
     def _features(self, decision_time: datetime, current_qty: Decimal, current_equity: Decimal) -> dict[str, Any]:
         bars = [bar for bar in self.bars if bar.timestamp + __import__("datetime").timedelta(hours=1) <= decision_time]
@@ -102,8 +164,10 @@ class RealtimeFeatureEngine:
             "feature_trend_slope_24bar": ret(24) / 24.0,
             "feature_distance_rolling_high_72bar": latest_close / max(closes[-72:]) - 1.0 if closes else 0.0,
             "feature_distance_rolling_low_72bar": latest_close / min(closes[-72:]) - 1.0 if closes and min(closes[-72:]) else 0.0,
-            "feature_funding_rate": 0.0 if legacy_contract else (float(latest.funding_rate) if latest and latest.funding_rate is not None else None),
+            "feature_funding_rate": 0.0 if legacy_contract else self.latest_funding_rate,
+            "feature_funding_rate_missing": False if legacy_contract else self.latest_funding_rate is None,
             "feature_mark_index_basis": 0.0 if legacy_contract else None,
+            "feature_mark_index_basis_missing": False if legacy_contract else True,
             "feature_market_regime": regime,
             "feature_time_of_day_fraction": (decision_time.hour * 3600 + decision_time.minute * 60) / 86400,
             "feature_day_of_week": decision_time.weekday(), "feature_day_of_week_sin": math.sin(2 * math.pi * decision_time.weekday() / 7), "feature_day_of_week_cos": math.cos(2 * math.pi * decision_time.weekday() / 7),
@@ -114,14 +178,15 @@ class RealtimeFeatureEngine:
         })
         if not legacy_contract:
             values.update({key: indicators[key] for key in indicators if key != "feature_volume_percentile_72bar"})
-            funding_time = getattr(latest, "funding_source_time", None) if latest else None
+            funding_time = self.latest_funding_source_time or (getattr(latest, "funding_source_time", None) if latest else None)
             if funding_time is not None and funding_time <= decision_time:
                 values["feature_funding_source_time"] = funding_time.isoformat().replace("+00:00", "Z")
-            mark = getattr(latest, "mark_price", None) if latest else None
-            index_price = getattr(latest, "index_price", None) if latest else None
+            mark = self.latest_mark_price or (getattr(latest, "mark_price", None) if latest else None)
+            index_price = self.latest_index_price or (getattr(latest, "index_price", None) if latest else None)
             if mark is not None and index_price is not None and float(index_price) > 0:
                 values["feature_mark_index_missing"] = False
                 values["feature_mark_index_basis"] = float(mark) / float(index_price) - 1.0
+                values["feature_mark_index_basis_missing"] = False
         return values
 
     def build_input(self, *, decision_time: datetime, current_qty: Decimal, current_equity: Decimal) -> StrategyInput:
@@ -133,7 +198,7 @@ class RealtimeFeatureEngine:
         if features["feature_latest_bar_time"] and features["feature_latest_bar_time"] >= decision_time.isoformat().replace("+00:00", "Z"):
             raise ValueError("realtime feature engine attempted to use an open or future bar")
         self.latest_decision = decision_time
-        return StrategyInput(decision_time=decision_time, features=features, current_strategy_position=float(current_qty) / self.position_scale, risk_state={"feature_contract_version": FEATURE_CONTRACT_VERSION, "market_data_available": features["feature_market_data_available"]})
+        return StrategyInput(decision_time=decision_time, features=features, current_strategy_position=float(current_qty) / self.position_scale, risk_state={"feature_contract_version": self.feature_contract_version, "market_data_available": features["feature_market_data_available"], "market_context_status": dict(self.latest_market_context_status)})
 
 
 __all__ = ["RealtimeFeatureEngine"]

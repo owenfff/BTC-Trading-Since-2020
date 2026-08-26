@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from quant_bot.domain.instrument import Instrument, InstrumentType
+from quant_bot.domain.market_data import MarketContext, MarketQuote
 from quant_bot.domain.order import Order
 from quant_bot.exchanges.binance import BinanceSpotAdapter
 from quant_bot.exchanges.binance_futures import BinanceFuturesAdapter
@@ -20,6 +21,7 @@ from quant_bot.exchanges.okx import OKXAdapter
 from quant_bot.execution.aggregation import merge_duplicate_target_plans
 from quant_bot.execution.target_planner import TargetOrderPlan, plan_spot_order, plan_target_order
 from quant_bot.risk.testnet_gate import check_testnet_order, portfolio_target_scale, risk_envelope_for_symbol
+from quant_bot.risk.runtime_risk import RuntimeRiskState
 from quant_bot.strategy.deployment import DeploymentBundle, load_deployment_bundle
 from quant_bot.strategy.explanations import strategy_basis_from_features
 from quant_bot.strategy.feature_contract import LEGACY_FEATURE_CONTRACT_VERSION
@@ -27,8 +29,12 @@ from quant_bot.strategy.realtime_features import RealtimeFeatureEngine
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_ARTIFACT = ROOT / "quant" / "outputs" / "cross_asset_deployment_model.json"
+DEFAULT_ARTIFACT = ROOT / "quant" / "outputs" / "cross_asset_deployment_model_v3.json"
+KILL_SWITCH_PATH = ROOT / "quant" / "outputs" / "okx_demo_kill_switch.json"
 ALLOWED_MAPPING_STATUSES = {"ALLOW_DERIVATIVE_TRADING", "ALLOW_SPOT_BEHAVIOR_APPROXIMATION"}
+MAX_ACTIVE_ORDER_AGE_SECONDS = 15 * 60
+MAX_LEVERAGE = Decimal("2")
+REQUIRED_MARGIN_MODE = "isolated"
 
 
 def _json_default(value: Any) -> Any:
@@ -177,7 +183,7 @@ def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str, order
         "reconciliation_ok": bool(state.get("ok")),
         "captured_at_utc": datetime.now(timezone.utc).isoformat(),
         "balances": [{"currency": as_text(item, "currency", ""), "total": as_text(item, "total", "0"), "available": as_text(item, "available", "0")} for item in state.get("balances", [])],
-        "positions": [{"symbol": as_text(item, "symbol", ""), "settlement_currency": as_text(item, "settlement_currency", ""), "quantity": as_text(item, "quantity", "0"), "average_entry_price": as_text(item, "average_entry_price"), "realized_pnl": as_text(item, "realized_pnl", "0")} for item in state.get("positions", [])],
+        "positions": [{"symbol": as_text(item, "symbol", ""), "settlement_currency": as_text(item, "settlement_currency", ""), "quantity": as_text(item, "quantity", "0"), "average_entry_price": as_text(item, "average_entry_price"), "realized_pnl": as_text(item, "realized_pnl", "0"), "leverage": as_text(item, "leverage"), "margin_mode": as_text(item, "margin_mode")} for item in state.get("positions", [])],
         "open_orders": [{"client_order_id": as_text(item, "client_order_id", ""), "exchange_order_id": as_text(item, "exchange_order_id"), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "status": as_text(item, "status", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price"), "reduce_only": bool(getattr(item, "reduce_only", False)), "post_only": bool(getattr(item, "post_only", False)), **strategy_fields(item)} for item in state.get("open_orders", [])],
         "recent_fills": [{"event_id": as_text(item, "event_id", ""), "exchange_fill_id": as_text(item, "exchange_fill_id"), "client_order_id": as_text(item, "client_order_id", ""), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price", "0"), "fee": as_text(item, "fee", "0"), "fee_currency": as_text(item, "fee_currency", ""), "timestamp": as_text(item, "timestamp"), **strategy_fields(item)} for item in state.get("recent_fills", [])],
     }
@@ -215,6 +221,105 @@ class VenueRuntime:
     portfolio_target_scale: Decimal = Decimal("1")
     stop_event: threading.Event = field(default_factory=threading.Event)
     last_loop_monotonic: float = field(default_factory=time.monotonic)
+    seen_fill_ids: set[str] = field(default_factory=set)
+    behavior_state_bootstrapped: bool = False
+    persisted_engine_state: dict[str, dict[str, Any]] = field(default_factory=dict)
+    realized_pnl_by_symbol: dict[str, Decimal] = field(default_factory=dict)
+    market_contexts: dict[str, MarketContext] = field(default_factory=dict)
+    risk_state: RuntimeRiskState = field(default_factory=RuntimeRiskState)
+    clock_drift_seconds: Decimal = Decimal("0")
+    latest_feedback_at: str | None = None
+    orphans_checked: bool = False
+
+    def __post_init__(self) -> None:
+        self._restore_runtime_state()
+        if KILL_SWITCH_PATH.exists():
+            self.risk_state.engage_kill_switch()
+
+    def _restore_runtime_state(self) -> None:
+        if not self.output_path.exists():
+            return
+        try:
+            payload = json.loads(self.output_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return
+        behavior = payload.get("behavior_state", {}) if isinstance(payload, dict) else {}
+        self.seen_fill_ids = {str(item) for item in behavior.get("seen_fill_ids", []) if str(item)}
+        self.persisted_engine_state = {str(key): dict(value) for key, value in dict(behavior.get("engine_state", {})).items() if isinstance(value, dict)}
+        self.realized_pnl_by_symbol = {str(key): Decimal(str(value)) for key, value in dict(behavior.get("realized_pnl_by_symbol", {})).items()}
+        self.order_context.update({str(key): dict(value) for key, value in dict(behavior.get("order_context", {})).items() if isinstance(value, dict)})
+        self.behavior_state_bootstrapped = bool(behavior.get("bootstrapped", False))
+        self.risk_state.restore(payload.get("risk"))
+
+    def _engine_for(self, historical_symbol: str) -> RealtimeFeatureEngine:
+        instrument = self.instruments[historical_symbol]
+        engine = self.engines.get(historical_symbol)
+        if engine is None:
+            engine = RealtimeFeatureEngine(instrument, feature_symbol=historical_symbol, position_scale=self.bundle.position_scales.get(historical_symbol, 1.0), feature_contract_version=getattr(self.bundle, "feature_contract_version", LEGACY_FEATURE_CONTRACT_VERSION))
+            if historical_symbol in self.persisted_engine_state:
+                engine.restore(self.persisted_engine_state[historical_symbol])
+            self.engines[historical_symbol] = engine
+        return engine
+
+    def _historical_sources_for_venue(self, venue_symbol: str) -> list[str]:
+        return [symbol for symbol, instrument in self.instruments.items() if instrument.canonical_symbol == venue_symbol]
+
+    @staticmethod
+    def _fill_action(previous: Decimal, signed_quantity: Decimal, current: Decimal) -> str:
+        direction = "LONG" if (signed_quantity > 0 or current > 0) else "SHORT"
+        if previous == 0:
+            return f"OPEN_{direction}"
+        if current == 0:
+            return "CLOSE"
+        if (previous > 0 > current) or (previous < 0 < current):
+            return f"FLIP_{direction}"
+        if (previous > 0 and signed_quantity > 0) or (previous < 0 and signed_quantity < 0):
+            return f"ADD_{direction}"
+        return f"REDUCE_{'LONG' if previous > 0 else 'SHORT'}"
+
+    def _record_fills(self, fills: list[Any], previous_positions: dict[str, Decimal], new_positions: dict[str, Decimal], previous_realized: dict[str, Decimal], new_realized: dict[str, Decimal]) -> None:
+        unseen_by_symbol: dict[str, int] = {}
+        for fill in fills:
+            event_id = str(getattr(fill, "event_id", "") or getattr(fill, "exchange_fill_id", ""))
+            if event_id and event_id not in self.seen_fill_ids:
+                symbol = str(getattr(fill, "symbol", ""))
+                unseen_by_symbol[symbol] = unseen_by_symbol.get(symbol, 0) + 1
+        for fill in sorted(fills, key=lambda item: getattr(item, "timestamp", datetime.min.replace(tzinfo=timezone.utc))):
+            event_id = str(getattr(fill, "event_id", "") or getattr(fill, "exchange_fill_id", ""))
+            if not event_id or event_id in self.seen_fill_ids:
+                continue
+            symbol = str(getattr(fill, "symbol", ""))
+            signed = Decimal(str(getattr(fill, "quantity", "0")))
+            if str(getattr(getattr(fill, "side", None), "value", getattr(fill, "side", ""))).upper() == "SELL":
+                signed = -abs(signed)
+            else:
+                signed = abs(signed)
+            previous = previous_positions.get(symbol, Decimal("0"))
+            current = new_positions.get(symbol, previous + signed)
+            action = self._fill_action(previous, signed, current)
+            sources = list((self.order_context.get(str(getattr(fill, "client_order_id", "")), {}) or {}).get("strategy_source_symbols", []))
+            if not sources:
+                sources = self._historical_sources_for_venue(symbol)
+            if not sources:
+                self.seen_fill_ids.add(event_id)
+                continue
+            confidence = "HIGH" if len(sources) == 1 and str(getattr(fill, "client_order_id", "")) in self.order_context else "LOW_CONFIDENCE"
+            realized_delta = new_realized.get(symbol, Decimal("0")) - previous_realized.get(symbol, Decimal("0"))
+            if unseen_by_symbol.get(symbol, 0) > 1:
+                realized_delta /= Decimal(str(unseen_by_symbol[symbol]))
+            fee = Decimal(str(getattr(fill, "fee", "0")))
+            for source in sources:
+                engine = self._engine_for(source)
+                share = Decimal("1") / Decimal(str(len(sources)))
+                engine.record_action(action, realised_outcome=float(realized_delta * share), fee=float(fee * share))
+                if confidence != "HIGH":
+                    engine.latest_market_context_status = {**engine.latest_market_context_status, "behavior_source": "LOW_CONFIDENCE"}
+            timestamp = getattr(fill, "timestamp", None)
+            self.latest_feedback_at = timestamp.isoformat() if isinstance(timestamp, datetime) else datetime.now(timezone.utc).isoformat()
+            self.seen_fill_ids.add(event_id)
+        if len(self.seen_fill_ids) > 2000:
+            self.seen_fill_ids = set(sorted(self.seen_fill_ids)[-2000:])
+        self.behavior_state_bootstrapped = True
 
     @property
     def equity_unit(self) -> str:
@@ -223,13 +328,50 @@ class VenueRuntime:
     def refresh(self) -> Decimal:
         state = self.adapter.reconcile_state()
         self.reconciliation_ok = bool(state.get("ok"))
-        self.positions = {str(item.symbol): Decimal(str(item.quantity)) for item in state.get("positions", [])}
+        previous_positions = dict(self.positions)
+        previous_realized = dict(self.realized_pnl_by_symbol)
+        next_positions = {str(item.symbol): Decimal(str(item.quantity)) for item in state.get("positions", [])}
+        next_realized: dict[str, Decimal] = {}
+        for item in state.get("positions", []):
+            next_realized[str(item.symbol)] = Decimal(str(getattr(item, "realized_pnl", "0")))
+        self._record_fills(list(state.get("recent_fills", [])), previous_positions, next_positions, previous_realized, next_realized)
+        self.realized_pnl_by_symbol = next_realized
+        self.positions = next_positions
         self.active_orders = list(state.get("open_orders", []))
         self.balances = {str(item.currency).upper(): Decimal(str(item.available)) for item in state.get("balances", [])}
         equity = self.adapter.fetch_equity()
+        total_notional = sum((abs(Decimal(str(getattr(item, "quantity", "0"))) * Decimal(str(getattr(item, "average_entry_price", "0") or "0"))) for item in state.get("positions", [])), Decimal("0"))
+        self.risk_state.update(equity, total_notional=total_notional)
+        if self.risk_state.block_reasons and self.enable_orders:
+            self._engage_safety(self.risk_state.block_reasons[0])
+        self._discover_and_cancel_orphans()
         self.account_snapshot = _snapshot(state, equity, equity_unit=self.equity_unit, order_context=self.order_context)
         self.last_error = None
         return equity
+
+    def _is_bot_order(self, order: Order) -> bool:
+        client_id = str(getattr(order, "client_order_id", ""))
+        return client_id.lower().startswith(("qbot", "qbotv31"))
+
+    def _discover_and_cancel_orphans(self) -> None:
+        owned = [order for order in self.active_orders if self._is_bot_order(order)]
+        self.created_order_ids.update(str(order.client_order_id) for order in owned)
+        if not self.enable_orders or self.orphans_checked:
+            return
+        # On restart every remote bot order is an orphan until the next signal
+        # explicitly recreates it. A persisted order context proves that this
+        # process can resume the order idempotently; human/other-strategy
+        # orders are untouched.
+        orphans = [order for order in owned if str(order.client_order_id) not in self.order_context]
+        for order in orphans:
+            try:
+                self.adapter.cancel_order(order.client_order_id)
+            except AdapterError as error:
+                self.risk_state.trigger(f"ORPHAN_CANCEL_FAILED:{getattr(error, 'code', 'UNKNOWN')}")
+        owned_ids = {str(order.client_order_id) for order in orphans}
+        self.active_orders = [order for order in self.active_orders if str(order.client_order_id) not in owned_ids]
+        self.created_order_ids.difference_update(owned_ids)
+        self.orphans_checked = True
 
     def _spot_quantity(self, instrument: Instrument) -> Decimal:
         return self.balances.get(instrument.base_currency.upper(), Decimal("0"))
@@ -317,9 +459,46 @@ class VenueRuntime:
             scales[currency] = min(Decimal("1"), capacity / target_notional)
         return scales
 
+    def _engage_safety(self, reason: str) -> None:
+        self.risk_state.trigger(reason)
+        self.stop_reason = reason
+        self.cancel_created_orders()
+        self.stop_event.set()
+
+    def _refresh_clock(self) -> None:
+        try:
+            if hasattr(self.adapter, "get_server_time_drift_seconds"):
+                self.clock_drift_seconds = abs(Decimal(str(self.adapter.get_server_time_drift_seconds())))
+            elif hasattr(self.adapter, "get_server_time"):
+                server = self.adapter.get_server_time()
+                self.clock_drift_seconds = abs(Decimal(str((server - datetime.now(timezone.utc)).total_seconds())))
+        except AdapterError as error:
+            self.clock_drift_seconds = Decimal("999")
+            self.risk_state.trigger(f"CLOCK_SYNC_FAILED:{error.code}")
+
+    def _market_fresh(self, symbol: str) -> bool:
+        context = self.market_contexts.get(symbol)
+        if context is None:
+            return False
+        if context.coverage.get("closed_bar") == "UNVERIFIED_ADAPTER_FALLBACK":
+            return True
+        now = datetime.now(timezone.utc)
+        quote_ok = context.quote_age_seconds(now) <= 30
+        bar_age = context.closed_bar_age_seconds(now)
+        bar_ok = bar_age is not None and bar_age <= 7200
+        return quote_ok and bar_ok
+
     def on_private_message(self, message: dict[str, Any]) -> None:
-        self.private_stream_seen = True
-        self.market_connected = not (message.get("success") is False or str(message.get("code", "0")) not in {"0", ""})
+        if message.get("success") is False or str(message.get("code", "0")) not in {"0", ""}:
+            self.market_connected = False
+            self.private_stream_error = str(message.get("msg") or message.get("code") or "private stream error")
+            if self.enable_orders:
+                self._engage_safety("PRIVATE_WEBSOCKET_ERROR")
+            return
+        channel = str((message.get("arg") or {}).get("channel", ""))
+        if message.get("event") in {"login", "subscribe"} or channel in {"account", "positions", "orders", "fills"} or "data" in message:
+            self.private_stream_seen = True
+            self.market_connected = True
 
     def on_private_error(self, error: BaseException) -> None:
         self.market_connected = False
@@ -354,29 +533,76 @@ class VenueRuntime:
     def _watchdog(self) -> None:
         while not self.stop_event.wait(15):
             if self.enable_orders and self.private_stream_available and self.private_stream_seen and not self.market_connected:
-                self.cancel_created_orders()
-                self.stop_reason = "PRIVATE_WEBSOCKET_DISCONNECTED"
-                self.stop_event.set()
+                self._engage_safety("PRIVATE_WEBSOCKET_DISCONNECTED")
                 break
             if time.monotonic() - self.last_loop_monotonic > max(90, self.poll_seconds * 2 + 30):
-                self.cancel_created_orders()
-                self.stop_reason = "WATCHDOG_TIMEOUT"
-                self.stop_event.set()
+                self._engage_safety("WATCHDOG_TIMEOUT")
                 break
+
+    def _cancel_stale_orders(self) -> None:
+        now = datetime.now(timezone.utc)
+        remaining: list[Order] = []
+        for order in self.active_orders:
+            if not self._is_bot_order(order):
+                remaining.append(order)
+                continue
+            age = max(0.0, (now - order.created_at).total_seconds())
+            if age <= MAX_ACTIVE_ORDER_AGE_SECONDS:
+                remaining.append(order)
+                continue
+            try:
+                self.adapter.cancel_order(order.client_order_id)
+                self.created_order_ids.discard(order.client_order_id)
+            except AdapterError as error:
+                self._engage_safety(f"STALE_ORDER_CANCEL_FAILED:{error.code}")
+        self.active_orders = remaining
+
+    def _cancel_replaced_order(self, symbol: str, target_exposure: Decimal, current_contracts: Decimal, bid: Decimal, ask: Decimal) -> None:
+        """Cancel only bot-owned orders whose target or quote is obsolete."""
+
+        remaining: list[Order] = []
+        for order in self.active_orders:
+            if order.symbol != symbol or not self._is_bot_order(order):
+                remaining.append(order)
+                continue
+            context = self.order_context.get(str(order.client_order_id), {})
+            old_target = context.get("strategy_target_exposure")
+            old_current = context.get("strategy_current_contracts")
+            target_changed = old_target not in (None, "") and abs(Decimal(str(old_target)) - target_exposure) > Decimal("0.000001")
+            partial_fill_changed = old_current not in (None, "") and abs(Decimal(str(old_current)) - current_contracts) > Decimal("0")
+            reference = ask if order.side.value == "BUY" else bid
+            price_drift = order.price is not None and reference > 0 and abs(order.price - reference) / reference > Decimal("0.01")
+            if not (target_changed or partial_fill_changed or price_drift):
+                remaining.append(order)
+                continue
+            try:
+                self.adapter.cancel_order(order.client_order_id)
+                self.created_order_ids.discard(order.client_order_id)
+            except AdapterError as error:
+                self._engage_safety(f"REPLACEMENT_CANCEL_FAILED:{error.code}")
+        self.active_orders = remaining
 
     def _plan_symbol(self, historical_symbol: str, instrument: Instrument, equity: Decimal) -> TargetOrderPlan | None:
         venue_symbol = instrument.canonical_symbol
         bars = self.adapter.fetch_closed_bars(venue_symbol, limit=100)
         if not bars:
             return None
-        engine = self.engines.setdefault(historical_symbol, RealtimeFeatureEngine(instrument, feature_symbol=historical_symbol, position_scale=self.bundle.position_scales.get(historical_symbol, 1.0), feature_contract_version=getattr(self.bundle, "feature_contract_version", LEGACY_FEATURE_CONTRACT_VERSION)))
+        engine = self._engine_for(historical_symbol)
         engine.ingest_closed_bars(bars)
         latest = bars[-1]
         decision_time = datetime.now(timezone.utc)
         current = self._spot_quantity(instrument) if instrument.instrument_type == InstrumentType.SPOT else self.positions.get(venue_symbol, Decimal("0"))
+        if hasattr(self.adapter, "fetch_market_context"):
+            context = self.adapter.fetch_market_context(venue_symbol, bars=bars)
+        else:
+            bid, ask = self.adapter.fetch_quote(venue_symbol)
+            context = MarketContext(venue_symbol, MarketQuote(venue_symbol, bid, ask, decision_time, "adapter-quote"), latest.timestamp + __import__("datetime").timedelta(hours=1), None, None, None, None, decision_time, {"quote": "OK", "closed_bar": "UNVERIFIED_ADAPTER_FALLBACK", "funding": "MISSING", "mark_price": "MISSING", "index_price": "MISSING"})
+        self.market_contexts[venue_symbol] = context
+        engine.attach_market_context(funding_rate=float(context.funding_rate) if context.funding_rate is not None else None, funding_source_time=context.funding_source_time, mark_price=float(context.mark_price) if context.mark_price is not None else None, index_price=float(context.index_price) if context.index_price is not None else None, status=context.coverage)
         strategy_input = engine.build_input(decision_time=decision_time, current_qty=current, current_equity=equity)
         signal = self.bundle.model.predict(strategy_input)
-        bid, ask = self.adapter.fetch_quote(venue_symbol)
+        bid, ask = context.quote.bid, context.quote.ask
+        self._cancel_replaced_order(venue_symbol, Decimal(str(signal.target_exposure)), current, bid, ask)
         limit = risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol)
         if instrument.instrument_type == InstrumentType.SPOT:
             if not self.allow_spot_approximation:
@@ -406,15 +632,19 @@ class VenueRuntime:
 
     def process_once(self) -> dict[str, Any]:
         self.last_loop_monotonic = time.monotonic()
+        if KILL_SWITCH_PATH.exists():
+            self._engage_safety("MANUAL_KILL_SWITCH")
+            return self._result("BLOCKED" if self.enable_orders else "RUNNING_READ_ONLY", Decimal("0"), [], {"kill_switch": ["MANUAL_KILL_SWITCH"]})
         try:
             equity = self.refresh()
         except AdapterError as error:
             self.last_error = f"{error.code}: {error}"
             if self.enable_orders:
-                self.cancel_created_orders()
-                self.stop_reason = "ACCOUNT_REFRESH_FAILED"
-                self.stop_event.set()
+                self._engage_safety("ACCOUNT_REFRESH_FAILED")
             return self._result("BLOCKED" if self.enable_orders else "RUNNING_READ_ONLY", Decimal("0"), [], {"account_refresh": [error.code]})
+
+        self._refresh_clock()
+        self._cancel_stale_orders()
 
         plans: list[TargetOrderPlan] = []
         blocked: dict[str, list[str]] = {}
@@ -484,7 +714,29 @@ class VenueRuntime:
         order_errors: dict[str, str] = {}
         for plan in plans:
             historical_symbol = self._historical_symbol(plan)
-            decision = check_testnet_order(enable_orders=self.enable_orders, confirm_testnet=self.confirm_testnet, symbol=historical_symbol, target_exposure=plan.target_exposure, total_target_exposure=total_target, envelope=self.bundle.risk_envelope, reconciliation_ok=self.reconciliation_ok, websocket_connected=self.market_connected, market_fresh=True, clock_drift_seconds=Decimal("0"), consecutive_rejects=self.consecutive_rejects)
+            decision = check_testnet_order(
+                enable_orders=self.enable_orders,
+                confirm_testnet=self.confirm_testnet,
+                symbol=historical_symbol,
+                target_exposure=plan.target_exposure,
+                total_target_exposure=total_target,
+                envelope=self.bundle.risk_envelope,
+                reconciliation_ok=self.reconciliation_ok,
+                websocket_connected=self.market_connected,
+                market_fresh=self._market_fresh(plan.symbol),
+                clock_drift_seconds=self.clock_drift_seconds,
+                consecutive_rejects=self.consecutive_rejects,
+                daily_loss=self.risk_state.daily_loss,
+                max_daily_loss=self.risk_state.max_daily_loss,
+                drawdown=self.risk_state.drawdown,
+                max_drawdown=self.risk_state.max_drawdown,
+                risk_block_reasons=tuple(self.risk_state.block_reasons),
+                kill_switch_engaged=self.risk_state.kill_switch_engaged,
+                margin_mode=getattr(self.adapter, "margin_mode", None),
+                required_margin_mode=getattr(self.adapter, "required_margin_mode", ""),
+                current_leverage=getattr(self.adapter, "max_position_leverage", None),
+                max_leverage=MAX_LEVERAGE if hasattr(self.adapter, "max_position_leverage") else Decimal("0"),
+            )
             if not decision.allowed:
                 blocked[historical_symbol] = list(decision.reasons)
                 continue
@@ -508,9 +760,7 @@ class VenueRuntime:
                 self.consecutive_rejects += 1
                 order_errors[historical_symbol] = f"{error.code}: {error}"
                 if self.consecutive_rejects >= 3:
-                    self.cancel_created_orders()
-                    self.stop_reason = "CONSECUTIVE_ORDER_REJECTS"
-                    self.stop_event.set()
+                    self._engage_safety("CONSECUTIVE_ORDER_REJECTS")
                 continue
             self.consecutive_rejects = 0
             self.created_order_ids.add(accepted.client_order_id)
@@ -523,9 +773,7 @@ class VenueRuntime:
                 self.refresh()
             except AdapterError as error:
                 self.last_error = f"{error.code}: {error}"
-                self.cancel_created_orders()
-                self.stop_reason = "ACCOUNT_REFRESH_FAILED_AFTER_ORDER"
-                self.stop_event.set()
+                self._engage_safety("ACCOUNT_REFRESH_FAILED_AFTER_ORDER")
         return self._result("RUNNING" if self.enable_orders else "RUNNING_READ_ONLY", equity, plans, blocked, submitted, order_errors)
 
     def _result(self, status: str, equity: Decimal, plans: list[TargetOrderPlan], blocked: dict[str, list[str]], submitted: list[str] | None = None, order_errors: dict[str, str] | None = None) -> dict[str, Any]:
@@ -533,17 +781,58 @@ class VenueRuntime:
             connection = "PRIVATE_WEBSOCKET" if self.private_stream_seen else "PRIVATE_WEBSOCKET_WAITING"
         else:
             connection = "REST_POLLING"
-        result = {"status": status, "venue": self.venue, "equity": equity, "plans": len(plans), "submitted": submitted or [], "blocked": blocked, "market_connection": connection, "market_connected": self.market_connected, "private_stream_seen": self.private_stream_seen, "private_stream_error": self.private_stream_error, "order_submission_enabled": self.enable_orders and self.confirm_testnet, "created_order_ids": sorted(self.created_order_ids), "account": self.account_snapshot, "stop_reason": self.stop_reason, "last_error": self.last_error, "portfolio_target_scale": self.portfolio_target_scale, "order_errors": order_errors or {}, "strategy_fidelity": "BEHAVIORAL_APPROXIMATION"}
+        now = datetime.now(timezone.utc)
+        ages = [(now - order.created_at).total_seconds() for order in self.active_orders if self._is_bot_order(order)]
+        result = {
+            "status": status,
+            "venue": self.venue,
+            "model_version": getattr(self.bundle, "model_version", "UNKNOWN"),
+            "feature_contract_version": getattr(self.bundle, "feature_contract_version", "UNKNOWN"),
+            "model_sha256": getattr(self.bundle, "model_sha256", ""),
+            "training_data_sha256": getattr(self.bundle, "training_data_sha256", ""),
+            "frozen_cutoff": getattr(self.bundle, "frozen_cutoff", ""),
+            "equity": equity,
+            "plans": len(plans),
+            "submitted": submitted or [],
+            "blocked": blocked,
+            "market_connection": connection,
+            "market_connected": self.market_connected,
+            "private_stream_seen": self.private_stream_seen,
+            "private_stream_error": self.private_stream_error,
+            "order_submission_enabled": self.enable_orders and self.confirm_testnet and self.risk_state.safe(),
+            "created_order_ids": sorted(self.created_order_ids),
+            "account": self.account_snapshot,
+            "risk": self.risk_state.snapshot(),
+            "clock_drift_seconds": self.clock_drift_seconds,
+            "market_context": {symbol: {"coverage": context.coverage, "quote_time": context.quote.observed_at, "closed_bar_time": context.closed_bar_time, "quote_age_seconds": context.quote_age_seconds(now), "closed_bar_age_seconds": context.closed_bar_age_seconds(now)} for symbol, context in self.market_contexts.items()},
+            "behavior_state": {
+                "bootstrapped": self.behavior_state_bootstrapped,
+                "seen_fill_ids": sorted(self.seen_fill_ids)[-2000:],
+                "engine_state": {symbol: engine.snapshot() for symbol, engine in self.engines.items()},
+                "realized_pnl_by_symbol": {symbol: str(value) for symbol, value in self.realized_pnl_by_symbol.items()},
+                "order_context": self.order_context,
+                "latest_feedback_at": self.latest_feedback_at,
+            },
+            "oldest_active_order_age_seconds": max(ages) if ages else None,
+            "stop_reason": self.stop_reason,
+            "last_error": self.last_error,
+            "portfolio_target_scale": self.portfolio_target_scale,
+            "order_errors": order_errors or {},
+            "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+        }
         _write_json(self.output_path, result)
         return result
 
     def cancel_created_orders(self) -> None:
-        for client_id in sorted(self.created_order_ids):
+        owned_ids = set(self.created_order_ids)
+        owned_ids.update(str(order.client_order_id) for order in self.active_orders if self._is_bot_order(order))
+        for client_id in sorted(owned_ids):
             try:
                 self.adapter.cancel_order(client_id)
             except AdapterError:
                 pass
-        self.created_order_ids.clear()
+        self.created_order_ids.difference_update(owned_ids)
+        self.active_orders = [order for order in self.active_orders if str(order.client_order_id) not in owned_ids]
 
     def shutdown(self) -> None:
         self.stop_event.set()
@@ -567,7 +856,7 @@ def _adapter_for(venue: str) -> tuple[Any, Path]:
 
 
 def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, enable_orders: bool = False, confirm_testnet: bool = False, symbols: str = "auto", once: bool = False, poll_seconds: int = 60, allow_spot_approximation: bool = False, external_stop_event: threading.Event | None = None) -> dict[str, Any]:
-    bundle = load_deployment_bundle(artifact_path)
+    bundle = load_deployment_bundle(artifact_path, require_model_sha256=True)
     adapter, output_path = _adapter_for(venue)
     live_instruments = adapter.load_all_instruments()
     mapping = build_venue_symbol_mapping(bundle, venue, live_instruments)
@@ -626,4 +915,4 @@ def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, 
     return last
 
 
-__all__ = ["ALLOWED_MAPPING_STATUSES", "DEFAULT_ARTIFACT", "VenueRuntime", "build_venue_symbol_mapping", "run_foreground_venue"]
+__all__ = ["ALLOWED_MAPPING_STATUSES", "DEFAULT_ARTIFACT", "KILL_SWITCH_PATH", "VenueRuntime", "build_venue_symbol_mapping", "run_foreground_venue"]
