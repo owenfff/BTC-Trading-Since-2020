@@ -113,3 +113,27 @@ def test_runtime_blocks_order_when_private_stream_is_unhealthy(tmp_path: Path) -
     result = runtime.process_once()
     assert result["submitted"] == []
     assert result["blocked"]["XBTUSD"] == ["WEBSOCKET_NOT_CONNECTED"]
+
+
+def test_runtime_persists_pre_action_context_before_order_submission(tmp_path: Path) -> None:
+    adapter = SimulatedAdapter()
+    runtime = _runtime(tmp_path, adapter)
+    runtime.refresh()
+    result = runtime.process_once()
+    audit = result["behavior_state"]["decision_audit"]
+    assert len(audit) == 1
+    assert audit[0]["historical_symbol"] == "XBTUSD"
+    assert audit[0]["venue_symbol"] == "BTCUSDT"
+    assert audit[0]["pre_action"]["quote"]["bid"] == "99.9"
+    assert audit[0]["pre_action"]["features"]["feature_latest_bar_time"]
+    assert "secret" not in str(audit[0]).lower()
+
+
+def test_runtime_restores_bounded_pre_action_context(tmp_path: Path) -> None:
+    adapter = SimulatedAdapter()
+    runtime = _runtime(tmp_path, adapter)
+    runtime.decision_audit = [{"decision_time": str(index)} for index in range(6000)]
+    runtime._result("RUNNING_READ_ONLY", Decimal("1000"), [], {})
+    restored = _runtime(tmp_path, adapter)
+    assert len(restored.decision_audit) == 5000
+    assert restored.decision_audit[0]["decision_time"] == "1000"

@@ -35,6 +35,7 @@ ALLOWED_MAPPING_STATUSES = {"ALLOW_DERIVATIVE_TRADING", "ALLOW_SPOT_BEHAVIOR_APP
 MAX_ACTIVE_ORDER_AGE_SECONDS = 15 * 60
 MAX_LEVERAGE = Decimal("2")
 REQUIRED_MARGIN_MODE = "isolated"
+MAX_DECISION_AUDIT_ROWS = 5000
 
 
 def _json_default(value: Any) -> Any:
@@ -52,6 +53,18 @@ def _json_default(value: Any) -> Any:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, default=_json_default) + "\n", encoding="utf-8")
+
+
+def _audit_value(value: Any) -> Any:
+    """Convert a prospective decision value to a credential-free JSON scalar."""
+
+    if isinstance(value, Decimal):
+        return str(value)
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
 
 
 def _instrument_status(instrument: Instrument) -> str:
@@ -230,6 +243,7 @@ class VenueRuntime:
     clock_drift_seconds: Decimal = Decimal("0")
     latest_feedback_at: str | None = None
     orphans_checked: bool = False
+    decision_audit: list[dict[str, Any]] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._restore_runtime_state()
@@ -249,6 +263,7 @@ class VenueRuntime:
         self.realized_pnl_by_symbol = {str(key): Decimal(str(value)) for key, value in dict(behavior.get("realized_pnl_by_symbol", {})).items()}
         self.order_context.update({str(key): dict(value) for key, value in dict(behavior.get("order_context", {})).items() if isinstance(value, dict)})
         self.behavior_state_bootstrapped = bool(behavior.get("bootstrapped", False))
+        self.decision_audit = [dict(item) for item in behavior.get("decision_audit", []) if isinstance(item, dict)][-MAX_DECISION_AUDIT_ROWS:]
         self.risk_state.restore(payload.get("risk"))
 
     def _engine_for(self, historical_symbol: str) -> RealtimeFeatureEngine:
@@ -488,6 +503,64 @@ class VenueRuntime:
         bar_ok = bar_age is not None and bar_age <= 7200
         return quote_ok and bar_ok
 
+    def _record_decision_snapshot(
+        self,
+        *,
+        historical_symbol: str,
+        venue_symbol: str,
+        decision_time: datetime,
+        equity: Decimal,
+        current_quantity: Decimal,
+        context: MarketContext,
+        strategy_input: Any,
+        signal: Any,
+    ) -> None:
+        """Persist bounded, pre-order context for prospective replay analysis.
+
+        This is written before order cancellation or submission. It records
+        what this process observed and predicted, not a historical label. The
+        bounded ring prevents a long-running Demo process from growing its
+        state file without limit, and only strategy features are copied so
+        credentials/raw adapter payloads cannot enter the journal.
+        """
+
+        features = {
+            str(key): _audit_value(value)
+            for key, value in dict(getattr(strategy_input, "features", {}) or {}).items()
+        }
+        self.decision_audit.append({
+            "decision_time": decision_time.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "historical_symbol": historical_symbol,
+            "venue_symbol": venue_symbol,
+            "strategy_version": _audit_value(getattr(signal, "strategy_version", getattr(self.bundle, "model_version", "UNKNOWN"))),
+            "pre_action": {
+                "equity": str(equity),
+                "current_quantity": str(current_quantity),
+                "quote": {
+                    "bid": str(context.quote.bid),
+                    "ask": str(context.quote.ask),
+                    "observed_at": context.quote.observed_at.isoformat().replace("+00:00", "Z"),
+                    "source": context.quote.source,
+                },
+                "closed_bar_time": context.closed_bar_time.isoformat().replace("+00:00", "Z") if context.closed_bar_time else None,
+                "funding_rate": _audit_value(context.funding_rate),
+                "funding_source_time": context.funding_source_time.isoformat().replace("+00:00", "Z") if context.funding_source_time else None,
+                "mark_price": _audit_value(context.mark_price),
+                "index_price": _audit_value(context.index_price),
+                "coverage": {str(key): str(value) for key, value in context.coverage.items()},
+                "features": features,
+            },
+            "model_output": {
+                "action": _audit_value(getattr(signal, "action", "UNKNOWN")),
+                "target_exposure": _audit_value(getattr(signal, "target_exposure", None)),
+                "confidence": _audit_value(getattr(signal, "confidence", None)),
+                "valid_until": _audit_value(getattr(signal, "valid_until", None)),
+                "risk_tags": [_audit_value(item) for item in getattr(signal, "risk_tags", ())],
+            },
+        })
+        if len(self.decision_audit) > MAX_DECISION_AUDIT_ROWS:
+            self.decision_audit = self.decision_audit[-MAX_DECISION_AUDIT_ROWS:]
+
     def on_private_message(self, message: dict[str, Any]) -> None:
         if message.get("success") is False or str(message.get("code", "0")) not in {"0", ""}:
             self.market_connected = False
@@ -601,6 +674,16 @@ class VenueRuntime:
         engine.attach_market_context(funding_rate=float(context.funding_rate) if context.funding_rate is not None else None, funding_source_time=context.funding_source_time, mark_price=float(context.mark_price) if context.mark_price is not None else None, index_price=float(context.index_price) if context.index_price is not None else None, status=context.coverage)
         strategy_input = engine.build_input(decision_time=decision_time, current_qty=current, current_equity=equity)
         signal = self.bundle.model.predict(strategy_input)
+        self._record_decision_snapshot(
+            historical_symbol=historical_symbol,
+            venue_symbol=venue_symbol,
+            decision_time=decision_time,
+            equity=equity,
+            current_quantity=current,
+            context=context,
+            strategy_input=strategy_input,
+            signal=signal,
+        )
         bid, ask = context.quote.bid, context.quote.ask
         self._cancel_replaced_order(venue_symbol, Decimal(str(signal.target_exposure)), current, bid, ask)
         limit = risk_envelope_for_symbol(self.bundle.risk_envelope, historical_symbol)
@@ -812,6 +895,7 @@ class VenueRuntime:
                 "realized_pnl_by_symbol": {symbol: str(value) for symbol, value in self.realized_pnl_by_symbol.items()},
                 "order_context": self.order_context,
                 "latest_feedback_at": self.latest_feedback_at,
+                "decision_audit": self.decision_audit,
             },
             "oldest_active_order_age_seconds": max(ages) if ages else None,
             "stop_reason": self.stop_reason,
