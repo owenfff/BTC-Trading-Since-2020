@@ -5,7 +5,7 @@
   "current_work_package": "M15.14-public-record-identifiability-ceiling",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "74ce3fbc13728bfd39b124f61f418a0a21a75c42",
-  "last_report_commit": "68c3d9ba312ab9d090e5c43f99ef144cdbdf607a",
+  "last_report_commit": "126a9f918ebab03f4c3b71c11654ebbae4450fd8",
   "test_count": 391,
   "last_test_status": "FULL_SUITE_391_PASSED;IDENTIFIABILITY_CEILING_DIAGNOSTIC;CONDITIONAL_ACTION_TYPE_PARTIAL;AUTONOMOUS_TIMING_F1_ZERO_BOTH_VENUES;V4.4_DIAGNOSTIC_ONLY;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
