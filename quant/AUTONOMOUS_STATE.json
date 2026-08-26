@@ -5,7 +5,7 @@
   "current_work_package": "M15.17-strategy-learning-completion-audit",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "50b801b21bcbaebbcf27afd5e9c2f9dd08861121",
-  "last_report_commit": "245efd9dfe5ea3cb22e09f7b337a53795724faa0",
+  "last_report_commit": "dfa4b7feeca8c9dbaed44cb98bc014f8b6e49795",
   "test_count": 400,
   "last_test_status": "FULL_SUITE_400_PASSED;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
