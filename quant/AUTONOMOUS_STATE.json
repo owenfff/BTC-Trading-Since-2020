@@ -5,7 +5,7 @@
   "current_work_package": "M15.23-fail-closed-market-freshness-gate",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "5c5ef8fddc7e06eb06f1b82c30337235d2ab5d92",
-  "last_report_commit": "294f2b80801aa7348e03614395d93d45a5e42913",
+  "last_report_commit": "42e66c43ac23924e528c71308bbabb15f1b8629f",
   "test_count": 415,
   "last_test_status": "FULL_SUITE_415_PASSED;MARKET_FRESHNESS_FAIL_CLOSED;APPEND_ONLY_PROSPECTIVE_DECISION_AUDIT_JOURNAL;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -89,5 +89,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Run the stricter runtime only with verified fresh market context during an explicitly authorized Demo observation, then audit its daily files; do not claim exact learning without verified historical pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
-  "updated_at_utc": "2026-08-26T16:29:54Z"
+  "updated_at_utc": "2026-08-26T16:34:42Z"
 }
