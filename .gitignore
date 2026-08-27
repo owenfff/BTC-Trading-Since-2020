@@ -12,3 +12,4 @@ quant/outputs/decision_audit/
 quant/outputs/cross_asset_model_dataset_v3.csv
 quant/outputs/strategy_effectiveness_per_trade*.csv
 quant/outputs/strategy_effectiveness_*.parquet
+quant/outputs/trade_context_indicator_replay*.csv
