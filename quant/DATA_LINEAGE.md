@@ -415,3 +415,13 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Runtime source: adapter-provided `MarketContext` only. A quote-only fallback remains available for read-only diagnostics but is explicitly ineligible for order submission.
 - Freshness rules: quote coverage must be `OK` and its unclamped age must be `0–30` seconds; closed-bar coverage must be `OK` and its unclamped age must be `0–7200` seconds. Future timestamps are rejected.
 - Verification: full suite `415 passed` with only the existing 6 `read_csv_batched` deprecation warnings. No historical CSV/JSON input, active model, credential, private endpoint, mainnet connection, or Demo order was changed.
+
+## M15.24 historical trade-context indicator replay
+
+- Code: `quant/scripts/build_trade_context_indicator_replay.py`; tests: `quant/tests/test_trade_context_indicator_replay.py`; code commit: `43a3e5a728a0556d26672cf6e33a0cbb45542cb8`.
+- Input: ignored `quant/outputs/cross_venue_model_dataset_v3.csv`, SHA256 recorded in `quant/reports/trade_context_indicator_replay.json`; frozen deployment model `quant/outputs/cross_asset_deployment_model_v3.json` is loaded read-only.
+- Outputs: tracked summaries `quant/reports/trade_context_indicator_replay.md` / `.json`; ignored per-decision detail `quant/outputs/trade_context_indicator_replay.csv`. No source CSV/JSON is modified.
+- Replay semantics: use only the feature contract and the strictly prior closed bar already stored in each row; labels are compared after prediction and are never passed to `strategy_input_from_row`. The conditional track retains historical dynamic state and is explicitly not strict autonomous replay.
+- Result: `32,552` rows scanned, `31,631` eligible predictions, zero causal timestamp violations. The report records the model's `100%` predicted action rate, Macro-F1 `0.188487`, target MAE `0.076822`, and missing/warmup/position-scale coverage.
+- Historical L2/order-book: unavailable from the pinned public source, so the artifact is K-line/indicator context replay only. Active Demo/model, credentials, private endpoints and order state were not changed.
+- Verification: full suite `420 passed` with 6 existing warnings; targeted M15.24 tests `5 passed`.

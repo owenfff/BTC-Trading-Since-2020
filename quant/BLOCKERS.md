@@ -230,3 +230,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - M15.23 closes a runtime safety gap: adapters without a verified market context, stale quote/bar data, or future-dated quote/bar timestamps cannot pass the order freshness gate.
 - This makes the safety condition stricter; it does not improve historical strategy identifiability. Exact recovery, autonomous timing and candidate promotion remain blocked.
 - The active Demo model remains unchanged and no new Demo orders are authorized by this change.
+
+## 2026-08-27 — Indicator replay does not clear strategy-learning blocker
+
+- M15.24 proves the existing event dataset can be causally replayed to the last closed bar: `0` future/equal closed-bar, funding, or next-label timestamp violations across `32,552` rows.
+- The current frozen model still predicts a non-idle action for `100%` of `31,631` eligible rows. Conditional Macro-F1 is `0.188487`, target exposure MAE is `0.076822`, and aggregate OPEN/CLOSE/FLIP family recall is `0`; this is not evidence of a reliable autonomous trigger.
+- `quant/outputs/trade_context_indicator_replay.csv` is a useful historical K-line/indicator context artifact, but the public source still has no verified historical L2/order-book depth. Do not promote the model, switch Demo artifacts or add Demo orders.

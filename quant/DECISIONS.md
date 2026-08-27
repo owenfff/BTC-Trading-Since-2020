@@ -357,3 +357,11 @@
 - Quote and closed-bar ages are now checked without clamping future timestamps: negative ages, stale quotes over `30` seconds, and closed bars older than `2` hours all fail the gate.
 - The change preserves the existing safety boundary: it blocks new orders and does not liquidate existing positions. The active model is unchanged.
 - Verification: full suite `415 passed` with 6 existing deprecation warnings; no credential, Demo order, mainnet connection, or raw historical input was used.
+
+## 2026-08-27 — Historical trade-context indicator replay is available, strategy remains diagnostic
+
+- M15.24 adds `quant/scripts/build_trade_context_indicator_replay.py` and `quant/tests/test_trade_context_indicator_replay.py`. It streams the frozen cross-venue v3 event dataset and writes one ignored detail row per model-eligible historical decision context.
+- The detail replay includes the last strictly prior closed bar, RSI14, MACD histogram, Bollinger `%B`, volume percentile, 24-hour return, observed next action, model action, target exposure and a Chinese explanation explicitly labeled as model-input evidence rather than the original trader's claimed reason.
+- Across `32,552` event rows, `31,631` were model-eligible. Causal timestamp violations were `0`; current-model conditional Action Accuracy was `0.683696`, Macro-F1 `0.188487`, target-exposure MAE `0.076822`, and predicted action rate `100%` versus observed `98.3276%`.
+- BitMEX conditional Macro-F1 was `0.217748`; Hyperliquid was `0.378235` on only `320` rows. OPEN/CLOSE/FLIP family recall was zero in the aggregate conditional result, so indicators provide a useful replay view but do not prove trigger recovery.
+- The pinned public source has no verified historical L2/order-book stream. The active Demo model is unchanged; no candidate promotion, new Demo order, exchange connection or credential use is authorized.
