@@ -185,13 +185,14 @@ function strategyReasonParts(item) {
   const target = item.strategy_target_exposure ? `目标暴露 ${displayNumber(item.strategy_target_exposure)}` : "目标暴露未知";
   const confidence = item.strategy_confidence ? `置信度 ${displayNumber(item.strategy_confidence)}` : "置信度未知";
   const basis = strategyBasisText(item);
+  const reasonZh = String(item.strategy_reason_zh || "");
   const sources = Array.isArray(item.strategy_source_symbols) && item.strategy_source_symbols.length > 1
     ? `合并来源：${item.strategy_source_symbols.join(" / ")}`
     : "";
   const tags = (Array.isArray(item.strategy_risk_tags) ? item.strategy_risk_tags : [])
     .map((tag) => riskTagLabels[String(tag).toUpperCase()] || String(tag))
     .filter((tag, index, all) => tag && all.indexOf(tag) === index);
-  return { actionLabel, executionLabel, detail: [target, confidence, basis, sources, ...tags].filter(Boolean).join(" · ") };
+  return { actionLabel, executionLabel, detail: [reasonZh, target, confidence, basis, sources, ...tags].filter(Boolean).join(" · ") };
 }
 
 function appendStrategyReasonCell(row, item) {
@@ -640,6 +641,35 @@ function renderVenues(venues) {
   });
 }
 
+function renderSignals(signals) {
+  const list = $("#signal-list");
+  if (!list) return;
+  list.replaceChildren();
+  const rows = Object.values(signals || {}).sort((a, b) => String(a.venue_symbol || a.historical_symbol || "").localeCompare(String(b.venue_symbol || b.historical_symbol || "")));
+  if (!rows.length) {
+    const empty = document.createElement("span");
+    empty.className = "empty-state";
+    empty.textContent = "等待策略信号";
+    list.append(empty);
+    return;
+  }
+  rows.slice(0, 12).forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "signal-card";
+    const symbol = document.createElement("strong");
+    symbol.textContent = item.venue_symbol || item.historical_symbol || "—";
+    const action = document.createElement("b");
+    action.className = String(item.action || "").includes("LONG") ? "signal-long" : String(item.action || "").includes("SHORT") ? "signal-short" : "signal-neutral";
+    action.textContent = item.action || "—";
+    const detail = document.createElement("span");
+    detail.textContent = `${item.reason_zh || "暂无完整指标依据"} · 目标 ${displayNumber(item.target_exposure)} · 置信度 ${displayNumber(Number(item.confidence) * 100)}%`;
+    const basis = document.createElement("small");
+    basis.textContent = Array.isArray(item.basis) ? item.basis.join(" · ") : "";
+    card.append(symbol, action, detail, basis);
+    list.append(card);
+  });
+}
+
 function render(payload) {
   const localControl = Boolean(payload.control?.enabled && payload.control?.local_only);
   document.body.classList.toggle("public-mode", !localControl);
@@ -687,6 +717,7 @@ function render(payload) {
   const featureContract = payload.model?.feature_contract_version || "";
   setText("#model-meta", modelSha ? `${modelSha.slice(0, 12)}${featureContract ? ` · ${featureContract}` : ""}` : "—");
   renderVenues(payload.venues || []);
+  renderSignals(payload.runtime?.signals || {});
   setText("#allowed-count", payload.mapping?.allowed_count ?? 0);
   const reconciliation = $("#reconciliation");
   if (reconciliation) {

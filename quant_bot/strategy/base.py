@@ -44,6 +44,7 @@ class StrategySignal:
     max_slippage: float | None
     execution_preference: str
     risk_tags: tuple[str, ...]
+    strategy_reason_zh: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -57,6 +58,7 @@ class StrategySignal:
             "max_slippage": self.max_slippage,
             "execution_preference": self.execution_preference,
             "risk_tags": list(self.risk_tags),
+            "strategy_reason_zh": self.strategy_reason_zh,
         }
 
     def validate(self) -> None:
@@ -80,6 +82,7 @@ def make_signal(
     target_position_notional: float | None = None,
     max_slippage: float | None = None,
     execution_preference: str = "PASSIVE_UNLESS_RISK_REDUCTION",
+    strategy_reason_zh: str = "",
 ) -> StrategySignal:
     signal = StrategySignal(
         strategy_version=strategy_version,
@@ -92,6 +95,7 @@ def make_signal(
         max_slippage=max_slippage,
         execution_preference=execution_preference,
         risk_tags=tuple(dict.fromkeys(risk_tags)),
+        strategy_reason_zh=str(strategy_reason_zh or ""),
     )
     signal.validate()
     return signal

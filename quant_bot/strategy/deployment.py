@@ -7,22 +7,23 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from .feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION, OPERATIONAL_FEATURE_CONTRACT_VERSION
+from .feature_contract import FEATURE_CONTRACT_VERSION, LEGACY_FEATURE_CONTRACT_VERSION, OPERATIONAL_FEATURE_CONTRACT_VERSION, UNIFIED_FEATURE_CONTRACT_VERSION
 from .supervised_models import CrossAssetNumpyLogisticStrategy
+from .unified_distillation import UNIFIED_MODEL_VERSION, UnifiedDistilledStrategy
 
 
 LEGACY_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v2-cross-asset-deploy"
 DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3-cross-asset-indicators"
 OPERATIONAL_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3.1-operational-parity"
 STABLE_TARGET_DEPLOYMENT_MODEL_VERSION = "behavioral-distillation-v3.2-stable-target"
-SUPPORTED_DEPLOYMENT_MODEL_VERSIONS = {LEGACY_DEPLOYMENT_MODEL_VERSION, DEPLOYMENT_MODEL_VERSION, OPERATIONAL_DEPLOYMENT_MODEL_VERSION, STABLE_TARGET_DEPLOYMENT_MODEL_VERSION}
+SUPPORTED_DEPLOYMENT_MODEL_VERSIONS = {LEGACY_DEPLOYMENT_MODEL_VERSION, DEPLOYMENT_MODEL_VERSION, OPERATIONAL_DEPLOYMENT_MODEL_VERSION, STABLE_TARGET_DEPLOYMENT_MODEL_VERSION, UNIFIED_MODEL_VERSION}
 
 
 @dataclass(frozen=True)
 class DeploymentBundle:
     """Immutable-at-runtime model, metadata and data-derived risk envelope."""
 
-    model: CrossAssetNumpyLogisticStrategy
+    model: Any
     model_version: str
     feature_contract_version: str
     training_data_sha256: str
@@ -38,7 +39,7 @@ class DeploymentBundle:
     def validate(self) -> None:
         if self.model_version not in SUPPORTED_DEPLOYMENT_MODEL_VERSIONS:
             raise ValueError(f"unexpected deployment model version: {self.model_version}")
-        expected_contract = LEGACY_FEATURE_CONTRACT_VERSION if self.model_version == LEGACY_DEPLOYMENT_MODEL_VERSION else OPERATIONAL_FEATURE_CONTRACT_VERSION if self.model_version in {OPERATIONAL_DEPLOYMENT_MODEL_VERSION, STABLE_TARGET_DEPLOYMENT_MODEL_VERSION} else FEATURE_CONTRACT_VERSION
+        expected_contract = LEGACY_FEATURE_CONTRACT_VERSION if self.model_version == LEGACY_DEPLOYMENT_MODEL_VERSION else UNIFIED_FEATURE_CONTRACT_VERSION if self.model_version == UNIFIED_MODEL_VERSION else OPERATIONAL_FEATURE_CONTRACT_VERSION if self.model_version in {OPERATIONAL_DEPLOYMENT_MODEL_VERSION, STABLE_TARGET_DEPLOYMENT_MODEL_VERSION} else FEATURE_CONTRACT_VERSION
         if self.feature_contract_version != expected_contract:
             raise ValueError("deployment feature contract does not match runtime contract")
         if not self.training_data_sha256 or len(self.training_data_sha256) != 64:
@@ -73,7 +74,7 @@ class DeploymentBundle:
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "DeploymentBundle":
         bundle = cls(
-            model=CrossAssetNumpyLogisticStrategy.from_dict(payload.get("model", {})),
+            model=(UnifiedDistilledStrategy.from_dict(payload.get("model", {})) if payload.get("model", {}).get("model_type") == "UnifiedDistilledStrategy" else CrossAssetNumpyLogisticStrategy.from_dict(payload.get("model", {}))),
             model_version=str(payload.get("model_version", "")),
             feature_contract_version=str(payload.get("feature_contract_version", "")),
             training_data_sha256=str(payload.get("training_data_sha256", "")),
@@ -125,8 +126,11 @@ def utc_now() -> str:
 
 __all__ = [
     "DEPLOYMENT_MODEL_VERSION",
+    "LEGACY_DEPLOYMENT_MODEL_VERSION",
     "OPERATIONAL_DEPLOYMENT_MODEL_VERSION",
     "STABLE_TARGET_DEPLOYMENT_MODEL_VERSION",
+    "SUPPORTED_DEPLOYMENT_MODEL_VERSIONS",
+    "UNIFIED_MODEL_VERSION",
     "DeploymentBundle",
     "load_deployment_bundle",
     "save_deployment_bundle",

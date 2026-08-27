@@ -517,6 +517,7 @@ def status_payload() -> dict[str, Any]:
             "blocked_symbols": blocked_symbols,
             "clock_drift_seconds": runtime.get("clock_drift_seconds"),
             "market_context": runtime.get("market_context", {}),
+            "signals": runtime.get("signals", {}),
             "latest_feedback_at": (runtime.get("behavior_state") or {}).get("latest_feedback_at"),
             "oldest_active_order_age_seconds": runtime.get("oldest_active_order_age_seconds"),
             "behavior_state": {symbol: {key: value for key, value in state.items() if key in {"latest_action", "add_count", "reduce_count", "flip_count", "latest_decision", "latest_market_context_status"}} for symbol, state in dict((runtime.get("behavior_state") or {}).get("engine_state", {})).items()},

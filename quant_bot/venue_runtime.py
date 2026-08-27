@@ -24,7 +24,7 @@ from quant_bot.execution.target_planner import TargetOrderPlan, plan_spot_order,
 from quant_bot.risk.testnet_gate import check_testnet_order, portfolio_target_scale, risk_envelope_for_symbol
 from quant_bot.risk.runtime_risk import RuntimeRiskState
 from quant_bot.strategy.deployment import DeploymentBundle, load_deployment_bundle
-from quant_bot.strategy.explanations import strategy_basis_from_features
+from quant_bot.strategy.explanations import strategy_basis_from_features, strategy_reason_zh
 from quant_bot.strategy.feature_contract import LEGACY_FEATURE_CONTRACT_VERSION
 from quant_bot.strategy.realtime_features import RealtimeFeatureEngine
 
@@ -187,6 +187,7 @@ def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str, order
             "strategy_signal_timestamp": context.get("strategy_signal_timestamp"),
             "strategy_risk_tags": context.get("strategy_risk_tags", []),
             "strategy_basis": context.get("strategy_basis", []),
+            "strategy_reason_zh": context.get("strategy_reason_zh", ""),
             "strategy_source_symbols": context.get("strategy_source_symbols", []),
             "strategy_source_signals": context.get("strategy_source_signals", []),
         }
@@ -276,6 +277,7 @@ class VenueRuntime:
     latest_feedback_at: str | None = None
     orphans_checked: bool = False
     decision_audit: list[dict[str, Any]] = field(default_factory=list)
+    latest_signals: dict[str, dict[str, Any]] = field(default_factory=dict)
     risk_metrics: dict[str, str] = field(default_factory=dict)
     decision_journal: DecisionAuditJournal = field(init=False, repr=False)
 
@@ -443,6 +445,7 @@ class VenueRuntime:
             strategy_basis=source.strategy_basis,
             strategy_source_symbols=source.strategy_source_symbols,
             strategy_source_signals=source.strategy_source_signals,
+            strategy_reason_zh=source.strategy_reason_zh,
         )
 
     def _source_symbols(self, plan: TargetOrderPlan) -> tuple[str, ...]:
@@ -600,6 +603,7 @@ class VenueRuntime:
                 "confidence": _audit_value(getattr(signal, "confidence", None)),
                 "valid_until": _audit_value(getattr(signal, "valid_until", None)),
                 "risk_tags": [_audit_value(item) for item in getattr(signal, "risk_tags", ())],
+                "reason_zh": _audit_value(getattr(signal, "strategy_reason_zh", "")),
             },
         }
         try:
@@ -732,6 +736,19 @@ class VenueRuntime:
         engine.attach_market_context(funding_rate=float(context.funding_rate) if context.funding_rate is not None else None, funding_source_time=context.funding_source_time, mark_price=float(context.mark_price) if context.mark_price is not None else None, index_price=float(context.index_price) if context.index_price is not None else None, status=context.coverage)
         strategy_input = engine.build_input(decision_time=decision_time, current_qty=current, current_equity=equity)
         signal = self.bundle.model.predict(strategy_input)
+        self.latest_signals[historical_symbol] = {
+            "historical_symbol": historical_symbol,
+            "venue_symbol": venue_symbol,
+            "signal_timestamp": _audit_value(getattr(signal, "signal_timestamp", decision_time)),
+            "action": _audit_value(getattr(signal, "action", "UNKNOWN")),
+            "target_exposure": _audit_value(getattr(signal, "target_exposure", None)),
+            "current_exposure": _audit_value(getattr(strategy_input, "current_strategy_position", None)),
+            "confidence": _audit_value(getattr(signal, "confidence", None)),
+            "reason_zh": _audit_value(getattr(signal, "strategy_reason_zh", "")),
+            "basis": list(strategy_basis_from_features(strategy_input.features)),
+            "risk_tags": [_audit_value(item) for item in getattr(signal, "risk_tags", ())],
+            "coverage": {str(key): str(value) for key, value in context.coverage.items()},
+        }
         recorded = self._record_decision_snapshot(
             historical_symbol=historical_symbol,
             venue_symbol=venue_symbol,
@@ -763,6 +780,7 @@ class VenueRuntime:
             strategy_signal_timestamp=str(getattr(signal, "signal_timestamp", "")),
             strategy_risk_tags=tuple(str(item) for item in getattr(signal, "risk_tags", ())),
             strategy_basis=strategy_basis_from_features(strategy_input.features),
+            strategy_reason_zh=str(getattr(signal, "strategy_reason_zh", "") or strategy_reason_zh(getattr(signal, "action", plan.reason), strategy_input.current_strategy_position, signal.target_exposure, strategy_input.features)),
             strategy_source_symbols=(historical_symbol,),
             strategy_source_signals=({
                 "historical_symbol": historical_symbol,
@@ -770,6 +788,7 @@ class VenueRuntime:
                 "target_exposure": str(signal.target_exposure),
                 "confidence": str(confidence) if confidence is not None else None,
                 "strategy_basis": list(strategy_basis_from_features(strategy_input.features)),
+                "strategy_reason_zh": str(getattr(signal, "strategy_reason_zh", "") or strategy_reason_zh(getattr(signal, "action", plan.reason), strategy_input.current_strategy_position, signal.target_exposure, strategy_input.features)),
             },),
         )
 
@@ -894,6 +913,7 @@ class VenueRuntime:
                 "strategy_signal_timestamp": plan.strategy_signal_timestamp,
                 "strategy_risk_tags": list(plan.strategy_risk_tags),
                 "strategy_basis": list(plan.strategy_basis),
+                "strategy_reason_zh": plan.strategy_reason_zh,
                 "strategy_source_symbols": list(self._source_symbols(plan)),
                 "strategy_source_signals": list(plan.strategy_source_signals),
             }
@@ -966,6 +986,7 @@ class VenueRuntime:
                     "max_record_bytes": 128 * 1024,
                 },
             },
+            "signals": self.latest_signals,
             "oldest_active_order_age_seconds": max(ages) if ages else None,
             "stop_reason": self.stop_reason,
             "last_error": self.last_error,

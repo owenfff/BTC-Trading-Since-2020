@@ -5,6 +5,7 @@ from .distilled_rules import DistilledRuleStrategy
 from .imitation_model import HistoricalBehaviorBaseline
 from .strategy_state import StrategyState
 from .supervised_models import CrossAssetNumpyLogisticStrategy, NumpyDecisionTreeStrategy, NumpyLogisticStrategy, TwoStageCrossAssetStrategy
+from .unified_distillation import UNIFIED_MODEL_VERSION, UnifiedDistilledStrategy
 
 __all__ = [
     "StrategyInput",
@@ -16,4 +17,6 @@ __all__ = [
     "NumpyLogisticStrategy",
     "CrossAssetNumpyLogisticStrategy",
     "TwoStageCrossAssetStrategy",
+    "UNIFIED_MODEL_VERSION",
+    "UnifiedDistilledStrategy",
 ]

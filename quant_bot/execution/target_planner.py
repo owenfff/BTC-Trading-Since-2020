@@ -34,6 +34,7 @@ class TargetOrderPlan:
     strategy_basis: tuple[str, ...] = ()
     strategy_source_symbols: tuple[str, ...] = ()
     strategy_source_signals: tuple[dict[str, Any], ...] = ()
+    strategy_reason_zh: str = ""
 
 
 def _signed_target_contracts(instrument: Instrument, target_exposure: Decimal, equity: Decimal, reference_price: Decimal) -> Decimal:

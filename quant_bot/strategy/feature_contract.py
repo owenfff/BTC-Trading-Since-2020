@@ -9,6 +9,7 @@ from .base import StrategyInput
 LEGACY_FEATURE_CONTRACT_VERSION = "m13-v2-cross-asset"
 FEATURE_CONTRACT_VERSION = "m13-v3-cross-asset-indicators"
 OPERATIONAL_FEATURE_CONTRACT_VERSION = "m13-v3.1-operational-parity"
+UNIFIED_FEATURE_CONTRACT_VERSION = "m16-unified-cross-venue-distillation"
 
 FEATURE_COLUMNS = (
     "feature_symbol",

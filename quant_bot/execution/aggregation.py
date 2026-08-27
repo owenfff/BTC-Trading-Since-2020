@@ -84,6 +84,7 @@ def merge_duplicate_target_plans(plans: Iterable[TargetOrderPlan]) -> list[Targe
             strategy_basis=tuple(basis),
             strategy_source_symbols=tuple(sources),
             strategy_source_signals=tuple(source_signals),
+            strategy_reason_zh="；".join(dict.fromkeys(plan.strategy_reason_zh for plan in group if plan.strategy_reason_zh)),
         ))
     return merged
 
