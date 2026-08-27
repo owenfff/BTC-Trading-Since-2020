@@ -4,7 +4,7 @@
   "current_phase": "PHASE_16_UNIFIED_DISTILLATION",
   "current_work_package": "M16-unified-distillation-v4.6-candidate",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "a50f2b00884e45c268cf96efadaf413218b5525a",
+  "last_code_commit": "4376d88e4b7bd9232e3639bf41ec8d943225b279",
   "last_report_commit": "b32e9d941ce975d5c644c30dc838680f61889127",
   "test_count": 433,
   "last_test_status": "FULL_SUITE_433_PASSED;M16_V46_CANDIDATE_NOT_PROMOTED;ACTIVE_V3_DEMO_UNCHANGED;NO_CREDENTIALS_USED;NO_ORDERS_SUBMITTED",
@@ -77,7 +77,7 @@
     "M15.23 makes unverified, stale, or future-dated market context fail closed before order submission; this improves runtime safety but does not identify the original trader's private triggers or authorize candidate promotion.",
     "M15.24 historical trade-context replay confirms 0 closed-bar/funding/label timestamp violations, but the active model predicts an action on 100% of its 31631 eligible rows; conditional Action Macro-F1 is 0.1884868585, OPEN/CLOSE/FLIP family recall is 0, and no historical L2/order-book stream is available from the pinned public source. The active Demo model remains unchanged.",
     "M15.25 hardens runtime liveness and derivative risk configuration: legacy Bybit order routing is disabled, stale dashboard artifacts are no longer live, OKX/Binance Futures require read-only isolated/leverage verification, and failed cancellations remain visible. This improves operational safety but does not authorize new Demo orders or strategy promotion.",
-    "M16 v4.6 unified distillation candidate is not promoted: WF1 lacks Hyperliquid time-out coverage, strict autonomous WF1/WF2 costed results fail, and autonomous OPEN/CLOSE/FLIP recall is zero. Active v3 Demo remains unchanged."
+    "M16 v4.6 unified distillation candidate is not promoted: unavailable Hyperliquid WF1 history is now excluded coverage rather than a hard gate, but strict autonomous WF1/WF2 costed results fail and autonomous OPEN/CLOSE/FLIP recall is zero. Active v3 Demo remains unchanged."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -92,5 +92,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep active v3 Demo unchanged and do not add Demo orders. Retain v4.6 as a candidate only; improve cross-venue coverage and autonomous behavior before any future review. Use the unified runtime only for read-only or explicitly verified Demo/Testnet validation. Do not claim exact learning or historical L2 recovery.",
-  "updated_at_utc": "2026-08-27T06:31:00Z"
+  "updated_at_utc": "2026-08-27T06:42:00Z"
 }

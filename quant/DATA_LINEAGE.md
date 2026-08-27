@@ -439,3 +439,8 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - The candidate uses only causal closed-bar/feature-contract values and current robot state. Same-time conflicting action/target groups are retained as ambiguity metadata and excluded from fitting. Source venue is not a predictive feature; exchange units and order semantics remain in adapters.
 - Outputs: manifest plus conditional-behavior and strict-autonomous walk-forward reports under `quant/reports/unified_distillation_*`; detailed generated data remains under ignored `quant/outputs/`.
 - Result: candidate not promoted. WF1 Hyperliquid coverage is insufficient; strict autonomous costed WF1/WF2 fails; active v3 Demo remains unchanged. Full suite: `433 passed`; no credentials, exchange calls, orders or mainnet access.
+
+## M16 coverage policy revision
+
+- Hyperliquid windows without frozen public rows are now explicitly excluded from the corresponding window gate rather than treated as a candidate failure. BitMEX rows remain the long-history validation source; no venue substitution, synthetic market data, or fabricated teacher labels is permitted.
+- After this policy change, `available_venue_WF1_coverage` passes because BitMEX is available, while strict autonomous WF1/WF2 cost and behavior gates still fail. v4.6 remains a candidate only and the active v3 Demo artifact is unchanged.

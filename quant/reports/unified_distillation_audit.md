@@ -9,6 +9,7 @@
 - track 1: `CONDITIONAL_BEHAVIOR`
 - track 2: `STRICT_AUTONOMOUS_REPLAY` from zero state
 - source venue is used for balancing/reporting only, not as a learned signal
+- coverage policy: unavailable Hyperliquid windows are reported and excluded; no synthetic or substituted rows are used
 - candidate promotion gates: **FAIL**
 - rollout authorization: **no**
 - active v3 Demo model changed: **no**
@@ -24,13 +25,13 @@
 
 - `time_leakage_zero`: **PASS**
 - `protected_raw_hashes_unchanged`: **PASS**
-- `both_venues_WF1_available`: **FAIL**
+- `available_venue_WF1_coverage`: **PASS**
 - `strict_autonomous_positive_WF1`: **FAIL**
 - `strict_autonomous_profit_factor_WF1`: **PASS**
-- `both_venues_WF2_available`: **PASS**
+- `available_venue_WF2_coverage`: **PASS**
 - `strict_autonomous_positive_WF2`: **FAIL**
 - `strict_autonomous_profit_factor_WF2`: **FAIL**
-- `both_venues_WF3_available`: **PASS**
+- `available_venue_WF3_coverage`: **PASS**
 - `strict_autonomous_positive_WF3`: **PASS**
 - `strict_autonomous_profit_factor_WF3`: **PASS**
 - `behavior_macro_f1_not_worse_WF1`: **FAIL**

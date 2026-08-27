@@ -244,6 +244,6 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 
 ## 2026-08-27 — Unified v4.6 candidate fails promotion gates
 
-- The candidate is implemented and auditable, but it is not deployable: WF1 has no Hyperliquid time-out rows, WF1/WF2 strict autonomous costed results are negative, WF2 profit factor is below 1, and autonomous OPEN/CLOSE/FLIP recall is zero.
+- The candidate is implemented and auditable, but it is not deployable: Hyperliquid's missing WF1 history is now an explicit excluded-coverage warning rather than a hard gate; WF1/WF2 strict autonomous costed results are negative, WF2 profit factor is below 1, and autonomous OPEN/CLOSE/FLIP recall is zero.
 - This is a model-quality/coverage blocker, not a runtime crash. Keep the current v3 Demo artifact unchanged, do not switch models, and do not add Demo orders. The report is `quant/reports/unified_distillation_audit.md` / `.json`.
 - Historical pre-action L2/order-book context remains unavailable, so the v4.6 strategy remains `BEHAVIORAL_APPROXIMATION`; no result establishes exact private trigger recovery or future profitability.

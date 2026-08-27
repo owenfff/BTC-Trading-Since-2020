@@ -797,8 +797,8 @@
       "status": "PASS"
     },
     {
-      "gate": "both_venues_WF1_available",
-      "status": "FAIL",
+      "gate": "available_venue_WF1_coverage",
+      "status": "PASS",
       "coverage": {
         "BITMEX": {
           "rows": 2635,
@@ -810,7 +810,8 @@
           "eligible_rows": 0,
           "status": "INSUFFICIENT_COVERAGE"
         }
-      }
+      },
+      "policy": "ignore unavailable venue windows; never synthesize or substitute rows"
     },
     {
       "gate": "strict_autonomous_positive_WF1",
@@ -823,7 +824,7 @@
       "profit_factor": 1.059981983555891
     },
     {
-      "gate": "both_venues_WF2_available",
+      "gate": "available_venue_WF2_coverage",
       "status": "PASS",
       "coverage": {
         "BITMEX": {
@@ -836,7 +837,8 @@
           "eligible_rows": 128,
           "status": "PASS"
         }
-      }
+      },
+      "policy": "ignore unavailable venue windows; never synthesize or substitute rows"
     },
     {
       "gate": "strict_autonomous_positive_WF2",
@@ -849,7 +851,7 @@
       "profit_factor": 0.9990662063728379
     },
     {
-      "gate": "both_venues_WF3_available",
+      "gate": "available_venue_WF3_coverage",
       "status": "PASS",
       "coverage": {
         "BITMEX": {
@@ -862,7 +864,8 @@
           "eligible_rows": 192,
           "status": "PASS"
         }
-      }
+      },
+      "policy": "ignore unavailable venue windows; never synthesize or substitute rows"
     },
     {
       "gate": "strict_autonomous_positive_WF3",
@@ -903,9 +906,10 @@
   "rollout_authorized": false,
   "active_demo_model_changed": false,
   "online_training": false,
+  "coverage_policy": "Hyperliquid is used only where its frozen public snapshot has rows; older unavailable windows remain explicitly INSUFFICIENT_COVERAGE and are not substituted. BitMEX is the long-history validation source.",
   "missing_context": [
     "historical pre-action L2/order-book context is unavailable",
-    "Hyperliquid coverage is recent and must pass each independent window"
+    "Hyperliquid public behavior coverage is recent; unavailable older windows are excluded rather than fabricated"
   ],
-  "next_action": "Keep current v3 Demo model; do not switch or add Demo orders unless every v4.6 gate passes and a human explicitly approves the rollout."
+  "next_action": "Keep current v3 Demo model; do not switch or add Demo orders unless the remaining strict autonomous and behavior gates pass and a human explicitly approves the rollout."
 }

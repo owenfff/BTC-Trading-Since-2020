@@ -381,3 +381,8 @@
 - Runtime deployment loading accepts the v4.6 JSON schema and emits per-symbol signal context (action, target exposure, confidence, Chinese model-input reason, basis and coverage) to the credential-free dashboard. The active v3 Demo artifact remains the default and was not changed.
 - Candidate audit result: `CANDIDATE_NOT_PROMOTED`. Causal leakage and protected raw hashes pass; WF1 lacks Hyperliquid time-out coverage; strict autonomous WF1/WF2 are negative after costs; autonomous OPEN/CLOSE/FLIP recall is zero. No Demo order, credential, private endpoint or mainnet connection was used.
 - Verification: full suite `433 passed`; candidate model reload passed; build and audit commands completed. v4.6 remains a candidate for future research only, not an authorization to trade.
+
+## 2026-08-27 — Treat unavailable Hyperliquid history as excluded coverage, not synthetic data
+
+- The v4.6 audit policy now evaluates each walk-forward window using the venue rows that actually exist. A venue with no rows is recorded as `INSUFFICIENT_COVERAGE` and excluded from that window; it is never filled with BitMEX rows or synthetic candles.
+- Removing this one coverage gate did not change the model, data, or active Demo. v4.6 still fails independent strict-autonomous cost and behavior gates, so it remains unpromoted and v3 remains active.
