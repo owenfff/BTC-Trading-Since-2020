@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timedelta, timezone
 
 import frontend.server as dashboard
 
@@ -36,6 +37,21 @@ def test_dashboard_control_is_disabled_by_default(monkeypatch) -> None:
     status, payload = dashboard.start_control({"venue": "okx-demo", "mode": "readonly"})
     assert status == 403
     assert payload["error"] == "LOCAL_CONTROL_DISABLED"
+
+
+def test_dashboard_does_not_call_a_stale_running_artifact_live() -> None:
+    stale = (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat()
+    payload = dashboard._venue_payload(
+        "okx-demo",
+        "OKX Demo",
+        {},
+        {"status": "RUNNING", "updated_at_utc": stale, "market_connected": True},
+        {},
+    )
+    assert payload["runtime_live"] is False
+    assert payload["runtime_status"] == "STALE"
+    assert payload["feed_status"] == "WAITING"
+    assert payload["order_submission_enabled"] is False
 
 
 def test_dashboard_control_rejects_credentials(monkeypatch) -> None:

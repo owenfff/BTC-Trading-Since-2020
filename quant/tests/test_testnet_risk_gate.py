@@ -27,3 +27,21 @@ def test_testnet_gate_allows_only_reconciled_fresh_within_historical_envelope() 
     blocked = check_testnet_order(enable_orders=True, confirm_testnet=True, symbol="BTCUSDT", target_exposure=Decimal("0.3"), total_target_exposure=Decimal("0.3"), envelope=envelope(), reconciliation_ok=False, websocket_connected=False, market_fresh=False, clock_drift_seconds=Decimal("10"))
     assert not blocked.allowed
     assert {"HISTORICAL_SYMBOL_P99_EXCEEDED", "RECONCILIATION_NOT_OK", "WEBSOCKET_NOT_CONNECTED", "MARKET_DATA_STALE", "CLOCK_DRIFT"}.issubset(set(blocked.reasons))
+
+
+def test_testnet_gate_blocks_unverified_margin_configuration() -> None:
+    decision = check_testnet_order(
+        enable_orders=True,
+        confirm_testnet=True,
+        symbol="BTCUSDT",
+        target_exposure=Decimal("0.1"),
+        total_target_exposure=Decimal("0.1"),
+        envelope=envelope(),
+        reconciliation_ok=True,
+        websocket_connected=True,
+        market_fresh=True,
+        clock_drift_seconds=Decimal("0"),
+        risk_configuration_verified=False,
+    )
+    assert not decision.allowed
+    assert "RISK_CONFIGURATION_UNVERIFIED" in decision.reasons

@@ -7,7 +7,7 @@ import threading
 import time
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -197,10 +197,41 @@ def _snapshot(state: dict[str, Any], equity: Decimal, *, equity_unit: str, order
         "reconciliation_ok": bool(state.get("ok")),
         "captured_at_utc": datetime.now(timezone.utc).isoformat(),
         "balances": [{"currency": as_text(item, "currency", ""), "total": as_text(item, "total", "0"), "available": as_text(item, "available", "0")} for item in state.get("balances", [])],
-        "positions": [{"symbol": as_text(item, "symbol", ""), "settlement_currency": as_text(item, "settlement_currency", ""), "quantity": as_text(item, "quantity", "0"), "average_entry_price": as_text(item, "average_entry_price"), "realized_pnl": as_text(item, "realized_pnl", "0"), "leverage": as_text(item, "leverage"), "margin_mode": as_text(item, "margin_mode")} for item in state.get("positions", [])],
+        "positions": [{"symbol": as_text(item, "symbol", ""), "settlement_currency": as_text(item, "settlement_currency", ""), "quantity": as_text(item, "quantity", "0"), "average_entry_price": as_text(item, "average_entry_price"), "mark_price": as_text(item, "mark_price"), "realized_pnl": as_text(item, "realized_pnl", "0"), "unrealized_pnl": as_text(item, "unrealized_pnl"), "leverage": as_text(item, "leverage"), "margin_mode": as_text(item, "margin_mode"), "notional": as_text(item, "notional"), "margin_used": as_text(item, "margin_used")} for item in state.get("positions", [])],
         "open_orders": [{"client_order_id": as_text(item, "client_order_id", ""), "exchange_order_id": as_text(item, "exchange_order_id"), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "status": as_text(item, "status", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price"), "reduce_only": bool(getattr(item, "reduce_only", False)), "post_only": bool(getattr(item, "post_only", False)), **strategy_fields(item)} for item in state.get("open_orders", [])],
         "recent_fills": [{"event_id": as_text(item, "event_id", ""), "exchange_fill_id": as_text(item, "exchange_fill_id"), "client_order_id": as_text(item, "client_order_id", ""), "symbol": as_text(item, "symbol", ""), "side": as_text(item, "side", ""), "quantity": as_text(item, "quantity", "0"), "price": as_text(item, "price", "0"), "fee": as_text(item, "fee", "0"), "fee_currency": as_text(item, "fee_currency", ""), "timestamp": as_text(item, "timestamp"), **strategy_fields(item)} for item in state.get("recent_fills", [])],
     }
+
+
+def _position_risk_metrics(positions: list[Any]) -> tuple[Decimal, Decimal, str, str]:
+    """Prefer exchange-reported notional/margin and label fallbacks explicitly."""
+
+    total_notional = Decimal("0")
+    margin_used = Decimal("0")
+    notional_sources: set[str] = set()
+    margin_sources: set[str] = set()
+    for item in positions:
+        reported_notional = getattr(item, "notional", None)
+        if reported_notional is not None and Decimal(str(reported_notional)) > 0:
+            total_notional += abs(Decimal(str(reported_notional)))
+            notional_sources.add("EXCHANGE_REPORTED")
+        else:
+            quantity = abs(Decimal(str(getattr(item, "quantity", "0"))))
+            entry = abs(Decimal(str(getattr(item, "average_entry_price", "0") or "0")))
+            total_notional += quantity * entry
+            notional_sources.add("FALLBACK_QTY_X_ENTRY")
+        reported_margin = getattr(item, "margin_used", None)
+        if reported_margin is not None:
+            margin_used += abs(Decimal(str(reported_margin)))
+            margin_sources.add("EXCHANGE_REPORTED")
+        else:
+            margin_sources.add("UNAVAILABLE")
+    return (
+        total_notional,
+        margin_used,
+        "+".join(sorted(notional_sources)) if notional_sources else "NO_OPEN_POSITIONS",
+        "+".join(sorted(margin_sources)) if margin_sources else "NO_OPEN_POSITIONS",
+    )
 
 
 @dataclass
@@ -245,6 +276,7 @@ class VenueRuntime:
     latest_feedback_at: str | None = None
     orphans_checked: bool = False
     decision_audit: list[dict[str, Any]] = field(default_factory=list)
+    risk_metrics: dict[str, str] = field(default_factory=dict)
     decision_journal: DecisionAuditJournal = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -263,7 +295,10 @@ class VenueRuntime:
         behavior = payload.get("behavior_state", {}) if isinstance(payload, dict) else {}
         self.seen_fill_ids = {str(item) for item in behavior.get("seen_fill_ids", []) if str(item)}
         self.persisted_engine_state = {str(key): dict(value) for key, value in dict(behavior.get("engine_state", {})).items() if isinstance(value, dict)}
-        self.realized_pnl_by_symbol = {str(key): Decimal(str(value)) for key, value in dict(behavior.get("realized_pnl_by_symbol", {})).items()}
+        try:
+            self.realized_pnl_by_symbol = {str(key): Decimal(str(value)) for key, value in dict(behavior.get("realized_pnl_by_symbol", {})).items()}
+        except (InvalidOperation, TypeError, ValueError):
+            self.realized_pnl_by_symbol = {}
         self.order_context.update({str(key): dict(value) for key, value in dict(behavior.get("order_context", {})).items() if isinstance(value, dict)})
         self.behavior_state_bootstrapped = bool(behavior.get("bootstrapped", False))
         self.decision_audit = [dict(item) for item in behavior.get("decision_audit", []) if isinstance(item, dict)][-MAX_DECISION_AUDIT_ROWS:]
@@ -358,8 +393,10 @@ class VenueRuntime:
         self.active_orders = list(state.get("open_orders", []))
         self.balances = {str(item.currency).upper(): Decimal(str(item.available)) for item in state.get("balances", [])}
         equity = self.adapter.fetch_equity()
-        total_notional = sum((abs(Decimal(str(getattr(item, "quantity", "0"))) * Decimal(str(getattr(item, "average_entry_price", "0") or "0"))) for item in state.get("positions", [])), Decimal("0"))
-        self.risk_state.update(equity, total_notional=total_notional)
+        position_rows = list(state.get("positions", []))
+        total_notional, margin_used, notional_source, margin_source = _position_risk_metrics(position_rows)
+        self.risk_metrics = {"notional_source": notional_source, "margin_source": margin_source}
+        self.risk_state.update(equity, total_notional=total_notional, margin_used=margin_used)
         if self.risk_state.block_reasons and self.enable_orders:
             self._engage_safety(self.risk_state.block_reasons[0])
         self._discover_and_cancel_orphans()
@@ -381,14 +418,15 @@ class VenueRuntime:
         # process can resume the order idempotently; human/other-strategy
         # orders are untouched.
         orphans = [order for order in owned if str(order.client_order_id) not in self.order_context]
+        canceled_ids: set[str] = set()
         for order in orphans:
             try:
                 self.adapter.cancel_order(order.client_order_id)
+                canceled_ids.add(str(order.client_order_id))
             except AdapterError as error:
                 self.risk_state.trigger(f"ORPHAN_CANCEL_FAILED:{getattr(error, 'code', 'UNKNOWN')}")
-        owned_ids = {str(order.client_order_id) for order in orphans}
-        self.active_orders = [order for order in self.active_orders if str(order.client_order_id) not in owned_ids]
-        self.created_order_ids.difference_update(owned_ids)
+        self.active_orders = [order for order in self.active_orders if str(order.client_order_id) not in canceled_ids]
+        self.created_order_ids.difference_update(canceled_ids)
         self.orphans_checked = True
 
     def _spot_quantity(self, instrument: Instrument) -> Decimal:
@@ -590,10 +628,15 @@ class VenueRuntime:
     def on_private_error(self, error: BaseException) -> None:
         self.market_connected = False
         self.private_stream_error = f"{type(error).__name__}: {str(error)[:160]}"
+        if self.enable_orders:
+            self._engage_safety("PRIVATE_WEBSOCKET_ERROR")
 
     def start_private_stream(self) -> None:
         if not hasattr(self.adapter, "stream_messages"):
             self.private_stream_available = False
+            if self.enable_orders:
+                self.market_connected = False
+                self._engage_safety("PRIVATE_WEBSOCKET_NOT_CONFIGURED")
             return
         self.private_stream_available = True
         if self.enable_orders:
@@ -641,6 +684,7 @@ class VenueRuntime:
                 self.adapter.cancel_order(order.client_order_id)
                 self.created_order_ids.discard(order.client_order_id)
             except AdapterError as error:
+                remaining.append(order)
                 self._engage_safety(f"STALE_ORDER_CANCEL_FAILED:{error.code}")
         self.active_orders = remaining
 
@@ -835,6 +879,7 @@ class VenueRuntime:
                 required_margin_mode=getattr(self.adapter, "required_margin_mode", ""),
                 current_leverage=getattr(self.adapter, "max_position_leverage", None),
                 max_leverage=MAX_LEVERAGE if hasattr(self.adapter, "max_position_leverage") else Decimal("0"),
+                risk_configuration_verified=getattr(self.adapter, "risk_configuration_verified", None),
             )
             if not decision.allowed:
                 blocked[historical_symbol] = list(decision.reasons)
@@ -885,6 +930,7 @@ class VenueRuntime:
         result = {
             "status": status,
             "venue": self.venue,
+            "updated_at_utc": now.isoformat(),
             "model_version": getattr(self.bundle, "model_version", "UNKNOWN"),
             "feature_contract_version": getattr(self.bundle, "feature_contract_version", "UNKNOWN"),
             "model_sha256": getattr(self.bundle, "model_sha256", ""),
@@ -899,9 +945,11 @@ class VenueRuntime:
             "private_stream_seen": self.private_stream_seen,
             "private_stream_error": self.private_stream_error,
             "order_submission_enabled": self.enable_orders and self.confirm_testnet and self.risk_state.safe(),
+            "risk_configuration_verified": getattr(self.adapter, "risk_configuration_verified", None),
             "created_order_ids": sorted(self.created_order_ids),
             "account": self.account_snapshot,
             "risk": self.risk_state.snapshot(),
+            "risk_metrics": dict(self.risk_metrics),
             "clock_drift_seconds": self.clock_drift_seconds,
             "market_context": {symbol: {"coverage": context.coverage, "quote_time": context.quote.observed_at, "closed_bar_time": context.closed_bar_time, "quote_age_seconds": context.quote_age_seconds(now), "closed_bar_age_seconds": context.closed_bar_age_seconds(now)} for symbol, context in self.market_contexts.items()},
             "behavior_state": {
@@ -931,13 +979,16 @@ class VenueRuntime:
     def cancel_created_orders(self) -> None:
         owned_ids = set(self.created_order_ids)
         owned_ids.update(str(order.client_order_id) for order in self.active_orders if self._is_bot_order(order))
+        canceled_ids: set[str] = set()
         for client_id in sorted(owned_ids):
             try:
                 self.adapter.cancel_order(client_id)
-            except AdapterError:
-                pass
-        self.created_order_ids.difference_update(owned_ids)
-        self.active_orders = [order for order in self.active_orders if str(order.client_order_id) not in owned_ids]
+                canceled_ids.add(client_id)
+            except AdapterError as error:
+                self.risk_state.trigger("BOT_ORDER_CANCEL_FAILED")
+                self.last_error = f"BOT_ORDER_CANCEL_FAILED:{error.code}"
+        self.created_order_ids.difference_update(canceled_ids)
+        self.active_orders = [order for order in self.active_orders if str(order.client_order_id) not in canceled_ids]
 
     def shutdown(self) -> None:
         self.stop_event.set()
@@ -980,6 +1031,14 @@ def run_foreground_venue(*, venue: str, artifact_path: Path = DEFAULT_ARTIFACT, 
         raise AdapterError(venue, "NO_SELECTED_SYMBOLS", "no selected symbols remain after the Spot/derivative safety boundary")
     if hasattr(adapter, "set_tracked_symbols"):
         adapter.set_tracked_symbols(tuple(item.canonical_symbol for item in selected.values()))
+    if enable_orders and hasattr(adapter, "verify_risk_configuration"):
+        derivative_symbols = [item.canonical_symbol for item in selected.values() if item.instrument_type != InstrumentType.SPOT]
+        if derivative_symbols:
+            adapter.verify_risk_configuration(
+                derivative_symbols,
+                max_leverage=MAX_LEVERAGE,
+                required_margin_mode=REQUIRED_MARGIN_MODE,
+            )
     adapter.get_server_time()
     runtime = VenueRuntime(adapter, venue, bundle, enable_orders, confirm_testnet, allow_spot_approximation, selected, output_path, max(5, poll_seconds))
     bridge_stop = threading.Event()

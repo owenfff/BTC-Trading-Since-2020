@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from .runtime import run_local
-from .testnet_runtime import DEFAULT_ARTIFACT, preflight, run_foreground
+from .testnet_runtime import DEFAULT_ARTIFACT, preflight
 from .venue_preflight import preflight_venue
 from .venue_runtime import run_foreground_venue
 from .multivenue_runtime import SUPPORTED_MULTI_VENUES, run_foreground_multivenue
@@ -55,10 +55,13 @@ def main() -> None:
     if args.command == "run":
         if args.mode == "testnet":
             try:
-                if args.venue in {"okx-demo", "binance-spot-testnet", "binance-futures-testnet"}:
-                    result = run_foreground_venue(venue=args.venue, artifact_path=Path(args.model), enable_orders=args.enable_orders, confirm_testnet=args.confirm_testnet, symbols=args.symbols, once=args.once, poll_seconds=args.poll_seconds, allow_spot_approximation=args.allow_spot_approximation)
-                else:
-                    result = run_foreground(artifact_path=Path(args.model), enable_orders=args.enable_orders, confirm_testnet=args.confirm_testnet, symbols=args.symbols, once=args.once, poll_seconds=args.poll_seconds)
+                if args.venue == "bybit-demo":
+                    print(json.dumps({"status": "BLOCKED", "error_code": "LEGACY_RUNTIME_DISABLED", "message": "bybit-demo legacy runtime is disabled; use a unified supported Demo/Testnet venue"}, ensure_ascii=False))
+                    raise SystemExit(2)
+                if args.venue is None:
+                    print(json.dumps({"status": "BLOCKED", "error_code": "VENUE_REQUIRED", "message": "a supported Demo/Testnet venue is required; the legacy default is disabled"}, ensure_ascii=False))
+                    raise SystemExit(2)
+                result = run_foreground_venue(venue=args.venue, artifact_path=Path(args.model), enable_orders=args.enable_orders, confirm_testnet=args.confirm_testnet, symbols=args.symbols, once=args.once, poll_seconds=args.poll_seconds, allow_spot_approximation=args.allow_spot_approximation)
                 print(json.dumps(result, ensure_ascii=False, default=str))
             except Exception as error:
                 print(json.dumps({"status": "BLOCKED", "error_code": getattr(error, "code", "RUNTIME_FAILED"), "message": str(error)}, ensure_ascii=False))

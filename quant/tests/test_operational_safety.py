@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -9,7 +10,8 @@ import pytest
 
 from quant_bot.domain.instrument import Instrument, InstrumentType
 from quant_bot.domain.market_data import MarketBar, MarketContext, MarketQuote
-from quant_bot.exchanges.http import FakeTransport
+from quant_bot.domain.order import Order, OrderSide, OrderType
+from quant_bot.exchanges.http import AdapterError, FakeTransport
 from quant_bot.exchanges.okx import OKXAdapter
 from quant_bot.risk.runtime_risk import RuntimeRiskState
 from quant_bot.risk.testnet_gate import check_testnet_order
@@ -116,3 +118,46 @@ def test_deployment_model_hash_mismatch_blocks_startup(tmp_path: Path) -> None:
     target.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(ValueError, match="hash mismatch"):
         load_deployment_bundle(target, require_model_sha256=True)
+
+
+def test_okx_flat_account_can_verify_isolated_leverage_before_first_order() -> None:
+    transport = FakeTransport({
+        ("GET", "/api/v5/account/config"): {"code": "0", "data": [{"acctLv": "2", "posMode": "net_mode"}]},
+        ("GET", "/api/v5/account/leverage-info?instId=BTC-USDT-SWAP,ETH-USDT-SWAP&mgnMode=isolated"): {
+            "code": "0",
+            "data": [
+                {"instId": "BTC-USDT-SWAP", "mgnMode": "isolated", "posSide": "net", "lever": "2"},
+                {"instId": "ETH-USDT-SWAP", "mgnMode": "isolated", "posSide": "net", "lever": "2"},
+            ],
+        },
+    })
+    adapter = OKXAdapter(transport, credentials=object())
+    result = adapter.verify_risk_configuration(("BTC-USDT-SWAP", "ETH-USDT-SWAP"))
+    assert result["verified"] is True
+    assert adapter.risk_configuration_verified is True
+    assert adapter.margin_mode == "isolated"
+    assert adapter.max_position_leverage == Decimal("2")
+
+
+def test_okx_derivative_order_is_blocked_until_risk_configuration_is_verified() -> None:
+    transport = FakeTransport({
+        ("GET", "/api/v5/public/instruments?instType=SWAP"): {
+            "code": "0",
+            "data": [{"instType": "SWAP", "instId": "BTC-USDT-SWAP", "baseCcy": "BTC", "quoteCcy": "USDT", "settleCcy": "USDT", "ctVal": "1", "tickSz": "0.1", "lotSz": "1", "minSz": "1", "state": "live"}],
+        },
+    })
+    adapter = OKXAdapter(transport, credentials=object())
+    adapter.load_instruments(inst_type="SWAP")
+    with pytest.raises(AdapterError, match="verify isolated margin") as error:
+        adapter.place_order(Order("client-1", "BTC-USDT-SWAP", OrderSide.BUY, OrderType.LIMIT, Decimal("1"), datetime.now(timezone.utc), price=Decimal("100")))
+    assert error.value.code == "RISK_CONFIGURATION_UNVERIFIED"
+
+
+def test_cli_does_not_route_bybit_to_the_legacy_order_runtime(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    from quant_bot.__main__ import main
+
+    monkeypatch.setattr(sys, "argv", ["quant_bot", "run", "--mode", "testnet", "--venue", "bybit-demo"])
+    with pytest.raises(SystemExit) as raised:
+        main()
+    assert raised.value.code == 2
+    assert "LEGACY_RUNTIME_DISABLED" in capsys.readouterr().out

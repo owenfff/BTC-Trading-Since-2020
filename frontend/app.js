@@ -648,7 +648,11 @@ function render(payload) {
   if (badge) {
     badge.classList.toggle("live", feed);
     badge.classList.toggle("waiting", !feed);
-    badge.innerHTML = `<i></i>OKX DEMO · ${feed ? "已连接" : "等待连接"}`;
+    const activeVenue = (payload.venues || []).find((item) => item.venue === payload.active_venue);
+    const venueLabel = activeVenue?.label || payload.active_venue || "DEMO";
+    badge.replaceChildren();
+    const indicator = document.createElement("i");
+    badge.append(indicator, document.createTextNode(`${venueLabel} · ${feed ? "已连接" : "等待连接"}`));
   }
 
   const runtimeStatus = String(payload.runtime?.status || "WAITING").toUpperCase();

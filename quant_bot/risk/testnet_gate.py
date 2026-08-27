@@ -49,6 +49,7 @@ def check_testnet_order(
     max_leverage: Decimal = Decimal("0"),
     margin_mode: str | None = None,
     required_margin_mode: str = "",
+    risk_configuration_verified: bool | None = None,
 ) -> TestnetRiskDecision:
     reasons: list[str] = []
     if not enable_orders:
@@ -80,6 +81,8 @@ def check_testnet_order(
     reasons.extend(str(item) for item in risk_block_reasons if str(item))
     if kill_switch_engaged:
         reasons.append("MANUAL_KILL_SWITCH")
+    if risk_configuration_verified is False:
+        reasons.append("RISK_CONFIGURATION_UNVERIFIED")
     if max_leverage > 0 and (current_leverage is None or current_leverage > max_leverage):
         reasons.append("LEVERAGE_LIMIT_OR_UNVERIFIED")
     if required_margin_mode and str(margin_mode or "").lower() != required_margin_mode.lower():

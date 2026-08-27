@@ -10,7 +10,8 @@ from quant_bot.domain.instrument import Instrument, InstrumentType
 from quant_bot.domain.market_data import MarketBar, MarketContext, MarketQuote
 from quant_bot.domain.order import Order, OrderSide, OrderStatus, OrderType
 from quant_bot.domain.position import Position
-from quant_bot.venue_runtime import VenueRuntime
+from quant_bot.exchanges.http import AdapterError
+from quant_bot.venue_runtime import VenueRuntime, _position_risk_metrics
 
 
 class SimulatedSignalModel:
@@ -189,3 +190,23 @@ def test_runtime_restores_bounded_pre_action_context(tmp_path: Path) -> None:
     restored = _runtime(tmp_path, adapter)
     assert len(restored.decision_audit) == 5000
     assert restored.decision_audit[0]["decision_time"] == "1000"
+
+
+def test_runtime_prefers_exchange_reported_position_risk_metrics() -> None:
+    position = Position("BTCUSDT", "USDT", "2", "100", notional="250", margin_used="12")
+    assert _position_risk_metrics([position]) == (Decimal("250"), Decimal("12"), "EXCHANGE_REPORTED", "EXCHANGE_REPORTED")
+
+
+def test_runtime_keeps_order_visible_when_cancel_fails(tmp_path: Path) -> None:
+    class FailingCancelAdapter(SimulatedAdapter):
+        def cancel_order(self, client_order_id: str) -> object:
+            raise AdapterError(self.name, "NETWORK", f"cannot cancel {client_order_id}")
+
+    adapter = FailingCancelAdapter()
+    runtime = _runtime(tmp_path, adapter)
+    order = Order("qbot-stuck", "BTCUSDT", OrderSide.BUY, OrderType.LIMIT, Decimal("1"), datetime.now(timezone.utc), price=Decimal("100"), status=OrderStatus.OPEN)
+    runtime.active_orders = [order]
+    runtime.created_order_ids.add(order.client_order_id)
+    runtime.cancel_created_orders()
+    assert runtime.active_orders == [order]
+    assert "BOT_ORDER_CANCEL_FAILED" in runtime.risk_state.block_reasons

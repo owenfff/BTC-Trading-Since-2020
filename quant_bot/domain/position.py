@@ -18,6 +18,10 @@ class Position:
     realized_pnl: Decimal = Decimal("0")
     leverage: Decimal | None = None
     margin_mode: str | None = None
+    mark_price: Decimal | None = None
+    unrealized_pnl: Decimal | None = None
+    notional: Decimal | None = None
+    margin_used: Decimal | None = None
 
     def __post_init__(self) -> None:
         self.symbol = canonical_symbol(self.symbol)
@@ -30,6 +34,13 @@ class Position:
             self.leverage = decimal(self.leverage)
         if self.margin_mode is not None:
             self.margin_mode = str(self.margin_mode).lower()
+        for name in ("mark_price", "unrealized_pnl", "notional", "margin_used"):
+            value = getattr(self, name)
+            if value is not None:
+                parsed = decimal(value)
+                if name in {"mark_price", "notional", "margin_used"}:
+                    parsed = abs(parsed)
+                setattr(self, name, parsed)
 
     def apply_fill(self, fill: Fill) -> None:
         signed = fill.quantity if fill.side == OrderSide.BUY else -fill.quantity

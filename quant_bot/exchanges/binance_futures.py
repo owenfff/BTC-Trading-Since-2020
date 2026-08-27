@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
-from typing import Any
+from typing import Any, Iterable
 
 from quant_bot.domain.balance import Balance
 from quant_bot.domain.fill import Fill
@@ -27,6 +27,10 @@ class BinanceFuturesAdapter:
         self.websocket = websocket
         self._order_symbols: dict[str, str] = {}
         self._tracked_symbols: tuple[str, ...] = ()
+        self.required_margin_mode = "isolated"
+        self.margin_mode: str | None = None
+        self.max_position_leverage: Decimal | None = None
+        self.risk_configuration_verified = False
 
     @classmethod
     def from_environment(cls) -> "BinanceFuturesAdapter":
@@ -116,12 +120,78 @@ class BinanceFuturesAdapter:
         response = self.transport.request("GET", "/fapi/v2/positionRisk", private=True)
         self._check(response)
         result: list[Position] = []
+        modes: set[str] = set()
+        leverages: list[Decimal] = []
         for item in response:
             quantity = self._decimal(item.get("positionAmt"))
+            if str(item.get("isolated", "")).lower() in {"true", "false"}:
+                modes.add("isolated" if str(item.get("isolated")).lower() == "true" else "cross")
+            leverage = self._decimal(item.get("leverage")) if item.get("leverage") not in (None, "") else None
+            if leverage is not None and leverage > 0:
+                leverages.append(leverage)
             if quantity == 0 or not item.get("symbol"):
                 continue
-            result.append(Position(str(item["symbol"]), "USDT", quantity, self._decimal(item.get("entryPrice")) or None, self._decimal(item.get("realizedPnl"))))
+            result.append(Position(
+                str(item["symbol"]),
+                "USDT",
+                quantity,
+                self._decimal(item.get("entryPrice")) or None,
+                self._decimal(item.get("realizedPnl")),
+                leverage,
+                "isolated" if str(item.get("isolated", "")).lower() == "true" else "cross" if str(item.get("isolated", "")).lower() == "false" else None,
+                mark_price=self._decimal(item.get("markPrice")) if item.get("markPrice") not in (None, "") else None,
+                unrealized_pnl=self._decimal(item.get("unRealizedProfit")) if item.get("unRealizedProfit") not in (None, "") else None,
+                notional=self._decimal(item.get("notional")) if item.get("notional") not in (None, "") else None,
+                margin_used=self._decimal(item.get("isolatedMargin")) if item.get("isolatedMargin") not in (None, "") else None,
+            ))
+        if modes:
+            self.margin_mode = next(iter(modes)) if len(modes) == 1 else "MIXED"
+            if any(mode != self.required_margin_mode for mode in modes):
+                self.risk_configuration_verified = False
+        elif not self.risk_configuration_verified:
+            self.margin_mode = None
+        if leverages:
+            self.max_position_leverage = max(leverages)
+            if self.max_position_leverage > Decimal("2"):
+                self.risk_configuration_verified = False
+        elif not self.risk_configuration_verified:
+            self.max_position_leverage = None
         return result
+
+    def verify_risk_configuration(
+        self,
+        symbols: Iterable[str],
+        *,
+        max_leverage: Decimal = Decimal("2"),
+        required_margin_mode: str = "isolated",
+    ) -> dict[str, Any]:
+        """Read-only verification of one-way, isolated, low-leverage setup."""
+
+        self._private_guard()
+        requested = tuple(dict.fromkeys(str(symbol) for symbol in symbols if str(symbol)))
+        mode_response = self.transport.request("GET", "/fapi/v1/positionSide/dual", private=True)
+        self._check(mode_response)
+        if str(mode_response.get("dualSidePosition", "true")).lower() != "false":
+            raise AdapterError(self.name, "POSITION_MODE_NOT_ALLOWED", "Binance Futures must use one-way position mode for this runtime")
+        observed: list[Decimal] = []
+        for symbol in requested:
+            response = self.transport.request("GET", f"/fapi/v2/positionRisk?symbol={symbol}", private=True)
+            self._check(response)
+            rows = [item for item in response if isinstance(item, dict) and str(item.get("symbol")) == symbol]
+            if not rows:
+                raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", f"no position configuration returned for {symbol}")
+            for item in rows:
+                if str(item.get("isolated", "")).lower() != "true":
+                    raise AdapterError(self.name, "MARGIN_MODE_NOT_ALLOWED", f"Binance Futures {symbol} is not isolated")
+                leverage = self._decimal(item.get("leverage"))
+                if leverage <= 0 or leverage > max_leverage:
+                    raise AdapterError(self.name, "LEVERAGE_LIMIT_OR_UNVERIFIED", f"Binance Futures leverage for {symbol} is not within the configured limit")
+                observed.append(leverage)
+        self.required_margin_mode = required_margin_mode
+        self.margin_mode = required_margin_mode
+        self.max_position_leverage = max(observed) if observed else max_leverage
+        self.risk_configuration_verified = True
+        return {"verified": True, "symbols": list(requested), "margin_mode": required_margin_mode, "max_leverage": str(self.max_position_leverage)}
 
     def _order(self, item: dict[str, Any]) -> Order:
         client_id = str(item.get("clientOrderId") or item.get("orderId") or "remote-order")
@@ -166,6 +236,8 @@ class BinanceFuturesAdapter:
 
     def place_order(self, order: Order) -> Order:
         self._private_guard()
+        if not self.risk_configuration_verified:
+            raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", "verify one-way isolated margin and leverage before placing a futures order")
         order_type = "LIMIT" if order.order_type == OrderType.LIMIT else "MARKET"
         body: dict[str, Any] = {"symbol": order.symbol, "side": order.side.value, "type": order_type, "quantity": str(order.quantity), "newClientOrderId": order.client_order_id, "positionSide": "BOTH"}
         if order.price is not None:

@@ -109,6 +109,32 @@ def _parse_time_ms(value: str | None) -> int | None:
         return None
 
 
+RUNTIME_HEARTBEAT_MAX_AGE_SECONDS = 30
+
+
+def _runtime_source_timestamp(runtime: dict[str, Any], account: dict[str, Any]) -> str | None:
+    """Return the node's last write time, never the dashboard request time."""
+
+    value = runtime.get("updated_at_utc")
+    if value:
+        return str(value)
+    value = account.get("captured_at_utc")
+    return str(value) if value else None
+
+
+def _runtime_age_seconds(timestamp: str | None) -> float | None:
+    parsed = _parse_time_ms(timestamp)
+    if parsed is None:
+        return None
+    return (datetime.now(timezone.utc).timestamp() * 1000 - parsed) / 1000
+
+
+def _runtime_is_live(runtime: dict[str, Any], account: dict[str, Any]) -> bool:
+    status = str(runtime.get("status", "")).upper()
+    age = _runtime_age_seconds(_runtime_source_timestamp(runtime, account))
+    return status in {"RUNNING", "RUNNING_READ_ONLY"} and age is not None and 0 <= age <= RUNTIME_HEARTBEAT_MAX_AGE_SECONDS
+
+
 def _number(value: Any) -> float | None:
     try:
         number = float(value)
@@ -335,17 +361,28 @@ def replay_payload(query: dict[str, list[str]]) -> dict[str, Any]:
 
 def _venue_payload(name: str, label: str, preflight: dict[str, Any], runtime: dict[str, Any], mapping: dict[str, Any]) -> dict[str, Any]:
     account = _account_payload(runtime, preflight)
-    has_feed = bool(preflight or runtime or mapping)
+    runtime_live = _runtime_is_live(runtime, account)
+    runtime_age = _runtime_age_seconds(_runtime_source_timestamp(runtime, account))
+    raw_runtime_status = str(runtime.get("status", "NOT_RUNNING"))
+    effective_runtime_status = raw_runtime_status
+    if raw_runtime_status.upper() in {"RUNNING", "RUNNING_READ_ONLY"} and not runtime_live:
+        effective_runtime_status = "STALE"
+    has_preflight = str(preflight.get("status", "")) == "PASS"
+    market_live = bool(runtime_live and runtime.get("market_connected", runtime.get("websocket_connected", False)))
     return {
         "venue": name,
         "label": label,
-        "feed_status": "CONNECTED" if has_feed else "WAITING",
+        "feed_status": "CONNECTED" if market_live else "DEGRADED" if runtime_live else "READY" if has_preflight else "WAITING",
         "preflight_status": preflight.get("status", "NOT_RECEIVED"),
-        "runtime_status": runtime.get("status", "NOT_RUNNING"),
-        "market_connection": runtime.get("market_connection", "NONE"),
-        "market_connected": runtime.get("market_connected", runtime.get("websocket_connected", False)),
-        "private_stream_seen": runtime.get("private_stream_seen", runtime.get("websocket_connected", False)),
-        "order_submission_enabled": bool(runtime.get("order_submission_enabled", False)),
+        "runtime_status": effective_runtime_status,
+        "raw_runtime_status": raw_runtime_status,
+        "runtime_live": runtime_live,
+        "runtime_age_seconds": runtime_age,
+        "last_source_update_utc": _runtime_source_timestamp(runtime, account),
+        "market_connection": runtime.get("market_connection", "NONE") if runtime_live else "STALE",
+        "market_connected": market_live,
+        "private_stream_seen": bool(runtime_live and runtime.get("private_stream_seen", runtime.get("websocket_connected", False))),
+        "order_submission_enabled": bool(runtime_live and runtime.get("order_submission_enabled", False)),
         "equity": account.get("equity"),
         "equity_unit": account.get("equity_unit"),
         "reconciliation_ok": account.get("reconciliation_ok", False),
@@ -377,13 +414,18 @@ def status_payload() -> dict[str, Any]:
         mapping = _read_json(PROJECT_ROOT / "quant" / "reports" / mapping_name)
         raw_states[name] = (preflight, runtime, mapping)
         venue_states.append(_venue_payload(name, label, preflight, runtime, mapping))
-    # Preserve the original single-venue dashboard fields by selecting the
-    # first venue with a runtime/preflight feed, while exposing every venue in
-    # the new `venues` collection.
-    active_name = next((item["venue"] for item in venue_states if item["runtime_status"] not in {"NOT_RUNNING", ""} or item["preflight_status"] not in {"NOT_RECEIVED", ""}), "bybit-demo")
+    # Prefer a genuinely live runtime.  A stale artifact must never win over
+    # a current venue merely because its old status says RUNNING.
+    active_name = next((item["venue"] for item in venue_states if item["runtime_live"]), None)
+    if active_name is None:
+        preferred_order = ("okx-demo", "binance-futures-testnet", "binance-spot-testnet", "bybit-demo")
+        ready_names = {item["venue"] for item in venue_states if item["preflight_status"] == "PASS"}
+        active_name = next((venue for venue in preferred_order if venue in ready_names), "okx-demo")
     preflight, runtime, mapping = raw_states[active_name]
-    has_feed = bool(preflight or runtime or mapping)
     account = _account_payload(runtime, preflight)
+    runtime_live = _runtime_is_live(runtime, account)
+    source_timestamp = _runtime_source_timestamp(runtime, account)
+    runtime_age = _runtime_age_seconds(source_timestamp)
     mapping_rows = mapping.get("symbols", []) if isinstance(mapping.get("symbols"), list) else []
     blocked_by_symbol = runtime.get("blocked", {}) if isinstance(runtime.get("blocked", {}), dict) else {}
     order_block_reasons = sorted({
@@ -416,8 +458,9 @@ def status_payload() -> dict[str, Any]:
         "dashboard_role": "FRONTEND_ONLY",
         "exchange_connection": "NONE_FROM_THIS_SERVER",
         "trading_enabled_here": False,
-        "feed_status": "CONNECTED" if has_feed else "WAITING_FOR_TRADING_NODE",
-        "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "feed_status": "CONNECTED" if runtime_live and runtime.get("market_connected", runtime.get("websocket_connected", False)) else "DEGRADED" if runtime_live else "READY" if preflight.get("status") == "PASS" else "WAITING_FOR_TRADING_NODE",
+        "updated_at_utc": source_timestamp,
+        "server_observed_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "model": {
             "version": active_model_version,
             "feature_contract_version": active_feature_contract,
@@ -451,14 +494,19 @@ def status_payload() -> dict[str, Any]:
             ],
         },
         "runtime": {
-            "status": runtime.get("status", "NOT_RUNNING"),
+            "status": "STALE" if str(runtime.get("status", "")).upper() in {"RUNNING", "RUNNING_READ_ONLY"} and not runtime_live else runtime.get("status", "NOT_RUNNING"),
+            "raw_status": runtime.get("status", "NOT_RUNNING"),
+            "live": runtime_live,
+            "age_seconds": runtime_age,
+            "updated_at_utc": source_timestamp,
             "selected_symbols": runtime.get("selected_symbols", []),
             "submitted_orders": runtime.get("submitted", []),
-            "websocket_connected": runtime.get("websocket_connected", False),
+            "websocket_connected": bool(runtime_live and runtime.get("websocket_connected", False)),
             "market_connection": runtime.get("market_connection", "NONE"),
-            "market_connected": runtime.get("market_connected", runtime.get("websocket_connected", False)),
-            "private_stream_seen": runtime.get("private_stream_seen", runtime.get("websocket_connected", False)),
-            "order_submission_enabled": bool(runtime.get("order_submission_enabled", False) and not order_block_reasons),
+            "market_connected": bool(runtime_live and runtime.get("market_connected", runtime.get("websocket_connected", False))),
+            "private_stream_seen": bool(runtime_live and runtime.get("private_stream_seen", runtime.get("websocket_connected", False))),
+            "order_submission_enabled": bool(runtime_live and runtime.get("order_submission_enabled", False) and not order_block_reasons),
+            "risk_configuration_verified": runtime.get("risk_configuration_verified"),
             "plans": runtime.get("plans", 0),
             "portfolio_target_scale": runtime.get("portfolio_target_scale", "1"),
             "order_errors": runtime.get("order_errors", {}),

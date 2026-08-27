@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import re
-from typing import Any
+from typing import Any, Iterable
 
 from quant_bot.domain.balance import Balance
 from quant_bot.domain.fill import Fill
@@ -30,8 +30,10 @@ class OKXAdapter:
         self._instrument_types: dict[str, str] = {}
         self.margin_mode: str | None = None
         self.required_margin_mode = "isolated"
-        self.order_margin_mode = "cross"
+        self.order_margin_mode = "isolated"
         self.max_position_leverage: Decimal | None = None
+        self.risk_configuration_verified = False
+        self.risk_configuration_at: datetime | None = None
 
     @classmethod
     def from_environment(cls) -> "OKXAdapter":
@@ -164,10 +166,96 @@ class OKXAdapter:
             leverage = self._decimal(item.get("lever")) if item.get("lever") not in (None, "") else None
             if leverage is not None and leverage > 0:
                 leverages.append(leverage)
-            result.append(Position(str(item["instId"]), str(item.get("settleCcy") or "USDT"), quantity, self._decimal(item.get("avgPx")) if item.get("avgPx") else None, self._decimal(item.get("realizedPnl")), leverage, margin_mode))
-        self.margin_mode = next(iter(modes)) if len(modes) == 1 else "MIXED" if modes else None
-        self.max_position_leverage = max(leverages) if leverages else None
+            result.append(Position(
+                str(item["instId"]),
+                str(item.get("settleCcy") or "USDT"),
+                quantity,
+                self._decimal(item.get("avgPx")) if item.get("avgPx") else None,
+                self._decimal(item.get("realizedPnl")),
+                leverage,
+                margin_mode,
+                mark_price=self._decimal(item.get("markPx")) if item.get("markPx") not in (None, "") else None,
+                unrealized_pnl=self._decimal(item.get("upl")) if item.get("upl") not in (None, "") else None,
+                notional=self._decimal(item.get("notionalUsd") or item.get("notional")) if item.get("notionalUsd") not in (None, "") or item.get("notional") not in (None, "") else None,
+                margin_used=self._decimal(item.get("imr") or item.get("margin")) if item.get("imr") not in (None, "") or item.get("margin") not in (None, "") else None,
+            ))
+        if modes:
+            self.margin_mode = next(iter(modes)) if len(modes) == 1 else "MIXED"
+            if any(mode != self.required_margin_mode for mode in modes):
+                self.risk_configuration_verified = False
+        elif not self.risk_configuration_verified:
+            self.margin_mode = None
+        if leverages:
+            self.max_position_leverage = max(leverages)
+            if self.max_position_leverage > Decimal("2"):
+                self.risk_configuration_verified = False
+        elif not self.risk_configuration_verified:
+            self.max_position_leverage = None
         return result
+
+    def verify_risk_configuration(
+        self,
+        symbols: Iterable[str],
+        *,
+        max_leverage: Decimal = Decimal("2"),
+        required_margin_mode: str = "isolated",
+    ) -> dict[str, Any]:
+        """Verify OKX account settings before the first derivative order.
+
+        This is intentionally read-only.  The bot never silently changes an
+        account's margin mode or leverage; an operator must configure those in
+        OKX first.  A flat account is valid once ``leverage-info`` confirms
+        the requested isolated setting for each symbol.
+        """
+
+        self._private_guard()
+        requested = tuple(dict.fromkeys(str(symbol) for symbol in symbols if str(symbol)))
+        if not requested:
+            self.risk_configuration_verified = True
+            self.margin_mode = required_margin_mode
+            self.max_position_leverage = max_leverage
+            self.risk_configuration_at = datetime.now(timezone.utc)
+            return {"verified": True, "symbols": [], "margin_mode": required_margin_mode, "max_leverage": str(max_leverage)}
+        config = self.transport.request("GET", "/api/v5/account/config", private=True)
+        self._check(config)
+        config_rows = config.get("data", [])
+        if not config_rows or not isinstance(config_rows[0], dict):
+            raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", "OKX account configuration is unavailable")
+        account_config = dict(config_rows[0])
+        observed: list[Decimal] = []
+        for start in range(0, len(requested), 20):
+            chunk = requested[start:start + 20]
+            path = f"/api/v5/account/leverage-info?instId={','.join(chunk)}&mgnMode={required_margin_mode}"
+            response = self.transport.request("GET", path, private=True)
+            self._check(response)
+            rows = [item for item in response.get("data", []) if isinstance(item, dict)]
+            for symbol in chunk:
+                matches = [item for item in rows if str(item.get("instId")) == symbol]
+                if not matches:
+                    raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", f"no isolated leverage configuration returned for {symbol}")
+                for item in matches:
+                    if str(item.get("mgnMode", "")).lower() != required_margin_mode.lower():
+                        raise AdapterError(self.name, "MARGIN_MODE_NOT_ALLOWED", f"OKX returned a non-{required_margin_mode} leverage mode for {symbol}")
+                    leverage = self._decimal(item.get("lever"))
+                    if leverage <= 0:
+                        raise AdapterError(self.name, "LEVERAGE_LIMIT_OR_UNVERIFIED", f"OKX returned no usable leverage for {symbol}")
+                    if leverage > max_leverage:
+                        raise AdapterError(self.name, "LEVERAGE_LIMIT_OR_UNVERIFIED", f"OKX leverage for {symbol} exceeds the configured maximum")
+                    observed.append(leverage)
+        self.required_margin_mode = required_margin_mode
+        self.order_margin_mode = required_margin_mode
+        self.margin_mode = required_margin_mode
+        self.max_position_leverage = max(observed) if observed else max_leverage
+        self.risk_configuration_verified = True
+        self.risk_configuration_at = datetime.now(timezone.utc)
+        return {
+            "verified": True,
+            "account_level": account_config.get("acctLv"),
+            "position_mode": account_config.get("posMode"),
+            "symbols": list(requested),
+            "margin_mode": required_margin_mode,
+            "max_leverage": str(self.max_position_leverage),
+        }
 
     def _order(self, item: dict[str, Any]) -> Order:
         client_id = str(item.get("clOrdId") or item.get("ordId") or "remote-order")
@@ -277,6 +365,10 @@ class OKXAdapter:
     def place_order(self, order: Order) -> Order:
         self._private_guard()
         inst_type = self._instrument_types.get(order.symbol, "SPOT")
+        if inst_type != "SPOT" and not self.risk_configuration_verified:
+            raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", "verify isolated margin and leverage before placing a derivative order")
+        if inst_type != "SPOT" and self.order_margin_mode != self.required_margin_mode:
+            raise AdapterError(self.name, "MARGIN_MODE_NOT_ALLOWED", "OKX derivative orders must use the configured isolated margin mode")
         client_order_id = self._client_order_id(order.client_order_id)
         body: dict[str, Any] = {"instId": order.symbol, "tdMode": "cash" if inst_type == "SPOT" else self.order_margin_mode, "side": order.side.value.lower(), "ordType": "post_only" if order.post_only else "limit" if order.order_type == OrderType.LIMIT else "market", "sz": str(order.quantity), "clOrdId": client_order_id}
         if order.price is not None:

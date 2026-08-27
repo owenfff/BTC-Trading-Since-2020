@@ -46,12 +46,15 @@ class BinanceFuturesTestnetWebSocket:
             self.transport.request_api_key("PUT", f"/fapi/v1/listenKey?listenKey={quote(self.listen_key, safe='')}")
 
     async def connect(self) -> None:
-        try:
-            import websockets
-        except ImportError as error:
-            raise AdapterError("binance-futures-testnet", "WEBSOCKET_DEPENDENCY_MISSING", "install the pinned websockets runtime dependency") from error
         self.listen_key = self._create_listen_key()
-        factory = self.connect_factory or websockets.connect
+        if self.connect_factory is not None:
+            factory = self.connect_factory
+        else:
+            try:
+                import websockets
+            except ImportError as error:
+                raise AdapterError("binance-futures-testnet", "WEBSOCKET_DEPENDENCY_MISSING", "install the pinned websockets runtime dependency") from error
+            factory = websockets.connect
         self.socket = await factory(f"{self.url}/{quote(self.listen_key, safe='')}", ping_interval=20, ping_timeout=20, close_timeout=5)
         self.connected = True
 

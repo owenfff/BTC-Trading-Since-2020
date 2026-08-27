@@ -52,11 +52,14 @@ class OKXDemoWebSocket:
         return True
 
     async def connect(self, channels: list[Any]) -> None:
-        try:
-            import websockets
-        except ImportError as error:
-            raise AdapterError("okx-demo", "WEBSOCKET_DEPENDENCY_MISSING", "install the pinned websockets runtime dependency") from error
-        factory = self.connect_factory or websockets.connect
+        if self.connect_factory is not None:
+            factory = self.connect_factory
+        else:
+            try:
+                import websockets
+            except ImportError as error:
+                raise AdapterError("okx-demo", "WEBSOCKET_DEPENDENCY_MISSING", "install the pinned websockets runtime dependency") from error
+            factory = websockets.connect
         self.socket = await factory(self.url, ping_interval=20, ping_timeout=20, close_timeout=5)
         await self.socket.send(json.dumps(self.login_message(), separators=(",", ":")))
         try:

@@ -46,6 +46,7 @@ def test_futures_adapter_maps_linear_perpetual_and_reduce_only_order() -> None:
     instrument = adapter.load_instruments()[0]
     assert instrument.instrument_type.value == "LINEAR_PERPETUAL"
     assert instrument.contract_multiplier == Decimal("1")
+    adapter.risk_configuration_verified = True
     accepted = adapter.place_order(Order("futures-client-1", "BTCUSDT", OrderSide.SELL, OrderType.LIMIT, Decimal("0.001"), datetime(2024, 1, 1, tzinfo=timezone.utc), price=Decimal("100"), reduce_only=True, post_only=True))
     assert accepted.exchange_order_id == "456"
     body = transport.calls[-1][3]
