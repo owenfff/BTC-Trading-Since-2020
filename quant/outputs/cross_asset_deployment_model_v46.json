@@ -1,0 +1,3114 @@
+{
+  "artifact_version": "testnet-deployment-bundle-1",
+  "model_version": "behavioral-distillation-v4.6-unified-distillation",
+  "feature_contract_version": "m16-unified-cross-venue-distillation",
+  "training_data_sha256": "3db0b050ec3f4c5602cf3c682e1a5bd8a2c8bbff0a21c5f304e0bebfafbafc69",
+  "code_commit": "9935af4ef37f1f9acb42beaef5f784ad74c1d449",
+  "deployment_time": "2026-08-27T06:28:00Z",
+  "frozen_cutoff": "2026-07-18T21:17:31.514000Z",
+  "symbols": [
+    "AAVEUSDT",
+    "ADAM20",
+    "ADAUSD",
+    "ADAUSDT",
+    "ALTMEXUSD",
+    "AXSUSDT",
+    "BCHH21",
+    "BCHUSD",
+    "BMEXUSD",
+    "BNBUSD",
+    "BNBUSDT",
+    "DOGEUSD",
+    "DOGEUSDT",
+    "DOTUSDT",
+    "DOTUSDTH21",
+    "EOSH21",
+    "EOSUSDTZ20",
+    "ETHH21",
+    "ETHH22",
+    "ETHH23",
+    "ETHH24",
+    "ETHM20",
+    "ETHM21",
+    "ETHM22",
+    "ETHM23",
+    "ETHM24",
+    "ETHU20",
+    "ETHU21",
+    "ETHU22",
+    "ETHU23",
+    "ETHU24",
+    "ETHUSD",
+    "ETHUSDZ20",
+    "ETHZ20",
+    "ETHZ21",
+    "ETHZ22",
+    "ETHZ23",
+    "ETHZ24",
+    "HL-BTC-PERP",
+    "LINKUSDT",
+    "LINKUSDTZ20",
+    "LTCH21",
+    "LTCM20",
+    "LTCM21",
+    "LTCU20",
+    "LTCU21",
+    "LTCUSD",
+    "LTCZ20",
+    "LTCZ21",
+    "LUNAUSD",
+    "ORDIUSD",
+    "TRXH21",
+    "TRXM20",
+    "TRXM21",
+    "TRXU20",
+    "TRXU21",
+    "TRXUSDT",
+    "TRXZ20",
+    "TRXZ21",
+    "UNIUSDT",
+    "XBTM21",
+    "XBTUSD",
+    "XLMUSDT",
+    "XRPUSD",
+    "XTZUSDTZ20",
+    "YFIUSDTH21",
+    "YFIUSDTZ20"
+  ],
+  "position_scales": {
+    "BITMEX:LTCM20": 3719.0,
+    "BITMEX:ADAM20": 1828163.0,
+    "BITMEX:BTC-PERP": 7663279.0,
+    "BITMEX:TRXM20": 4000000.0,
+    "BITMEX:ETHM20": 552.0,
+    "BITMEX:ETHUSD": 102665.0,
+    "BITMEX:LTCU20": 2090.0,
+    "BITMEX:TRXU20": 7300000.0,
+    "BITMEX:ETHU20": 332.0,
+    "BITMEX:XRPUSD": 305550.0,
+    "BITMEX:LTCUSD": 106109.0,
+    "BITMEX:BCHUSD": 23000.0,
+    "BITMEX:LINKUSDTZ20": 321.0,
+    "BITMEX:LTCZ20": 1647.0,
+    "BITMEX:TRXZ20": 3980667.0,
+    "BITMEX:XTZUSDTZ20": 14000.0,
+    "BITMEX:ETHUSDZ20": 1111.0,
+    "BITMEX:EOSUSDTZ20": 11110.0,
+    "BITMEX:ETHZ20": 1046.0,
+    "BITMEX:YFIUSDTZ20": 1930.0,
+    "BITMEX:LTCH21": 2785.0,
+    "BITMEX:ETHH21": 935.0,
+    "BITMEX:TRXH21": 5750000.0,
+    "BITMEX:YFIUSDTH21": 1668.0,
+    "BITMEX:DOTUSDTH21": 414.0,
+    "BITMEX:BCHH21": 400.0,
+    "BITMEX:EOSH21": 5555.0,
+    "BITMEX:LINKUSDT": 2333.0,
+    "BITMEX:DOGEUSDT": 77777.0,
+    "BITMEX:DOTUSDT": 21109.0,
+    "BITMEX:TRXM21": 5300000.0,
+    "BITMEX:ETHM21": 157.0,
+    "BITMEX:LTCM21": 607.0,
+    "BITMEX:UNIUSDT": 19221.0,
+    "BITMEX:XLMUSDT": 3333.0,
+    "BITMEX:BNBUSDT": 5465.0,
+    "BITMEX:ETHU21": 408.0,
+    "BITMEX:TRXU21": 2510500.0,
+    "BITMEX:ALTMEXUSD": 10032.0,
+    "BITMEX:AAVEUSDT": 9677.0,
+    "BITMEX:ADAUSDT": 544.0,
+    "BITMEX:LTCU21": 1000.0,
+    "BITMEX:AXSUSDT": 24949.0,
+    "BITMEX:DOGEUSD": 66983.0,
+    "BITMEX:ETHZ21": 40711000000.0,
+    "BITMEX:LUNAUSD": 3000.0,
+    "BITMEX:ADAUSD": 15000.0,
+    "BITMEX:TRXUSDT": 8332.0,
+    "BITMEX:TRXZ21": 350000000000000.0,
+    "BITMEX:LTCZ21": 299900000000.0,
+    "BITMEX:ETHH22": 36306000.0,
+    "BITMEX:BNBUSD": 3300.0,
+    "BITMEX:ETHM22": 8946000.0,
+    "HYPERLIQUID:BTC-PERP": 2.07997,
+    "LTCM20": 3719.0,
+    "ADAM20": 1828163.0,
+    "XBTUSD": 7663279.0,
+    "TRXM20": 4000000.0,
+    "ETHM20": 552.0,
+    "ETHUSD": 102665.0,
+    "LTCU20": 2090.0,
+    "TRXU20": 7300000.0,
+    "ETHU20": 332.0,
+    "XRPUSD": 305550.0,
+    "LTCUSD": 106109.0,
+    "BCHUSD": 23000.0,
+    "LINKUSDTZ20": 321.0,
+    "LTCZ20": 1647.0,
+    "TRXZ20": 3980667.0,
+    "XTZUSDTZ20": 14000.0,
+    "ETHUSDZ20": 1111.0,
+    "EOSUSDTZ20": 11110.0,
+    "ETHZ20": 1046.0,
+    "YFIUSDTZ20": 1930.0,
+    "LTCH21": 2785.0,
+    "ETHH21": 935.0,
+    "TRXH21": 5750000.0,
+    "YFIUSDTH21": 1668.0,
+    "DOTUSDTH21": 414.0,
+    "BCHH21": 400.0,
+    "EOSH21": 5555.0,
+    "LINKUSDT": 2333.0,
+    "DOGEUSDT": 77777.0,
+    "DOTUSDT": 21109.0,
+    "TRXM21": 5300000.0,
+    "ETHM21": 157.0,
+    "LTCM21": 607.0,
+    "UNIUSDT": 19221.0,
+    "XLMUSDT": 3333.0,
+    "BNBUSDT": 5465.0,
+    "XBTM21": 7663279.0,
+    "ETHU21": 408.0,
+    "TRXU21": 2510500.0,
+    "ALTMEXUSD": 10032.0,
+    "AAVEUSDT": 9677.0,
+    "ADAUSDT": 544.0,
+    "LTCU21": 1000.0,
+    "AXSUSDT": 24949.0,
+    "DOGEUSD": 66983.0,
+    "ETHZ21": 40711000000.0,
+    "LUNAUSD": 3000.0,
+    "ADAUSD": 15000.0,
+    "TRXUSDT": 8332.0,
+    "TRXZ21": 350000000000000.0,
+    "LTCZ21": 299900000000.0,
+    "ETHH22": 36306000.0,
+    "BNBUSD": 3300.0,
+    "ETHM22": 8946000.0,
+    "HL-BTC-PERP": 2.07997
+  },
+  "risk_envelope": {
+    "method": "unified-distillation-candidate-historical-envelope",
+    "units": "normalized exposure; exchange adapters convert units",
+    "per_symbol_target_exposure": {
+      "AAVEUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ALTMEXUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "AXSUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BCHH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BCHUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BMEXUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BNBUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BNBUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOGEUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOGEUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOTUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOTUSDTH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "EOSH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "EOSUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHUSDZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "HL-BTC-PERP": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LINKUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LINKUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCU20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCZ21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LUNAUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ORDIUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXU20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXZ21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "UNIUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XBTM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XBTUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XLMUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XRPUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XTZUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "YFIUSDTH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "YFIUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      }
+    },
+    "historical_simultaneous_total_exposure_cap": 1.0,
+    "historical_single_adjustment_p99": 1.0,
+    "historical_single_adjustment_max": 1.0,
+    "fail_closed_if_missing": true
+  },
+  "symbol_policy": {
+    "XBTUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "BTC-PERP"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCM20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCM20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ADAM20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ADAM20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXM20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXM20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHM20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHM20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCU20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCU20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXU20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXU20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHU20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHU20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "XRPUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "XRPUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LINKUSDTZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LINKUSDTZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "BCHUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "BCHUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "XTZUSDTZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "XTZUSDTZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHUSDZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHUSDZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "EOSUSDTZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "EOSUSDTZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "YFIUSDTZ20": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "YFIUSDTZ20"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCH21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCH21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHH21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHH21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXH21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXH21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "YFIUSDTH21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "YFIUSDTH21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "DOTUSDTH21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "DOTUSDTH21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "BCHH21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "BCHH21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "EOSH21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "EOSH21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LINKUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LINKUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "DOGEUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "DOGEUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "DOTUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "DOTUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXM21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXM21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHM21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHM21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCM21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCM21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "UNIUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "UNIUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "XLMUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "XLMUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "BNBUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "BNBUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "XBTM21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "BTC-PERP"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHU21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHU21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXU21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXU21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ALTMEXUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ALTMEXUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "AAVEUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "AAVEUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ADAUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ADAUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCU21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCU21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "AXSUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "AXSUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "DOGEUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "DOGEUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHZ21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHZ21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LUNAUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LUNAUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ADAUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ADAUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXUSDT": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXUSDT"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "TRXZ21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "TRXZ21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "LTCZ21": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "LTCZ21"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHH22": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHH22"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "BNBUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "BNBUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHM22": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHM22"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHU22": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHU22"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHZ22": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHZ22"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "BMEXUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "BMEXUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHH23": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHH23"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHM23": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHM23"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ORDIUSD": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ORDIUSD"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHU23": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHU23"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHZ23": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHZ23"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHH24": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHH24"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHM24": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHM24"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHU24": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHU24"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "ETHZ24": {
+      "historical_behavior": true,
+      "source_venues": [
+        "BITMEX"
+      ],
+      "canonical_assets": [
+        "ETHZ24"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    },
+    "HL-BTC-PERP": {
+      "historical_behavior": true,
+      "source_venues": [
+        "HYPERLIQUID"
+      ],
+      "canonical_assets": [
+        "BTC-PERP"
+      ],
+      "instrument_class": "DERIVATIVE",
+      "derivative_trading_allowed": true,
+      "spot_policy": "NOT_SPOT"
+    }
+  },
+  "model_sha256": "695648b77b77e249afc3c6981dcea5ccf58c74a2861eb98db29eb13d8c9bb508",
+  "model": {
+    "model_type": "UnifiedDistilledStrategy",
+    "version": "behavioral-distillation-v4.6-unified-distillation",
+    "epochs": 80,
+    "learning_rate": 0.12,
+    "l2": 0.001,
+    "target_l2": 1.0,
+    "action_threshold": 0.9,
+    "fit_row_count": 31279,
+    "ambiguous_row_count": 0,
+    "calibration_row_count": 6256,
+    "timing_head": {
+      "actions": [
+        "ACTION",
+        "NO_TRADE"
+      ],
+      "weights": [
+        [
+          0.016141652327390052,
+          -0.016141652327390052
+        ],
+        [
+          -0.015082691684912481,
+          0.015082691684912474
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.00024256071878758344,
+          -0.00024256071878758157
+        ],
+        [
+          0.007745296649587761,
+          -0.007745296649587759
+        ],
+        [
+          0.015485189681134378,
+          -0.015485189681134371
+        ],
+        [
+          0.018301455681631267,
+          -0.01830145568163126
+        ],
+        [
+          0.010819928474187205,
+          -0.0108199284741872
+        ],
+        [
+          -0.001642461006751326,
+          0.001642461006751329
+        ],
+        [
+          -0.03189123442810786,
+          0.03189123442810786
+        ],
+        [
+          -0.015194905098625387,
+          0.01519490509862539
+        ],
+        [
+          0.016540140269350818,
+          -0.016540140269350825
+        ],
+        [
+          0.03081933951549322,
+          -0.030819339515493226
+        ],
+        [
+          0.017586526239905725,
+          -0.01758652623990573
+        ],
+        [
+          0.017696654551326033,
+          -0.017696654551326033
+        ],
+        [
+          0.03703116379817583,
+          -0.03703116379817581
+        ],
+        [
+          -0.018720195912612952,
+          0.018720195912612956
+        ],
+        [
+          -0.09666599404367644,
+          0.09666599404367646
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0047098629153456825,
+          -0.0047098629153456825
+        ],
+        [
+          -0.02163677955545477,
+          0.021636779555454774
+        ],
+        [
+          -0.0280108961480949,
+          0.02801089614809491
+        ],
+        [
+          0.01432703456586793,
+          -0.014327034565867942
+        ],
+        [
+          0.012259678001573196,
+          -0.012259678001573201
+        ],
+        [
+          0.012259678001573248,
+          -0.012259678001573253
+        ],
+        [
+          -0.029879023494076173,
+          0.029879023494076173
+        ],
+        [
+          -0.01898736138605004,
+          0.018987361386050044
+        ],
+        [
+          -0.005386482608313684,
+          0.005386482608313679
+        ],
+        [
+          0.012734892354176092,
+          -0.01273489235417609
+        ],
+        [
+          0.013986630057538562,
+          -0.013986630057538559
+        ],
+        [
+          0.15168060972176006,
+          -0.15168060972176003
+        ],
+        [
+          0.016133134904206824,
+          -0.01613313490420682
+        ],
+        [
+          -0.029351916020742535,
+          0.02935191602074254
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          -0.05281476705682475,
+          0.05281476705682474
+        ],
+        [
+          -0.04746607304649501,
+          0.04746607304649502
+        ],
+        [
+          -0.0312845565659465,
+          0.03128455656594652
+        ],
+        [
+          -0.008409941115675003,
+          0.008409941115675005
+        ],
+        [
+          0.08360146199238974,
+          -0.08360146199238974
+        ],
+        [
+          -0.13680384121331746,
+          0.13680384121331746
+        ],
+        [
+          -0.11383615387877251,
+          0.11383615387877252
+        ],
+        [
+          0.23734905955212424,
+          -0.23734905955212426
+        ],
+        [
+          0.004712988247576778,
+          -0.004712988247576778
+        ],
+        [
+          0.16723845454543335,
+          -0.16723845454543335
+        ],
+        [
+          0.06539761675911412,
+          -0.06539761675911412
+        ],
+        [
+          0.03233437298428257,
+          -0.032334372984282565
+        ],
+        [
+          0.11552639300694793,
+          -0.11552639300694795
+        ],
+        [
+          0.03777623202240834,
+          -0.037776232022408346
+        ],
+        [
+          0.05171206153848554,
+          -0.05171206153848554
+        ],
+        [
+          0.11552639300694793,
+          -0.11552639300694795
+        ],
+        [
+          0.12182266654517647,
+          -0.12182266654517648
+        ],
+        [
+          0.23734905955212424,
+          -0.23734905955212426
+        ],
+        [
+          0.042207177890823004,
+          -0.042207177890823
+        ],
+        [
+          0.09293524585954072,
+          -0.0929352458595407
+        ],
+        [
+          0.10220663580176065,
+          -0.10220663580176066
+        ],
+        [
+          0.04349738421535374,
+          -0.04349738421535374
+        ],
+        [
+          0.007721137833034278,
+          -0.007721137833034278
+        ],
+        [
+          0.0019024141362863202,
+          -0.0019024141362863202
+        ],
+        [
+          0.0006676752840769531,
+          -0.0006676752840769531
+        ],
+        [
+          0.0005866303184983235,
+          -0.0005866303184983235
+        ],
+        [
+          0.00018712367326833583,
+          -0.00018712367326833592
+        ],
+        [
+          -9.233963670845831e-05,
+          9.233963670845831e-05
+        ],
+        [
+          -0.0003447901779801499,
+          0.0003447901779801499
+        ],
+        [
+          -0.00020586326155912433,
+          0.00020586326155912433
+        ],
+        [
+          0.011957922374065701,
+          -0.0119579223740657
+        ],
+        [
+          0.0031442656559284876,
+          -0.0031442656559284884
+        ],
+        [
+          0.02431870931883581,
+          -0.02431870931883581
+        ],
+        [
+          0.005081423170541739,
+          -0.005081423170541739
+        ],
+        [
+          0.13892736664848235,
+          -0.13892736664848238
+        ],
+        [
+          0.23734905955212424,
+          -0.23734905955212426
+        ],
+        [
+          0.23734905955212424,
+          -0.23734905955212426
+        ],
+        [
+          0.23734905955212424,
+          -0.23734905955212426
+        ],
+        [
+          0.06189023143086749,
+          -0.0618902314308675
+        ],
+        [
+          0.027540523033188075,
+          -0.02754052303318808
+        ],
+        [
+          0.005657266039082855,
+          -0.005657266039082855
+        ],
+        [
+          0.00323832175782727,
+          -0.00323832175782727
+        ],
+        [
+          6.48252736136352e-05,
+          -6.48252736136352e-05
+        ],
+        [
+          2.834292581089899e-05,
+          -2.8342925810898994e-05
+        ],
+        [
+          2.1824432517571936e-06,
+          -2.182443251757194e-06
+        ],
+        [
+          0.13892736664848235,
+          -0.13892736664848238
+        ],
+        [
+          0.0968138586485469,
+          -0.0968138586485469
+        ],
+        [
+          0.0016078342550951044,
+          -0.0016078342550951044
+        ],
+        [
+          0.13892736664848235,
+          -0.13892736664848238
+        ],
+        [
+          0.007642002722994503,
+          -0.007642002722994503
+        ],
+        [
+          0.09077969018064744,
+          -0.09077969018064742
+        ],
+        [
+          0.13892736664848235,
+          -0.13892736664848238
+        ]
+      ],
+      "bias": [
+        0.23919514595968377,
+        -0.23919514595968383
+      ]
+    },
+    "family_head": {
+      "actions": [
+        "ADD",
+        "FLIP",
+        "REDUCE",
+        "CLOSE",
+        "OPEN",
+        "OTHER"
+      ],
+      "weights": [
+        [
+          0.017047426992057853,
+          -0.00964236646980492,
+          0.006663568927089517,
+          0.015436922234419455,
+          -0.018049704067962403,
+          -0.011455847615799538
+        ],
+        [
+          -0.03284601006590074,
+          0.011233402474916535,
+          0.019320993968358555,
+          -0.1087243754539524,
+          0.030989795130565653,
+          0.08002619394601235
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.008669705912184807,
+          -0.0036050958318313954,
+          0.03451061721941805,
+          0.05065778317871782,
+          -0.05495531153258407,
+          -0.017938287121535595
+        ],
+        [
+          -0.01586249490638493,
+          -0.01231895442254774,
+          -0.009947912669780514,
+          0.04667385266046826,
+          -0.0151846399459602,
+          0.006640149284205104
+        ],
+        [
+          0.062053363185103086,
+          -0.016724125621764913,
+          -0.06739090815102892,
+          0.04659303336319879,
+          -0.005895736983410926,
+          -0.01863562579209711
+        ],
+        [
+          0.012150706810058049,
+          -0.020169567938138493,
+          0.014944883755956902,
+          0.03314231143773933,
+          -0.017191604876482428,
+          -0.02287672918913336
+        ],
+        [
+          0.04595071388100871,
+          -0.01632956794759671,
+          -0.06165630685189662,
+          0.009454912305847891,
+          0.04411683118490403,
+          -0.0215365825722673
+        ],
+        [
+          -0.029811728645882798,
+          -0.008514329643635339,
+          0.04718200478157207,
+          -0.05180846643535294,
+          0.03807278252897678,
+          0.004879737414322237
+        ],
+        [
+          -0.015772483907935272,
+          0.018544502277830038,
+          -0.07232011933837446,
+          0.0403720665617641,
+          0.08875176922199209,
+          -0.059575734815276386
+        ],
+        [
+          0.042743487660874005,
+          0.01076586437619728,
+          0.19593454163520144,
+          -0.19624975370546321,
+          -0.10377858953734131,
+          0.050584449570531674
+        ],
+        [
+          0.03906251571194353,
+          -0.013398836454790224,
+          0.02098124054194214,
+          -0.022065017070716415,
+          -0.02818246753143585,
+          0.0036025648030568297
+        ],
+        [
+          0.06848919246419741,
+          -0.038491626356346176,
+          0.039794712707382086,
+          -0.07777612455029627,
+          -0.028442552994832213,
+          0.03642639872989506
+        ],
+        [
+          0.04909013193656618,
+          -0.020294478254922588,
+          -0.043882843510851116,
+          0.023503445168835714,
+          0.01127828220508292,
+          -0.0196945375447111
+        ],
+        [
+          0.09117357645233522,
+          -0.02070153021885005,
+          -0.08122748718873181,
+          -0.006949344592352128,
+          0.034037875469135566,
+          -0.016333089921536797
+        ],
+        [
+          0.014523981420857453,
+          -0.03705739757574871,
+          -0.05308883091572958,
+          0.05113900972730194,
+          -0.012010633318258033,
+          0.03649387066157687
+        ],
+        [
+          -0.09549351403647607,
+          0.0073804304725779545,
+          0.035632748887892786,
+          -0.0021201759530247275,
+          0.08301311805729765,
+          -0.028412607428267577
+        ],
+        [
+          -0.1535696553824702,
+          0.07143067634192808,
+          -0.09307381717122186,
+          0.09605480842252861,
+          0.07870498101428489,
+          0.0004530067749504525
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.13731242270358343,
+          -0.022431853862458734,
+          0.12766719306677565,
+          0.011104562995459694,
+          0.021232938049196876,
+          -0.00026041754538999823
+        ],
+        [
+          -0.06697011078648828,
+          0.012140151711505875,
+          -0.006593652948027284,
+          0.008202263437801826,
+          0.02208569300766412,
+          0.031135655577543744
+        ],
+        [
+          -0.05605153244527165,
+          0.01687469864279503,
+          -0.044152621852543074,
+          0.014869195297810812,
+          0.025368872876360072,
+          0.04309138748084884
+        ],
+        [
+          -0.05393519925511982,
+          -0.011752504034786882,
+          0.11857997512812792,
+          -0.019061833919847476,
+          -0.004288276293945521,
+          -0.029542161624428256
+        ],
+        [
+          -0.06250265671127207,
+          -0.02797641097300858,
+          0.1321352826286431,
+          0.0072760802720866855,
+          -0.021213165358085328,
+          -0.027719129858363833
+        ],
+        [
+          -0.06250265671127395,
+          -0.027976410973008604,
+          0.13213528262864505,
+          0.007276080272086643,
+          -0.021213165358085262,
+          -0.02771912985836385
+        ],
+        [
+          0.030830695785702016,
+          0.015826859496483995,
+          -0.09700078644572259,
+          0.011721324849647516,
+          0.0333392692308816,
+          0.005282637083007454
+        ],
+        [
+          -0.0015789713197353705,
+          0.013585228264915237,
+          0.04677270775258442,
+          -0.03675188275761208,
+          0.0685612918492822,
+          -0.09058837378943434
+        ],
+        [
+          0.019725687427870023,
+          -0.0033164701206912202,
+          -0.07040032380556312,
+          0.0018359622039532915,
+          -0.034506971893092375,
+          0.08666211618752337
+        ],
+        [
+          -0.11154176230408899,
+          -0.014994190959909273,
+          -0.05099266134402762,
+          0.09576612273964029,
+          0.00488247119459774,
+          0.07688002067378791
+        ],
+        [
+          -0.0013383297353325514,
+          -0.006415062680049774,
+          0.05425364136336904,
+          -0.026789468552182956,
+          -0.011900262989811238,
+          -0.00781051740599256
+        ],
+        [
+          -0.10233462295698845,
+          -0.10819674614910593,
+          0.40038962611867096,
+          -0.020692436263560394,
+          0.007587562923820186,
+          -0.1767533836728367
+        ],
+        [
+          0.017076011114804793,
+          -0.009633748249818837,
+          0.006576101227514179,
+          0.015456820517685689,
+          -0.01802843892001062,
+          -0.011446745690175238
+        ],
+        [
+          -0.046419520483928896,
+          0.02116828723716955,
+          0.06180990362905288,
+          -0.02908861090549535,
+          -0.03292912556266707,
+          0.025459066085868905
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.002069574207451962,
+          0.0387864598110945,
+          0.06584265869953734,
+          -0.10675397954266412,
+          -0.057018830842044683,
+          0.05707411766662499
+        ],
+        [
+          -0.06366198881660656,
+          0.03630884343345635,
+          0.11174880076756852,
+          -0.09468287127622606,
+          -0.041262663825382934,
+          0.05154987971719063
+        ],
+        [
+          -0.027205553841650177,
+          0.02401560107400659,
+          0.03328953457010186,
+          -0.041875336389791774,
+          -0.022165980243406307,
+          0.03394173483073981
+        ],
+        [
+          0.0018676764806655657,
+          0.006532803018787954,
+          0.014734832038880909,
+          -0.013222436876876225,
+          -0.019342381253557493,
+          0.00942950659209928
+        ],
+        [
+          0.04820395166287997,
+          -0.05986059555935261,
+          -0.04967613986955264,
+          0.10706127888543852,
+          0.037215962541228664,
+          -0.08294445766064187
+        ],
+        [
+          -0.07349258966500716,
+          0.09734154640449035,
+          0.05397738323532441,
+          -0.15086801756443424,
+          -0.06081379239203683,
+          0.13385546998166356
+        ],
+        [
+          -0.06483939685574873,
+          0.0819931090430995,
+          0.08128159527868059,
+          -0.15516011641893887,
+          -0.05737921062454546,
+          0.11410401957745285
+        ],
+        [
+          0.2175858360275345,
+          -0.17334832761612873,
+          0.16569101688126756,
+          -0.02791376914207236,
+          -0.06792195706912865,
+          -0.11409279908147253
+        ],
+        [
+          0.008067431007527095,
+          -0.0035355891253524107,
+          0.008957355494713343,
+          -0.004995979137818121,
+          -0.0034406013862297107,
+          -0.005052616852840192
+        ],
+        [
+          0.12698286906523173,
+          -0.1223577188968734,
+          0.18646520700640407,
+          -0.09500436193886316,
+          -0.04688762455353652,
+          -0.04919837068236276
+        ],
+        [
+          0.08253553595477563,
+          -0.04745501959390286,
+          -0.02973154561984967,
+          0.0720865719346089,
+          -0.017593731129362425,
+          -0.05984181154626954
+        ],
+        [
+          0.030752397536380906,
+          -0.017896379972733113,
+          0.0038420556255194162,
+          0.03327282951388284,
+          -0.02012194769666852,
+          -0.029848955006381565
+        ],
+        [
+          0.14371671672910508,
+          -0.08601975744976012,
+          0.19372030639822985,
+          -0.1448640451827551,
+          -0.11280474351511016,
+          0.006251523020290483
+        ],
+        [
+          0.05985056942592179,
+          -0.033094228746522195,
+          -0.024616245750655727,
+          0.03381776328290796,
+          -0.0009123848189236293,
+          -0.035045473392728156
+        ],
+        [
+          -0.01673384766387323,
+          -0.03633796144711324,
+          -0.00725509939182587,
+          0.049859683243891936,
+          0.06591711896157369,
+          -0.05544989370265324
+        ],
+        [
+          0.14371671672910508,
+          -0.08601975744976012,
+          0.19372030639822985,
+          -0.1448640451827551,
+          -0.11280474351511016,
+          0.006251523020290483
+        ],
+        [
+          0.07386911929842947,
+          -0.0873285701663686,
+          -0.02802928951696223,
+          0.11695027604068271,
+          0.04488278644598153,
+          -0.12034432210176295
+        ],
+        [
+          0.2175858360275345,
+          -0.17334832761612873,
+          0.16569101688126756,
+          -0.02791376914207236,
+          -0.06792195706912865,
+          -0.11409279908147253
+        ],
+        [
+          0.06056114425593222,
+          -0.033185706959676486,
+          0.04094773845783856,
+          -0.03043158919373925,
+          -0.014919887241320052,
+          -0.022971699319034995
+        ],
+        [
+          0.018894487475791217,
+          -0.05622525185196274,
+          0.11625118478886255,
+          0.002205835678654231,
+          -0.03366449366386099,
+          -0.047461762427484296
+        ],
+        [
+          0.13813020429581108,
+          -0.08393736880448943,
+          0.00849209363456649,
+          0.000311984373012656,
+          -0.019337576163947608,
+          -0.04365933733495321
+        ],
+        [
+          0.3322177667386822,
+          -0.03932982035792788,
+          -0.11883680087887374,
+          -0.07590985604506777,
+          -0.057248712844917636,
+          -0.040892576611895125
+        ],
+        [
+          0.030780882624793084,
+          -0.0005110070042382013,
+          0.005789894323282116,
+          -0.022033959588270365,
+          -0.007494140787864015,
+          -0.006531669567702613
+        ],
+        [
+          0.00966835530128275,
+          -0.0015766647702858277,
+          -0.007034349439226745,
+          0.004135765772189835,
+          -0.003490623577989845,
+          -0.001702483285970167
+        ],
+        [
+          0.004433726738938882,
+          0.0006476809448042525,
+          -0.002895684112089631,
+          5.9225799770636e-05,
+          -0.0016640377938927945,
+          -0.0005809115775313458
+        ],
+        [
+          -0.007624133516123902,
+          -0.0004480709494286702,
+          0.0033172581926148967,
+          0.0037246054288750108,
+          0.0015493785681952733,
+          -0.0005190377241326075
+        ],
+        [
+          -0.0021725625579365874,
+          -0.00016641528898953632,
+          0.003727566669322737,
+          -0.0007751868963706081,
+          -0.0004328207360985964,
+          -0.0001805811899274097
+        ],
+        [
+          4.01338642029103e-05,
+          -2.1584791530959122e-05,
+          -1.212974970001312e-05,
+          -1.0082953868168108e-05,
+          3.068446805875792e-05,
+          -2.7020837162527887e-05
+        ],
+        [
+          4.629492604766524e-05,
+          -4.2387996940230496e-05,
+          0.00013038533138536387,
+          -5.3346170077700106e-05,
+          -2.5854586529856974e-05,
+          -5.5091503885241574e-05
+        ],
+        [
+          5.297909810849373e-05,
+          -1.3736076483933036e-05,
+          -5.908993531516976e-05,
+          -2.1786340203673803e-05,
+          5.8870981887389514e-05,
+          -1.723772799310659e-05
+        ],
+        [
+          0.040877375228933636,
+          -0.011239906255339095,
+          -0.06524164751933685,
+          0.029083514661715812,
+          0.01855936683617952,
+          -0.012038702952153028
+        ],
+        [
+          -0.026492405336646034,
+          -0.002436409885971959,
+          -0.007597133768965169,
+          0.039855784137943794,
+          -0.0007932499043928843,
+          -0.00253658524196775
+        ],
+        [
+          -0.233122393358261,
+          -0.017095067692281935,
+          0.21522485918834391,
+          0.013432050618640331,
+          0.04504873515851778,
+          -0.02348818391495906
+        ],
+        [
+          -0.04369316585740326,
+          -0.0030910716109777184,
+          0.047307417256691915,
+          -0.0025096914446014946,
+          0.006086174349810209,
+          -0.004099662693519659
+        ],
+        [
+          0.11257298213291571,
+          -0.09802386588053699,
+          0.09187047132313411,
+          -0.01689080612274799,
+          -0.06810572720009198,
+          -0.02142305425267287
+        ],
+        [
+          0.2175858360275345,
+          -0.17334832761612873,
+          0.16569101688126756,
+          -0.02791376914207236,
+          -0.06792195706912865,
+          -0.11409279908147253
+        ],
+        [
+          0.2175858360275345,
+          -0.17334832761612873,
+          0.16569101688126756,
+          -0.02791376914207236,
+          -0.06792195706912865,
+          -0.11409279908147253
+        ],
+        [
+          0.21758583602753453,
+          -0.17334832761612876,
+          0.1656910168812676,
+          -0.02791376914207234,
+          -0.06792195706912865,
+          -0.11409279908147253
+        ],
+        [
+          0.03314549733236157,
+          -0.0507542859440492,
+          0.07740262841398939,
+          -0.017558298577123717,
+          0.01763396357056656,
+          -0.05986950479574466
+        ],
+        [
+          0.08483705445774752,
+          -0.017927628157532467,
+          -0.006213120172683341,
+          -0.024451231772392574,
+          -0.010825942374276169,
+          -0.025419131980862965
+        ],
+        [
+          0.004360686372040176,
+          -0.004134673387161229,
+          0.008964805256613069,
+          -0.0029067826408835785,
+          -0.0015739512577450723,
+          -0.004710084342863368
+        ],
+        [
+          -0.017860565110554005,
+          -0.0024407677168441604,
+          -0.006276023287199322,
+          0.03409568706576046,
+          -0.00492333323133312,
+          -0.002594997719829851
+        ],
+        [
+          0.0005826386362381182,
+          -5.3280384213823515e-05,
+          -0.00017056392480050824,
+          -0.00019000363324982132,
+          -0.00011512200776704918,
+          -5.3668686206915755e-05
+        ],
+        [
+          -4.4592023324493144e-05,
+          -1.2587534347540607e-05,
+          0.00010270357914495188,
+          -1.0226614502287698e-05,
+          -1.4363591989298105e-05,
+          -2.093381498133235e-05
+        ],
+        [
+          -7.865769890114527e-06,
+          -1.2386114432724954e-06,
+          1.011569306933074e-05,
+          -2.106846932828583e-06,
+          2.519023507447611e-06,
+          -1.4234883105627418e-06
+        ],
+        [
+          0.11257298213291571,
+          -0.09802386588053699,
+          0.09187047132313411,
+          -0.01689080612274799,
+          -0.06810572720009198,
+          -0.02142305425267287
+        ],
+        [
+          0.12009746523456417,
+          -0.07400312336920553,
+          0.04736924781716907,
+          -0.00632112223060416,
+          0.0040111471515820825,
+          -0.09115361460350568
+        ],
+        [
+          -0.015084611339945387,
+          -0.0013213383663861272,
+          0.026451297740964483,
+          -0.004701840788720192,
+          -0.0038273770206187765,
+          -0.001516130225294005
+        ],
+        [
+          0.11257298213291571,
+          -0.09802386588053699,
+          0.09187047132313411,
+          -0.01689080612274799,
+          -0.06810572720009198,
+          -0.02142305425267287
+        ],
+        [
+          0.018355410903706123,
+          -0.007392771966231461,
+          0.0168710375964384,
+          -0.01243516589059224,
+          -0.00736741674134623,
+          -0.008031093901974606
+        ],
+        [
+          0.0866574429909127,
+          -0.06793168976936023,
+          0.056949507961695144,
+          0.0014122028712678723,
+          0.007551186872309532,
+          -0.08463865092682502
+        ],
+        [
+          0.11257298213291572,
+          -0.09802386588053699,
+          0.09187047132313411,
+          -0.01689080612274799,
+          -0.06810572720009198,
+          -0.02142305425267287
+        ]
+      ],
+      "bias": [
+        0.2193438600837142,
+        -0.17460610448163286,
+        0.16696049134447338,
+        -0.028136217341026386,
+        -0.0685294689947729,
+        -0.11503256061073956
+      ]
+    },
+    "direction_head": {
+      "actions": [
+        "SHORT",
+        "LONG"
+      ],
+      "weights": [
+        [
+          -0.0220354597077378,
+          0.022035459707737824
+        ],
+        [
+          0.012307845614165884,
+          -0.012307845614165881
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          -0.0018079947677960202,
+          0.0018079947677960252
+        ],
+        [
+          0.03056001400834776,
+          -0.030560014008347763
+        ],
+        [
+          -0.012013110859603755,
+          0.012013110859603751
+        ],
+        [
+          0.01270694222212572,
+          -0.01270694222212571
+        ],
+        [
+          -0.024413030765046237,
+          0.02441303076504625
+        ],
+        [
+          0.06363329095958623,
+          -0.06363329095958624
+        ],
+        [
+          0.012126898763708845,
+          -0.012126898763708859
+        ],
+        [
+          -0.0424646205291884,
+          0.0424646205291884
+        ],
+        [
+          -0.033679675678988774,
+          0.03367967567898878
+        ],
+        [
+          0.06818963176569755,
+          -0.06818963176569758
+        ],
+        [
+          -0.009568753093007332,
+          0.00956875309300733
+        ],
+        [
+          -0.014447911461185351,
+          0.014447911461185348
+        ],
+        [
+          -0.013667702981930731,
+          0.013667702981930716
+        ],
+        [
+          0.06652643965651617,
+          -0.06652643965651617
+        ],
+        [
+          -0.028967235177256745,
+          0.028967235177256734
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.04768191728295585,
+          -0.04768191728295585
+        ],
+        [
+          0.07566719697937446,
+          -0.07566719697937445
+        ],
+        [
+          0.081033072421435,
+          -0.08103307242143502
+        ],
+        [
+          0.004171997388169528,
+          -0.004171997388169535
+        ],
+        [
+          0.04950412744145701,
+          -0.04950412744145701
+        ],
+        [
+          0.049504127441456894,
+          -0.04950412744145691
+        ],
+        [
+          0.1529475483615233,
+          -0.15294754836152324
+        ],
+        [
+          2.966998122332979e-05,
+          -2.966998122332418e-05
+        ],
+        [
+          0.08760645480293276,
+          -0.08760645480293279
+        ],
+        [
+          -0.00284399307949074,
+          0.002843993079490736
+        ],
+        [
+          -0.01793519164328281,
+          0.01793519164328282
+        ],
+        [
+          -0.5996137692339946,
+          0.5996137692339947
+        ],
+        [
+          -0.022015301880862675,
+          0.02201530188086268
+        ],
+        [
+          0.018736417424699444,
+          -0.018736417424699437
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.007649161647769999,
+          -0.00764916164777
+        ],
+        [
+          0.0003649441335344761,
+          -0.0003649441335344734
+        ],
+        [
+          0.017616895745768316,
+          -0.017616895745768316
+        ],
+        [
+          -0.026253813459051076,
+          0.026253813459051072
+        ],
+        [
+          -0.040679267387570425,
+          0.040679267387570404
+        ],
+        [
+          0.08262736374337624,
+          -0.08262736374337622
+        ],
+        [
+          0.061510350670289586,
+          -0.061510350670289586
+        ],
+        [
+          -0.09424865790573252,
+          0.0942486579057325
+        ],
+        [
+          0.016877235035786423,
+          -0.01687723503578642
+        ],
+        [
+          -0.0981764093619187,
+          0.09817640936191871
+        ],
+        [
+          -0.012949483579600239,
+          0.012949483579600246
+        ],
+        [
+          0.022625942093345064,
+          -0.022625942093345057
+        ],
+        [
+          -0.05627687367734912,
+          0.056276873677349126
+        ],
+        [
+          -0.01869819063715887,
+          0.018698190637158874
+        ],
+        [
+          -0.04189953568456958,
+          0.0418995356845696
+        ],
+        [
+          -0.05627687367734912,
+          0.056276873677349126
+        ],
+        [
+          -0.037971784228383404,
+          0.0379717842283834
+        ],
+        [
+          -0.09424865790573252,
+          0.0942486579057325
+        ],
+        [
+          -0.060185306522270415,
+          0.06018530652227041
+        ],
+        [
+          -0.011747387471142765,
+          0.011747387471142774
+        ],
+        [
+          -0.022315963912319315,
+          0.022315963912319308
+        ],
+        [
+          -0.12813966754981504,
+          0.12813966754981504
+        ],
+        [
+          0.09486609525342408,
+          -0.09486609525342408
+        ],
+        [
+          -0.004363869110705796,
+          0.004363869110705796
+        ],
+        [
+          0.009434572157635162,
+          -0.009434572157635162
+        ],
+        [
+          0.008067643661937927,
+          -0.008067643661937927
+        ],
+        [
+          -0.001142201609549218,
+          0.0011422016095492178
+        ],
+        [
+          -9.596438492533715e-05,
+          9.596438492533713e-05
+        ],
+        [
+          0.0004436368723708608,
+          -0.00044363687237086074
+        ],
+        [
+          2.8906508367733784e-05,
+          -2.890650836773378e-05
+        ],
+        [
+          -0.04513960176084883,
+          0.04513960176084883
+        ],
+        [
+          0.045550508194747624,
+          -0.045550508194747624
+        ],
+        [
+          -0.055552817858962704,
+          0.0555528178589627
+        ],
+        [
+          0.05613382198443376,
+          -0.05613382198443376
+        ],
+        [
+          -0.07433972026384272,
+          0.07433972026384275
+        ],
+        [
+          -0.09424865790573252,
+          0.0942486579057325
+        ],
+        [
+          -0.09424865790573252,
+          0.0942486579057325
+        ],
+        [
+          -0.09424865790573252,
+          0.0942486579057325
+        ],
+        [
+          -0.01989513470870831,
+          0.019895134708708316
+        ],
+        [
+          -0.0233448964205836,
+          0.023344896420583596
+        ],
+        [
+          0.0038585290955431236,
+          -0.0038585290955431236
+        ],
+        [
+          0.019445080271031673,
+          -0.019445080271031673
+        ],
+        [
+          -3.376537858201348e-05,
+          3.376537858201348e-05
+        ],
+        [
+          5.881516687496496e-05,
+          -5.881516687496496e-05
+        ],
+        [
+          2.434332534408647e-06,
+          -2.4343325344086474e-06
+        ],
+        [
+          -0.07433972026384272,
+          0.07433972026384275
+        ],
+        [
+          -0.02483027082530165,
+          0.02483027082530166
+        ],
+        [
+          0.00492133318341187,
+          -0.00492133318341187
+        ],
+        [
+          -0.07433972026384272,
+          0.07433972026384275
+        ],
+        [
+          -0.010238716301581715,
+          0.010238716301581713
+        ],
+        [
+          -0.009670221340308056,
+          0.009670221340308052
+        ],
+        [
+          -0.07433972026384272,
+          0.07433972026384275
+        ]
+      ],
+      "bias": [
+        -0.09512924689808651,
+        0.09512924689808652
+      ]
+    },
+    "target_coef": [
+      0.046887356770117926,
+      0.05036698373733241,
+      -0.015194721097517346,
+      0.0,
+      0.0,
+      0.011374460764158056,
+      -0.007594129522705003,
+      -0.052965860580986415,
+      -0.06497004444772045,
+      -0.020316740638907784,
+      0.054555308489205444,
+      -0.008261686686048285,
+      0.014539794557330538,
+      0.003369249098585027,
+      -0.007517440886836788,
+      0.10696207830124696,
+      -0.011008539710061653,
+      -0.01698018117640626,
+      -0.044544641243338276,
+      -0.01708490707885071,
+      0.0,
+      0.0,
+      0.0,
+      -0.00819577479179848,
+      -0.012331200909789213,
+      -0.014629190871731458,
+      0.0038850481563359636,
+      0.007117278110768933,
+      0.0071172781021779175,
+      0.003402259378024883,
+      0.016719021403886033,
+      0.0030185501961125533,
+      0.015647858362748658,
+      0.0021608500718162797,
+      0.15285898823041436,
+      -0.05049655988242263,
+      0.01847863644987983,
+      0.0,
+      0.0,
+      0.0,
+      -0.031515656662848245,
+      0.04894029574740892,
+      -0.016506250623280344,
+      0.022501562585340182,
+      0.002625939070915067,
+      0.006872032273439443,
+      -0.0049282808052069395,
+      5.638867150992155e-11,
+      -0.012423111776939654,
+      0.012448492888319642,
+      -2.5381105108357164e-05,
+      -0.02847540843807963,
+      -0.019452884752755292,
+      0.016026915552140433,
+      0.03190137764148966,
+      -0.019452884752295358,
+      0.01945288475595762,
+      0.0,
+      0.01259701190912523,
+      -0.013903483234606185,
+      0.0013064713371369625,
+      0.10763478763669294,
+      -0.08862069492031018,
+      0.036032973153447806,
+      -0.12516582591208442,
+      0.08304286936999554,
+      0.01646692210826021,
+      -0.01316619093349965,
+      -0.08412481542376343,
+      -0.03274494773568358,
+      0.1440965130240483,
+      0.07887439869283072,
+      -0.08032037663671661,
+      -0.058562196047400185,
+      0.016556583629649308,
+      0.0,
+      5.638867150992155e-11,
+      0.0,
+      -0.06158528389359527,
+      -0.05437724939850555,
+      -0.031739713330713196,
+      0.13534068828990722,
+      -0.004655302292938843,
+      -0.0021293560144632173,
+      0.002589633020234952,
+      0.01655658362967715,
+      0.07938374625728,
+      -0.09594032990022876,
+      0.01655658362969769,
+      -0.003433761007570173,
+      -0.01312282261847728,
+      0.01655658362852138
+    ],
+    "encoder": {
+      "means": {
+        "feature_contract_lot_size": 7047660.275168712,
+        "feature_multiplier_major": 0.7189692643175933,
+        "feature_market_data_available": 0.0,
+        "feature_mark_index_missing": 0.0,
+        "feature_return_1bar": -0.0014800291283500648,
+        "feature_return_3bar": -0.002181337517322799,
+        "feature_return_6bar": -0.0021067732813884027,
+        "feature_return_12bar": -0.00028330171710419077,
+        "feature_return_24bar": 0.0030753867906446425,
+        "feature_return_72bar": 0.017380980612911923,
+        "feature_realized_volatility_72bar": 0.009520838325399248,
+        "feature_atr_14bar": 363.49768735691566,
+        "feature_volume_change_1bar": 1.7962522298091006,
+        "feature_volume_percentile_72bar": 0.618655221287978,
+        "feature_ma_distance_24bar": -0.0012253184093963224,
+        "feature_trend_slope_24bar": 5.260594560144168e-05,
+        "feature_distance_rolling_high_72bar": -0.06128749784104315,
+        "feature_distance_rolling_low_72bar": 0.08921285666734984,
+        "feature_funding_rate": 0.0008415979916840941,
+        "feature_funding_rate_missing": 0.0,
+        "feature_mark_index_basis": 0.0,
+        "feature_mark_index_basis_missing": 0.0,
+        "feature_rsi_14": 49.44530401699402,
+        "feature_macd_line_12_26": -40.38689424400184,
+        "feature_macd_signal_9": -25.540684530657067,
+        "feature_macd_histogram": -14.846209713344773,
+        "feature_bollinger_zscore_20": -0.12720638034005569,
+        "feature_bollinger_percent_b_20": 0.46819840491498604,
+        "feature_time_of_day_fraction": 0.5372455213413804,
+        "feature_day_of_week": 2.8257936634802903,
+        "feature_day_of_week_sin": 0.05792930892597662,
+        "feature_day_of_week_cos": -0.02211912898752358,
+        "feature_current_net_position_contracts": 146549836814.611,
+        "feature_current_normalized_exposure": 0.04859498706853086,
+        "feature_position_scale_contracts": 246705542839.66003,
+        "feature_cycle_duration_seconds": 1312589.7249837874,
+        "feature_action_lag_1": 0.0,
+        "feature_action_lag_2": 0.0,
+        "feature_action_lag_3": 0.0,
+        "feature_recent_add_count_24h": 19.207886689200066,
+        "feature_recent_reduce_count_24h": 14.697376468694673,
+        "feature_recent_flip_count_24h": 0.20663125704168678,
+        "feature_recent_realised_outcome": 23032301.843841255,
+        "feature_realised_drawdown": -385353629.344085,
+        "feature_fee_accumulation_raw": 667869949.3953323,
+        "feature_funding_accumulation_raw": 218681980.13117656
+      },
+      "scales": {
+        "feature_contract_lot_size": 265113398.94710556,
+        "feature_multiplier_major": 0.4494442081538956,
+        "feature_market_data_available": 1.0,
+        "feature_mark_index_missing": 1.0,
+        "feature_return_1bar": 0.018931250759021162,
+        "feature_return_3bar": 0.031162219168359734,
+        "feature_return_6bar": 0.03973530739685143,
+        "feature_return_12bar": 0.05617124088980784,
+        "feature_return_24bar": 0.0798353948993207,
+        "feature_return_72bar": 0.14207764264989756,
+        "feature_realized_volatility_72bar": 0.006834980948975231,
+        "feature_atr_14bar": 411.4755338328423,
+        "feature_volume_change_1bar": 30.835406031978856,
+        "feature_volume_percentile_72bar": 0.2972148209080907,
+        "feature_ma_distance_24bar": 0.045884377406477106,
+        "feature_trend_slope_24bar": 0.0031970562113024016,
+        "feature_distance_rolling_high_72bar": 0.061797181055177355,
+        "feature_distance_rolling_low_72bar": 0.13706142134263186,
+        "feature_funding_rate": 0.001034786544850431,
+        "feature_funding_rate_missing": 1.0,
+        "feature_mark_index_basis": 1.0,
+        "feature_mark_index_basis_missing": 1.0,
+        "feature_rsi_14": 14.883986894533026,
+        "feature_macd_line_12_26": 406.78273240788127,
+        "feature_macd_signal_9": 373.84413729577267,
+        "feature_macd_histogram": 116.57967247948503,
+        "feature_bollinger_zscore_20": 1.6232459234279766,
+        "feature_bollinger_percent_b_20": 0.4058114808569941,
+        "feature_time_of_day_fraction": 0.2765472130682472,
+        "feature_day_of_week": 1.944658986361816,
+        "feature_day_of_week_sin": 0.6813069104211171,
+        "feature_day_of_week_cos": 0.7293667343062911,
+        "feature_current_net_position_contracts": 6169113183864.269,
+        "feature_current_normalized_exposure": 0.21820301034867212,
+        "feature_position_scale_contracts": 9278967408376.143,
+        "feature_cycle_duration_seconds": 3314107.664786951,
+        "feature_action_lag_1": 1.0,
+        "feature_action_lag_2": 1.0,
+        "feature_action_lag_3": 1.0,
+        "feature_recent_add_count_24h": 31.925019524637975,
+        "feature_recent_reduce_count_24h": 27.490540073551866,
+        "feature_recent_flip_count_24h": 0.6327260965441598,
+        "feature_recent_realised_outcome": 107260930.98082213,
+        "feature_realised_drawdown": 487635333.5971316,
+        "feature_fee_accumulation_raw": 556775789.7858571,
+        "feature_funding_accumulation_raw": 199872473.44012192
+      },
+      "categories": {
+        "feature_instrument_class": [
+          "DERIVATIVE"
+        ],
+        "feature_payout_model": [
+          "INVERSE",
+          "LINEAR",
+          "QUANTO"
+        ],
+        "feature_quote_currency": [
+          "USD",
+          "USDC",
+          "USDT",
+          "XBT"
+        ],
+        "feature_settlement_currency": [
+          "USDC",
+          "XBT"
+        ],
+        "feature_market_bar_interval": [
+          "1h"
+        ],
+        "feature_market_regime": [
+          "RANGE_OR_MIXED",
+          "TREND_DOWN",
+          "TREND_UP"
+        ],
+        "feature_latest_action": [
+          "ADD_LONG",
+          "ADD_SHORT",
+          "CLOSE_LONG",
+          "CLOSE_SHORT",
+          "FLIP_LONG_TO_SHORT",
+          "FLIP_SHORT_TO_LONG",
+          "HOLD_LONG",
+          "HOLD_SHORT",
+          "NO_TRADE",
+          "OPEN_LONG",
+          "OPEN_SHORT",
+          "REDUCE_LONG",
+          "REDUCE_SHORT",
+          "__MISSING__"
+        ],
+        "feature_action_lag_1": [
+          "__MISSING__"
+        ],
+        "feature_action_lag_2": [
+          "__MISSING__"
+        ],
+        "feature_action_lag_3": [
+          "__MISSING__"
+        ],
+        "feature_order_execution_style": [
+          "Limit_MULTI_FILL",
+          "Limit_SINGLE_FILL",
+          "Market_MULTI_FILL",
+          "Market_SINGLE_FILL",
+          "StopLimit_SINGLE_FILL",
+          "Stop_MULTI_FILL",
+          "Stop_SINGLE_FILL",
+          "__MISSING__"
+        ],
+        "feature_ordering_confidence": [
+          "HIGH",
+          "LOW",
+          "__MISSING__"
+        ],
+        "feature_accounting_confidence": [
+          "HIGH",
+          "MEDIUM",
+          "__MISSING__"
+        ]
+      },
+      "numeric_features": [
+        "feature_contract_lot_size",
+        "feature_multiplier_major",
+        "feature_market_data_available",
+        "feature_mark_index_missing",
+        "feature_return_1bar",
+        "feature_return_3bar",
+        "feature_return_6bar",
+        "feature_return_12bar",
+        "feature_return_24bar",
+        "feature_return_72bar",
+        "feature_realized_volatility_72bar",
+        "feature_atr_14bar",
+        "feature_volume_change_1bar",
+        "feature_volume_percentile_72bar",
+        "feature_ma_distance_24bar",
+        "feature_trend_slope_24bar",
+        "feature_distance_rolling_high_72bar",
+        "feature_distance_rolling_low_72bar",
+        "feature_funding_rate",
+        "feature_funding_rate_missing",
+        "feature_mark_index_basis",
+        "feature_mark_index_basis_missing",
+        "feature_rsi_14",
+        "feature_macd_line_12_26",
+        "feature_macd_signal_9",
+        "feature_macd_histogram",
+        "feature_bollinger_zscore_20",
+        "feature_bollinger_percent_b_20",
+        "feature_time_of_day_fraction",
+        "feature_day_of_week",
+        "feature_day_of_week_sin",
+        "feature_day_of_week_cos",
+        "feature_current_net_position_contracts",
+        "feature_current_normalized_exposure",
+        "feature_position_scale_contracts",
+        "feature_cycle_duration_seconds",
+        "feature_action_lag_1",
+        "feature_action_lag_2",
+        "feature_action_lag_3",
+        "feature_recent_add_count_24h",
+        "feature_recent_reduce_count_24h",
+        "feature_recent_flip_count_24h",
+        "feature_recent_realised_outcome",
+        "feature_realised_drawdown",
+        "feature_fee_accumulation_raw",
+        "feature_funding_accumulation_raw"
+      ],
+      "categorical_features": [
+        "feature_instrument_class",
+        "feature_payout_model",
+        "feature_quote_currency",
+        "feature_settlement_currency",
+        "feature_market_bar_interval",
+        "feature_market_regime",
+        "feature_latest_action",
+        "feature_action_lag_1",
+        "feature_action_lag_2",
+        "feature_action_lag_3",
+        "feature_order_execution_style",
+        "feature_ordering_confidence",
+        "feature_accounting_confidence"
+      ]
+    }
+  }
+}

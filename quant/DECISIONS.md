@@ -373,3 +373,11 @@
 - Require read-only verification of isolated margin and bounded leverage before OKX or Binance Futures derivative orders. Never silently change account configuration; a flat account may pass only after the exchange returns explicit configuration.
 - Prefer exchange-reported position notional, mark price, unrealised PnL and margin. If a fallback is unavoidable, label its source. Failed cancellations must keep the remote order visible and raise a safety reason.
 - Verification: `427` tests passed; no credentials, orders, mainnet endpoint or raw input was used. The active model remains unchanged and Demo order authorization remains blocked.
+
+## 2026-08-27 — Build and audit the unified v4.6 candidate without switching Demo
+
+- M16 adds `UnifiedDistilledStrategy`, a venue-neutral shared intent model with separate timing, action-family, direction and normalized-exposure heads. The final executable action is derived from current robot state and predicted target exposure; below-threshold timing holds current exposure and cannot hide a rebalance.
+- The build uses frozen BitMEX and pinned Hyperliquid rows, excludes same-time ambiguous action/target groups from fitting while retaining their count, balances total sample weight by venue then canonical asset, and excludes raw source symbol from predictive categorical features. Spot remains monitor-only.
+- Runtime deployment loading accepts the v4.6 JSON schema and emits per-symbol signal context (action, target exposure, confidence, Chinese model-input reason, basis and coverage) to the credential-free dashboard. The active v3 Demo artifact remains the default and was not changed.
+- Candidate audit result: `CANDIDATE_NOT_PROMOTED`. Causal leakage and protected raw hashes pass; WF1 lacks Hyperliquid time-out coverage; strict autonomous WF1/WF2 are negative after costs; autonomous OPEN/CLOSE/FLIP recall is zero. No Demo order, credential, private endpoint or mainnet connection was used.
+- Verification: full suite `433 passed`; candidate model reload passed; build and audit commands completed. v4.6 remains a candidate for future research only, not an authorization to trade.

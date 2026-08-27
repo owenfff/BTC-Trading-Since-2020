@@ -241,3 +241,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 
 - M15.25 blocks legacy Bybit order routing and stale dashboard liveness, and requires explicit isolated/leverage verification for OKX/Binance Futures. These are safety improvements, not evidence of strategy quality.
 - The active model remains diagnostic `BEHAVIORAL_APPROXIMATION`; strict autonomous promotion, a real Demo lifecycle, and the 14-day observation requirement remain open. Do not add Demo orders based on this patch.
+
+## 2026-08-27 — Unified v4.6 candidate fails promotion gates
+
+- The candidate is implemented and auditable, but it is not deployable: WF1 has no Hyperliquid time-out rows, WF1/WF2 strict autonomous costed results are negative, WF2 profit factor is below 1, and autonomous OPEN/CLOSE/FLIP recall is zero.
+- This is a model-quality/coverage blocker, not a runtime crash. Keep the current v3 Demo artifact unchanged, do not switch models, and do not add Demo orders. The report is `quant/reports/unified_distillation_audit.md` / `.json`.
+- Historical pre-action L2/order-book context remains unavailable, so the v4.6 strategy remains `BEHAVIORAL_APPROXIMATION`; no result establishes exact private trigger recovery or future profitability.

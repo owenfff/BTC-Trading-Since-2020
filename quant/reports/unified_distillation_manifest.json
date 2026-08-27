@@ -1,0 +1,452 @@
+{
+  "report_version": "M16-UNIFIED-DISTILLATION-MANIFEST-1.0",
+  "status": "CANDIDATE_PENDING_STRICT_AUTONOMOUS_AUDIT",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "model_version": "behavioral-distillation-v4.6-unified-distillation",
+  "feature_contract_version": "m16-unified-cross-venue-distillation",
+  "dataset_path": "quant\\outputs\\cross_venue_model_dataset_v3.csv",
+  "dataset_sha256": "3db0b050ec3f4c5602cf3c682e1a5bd8a2c8bbff0a21c5f304e0bebfafbafc69",
+  "artifact_path": "quant\\outputs\\cross_asset_deployment_model_v46.json",
+  "model_sha256": "695648b77b77e249afc3c6981dcea5ccf58c74a2861eb98db29eb13d8c9bb508",
+  "code_commit": "9935af4ef37f1f9acb42beaef5f784ad74c1d449",
+  "deployment_time": "2026-08-27T06:28:00Z",
+  "frozen_cutoff": "2026-07-18T21:17:31.514000Z",
+  "raw_row_count": 32552,
+  "fit_row_count": 31279,
+  "ambiguous_row_count": 0,
+  "source_counts": {
+    "BITMEX": 32231,
+    "HYPERLIQUID": 321
+  },
+  "fit_source_counts": {
+    "BITMEX": 31065,
+    "HYPERLIQUID": 214
+  },
+  "symbol_count": 67,
+  "symbols": [
+    "AAVEUSDT",
+    "ADAM20",
+    "ADAUSD",
+    "ADAUSDT",
+    "ALTMEXUSD",
+    "AXSUSDT",
+    "BCHH21",
+    "BCHUSD",
+    "BMEXUSD",
+    "BNBUSD",
+    "BNBUSDT",
+    "DOGEUSD",
+    "DOGEUSDT",
+    "DOTUSDT",
+    "DOTUSDTH21",
+    "EOSH21",
+    "EOSUSDTZ20",
+    "ETHH21",
+    "ETHH22",
+    "ETHH23",
+    "ETHH24",
+    "ETHM20",
+    "ETHM21",
+    "ETHM22",
+    "ETHM23",
+    "ETHM24",
+    "ETHU20",
+    "ETHU21",
+    "ETHU22",
+    "ETHU23",
+    "ETHU24",
+    "ETHUSD",
+    "ETHUSDZ20",
+    "ETHZ20",
+    "ETHZ21",
+    "ETHZ22",
+    "ETHZ23",
+    "ETHZ24",
+    "HL-BTC-PERP",
+    "LINKUSDT",
+    "LINKUSDTZ20",
+    "LTCH21",
+    "LTCM20",
+    "LTCM21",
+    "LTCU20",
+    "LTCU21",
+    "LTCUSD",
+    "LTCZ20",
+    "LTCZ21",
+    "LUNAUSD",
+    "ORDIUSD",
+    "TRXH21",
+    "TRXM20",
+    "TRXM21",
+    "TRXU20",
+    "TRXU21",
+    "TRXUSDT",
+    "TRXZ20",
+    "TRXZ21",
+    "UNIUSDT",
+    "XBTM21",
+    "XBTUSD",
+    "XLMUSDT",
+    "XRPUSD",
+    "XTZUSDTZ20",
+    "YFIUSDTH21",
+    "YFIUSDTZ20"
+  ],
+  "weighting": {
+    "venues": [
+      "BITMEX",
+      "HYPERLIQUID"
+    ],
+    "symbols_by_venue": {
+      "BITMEX": [
+        "AAVEUSDT",
+        "ADAM20",
+        "ADAUSD",
+        "ADAUSDT",
+        "ALTMEXUSD",
+        "AXSUSDT",
+        "BCHH21",
+        "BCHUSD",
+        "BNBUSD",
+        "BNBUSDT",
+        "BTC-PERP",
+        "DOGEUSD",
+        "DOGEUSDT",
+        "DOTUSDT",
+        "DOTUSDTH21",
+        "EOSH21",
+        "EOSUSDTZ20",
+        "ETHH21",
+        "ETHH22",
+        "ETHM20",
+        "ETHM21",
+        "ETHM22",
+        "ETHU20",
+        "ETHU21",
+        "ETHUSD",
+        "ETHUSDZ20",
+        "ETHZ20",
+        "ETHZ21",
+        "LINKUSDT",
+        "LINKUSDTZ20",
+        "LTCH21",
+        "LTCM20",
+        "LTCM21",
+        "LTCU20",
+        "LTCU21",
+        "LTCUSD",
+        "LTCZ20",
+        "LTCZ21",
+        "LUNAUSD",
+        "TRXH21",
+        "TRXM20",
+        "TRXM21",
+        "TRXU20",
+        "TRXU21",
+        "TRXUSDT",
+        "TRXZ20",
+        "TRXZ21",
+        "UNIUSDT",
+        "XLMUSDT",
+        "XRPUSD",
+        "XTZUSDTZ20",
+        "YFIUSDTH21",
+        "YFIUSDTZ20"
+      ],
+      "HYPERLIQUID": [
+        "BTC-PERP"
+      ]
+    },
+    "weighting": "equal total weight per source venue, then equal total weight per canonical asset, then equal row weight",
+    "weight_sum": 31279.0
+  },
+  "threshold_calibration": {
+    "calibration_rows": 6256,
+    "observed_action_rate": 0.9483695652173914,
+    "selected_threshold": 0.9,
+    "predicted_action_rate": 0.9988810741687979
+  },
+  "source_venue_is_model_feature": false,
+  "spot_policy": "monitor-only",
+  "online_training": false,
+  "active_demo_model_changed": false,
+  "rollout_status": "NOT_PROMOTED",
+  "risk_envelope": {
+    "method": "unified-distillation-candidate-historical-envelope",
+    "units": "normalized exposure; exchange adapters convert units",
+    "per_symbol_target_exposure": {
+      "AAVEUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ADAUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ALTMEXUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "AXSUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BCHH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BCHUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BMEXUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BNBUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "BNBUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOGEUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOGEUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOTUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "DOTUSDTH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "EOSH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "EOSUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHH24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHM24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHU24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHUSDZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ22": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ23": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ETHZ24": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "HL-BTC-PERP": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LINKUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LINKUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCU20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LTCZ21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "LUNAUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "ORDIUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXM20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXU20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXU21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "TRXZ21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "UNIUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XBTM21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XBTUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XLMUSDT": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XRPUSD": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "XTZUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "YFIUSDTH21": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      },
+      "YFIUSDTZ20": {
+        "p99_abs_target_exposure": 1.0,
+        "max_abs_target_exposure": 1.0
+      }
+    },
+    "historical_simultaneous_total_exposure_cap": 1.0,
+    "historical_single_adjustment_p99": 1.0,
+    "historical_single_adjustment_max": 1.0,
+    "fail_closed_if_missing": true
+  }
+}

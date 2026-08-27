@@ -431,3 +431,11 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Code commit: `44708713ad7bb435fa8cb1a6e0d0ec496d064171`; report: `quant/reports/m15_25_runtime_safety_patch.md` / `.json`.
 - Runtime changes are prospective operational controls only: legacy Bybit order routing is disabled, dashboard liveness uses the node's own timestamp, OKX/Binance Futures require explicit isolated/leverage verification, and exchange-reported position risk fields are preserved.
 - Verification: full `pytest quant/tests -q` returned `427 passed`; no credentials or orders were used; raw root CSV/JSON inputs and the active model were unchanged.
+
+## M16 unified distillation v4.6 candidate
+
+- Code: `quant_bot/strategy/unified_distillation.py`, `quant/scripts/build_unified_distillation_model.py`, `quant/scripts/audit_unified_distillation.py`; model candidate: `quant/outputs/cross_asset_deployment_model_v46.json`.
+- Inputs: frozen `quant/outputs/cross_venue_model_dataset_v3.csv` (SHA256 recorded in `quant/reports/unified_distillation_manifest.json`), with BitMEX and pinned Hyperliquid rows kept source-separated for balancing/reporting. No synthetic market data, raw source rewrite, or online training.
+- The candidate uses only causal closed-bar/feature-contract values and current robot state. Same-time conflicting action/target groups are retained as ambiguity metadata and excluded from fitting. Source venue is not a predictive feature; exchange units and order semantics remain in adapters.
+- Outputs: manifest plus conditional-behavior and strict-autonomous walk-forward reports under `quant/reports/unified_distillation_*`; detailed generated data remains under ignored `quant/outputs/`.
+- Result: candidate not promoted. WF1 Hyperliquid coverage is insufficient; strict autonomous costed WF1/WF2 fails; active v3 Demo remains unchanged. Full suite: `433 passed`; no credentials, exchange calls, orders or mainnet access.
