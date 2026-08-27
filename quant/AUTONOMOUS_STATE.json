@@ -5,7 +5,7 @@
   "current_work_package": "M16-unified-distillation-v4.6-candidate",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "4376d88e4b7bd9232e3639bf41ec8d943225b279",
-  "last_report_commit": "b32e9d941ce975d5c644c30dc838680f61889127",
+  "last_report_commit": "69fe98e2987a9c218a3edc1d78b1e798478b48e9",
   "test_count": 433,
   "last_test_status": "FULL_SUITE_433_PASSED;M16_V46_CANDIDATE_NOT_PROMOTED;ACTIVE_V3_DEMO_UNCHANGED;NO_CREDENTIALS_USED;NO_ORDERS_SUBMITTED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
@@ -92,5 +92,5 @@
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
   "next_action": "Keep active v3 Demo unchanged and do not add Demo orders. Retain v4.6 as a candidate only; improve cross-venue coverage and autonomous behavior before any future review. Use the unified runtime only for read-only or explicitly verified Demo/Testnet validation. Do not claim exact learning or historical L2 recovery.",
-  "updated_at_utc": "2026-08-27T06:42:00Z"
+  "updated_at_utc": "2026-08-27T06:45:00Z"
 }
