@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15.23-fail-closed-market-freshness-gate",
+  "current_work_package": "M15.24-historical-trade-context-indicator-replay",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "5c5ef8fddc7e06eb06f1b82c30337235d2ab5d92",
-  "last_report_commit": "42e66c43ac23924e528c71308bbabb15f1b8629f",
-  "test_count": 415,
-  "last_test_status": "FULL_SUITE_415_PASSED;MARKET_FRESHNESS_FAIL_CLOSED;APPEND_ONLY_PROSPECTIVE_DECISION_AUDIT_JOURNAL;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
+  "last_code_commit": "43a3e5a728a0556d26672cf6e33a0cbb45542cb8",
+  "last_report_commit": "446d1cae459d069c38e435b791ac71beb3df85fb",
+  "test_count": 420,
+  "last_test_status": "FULL_SUITE_420_PASSED;HISTORICAL_TRADE_CONTEXT_INDICATOR_REPLAY;CAUSAL_CLOSED_BAR_ZERO_VIOLATIONS;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -74,7 +74,8 @@
     "M15.20 finds shared OPEN/ADD/REDUCE/FLIP action families across the separate BitMEX and Hyperliquid sources, but denominators and execution semantics are not interchangeable; exact private trigger recovery remains blocked and the active Demo model is unchanged.",
     "M15.21 adds bounded credential-free prospective decision snapshots before order side effects; this improves future Demo evidence but cannot reconstruct historical private triggers or prove exact strategy learning.",
     "M15.22 adds an append-only UTC-partitioned credential-free JSONL journal for prospective decision context; it preserves future observations beyond the 5000-row state ring but cannot recover missing historical triggers or authorize model promotion.",
-    "M15.23 makes unverified, stale, or future-dated market context fail closed before order submission; this improves runtime safety but does not identify the original trader's private triggers or authorize candidate promotion."
+    "M15.23 makes unverified, stale, or future-dated market context fail closed before order submission; this improves runtime safety but does not identify the original trader's private triggers or authorize candidate promotion.",
+    "M15.24 historical trade-context replay confirms 0 closed-bar/funding/label timestamp violations, but the active model predicts an action on 100% of its 31631 eligible rows; conditional Action Macro-F1 is 0.1884868585, OPEN/CLOSE/FLIP family recall is 0, and no historical L2/order-book stream is available from the pinned public source. The active Demo model remains unchanged."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -88,6 +89,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Run the stricter runtime only with verified fresh market context during an explicitly authorized Demo observation, then audit its daily files; do not claim exact learning without verified historical pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
-  "updated_at_utc": "2026-08-26T16:34:42Z"
+  "next_action": "Keep the current Demo model unchanged and do not add Demo orders. Use quant/outputs/trade_context_indicator_replay.csv to add historical K-line/indicator replay to the panel, while treating the current model as a diagnostic only until strict autonomous timing and cost gates pass. Do not claim exact learning or historical L2 recovery; do not incur requester-pays transfer costs without explicit authorization.",
+  "updated_at_utc": "2026-08-27T02:35:36Z"
 }
