@@ -425,3 +425,9 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Result: `32,552` rows scanned, `31,631` eligible predictions, zero causal timestamp violations. The report records the model's `100%` predicted action rate, Macro-F1 `0.188487`, target MAE `0.076822`, and missing/warmup/position-scale coverage.
 - Historical L2/order-book: unavailable from the pinned public source, so the artifact is K-line/indicator context replay only. Active Demo/model, credentials, private endpoints and order state were not changed.
 - Verification: full suite `420 passed` with 6 existing warnings; targeted M15.24 tests `5 passed`.
+
+## M15.25 runtime safety and liveness patch
+
+- Code commit: `44708713ad7bb435fa8cb1a6e0d0ec496d064171`; report: `quant/reports/m15_25_runtime_safety_patch.md` / `.json`.
+- Runtime changes are prospective operational controls only: legacy Bybit order routing is disabled, dashboard liveness uses the node's own timestamp, OKX/Binance Futures require explicit isolated/leverage verification, and exchange-reported position risk fields are preserved.
+- Verification: full `pytest quant/tests -q` returned `427 passed`; no credentials or orders were used; raw root CSV/JSON inputs and the active model were unchanged.

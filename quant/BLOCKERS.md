@@ -236,3 +236,8 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - M15.24 proves the existing event dataset can be causally replayed to the last closed bar: `0` future/equal closed-bar, funding, or next-label timestamp violations across `32,552` rows.
 - The current frozen model still predicts a non-idle action for `100%` of `31,631` eligible rows. Conditional Macro-F1 is `0.188487`, target exposure MAE is `0.076822`, and aggregate OPEN/CLOSE/FLIP family recall is `0`; this is not evidence of a reliable autonomous trigger.
 - `quant/outputs/trade_context_indicator_replay.csv` is a useful historical K-line/indicator context artifact, but the public source still has no verified historical L2/order-book depth. Do not promote the model, switch Demo artifacts or add Demo orders.
+
+## 2026-08-27 — Runtime safety patch does not clear strategy or Demo gates
+
+- M15.25 blocks legacy Bybit order routing and stale dashboard liveness, and requires explicit isolated/leverage verification for OKX/Binance Futures. These are safety improvements, not evidence of strategy quality.
+- The active model remains diagnostic `BEHAVIORAL_APPROXIMATION`; strict autonomous promotion, a real Demo lifecycle, and the 14-day observation requirement remain open. Do not add Demo orders based on this patch.

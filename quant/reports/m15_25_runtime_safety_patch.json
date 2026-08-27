@@ -1,0 +1,30 @@
+{
+  "report_version": "M15.25-RUNTIME-SAFETY-PATCH-1.0",
+  "status": "IMPLEMENTED_NOT_DEMO_AUTHORIZED",
+  "code_commit": "4470871",
+  "completed_at_utc": "2026-08-27T03:30:58.7482394Z",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "credentials_used": false,
+  "orders_submitted": false,
+  "raw_root_csv_json_changed": false,
+  "tests": {
+    "command": "pytest quant/tests -q",
+    "passed": 427,
+    "failed": 0
+  },
+  "changes": [
+    "disable legacy Bybit order runtime",
+    "source-heartbeat freshness for dashboard liveness",
+    "dynamic active venue badge",
+    "read-only OKX isolated margin and leverage verification",
+    "read-only Binance Futures one-way isolated margin and leverage verification",
+    "exchange-reported position risk metrics",
+    "preserve active orders when cancellation fails",
+    "dependency-free injected WebSocket tests"
+  ],
+  "remaining_gates": [
+    "strict autonomous strategy promotion remains blocked",
+    "real Demo order lifecycle remains open",
+    "14-day Demo observation remains open"
+  ]
+}

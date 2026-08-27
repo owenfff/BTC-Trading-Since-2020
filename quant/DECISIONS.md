@@ -365,3 +365,11 @@
 - Across `32,552` event rows, `31,631` were model-eligible. Causal timestamp violations were `0`; current-model conditional Action Accuracy was `0.683696`, Macro-F1 `0.188487`, target-exposure MAE `0.076822`, and predicted action rate `100%` versus observed `98.3276%`.
 - BitMEX conditional Macro-F1 was `0.217748`; Hyperliquid was `0.378235` on only `320` rows. OPEN/CLOSE/FLIP family recall was zero in the aggregate conditional result, so indicators provide a useful replay view but do not prove trigger recovery.
 - The pinned public source has no verified historical L2/order-book stream. The active Demo model is unchanged; no candidate promotion, new Demo order, exchange connection or credential use is authorized.
+
+## 2026-08-27 — M15.25 hardens runtime safety without promoting the strategy
+
+- Disable the legacy Bybit order runtime from the general testnet CLI. A missing venue must fail closed rather than select an old default path.
+- Treat a runtime artifact as live only when its own heartbeat is recent; the dashboard request time is not a node heartbeat. Preserve stale artifacts as historical diagnostics, but expose them as `STALE` and disable their order status.
+- Require read-only verification of isolated margin and bounded leverage before OKX or Binance Futures derivative orders. Never silently change account configuration; a flat account may pass only after the exchange returns explicit configuration.
+- Prefer exchange-reported position notional, mark price, unrealised PnL and margin. If a fallback is unavoidable, label its source. Failed cancellations must keep the remote order visible and raise a safety reason.
+- Verification: `427` tests passed; no credentials, orders, mainnet endpoint or raw input was used. The active model remains unchanged and Demo order authorization remains blocked.
