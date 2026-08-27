@@ -5,7 +5,7 @@
   "current_work_package": "M15.25-runtime-safety-and-liveness-patch",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
   "last_code_commit": "44708713ad7bb435fa8cb1a6e0d0ec496d064171",
-  "last_report_commit": "446d1cae459d069c38e435b791ac71beb3df85fb",
+  "last_report_commit": "076e266b1f6c1634de8456327205bd854bc798a3",
   "test_count": 427,
   "last_test_status": "FULL_SUITE_427_PASSED;M15.25_RUNTIME_SAFETY_AND_LIVENESS_PATCH;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED;NO_ORDERS_SUBMITTED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
