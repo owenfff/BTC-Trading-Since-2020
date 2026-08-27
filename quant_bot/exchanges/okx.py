@@ -34,6 +34,10 @@ class OKXAdapter:
         self.max_position_leverage: Decimal | None = None
         self.risk_configuration_verified = False
         self.risk_configuration_at: datetime | None = None
+        self.risk_configuration_by_symbol: dict[str, bool] = {}
+        self.risk_configuration_reason_by_symbol: dict[str, tuple[str, ...]] = {}
+        self.leverage_by_symbol: dict[str, Decimal] = {}
+        self.margin_mode_by_symbol: dict[str, str] = {}
 
     @classmethod
     def from_environment(cls) -> "OKXAdapter":
@@ -158,6 +162,7 @@ class OKXAdapter:
             quantity = self._decimal(item.get("pos"))
             if quantity == 0 or not item.get("instId"):
                 continue
+            symbol = str(item["instId"])
             if str(item.get("posSide", "net")).lower() == "short":
                 quantity = -abs(quantity)
             margin_mode = str(item.get("mgnMode") or "").lower() or None
@@ -166,8 +171,18 @@ class OKXAdapter:
             leverage = self._decimal(item.get("lever")) if item.get("lever") not in (None, "") else None
             if leverage is not None and leverage > 0:
                 leverages.append(leverage)
+                self.leverage_by_symbol[symbol] = leverage
+            if margin_mode:
+                self.margin_mode_by_symbol[symbol] = margin_mode
+            position_reasons: list[str] = []
+            if margin_mode != self.required_margin_mode:
+                position_reasons.append("MARGIN_MODE_NOT_ALLOWED")
+            if leverage is None or leverage <= 0 or leverage > Decimal("2"):
+                position_reasons.append("LEVERAGE_LIMIT_OR_UNVERIFIED")
+            self.risk_configuration_by_symbol[symbol] = not position_reasons
+            self.risk_configuration_reason_by_symbol[symbol] = tuple(position_reasons)
             result.append(Position(
-                str(item["instId"]),
+                symbol,
                 str(item.get("settleCcy") or "USDT"),
                 quantity,
                 self._decimal(item.get("avgPx")) if item.get("avgPx") else None,
@@ -181,16 +196,14 @@ class OKXAdapter:
             ))
         if modes:
             self.margin_mode = next(iter(modes)) if len(modes) == 1 else "MIXED"
-            if any(mode != self.required_margin_mode for mode in modes):
-                self.risk_configuration_verified = False
         elif not self.risk_configuration_verified:
             self.margin_mode = None
         if leverages:
             self.max_position_leverage = max(leverages)
-            if self.max_position_leverage > Decimal("2"):
-                self.risk_configuration_verified = False
         elif not self.risk_configuration_verified:
             self.max_position_leverage = None
+        if self.risk_configuration_by_symbol:
+            self.risk_configuration_verified = all(self.risk_configuration_by_symbol.values())
         return result
 
     def verify_risk_configuration(
@@ -223,6 +236,12 @@ class OKXAdapter:
             raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", "OKX account configuration is unavailable")
         account_config = dict(config_rows[0])
         observed: list[Decimal] = []
+        self.required_margin_mode = required_margin_mode
+        self.order_margin_mode = required_margin_mode
+        self.risk_configuration_by_symbol = {}
+        self.risk_configuration_reason_by_symbol = {}
+        self.leverage_by_symbol = {}
+        self.margin_mode_by_symbol = {}
         for start in range(0, len(requested), 20):
             chunk = requested[start:start + 20]
             path = f"/api/v5/account/leverage-info?instId={','.join(chunk)}&mgnMode={required_margin_mode}"
@@ -231,30 +250,43 @@ class OKXAdapter:
             rows = [item for item in response.get("data", []) if isinstance(item, dict)]
             for symbol in chunk:
                 matches = [item for item in rows if str(item.get("instId")) == symbol]
+                reasons: list[str] = []
                 if not matches:
-                    raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", f"no isolated leverage configuration returned for {symbol}")
+                    reasons.append("RISK_CONFIGURATION_UNVERIFIED")
                 for item in matches:
                     if str(item.get("mgnMode", "")).lower() != required_margin_mode.lower():
-                        raise AdapterError(self.name, "MARGIN_MODE_NOT_ALLOWED", f"OKX returned a non-{required_margin_mode} leverage mode for {symbol}")
+                        reasons.append("MARGIN_MODE_NOT_ALLOWED")
+                        continue
+                    self.margin_mode_by_symbol[symbol] = required_margin_mode
                     leverage = self._decimal(item.get("lever"))
                     if leverage <= 0:
-                        raise AdapterError(self.name, "LEVERAGE_LIMIT_OR_UNVERIFIED", f"OKX returned no usable leverage for {symbol}")
+                        reasons.append("LEVERAGE_LIMIT_OR_UNVERIFIED")
+                        continue
+                    self.leverage_by_symbol[symbol] = max(self.leverage_by_symbol.get(symbol, Decimal("0")), leverage)
                     if leverage > max_leverage:
-                        raise AdapterError(self.name, "LEVERAGE_LIMIT_OR_UNVERIFIED", f"OKX leverage for {symbol} exceeds the configured maximum")
+                        reasons.append("LEVERAGE_LIMIT_OR_UNVERIFIED")
+                        continue
                     observed.append(leverage)
-        self.required_margin_mode = required_margin_mode
-        self.order_margin_mode = required_margin_mode
+                self.risk_configuration_by_symbol[symbol] = not reasons
+                self.risk_configuration_reason_by_symbol[symbol] = tuple(dict.fromkeys(reasons))
         self.margin_mode = required_margin_mode
         self.max_position_leverage = max(observed) if observed else max_leverage
-        self.risk_configuration_verified = True
+        self.risk_configuration_verified = bool(requested) and all(self.risk_configuration_by_symbol.get(symbol) is True for symbol in requested)
         self.risk_configuration_at = datetime.now(timezone.utc)
         return {
-            "verified": True,
+            "verified": self.risk_configuration_verified,
             "account_level": account_config.get("acctLv"),
             "position_mode": account_config.get("posMode"),
             "symbols": list(requested),
             "margin_mode": required_margin_mode,
             "max_leverage": str(self.max_position_leverage),
+            "symbol_results": {
+                symbol: {
+                    "verified": self.risk_configuration_by_symbol.get(symbol, False),
+                    "reasons": list(self.risk_configuration_reason_by_symbol.get(symbol, ())),
+                }
+                for symbol in requested
+            },
         }
 
     def _order(self, item: dict[str, Any]) -> Order:
@@ -334,6 +366,8 @@ class OKXAdapter:
         funding_time: datetime | None = None
         mark_price: Decimal | None = None
         index_price: Decimal | None = None
+        mark_source_time: datetime | None = None
+        index_source_time: datetime | None = None
         coverage: dict[str, str] = {"quote": "OK", "closed_bar": "OK" if bars else "MISSING"}
         if instrument_type == "SPOT":
             coverage.update({"funding": "NOT_APPLICABLE", "mark_price": "NOT_APPLICABLE", "index_price": "NOT_APPLICABLE"})
@@ -351,21 +385,37 @@ class OKXAdapter:
             mark = self._optional_public(f"/api/v5/public/mark-price?instType=SWAP&instId={symbol}")
             if mark and mark.get("markPx") not in (None, ""):
                 mark_price = self._decimal(mark.get("markPx"))
-                coverage["mark_price"] = "OK"
+                mark_source_time = self._timestamp(mark.get("ts")) if mark.get("ts") not in (None, "") else observed_at
+                if mark_source_time > observed_at:
+                    mark_price = None
+                    mark_source_time = None
+                    coverage["mark_price"] = "FUTURE_REJECTED"
+                else:
+                    coverage["mark_price"] = "OK"
             else:
                 coverage["mark_price"] = "MISSING"
             index = self._optional_public(f"/api/v5/market/index-tickers?instId={symbol}")
             if index and index.get("idxPx") not in (None, ""):
                 index_price = self._decimal(index.get("idxPx"))
-                coverage["index_price"] = "OK"
+                index_source_time = self._timestamp(index.get("ts")) if index.get("ts") not in (None, "") else observed_at
+                if index_source_time > observed_at:
+                    index_price = None
+                    index_source_time = None
+                    coverage["index_price"] = "FUTURE_REJECTED"
+                else:
+                    coverage["index_price"] = "OK"
             else:
                 coverage["index_price"] = "MISSING"
-        return MarketContext(symbol, quote, bars[-1].timestamp + __import__("datetime").timedelta(hours=1) if bars else None, funding_rate, funding_time, mark_price, index_price, observed_at, coverage)
+        return MarketContext(symbol, quote, bars[-1].timestamp + __import__("datetime").timedelta(hours=1) if bars else None, funding_rate, funding_time, mark_price, index_price, observed_at, coverage, mark_source_time, index_source_time)
 
     def place_order(self, order: Order) -> Order:
         self._private_guard()
         inst_type = self._instrument_types.get(order.symbol, "SPOT")
-        if inst_type != "SPOT" and not self.risk_configuration_verified:
+        symbol_verified = self.risk_configuration_by_symbol.get(order.symbol)
+        if inst_type != "SPOT" and symbol_verified is False:
+            reasons = ",".join(self.risk_configuration_reason_by_symbol.get(order.symbol, ())) or "RISK_CONFIGURATION_UNVERIFIED"
+            raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", f"OKX derivative order blocked for {order.symbol}: {reasons}")
+        if inst_type != "SPOT" and symbol_verified is None and not self.risk_configuration_verified:
             raise AdapterError(self.name, "RISK_CONFIGURATION_UNVERIFIED", "verify isolated margin and leverage before placing a derivative order")
         if inst_type != "SPOT" and self.order_margin_mode != self.required_margin_mode:
             raise AdapterError(self.name, "MARGIN_MODE_NOT_ALLOWED", "OKX derivative orders must use the configured isolated margin mode")

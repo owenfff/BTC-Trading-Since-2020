@@ -1,0 +1,33 @@
+[Unit]
+Description=Quant OKX Demo trading supervisor
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=@SERVICE_USER@
+Group=@SERVICE_USER@
+WorkingDirectory=@PROJECT_ROOT@
+Environment=PYTHONUNBUFFERED=1
+Environment=HTTP_PROXY=http://127.0.0.1:7890
+Environment=HTTPS_PROXY=http://127.0.0.1:7890
+Environment=ALL_PROXY=http://127.0.0.1:7890
+Environment=NO_PROXY=127.0.0.1,localhost,::1
+EnvironmentFile=-/home/@SERVICE_USER@/.config/quant-bot/credentials.env
+ExecStart=@PYTHON_BIN@ -m quant_bot supervise --venue okx-demo --mode testnet --symbols auto --enable-orders --confirm-testnet --poll-seconds 60
+Restart=on-failure
+RestartSec=10
+# Exit code 2 is the application's fail-closed configuration/preflight block.
+# Do not spin on an unchanged account configuration; the operator must fix
+# the Demo account or explicitly start the service again.
+RestartPreventExitStatus=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=@PROJECT_ROOT@/quant/outputs @PROJECT_ROOT@/quant/reports
+
+[Install]
+WantedBy=multi-user.target

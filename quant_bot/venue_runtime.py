@@ -63,8 +63,17 @@ def _audit_value(value: Any) -> Any:
         return str(value)
     if isinstance(value, datetime):
         return value.isoformat()
+    if isinstance(value, dict):
+        return {str(key): _audit_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_audit_value(item) for item in value]
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
+    if hasattr(value, "item"):
+        try:
+            return _audit_value(value.item())
+        except Exception:  # noqa: BLE001 - diagnostics must never stop the loop
+            pass
     return str(value)
 
 
@@ -280,6 +289,8 @@ class VenueRuntime:
     latest_signals: dict[str, dict[str, Any]] = field(default_factory=dict)
     risk_metrics: dict[str, str] = field(default_factory=dict)
     decision_journal: DecisionAuditJournal = field(init=False, repr=False)
+    _result_lock: threading.RLock = field(default_factory=threading.RLock, init=False, repr=False)
+    _last_result: dict[str, Any] = field(default_factory=dict, init=False, repr=False)
 
     def __post_init__(self) -> None:
         self.decision_journal = DecisionAuditJournal(self.output_path.parent / "decision_audit")
@@ -339,6 +350,11 @@ class VenueRuntime:
             if event_id and event_id not in self.seen_fill_ids:
                 symbol = str(getattr(fill, "symbol", ""))
                 unseen_by_symbol[symbol] = unseen_by_symbol.get(symbol, 0) + 1
+        # Reconstruct the position cursor in fill order.  The exchange
+        # snapshot contains only the final quantity for this refresh; using
+        # that final value for every fill mislabels a multi-fill transition
+        # (for example OPEN + ADD) and poisons the next decision features.
+        position_cursor = {str(symbol): Decimal(str(quantity)) for symbol, quantity in previous_positions.items()}
         for fill in sorted(fills, key=lambda item: getattr(item, "timestamp", datetime.min.replace(tzinfo=timezone.utc))):
             event_id = str(getattr(fill, "event_id", "") or getattr(fill, "exchange_fill_id", ""))
             if not event_id or event_id in self.seen_fill_ids:
@@ -349,8 +365,9 @@ class VenueRuntime:
                 signed = -abs(signed)
             else:
                 signed = abs(signed)
-            previous = previous_positions.get(symbol, Decimal("0"))
-            current = new_positions.get(symbol, previous + signed)
+            previous = position_cursor.get(symbol, previous_positions.get(symbol, Decimal("0")))
+            current = previous + signed
+            position_cursor[symbol] = current
             action = self._fill_action(previous, signed, current)
             sources = list((self.order_context.get(str(getattr(fill, "client_order_id", "")), {}) or {}).get("strategy_source_symbols", []))
             if not sources:
@@ -366,7 +383,13 @@ class VenueRuntime:
             for source in sources:
                 engine = self._engine_for(source)
                 share = Decimal("1") / Decimal(str(len(sources)))
-                engine.record_action(action, realised_outcome=float(realized_delta * share), fee=float(fee * share))
+                engine.record_action(
+                    action,
+                    realised_outcome=float(realized_delta * share),
+                    fee=float(fee * share),
+                    timestamp=getattr(fill, "timestamp", None),
+                    current_position=current,
+                )
                 if confidence != "HIGH":
                     engine.latest_market_context_status = {**engine.latest_market_context_status, "behavior_source": "LOW_CONFIDENCE"}
             timestamp = getattr(fill, "timestamp", None)
@@ -593,7 +616,9 @@ class VenueRuntime:
                 "funding_rate": _audit_value(context.funding_rate),
                 "funding_source_time": context.funding_source_time.isoformat().replace("+00:00", "Z") if context.funding_source_time else None,
                 "mark_price": _audit_value(context.mark_price),
+                "mark_source_time": context.mark_source_time.isoformat().replace("+00:00", "Z") if context.mark_source_time else None,
                 "index_price": _audit_value(context.index_price),
+                "index_source_time": context.index_source_time.isoformat().replace("+00:00", "Z") if context.index_source_time else None,
                 "coverage": {str(key): str(value) for key, value in context.coverage.items()},
                 "features": features,
             },
@@ -604,6 +629,7 @@ class VenueRuntime:
                 "valid_until": _audit_value(getattr(signal, "valid_until", None)),
                 "risk_tags": [_audit_value(item) for item in getattr(signal, "risk_tags", ())],
                 "reason_zh": _audit_value(getattr(signal, "strategy_reason_zh", "")),
+                "diagnostics": _audit_value(getattr(signal, "diagnostics", {})),
             },
         }
         try:
@@ -666,6 +692,7 @@ class VenueRuntime:
 
     def _watchdog(self) -> None:
         while not self.stop_event.wait(15):
+            self._write_heartbeat()
             if self.enable_orders and self.private_stream_available and self.private_stream_seen and not self.market_connected:
                 self._engage_safety("PRIVATE_WEBSOCKET_DISCONNECTED")
                 break
@@ -719,13 +746,25 @@ class VenueRuntime:
 
     def _plan_symbol(self, historical_symbol: str, instrument: Instrument, equity: Decimal) -> TargetOrderPlan | None:
         venue_symbol = instrument.canonical_symbol
+        decision_time = datetime.now(timezone.utc)
         bars = self.adapter.fetch_closed_bars(venue_symbol, limit=100)
         if not bars:
-            return None
+            raise AdapterError(self.venue, "MARKET_DATA_MISSING", f"no closed 1h bars available for {venue_symbol}")
+        # Treat the adapter's closed-bar contract as untrusted input.  A
+        # malformed/current candle must never become a model feature or order
+        # reference price merely because its endpoint was called
+        # ``fetch_closed_bars``.
+        bars = sorted(
+            [bar for bar in bars if bar.timestamp + __import__("datetime").timedelta(hours=1) <= decision_time],
+            key=lambda item: item.timestamp,
+        )
+        if not bars:
+            raise AdapterError(self.venue, "CLOSED_BAR_NOT_CONFIRMED", f"no closed 1h bar available for {venue_symbol}")
+        if len(bars) < 2:
+            raise AdapterError(self.venue, "MARKET_FEATURES_INCOMPLETE", f"fewer than two closed 1h bars available for {venue_symbol}")
         engine = self._engine_for(historical_symbol)
-        engine.ingest_closed_bars(bars)
+        engine.ingest_closed_bars(bars, now=decision_time)
         latest = bars[-1]
-        decision_time = datetime.now(timezone.utc)
         current = self._spot_quantity(instrument) if instrument.instrument_type == InstrumentType.SPOT else self.positions.get(venue_symbol, Decimal("0"))
         if hasattr(self.adapter, "fetch_market_context"):
             context = self.adapter.fetch_market_context(venue_symbol, bars=bars)
@@ -734,6 +773,7 @@ class VenueRuntime:
             context = MarketContext(venue_symbol, MarketQuote(venue_symbol, bid, ask, decision_time, "adapter-quote"), latest.timestamp + __import__("datetime").timedelta(hours=1), None, None, None, None, decision_time, {"quote": "OK", "closed_bar": "UNVERIFIED_ADAPTER_FALLBACK", "funding": "MISSING", "mark_price": "MISSING", "index_price": "MISSING"})
         self.market_contexts[venue_symbol] = context
         engine.attach_market_context(funding_rate=float(context.funding_rate) if context.funding_rate is not None else None, funding_source_time=context.funding_source_time, mark_price=float(context.mark_price) if context.mark_price is not None else None, index_price=float(context.index_price) if context.index_price is not None else None, status=context.coverage)
+        engine.attach_market_source_times(mark_source_time=context.mark_source_time, index_source_time=context.index_source_time)
         strategy_input = engine.build_input(decision_time=decision_time, current_qty=current, current_equity=equity)
         signal = self.bundle.model.predict(strategy_input)
         self.latest_signals[historical_symbol] = {
@@ -748,6 +788,25 @@ class VenueRuntime:
             "basis": list(strategy_basis_from_features(strategy_input.features)),
             "risk_tags": [_audit_value(item) for item in getattr(signal, "risk_tags", ())],
             "coverage": {str(key): str(value) for key, value in context.coverage.items()},
+            "indicators": {
+                key: _audit_value(strategy_input.features.get(key))
+                for key in (
+                    "feature_rsi_14",
+                    "feature_macd_line_12_26",
+                    "feature_macd_signal_9",
+                    "feature_macd_histogram",
+                    "feature_bollinger_zscore_20",
+                    "feature_bollinger_percent_b_20",
+                    "feature_return_24bar",
+                    "feature_realized_volatility_72bar",
+                    "feature_volume_percentile_72bar",
+                    "feature_funding_rate",
+                    "feature_funding_rate_missing",
+                    "feature_mark_index_basis",
+                    "feature_mark_index_basis_missing",
+                )
+            },
+            "diagnostics": _audit_value(getattr(signal, "diagnostics", {})),
         }
         recorded = self._record_decision_snapshot(
             historical_symbol=historical_symbol,
@@ -894,11 +953,12 @@ class VenueRuntime:
                 max_drawdown=self.risk_state.max_drawdown,
                 risk_block_reasons=tuple(self.risk_state.block_reasons),
                 kill_switch_engaged=self.risk_state.kill_switch_engaged,
-                margin_mode=getattr(self.adapter, "margin_mode", None),
+                margin_mode=getattr(self.adapter, "margin_mode_by_symbol", {}).get(plan.symbol, getattr(self.adapter, "margin_mode", None)),
                 required_margin_mode=getattr(self.adapter, "required_margin_mode", ""),
-                current_leverage=getattr(self.adapter, "max_position_leverage", None),
+                current_leverage=getattr(self.adapter, "leverage_by_symbol", {}).get(plan.symbol, getattr(self.adapter, "max_position_leverage", None)),
                 max_leverage=MAX_LEVERAGE if hasattr(self.adapter, "max_position_leverage") else Decimal("0"),
                 risk_configuration_verified=getattr(self.adapter, "risk_configuration_verified", None),
+                symbol_risk_configuration_verified=getattr(self.adapter, "risk_configuration_by_symbol", {}).get(plan.symbol),
             )
             if not decision.allowed:
                 blocked[historical_symbol] = list(decision.reasons)
@@ -951,6 +1011,8 @@ class VenueRuntime:
             "status": status,
             "venue": self.venue,
             "updated_at_utc": now.isoformat(),
+            "runtime_heartbeat_at_utc": now.isoformat(),
+            "heartbeat_only": False,
             "model_version": getattr(self.bundle, "model_version", "UNKNOWN"),
             "feature_contract_version": getattr(self.bundle, "feature_contract_version", "UNKNOWN"),
             "model_sha256": getattr(self.bundle, "model_sha256", ""),
@@ -971,7 +1033,7 @@ class VenueRuntime:
             "risk": self.risk_state.snapshot(),
             "risk_metrics": dict(self.risk_metrics),
             "clock_drift_seconds": self.clock_drift_seconds,
-            "market_context": {symbol: {"coverage": context.coverage, "quote_time": context.quote.observed_at, "closed_bar_time": context.closed_bar_time, "quote_age_seconds": context.quote_age_seconds(now), "closed_bar_age_seconds": context.closed_bar_age_seconds(now)} for symbol, context in self.market_contexts.items()},
+            "market_context": {symbol: {"coverage": context.coverage, "quote_time": context.quote.observed_at, "closed_bar_time": context.closed_bar_time, "funding_source_time": context.funding_source_time, "mark_source_time": context.mark_source_time, "index_source_time": context.index_source_time, "quote_age_seconds": context.quote_age_seconds(now), "closed_bar_age_seconds": context.closed_bar_age_seconds(now)} for symbol, context in self.market_contexts.items()},
             "behavior_state": {
                 "bootstrapped": self.behavior_state_bootstrapped,
                 "seen_fill_ids": sorted(self.seen_fill_ids)[-2000:],
@@ -994,8 +1056,22 @@ class VenueRuntime:
             "order_errors": order_errors or {},
             "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
         }
-        _write_json(self.output_path, result)
+        with self._result_lock:
+            self._last_result = result
+            _write_json(self.output_path, result)
         return result
+
+    def _write_heartbeat(self) -> None:
+        """Refresh process liveness without fabricating fresher market data."""
+
+        with self._result_lock:
+            if not self._last_result:
+                return
+            heartbeat = dict(self._last_result)
+            heartbeat["runtime_heartbeat_at_utc"] = datetime.now(timezone.utc).isoformat()
+            heartbeat["heartbeat_only"] = True
+            _write_json(self.output_path, heartbeat)
+            self._last_result = heartbeat
 
     def cancel_created_orders(self) -> None:
         owned_ids = set(self.created_order_ids)

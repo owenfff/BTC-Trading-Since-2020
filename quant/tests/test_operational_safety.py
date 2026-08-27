@@ -90,6 +90,39 @@ def test_realtime_behavior_state_is_not_lost_on_restore() -> None:
     assert restored.realised_outcome == pytest.approx(1.2)
 
 
+def test_realtime_features_reject_future_public_context() -> None:
+    now = datetime(2026, 1, 1, 12, tzinfo=timezone.utc)
+    instrument = Instrument("BTCUSDT", InstrumentType.LINEAR_PERPETUAL, "BTC", "USDT", "USDT", "0.1", "1", "1", "0")
+    engine = RealtimeFeatureEngine(instrument)
+    bars = [MarketBar("BTCUSDT", now - timedelta(hours=2 + index), "100", "101", "99", "100", "10") for index in range(40)]
+    engine.ingest_closed_bars(bars, now=now)
+    engine.attach_market_context(
+        funding_rate=0.001,
+        funding_source_time=now + timedelta(minutes=1),
+        mark_price=101,
+        index_price=100,
+    )
+    engine.attach_market_source_times(mark_source_time=now + timedelta(minutes=1), index_source_time=now + timedelta(minutes=1))
+    features = engine.build_input(decision_time=now, current_qty=Decimal("0"), current_equity=Decimal("1000")).features
+    assert features["feature_funding_rate"] is None
+    assert features["feature_funding_rate_missing"] is True
+    assert features["feature_mark_index_basis"] is None
+    assert features["feature_mark_index_basis_missing"] is True
+
+
+def test_realtime_features_keep_action_history_and_position_cycle() -> None:
+    start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    instrument = Instrument("BTCUSDT", InstrumentType.LINEAR_PERPETUAL, "BTC", "USDT", "USDT", "0.1", "1", "1", "0")
+    engine = RealtimeFeatureEngine(instrument)
+    engine.record_action("OPEN_LONG", timestamp=start, current_position=Decimal("1"))
+    engine.record_action("ADD_LONG", timestamp=start + timedelta(hours=1), current_position=Decimal("2"))
+    engine.ingest_closed_bars([MarketBar("BTCUSDT", start + timedelta(hours=index), "100", "101", "99", "100", "10") for index in range(1, 40)], now=start + timedelta(hours=41))
+    features = engine.build_input(decision_time=start + timedelta(hours=2), current_qty=Decimal("2"), current_equity=Decimal("1000")).features
+    assert features["feature_latest_action"] == "ADD_LONG"
+    assert features["feature_action_lag_1"] == "OPEN_LONG"
+    assert features["feature_cycle_duration_seconds"] == pytest.approx(7200)
+
+
 def test_okx_context_preserves_missing_public_fields() -> None:
     timestamp = str(int(datetime.now(timezone.utc).timestamp() * 1000))
     transport = FakeTransport({
@@ -108,6 +141,24 @@ def test_okx_context_preserves_missing_public_fields() -> None:
     assert context.coverage["funding"] == "MISSING"
     assert context.coverage["mark_price"] == "MISSING"
     assert context.coverage["index_price"] == "MISSING"
+
+
+def test_okx_context_rejects_future_mark_and_index_snapshots() -> None:
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    future_ms = now_ms + 60_000
+    transport = FakeTransport({
+        ("GET", "/api/v5/market/ticker?instId=BTC-USDT-SWAP"): {"code": "0", "data": [{"bidPx": "99", "askPx": "100", "ts": str(now_ms)}]},
+        ("GET", "/api/v5/public/funding-rate?instId=BTC-USDT-SWAP"): {"code": "0", "data": []},
+        ("GET", "/api/v5/public/mark-price?instType=SWAP&instId=BTC-USDT-SWAP"): {"code": "0", "data": [{"markPx": "101", "ts": str(future_ms)}]},
+        ("GET", "/api/v5/market/index-tickers?instId=BTC-USDT-SWAP"): {"code": "0", "data": [{"idxPx": "100", "ts": str(future_ms)}]},
+    })
+    adapter = OKXAdapter(transport)
+    adapter._instrument_types["BTC-USDT-SWAP"] = "SWAP"
+    context = adapter.fetch_market_context("BTC-USDT-SWAP", bars=[])
+    assert context.mark_price is None
+    assert context.index_price is None
+    assert context.coverage["mark_price"] == "FUTURE_REJECTED"
+    assert context.coverage["index_price"] == "FUTURE_REJECTED"
 
 
 def test_deployment_model_hash_mismatch_blocks_startup(tmp_path: Path) -> None:
@@ -137,6 +188,46 @@ def test_okx_flat_account_can_verify_isolated_leverage_before_first_order() -> N
     assert adapter.risk_configuration_verified is True
     assert adapter.margin_mode == "isolated"
     assert adapter.max_position_leverage == Decimal("2")
+
+
+def test_okx_risk_verification_is_scoped_per_symbol() -> None:
+    transport = FakeTransport({
+        ("GET", "/api/v5/account/config"): {"code": "0", "data": [{"acctLv": "2", "posMode": "net_mode"}]},
+        ("GET", "/api/v5/account/leverage-info?instId=BTC-USDT-SWAP,ETH-USDT-SWAP&mgnMode=isolated"): {
+            "code": "0",
+            "data": [
+                {"instId": "BTC-USDT-SWAP", "mgnMode": "isolated", "posSide": "net", "lever": "2"},
+                {"instId": "ETH-USDT-SWAP", "mgnMode": "isolated", "posSide": "net", "lever": "3"},
+            ],
+        },
+    })
+    adapter = OKXAdapter(transport, credentials=object())
+    result = adapter.verify_risk_configuration(("BTC-USDT-SWAP", "ETH-USDT-SWAP"))
+    assert result["verified"] is False
+    assert adapter.risk_configuration_verified is False
+    assert adapter.risk_configuration_by_symbol["BTC-USDT-SWAP"] is True
+    assert adapter.risk_configuration_by_symbol["ETH-USDT-SWAP"] is False
+    assert "LEVERAGE_LIMIT_OR_UNVERIFIED" in adapter.risk_configuration_reason_by_symbol["ETH-USDT-SWAP"]
+
+
+def test_risk_gate_uses_symbol_verdict_over_global_verdict() -> None:
+    kwargs = dict(
+        enable_orders=True,
+        confirm_testnet=True,
+        symbol="BTCUSDT",
+        target_exposure=Decimal("0.1"),
+        total_target_exposure=Decimal("0.1"),
+        envelope=_envelope(),
+        reconciliation_ok=True,
+        websocket_connected=True,
+        market_fresh=True,
+        clock_drift_seconds=Decimal("0"),
+        risk_configuration_verified=False,
+    )
+    assert check_testnet_order(**kwargs, symbol_risk_configuration_verified=True).allowed
+    blocked = check_testnet_order(**kwargs, symbol_risk_configuration_verified=False)
+    assert not blocked.allowed
+    assert "RISK_CONFIGURATION_UNVERIFIED" in blocked.reasons
 
 
 def test_okx_derivative_order_is_blocked_until_risk_configuration_is_verified() -> None:

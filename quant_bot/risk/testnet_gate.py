@@ -50,6 +50,7 @@ def check_testnet_order(
     margin_mode: str | None = None,
     required_margin_mode: str = "",
     risk_configuration_verified: bool | None = None,
+    symbol_risk_configuration_verified: bool | None = None,
 ) -> TestnetRiskDecision:
     reasons: list[str] = []
     if not enable_orders:
@@ -81,7 +82,11 @@ def check_testnet_order(
     reasons.extend(str(item) for item in risk_block_reasons if str(item))
     if kill_switch_engaged:
         reasons.append("MANUAL_KILL_SWITCH")
-    if risk_configuration_verified is False:
+    # A venue can legitimately contain an old/non-compliant position while a
+    # different instrument is configured safely.  Prefer the adapter's
+    # per-symbol verdict when present; retain the global verdict as the
+    # fail-closed fallback for adapters that do not expose one.
+    if symbol_risk_configuration_verified is False or (symbol_risk_configuration_verified is None and risk_configuration_verified is False):
         reasons.append("RISK_CONFIGURATION_UNVERIFIED")
     if max_leverage > 0 and (current_leverage is None or current_leverage > max_leverage):
         reasons.append("LEVERAGE_LIMIT_OR_UNVERIFIED")

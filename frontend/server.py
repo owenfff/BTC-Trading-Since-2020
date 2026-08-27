@@ -109,7 +109,12 @@ def _parse_time_ms(value: str | None) -> int | None:
         return None
 
 
-RUNTIME_HEARTBEAT_MAX_AGE_SECONDS = 30
+# The runtime writes after each polling cycle.  The Demo service is currently
+# configured for a 60-second cycle, so a 30-second cutoff would label a
+# healthy process stale between every two cycles.  The browser still exposes
+# amber at 15s and red at 60s; this value only decides whether the process is
+# alive enough to be shown as a live runtime rather than completely stale.
+RUNTIME_HEARTBEAT_MAX_AGE_SECONDS = 90
 
 
 def _runtime_source_timestamp(runtime: dict[str, Any], account: dict[str, Any]) -> str | None:
@@ -122,6 +127,15 @@ def _runtime_source_timestamp(runtime: dict[str, Any], account: dict[str, Any]) 
     return str(value) if value else None
 
 
+def _runtime_heartbeat_timestamp(runtime: dict[str, Any], account: dict[str, Any]) -> str | None:
+    """Return process liveness time separately from data freshness."""
+
+    value = runtime.get("runtime_heartbeat_at_utc")
+    if value:
+        return str(value)
+    return _runtime_source_timestamp(runtime, account)
+
+
 def _runtime_age_seconds(timestamp: str | None) -> float | None:
     parsed = _parse_time_ms(timestamp)
     if parsed is None:
@@ -131,7 +145,7 @@ def _runtime_age_seconds(timestamp: str | None) -> float | None:
 
 def _runtime_is_live(runtime: dict[str, Any], account: dict[str, Any]) -> bool:
     status = str(runtime.get("status", "")).upper()
-    age = _runtime_age_seconds(_runtime_source_timestamp(runtime, account))
+    age = _runtime_age_seconds(_runtime_heartbeat_timestamp(runtime, account))
     return status in {"RUNNING", "RUNNING_READ_ONLY"} and age is not None and 0 <= age <= RUNTIME_HEARTBEAT_MAX_AGE_SECONDS
 
 
