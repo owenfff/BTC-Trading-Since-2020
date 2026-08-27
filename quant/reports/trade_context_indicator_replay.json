@@ -1,0 +1,4550 @@
+{
+  "report_version": "M15.24-TRADE-CONTEXT-INDICATOR-REPLAY-1.0",
+  "status": "PASS_WITH_STRATEGY_LIMITS",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "research_only": true,
+  "live_trading_allowed": false,
+  "demo_model_switched": false,
+  "analysis_commit": "43a3e5a728a0556d26672cf6e33a0cbb45542cb8",
+  "data_source": {
+    "dataset": "quant/outputs/cross_venue_model_dataset_v3.csv",
+    "dataset_sha256": "3db0b050ec3f4c5602cf3c682e1a5bd8a2c8bbff0a21c5f304e0bebfafbafc69",
+    "model": {
+      "path": "quant/outputs/cross_asset_deployment_model_v3.json",
+      "sha256": "d2b224f5c35f34162c92a3e7b1895226ff9b9ce656b0a42701a37840c19555ab",
+      "model_version": "behavioral-distillation-v3-cross-asset-indicators",
+      "feature_contract_version": "m13-v3-cross-asset-indicators",
+      "training_data_sha256": "2a38dbb79daae88bb49d1d998bf18b8aac6bc5de3bafb94481e0a71b574916c5",
+      "frozen_cutoff": "2026-07-18T21:17:31.514Z"
+    },
+    "detail_output": "quant/outputs/trade_context_indicator_replay.csv"
+  },
+  "scope": {
+    "total_rows": 32552,
+    "model_eligible_rows": 31631,
+    "labeled_rows_predicted": 31631,
+    "model_input_contract_columns": 60,
+    "dataset_missing_contract_columns": [
+      "feature_funding_rate_missing",
+      "feature_mark_index_basis_missing",
+      "feature_action_lag_1",
+      "feature_action_lag_2",
+      "feature_action_lag_3"
+    ],
+    "labels_used_as_model_input": false,
+    "observed_dynamic_state_in_conditional_track": true,
+    "conditional_track_note": "Teacher position/state fields describe the recorded pre-action context; they are not strict autonomous evidence."
+  },
+  "coverage": {
+    "row_market_coverage": {
+      "MISSING_MARKET_DATA": 3,
+      "WARMUP_INSUFFICIENT": 107,
+      "PASS": 31686,
+      "POSITION_SCALE_MISSING": 756
+    },
+    "indicator_missing_counts": {
+      "feature_rsi_14": 28,
+      "feature_macd_histogram": 62,
+      "feature_bollinger_percent_b_20": 36,
+      "feature_volume_percentile_72bar": 101,
+      "feature_return_24bar": 38,
+      "feature_atr_14bar": 28
+    },
+    "indicator_missing_rates": {
+      "feature_rsi_14": 0.0008601622020152371,
+      "feature_macd_histogram": 0.0019046448758908822,
+      "feature_bollinger_percent_b_20": 0.0011059228311624477,
+      "feature_volume_percentile_72bar": 0.003102727942983534,
+      "feature_return_24bar": 0.0011673629884492505,
+      "feature_atr_14bar": 0.0008601622020152371
+    }
+  },
+  "historical_orderbook": {
+    "available": false,
+    "status": "NOT_AVAILABLE_FROM_CURRENT_PUBLIC_SOURCE",
+    "note": "The pinned public replay provides candles, fills, orders, funding and snapshots; it does not provide a verified historical L2/order-book stream. This report therefore replays closed-bar indicators, not historical bid/ask depth."
+  },
+  "causal_audit": {
+    "violations": 0,
+    "counts": {
+      "decision_time:PASS": 32552,
+      "closed_bar:MISSING": 3,
+      "funding:MISSING": 24180,
+      "next_label:PASS": 32485,
+      "closed_bar:PASS": 32549,
+      "funding:PASS": 8372,
+      "next_label:NOT_APPLICABLE": 67
+    },
+    "definition": "feature_latest_bar_time must be strictly earlier than decision_time; funding source time must not be after decision_time; next labels must be strictly later."
+  },
+  "conditional_behavior": {
+    "rows": 31631,
+    "labeled_rows": 31631,
+    "observed_action_rate": 0.9832759002244633,
+    "predicted_action_rate": 1.0,
+    "action_accuracy": 0.6836963738105023,
+    "action_macro_f1": 0.18848685852416638,
+    "target_exposure_mae": 0.07682238056420622,
+    "target_rows": 31631,
+    "action_counts": {
+      "ADD_SHORT": 6103,
+      "ADD_LONG": 10635,
+      "FLIP_SHORT_TO_LONG": 80,
+      "REDUCE_LONG": 7433,
+      "FLIP_LONG_TO_SHORT": 86,
+      "CLOSE_LONG": 860,
+      "REDUCE_SHORT": 4428,
+      "OPEN_SHORT": 317,
+      "CLOSE_SHORT": 336,
+      "OPEN_LONG": 816,
+      "HOLD_LONG": 128,
+      "NO_TRADE": 117,
+      "HOLD_SHORT": 284,
+      "FLIP_SHORT": 3,
+      "FLIP_LONG": 5
+    },
+    "predicted_action_counts": {
+      "ADD_LONG": 13386,
+      "ADD_SHORT": 6937,
+      "REDUCE_LONG": 7322,
+      "REDUCE_SHORT": 3986
+    },
+    "family_recall": {
+      "open_recall": 0.0,
+      "add_recall": 0.8672481777990202,
+      "reduce_recall": 0.6775145434617654,
+      "close_recall": 0.0,
+      "flip_recall": 0.0
+    },
+    "indicator_summary": {
+      "feature_atr_14bar": {
+        "count": 31631,
+        "mean": 364.1937833780416,
+        "min": 1.9071428571428793e-09,
+        "max": 3108.5
+      },
+      "feature_bollinger_percent_b_20": {
+        "count": 31631,
+        "mean": 0.46815274220752495,
+        "min": -0.563321675692917,
+        "max": 1.5787613792179975
+      },
+      "feature_macd_histogram": {
+        "count": 31631,
+        "mean": -14.671072033059383,
+        "min": -899.4914074655304,
+        "max": 892.6413506298254
+      },
+      "feature_return_24bar": {
+        "count": 31631,
+        "mean": 0.0030446360837349663,
+        "min": -0.4699010445299615,
+        "max": 0.7280491059514278
+      },
+      "feature_rsi_14": {
+        "count": 31631,
+        "mean": 49.444326639092964,
+        "min": 5.950890478395465,
+        "max": 95.86499228294944
+      },
+      "feature_volume_percentile_72bar": {
+        "count": 31631,
+        "mean": 0.6198481447525233,
+        "min": 0.013888888888888888,
+        "max": 1.0
+      }
+    }
+  },
+  "by_venue": {
+    "BITMEX": {
+      "rows": 31311,
+      "labeled_rows": 31311,
+      "observed_action_rate": 0.9831049790808342,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6844878796589058,
+      "action_macro_f1": 0.2177476283522504,
+      "target_exposure_mae": 0.06287504965112622,
+      "target_rows": 31311,
+      "action_counts": {
+        "ADD_SHORT": 6091,
+        "ADD_LONG": 10510,
+        "FLIP_SHORT_TO_LONG": 80,
+        "REDUCE_LONG": 7273,
+        "FLIP_LONG_TO_SHORT": 86,
+        "CLOSE_LONG": 860,
+        "REDUCE_SHORT": 4413,
+        "OPEN_SHORT": 317,
+        "CLOSE_SHORT": 336,
+        "OPEN_LONG": 816,
+        "HOLD_LONG": 128,
+        "NO_TRADE": 117,
+        "HOLD_SHORT": 284
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 13252,
+        "ADD_SHORT": 6910,
+        "REDUCE_LONG": 7172,
+        "REDUCE_SHORT": 3977
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8686223721462563,
+        "reduce_recall": 0.6775628957727194,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 31311,
+          "mean": 361.27019456519605,
+          "min": 1.9071428571428793e-09,
+          "max": 3108.5
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 31311,
+          "mean": 0.4675591903719366,
+          "min": -0.563321675692917,
+          "max": 1.5787613792179975
+        },
+        "feature_macd_histogram": {
+          "count": 31311,
+          "mean": -15.073427889526016,
+          "min": -899.4914074655304,
+          "max": 892.6413506298254
+        },
+        "feature_return_24bar": {
+          "count": 31311,
+          "mean": 0.003107499292486092,
+          "min": -0.4699010445299615,
+          "max": 0.7280491059514278
+        },
+        "feature_rsi_14": {
+          "count": 31311,
+          "mean": 49.43824713195974,
+          "min": 5.950890478395465,
+          "max": 95.86499228294944
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 31311,
+          "mean": 0.6186963048130183,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "HYPERLIQUID": {
+      "rows": 320,
+      "labeled_rows": 320,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.60625,
+      "action_macro_f1": 0.3782345621055299,
+      "target_exposure_mae": 1.4415251250000007,
+      "target_rows": 320,
+      "action_counts": {
+        "ADD_LONG": 125,
+        "REDUCE_LONG": 160,
+        "REDUCE_SHORT": 15,
+        "FLIP_SHORT": 3,
+        "FLIP_LONG": 5,
+        "ADD_SHORT": 12
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 134,
+        "REDUCE_LONG": 150,
+        "REDUCE_SHORT": 9,
+        "ADD_SHORT": 27
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.7007299270072993,
+        "reduce_recall": 0.6742857142857143,
+        "close_recall": null,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 320,
+          "mean": 650.2578124999997,
+          "min": 181.5,
+          "max": 1570.4285714285713
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 320,
+          "mean": 0.5262299344703449,
+          "min": -0.5124978859185434,
+          "max": 1.4590622435090166
+        },
+        "feature_macd_histogram": {
+          "count": 320,
+          "mean": 24.69819116015163,
+          "min": -555.3866040675366,
+          "max": 562.6030290090179
+        },
+        "feature_return_24bar": {
+          "count": 320,
+          "mean": -0.0031063324450357516,
+          "min": -0.1046975777944551,
+          "max": 0.07653073244281106
+        },
+        "feature_rsi_14": {
+          "count": 320,
+          "mean": 50.03918741361248,
+          "min": 13.137816370248046,
+          "max": 88.62497248384928
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 320,
+          "mean": 0.7325520833333328,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    }
+  },
+  "by_symbol": {
+    "AAVEUSDT": {
+      "rows": 83,
+      "labeled_rows": 83,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7108433734939759,
+      "action_macro_f1": 0.35777266628330456,
+      "target_exposure_mae": 0.12963107689259268,
+      "target_rows": 83,
+      "action_counts": {
+        "ADD_LONG": 51,
+        "CLOSE_LONG": 4,
+        "OPEN_LONG": 4,
+        "REDUCE_LONG": 24
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 60,
+        "REDUCE_LONG": 23
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8627450980392157,
+        "reduce_recall": 0.625,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 83,
+          "mean": 4.395808950086062,
+          "min": 1.5735714285714306,
+          "max": 8.857142857142852
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 83,
+          "mean": 0.47207744444342914,
+          "min": -0.3935323164402343,
+          "max": 1.4133036776605694
+        },
+        "feature_macd_histogram": {
+          "count": 83,
+          "mean": 0.11565668165326023,
+          "min": -3.2484055463425743,
+          "max": 3.9567966146835998
+        },
+        "feature_return_24bar": {
+          "count": 83,
+          "mean": -0.0036077635329899702,
+          "min": -0.1464182769296467,
+          "max": 0.20152436258052808
+        },
+        "feature_rsi_14": {
+          "count": 83,
+          "mean": 49.388191594221375,
+          "min": 22.434527379127147,
+          "max": 79.76385595030881
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 83,
+          "mean": 0.616633199464525,
+          "min": 0.027777777777777776,
+          "max": 1.0
+        }
+      }
+    },
+    "ADAM20": {
+      "rows": 77,
+      "labeled_rows": 77,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.2987012987012987,
+      "action_macro_f1": 0.14921374921374922,
+      "target_exposure_mae": 0.11779941068901033,
+      "target_rows": 77,
+      "action_counts": {
+        "ADD_LONG": 8,
+        "REDUCE_LONG": 2,
+        "CLOSE_LONG": 2,
+        "OPEN_SHORT": 7,
+        "ADD_SHORT": 29,
+        "CLOSE_SHORT": 9,
+        "REDUCE_SHORT": 17,
+        "OPEN_LONG": 2,
+        "FLIP_LONG_TO_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 47,
+        "REDUCE_LONG": 3,
+        "ADD_SHORT": 23,
+        "REDUCE_SHORT": 4
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9459459459459459,
+        "reduce_recall": 0.15789473684210525,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 77,
+          "mean": 8.179962894248618e-08,
+          "min": 2.6428571428571477e-08,
+          "max": 2.228571428571429e-07
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 77,
+          "mean": 0.4672298367778128,
+          "min": -0.3599441695982825,
+          "max": 1.2913232848822824
+        },
+        "feature_macd_histogram": {
+          "count": 77,
+          "mean": 2.1745006695905094e-09,
+          "min": -3.255383530220527e-08,
+          "max": 6.691863992465459e-08
+        },
+        "feature_return_24bar": {
+          "count": 77,
+          "mean": 0.005860215226710606,
+          "min": -0.058472553699283836,
+          "max": 0.16510067114093951
+        },
+        "feature_rsi_14": {
+          "count": 77,
+          "mean": 48.516802030684744,
+          "min": 24.154666292634346,
+          "max": 74.4045730610039
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 77,
+          "mean": 0.5214646464646465,
+          "min": 0.027777777777777776,
+          "max": 0.9861111111111112
+        }
+      }
+    },
+    "ADAUSD": {
+      "rows": 16,
+      "labeled_rows": 16,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.5,
+      "action_macro_f1": 0.22564102564102564,
+      "target_exposure_mae": 0.4412845720648766,
+      "target_rows": 16,
+      "action_counts": {
+        "ADD_LONG": 7,
+        "REDUCE_LONG": 6,
+        "FLIP_LONG_TO_SHORT": 1,
+        "ADD_SHORT": 1,
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 8,
+        "REDUCE_LONG": 7,
+        "ADD_SHORT": 1
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.625,
+        "reduce_recall": 0.5,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 16,
+          "mean": 0.020891964285714295,
+          "min": 0.012921428571428528,
+          "max": 0.033842857142857126
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 16,
+          "mean": 0.4854541479632652,
+          "min": -0.23710288838939764,
+          "max": 1.0496679260207942
+        },
+        "feature_macd_histogram": {
+          "count": 16,
+          "mean": 0.0011924424478364727,
+          "min": -0.006518617641048505,
+          "max": 0.010900424055230019
+        },
+        "feature_return_24bar": {
+          "count": 16,
+          "mean": 0.012213150100475974,
+          "min": -0.04285506755120827,
+          "max": 0.09575508607198757
+        },
+        "feature_rsi_14": {
+          "count": 16,
+          "mean": 51.47675368817096,
+          "min": 24.418828101268858,
+          "max": 80.17829603882211
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 16,
+          "mean": 0.6397569444444444,
+          "min": 0.027777777777777776,
+          "max": 1.0
+        }
+      }
+    },
+    "ADAUSDT": {
+      "rows": 3,
+      "labeled_rows": 3,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.3333333333333333,
+      "action_macro_f1": 0.16666666666666666,
+      "target_exposure_mae": 0.4654085846508251,
+      "target_rows": 3,
+      "action_counts": {
+        "REDUCE_LONG": 2,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 1,
+        "REDUCE_LONG": 2
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": 0.5,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 3,
+          "mean": 0.01619238095238094,
+          "min": 0.015275714285714281,
+          "max": 0.016650714285714265
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 3,
+          "mean": 0.8280288880788248,
+          "min": 0.800401339644608,
+          "max": 0.8832839849472581
+        },
+        "feature_macd_histogram": {
+          "count": 3,
+          "mean": 0.007526350258291521,
+          "min": 0.0062575662978591445,
+          "max": 0.008160742238507709
+        },
+        "feature_return_24bar": {
+          "count": 3,
+          "mean": 0.04120441732936434,
+          "min": 0.03377664014245174,
+          "max": 0.044918305922820645
+        },
+        "feature_rsi_14": {
+          "count": 3,
+          "mean": 65.9377311847562,
+          "min": 63.78053492736014,
+          "max": 67.01632931345422
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 3,
+          "mean": 0.2777777777777778,
+          "min": 0.027777777777777776,
+          "max": 0.4027777777777778
+        }
+      }
+    },
+    "ALTMEXUSD": {
+      "rows": 12,
+      "labeled_rows": 12,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.75,
+      "action_macro_f1": 0.225,
+      "target_exposure_mae": 0.3111631535013453,
+      "target_rows": 12,
+      "action_counts": {
+        "ADD_LONG": 9,
+        "CLOSE_LONG": 2,
+        "OPEN_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 11,
+        "REDUCE_LONG": 1
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 12,
+          "mean": 0.7550595238095253,
+          "min": 0.5400000000000001,
+          "max": 1.4399999999999997
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 12,
+          "mean": 0.5590885902337188,
+          "min": -0.1069026172683743,
+          "max": 0.8829841894320564
+        },
+        "feature_macd_histogram": {
+          "count": 12,
+          "mean": -0.11307535716241995,
+          "min": -0.41805398416936596,
+          "max": 0.16099466809948684
+        },
+        "feature_return_24bar": {
+          "count": 12,
+          "mean": 0.02837900506133863,
+          "min": -0.02839116719242918,
+          "max": 0.10479784366576816
+        },
+        "feature_rsi_14": {
+          "count": 12,
+          "mean": 56.55330976078775,
+          "min": 35.957656567530904,
+          "max": 67.25182324284344
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 12,
+          "mean": 0.4907407407407407,
+          "min": 0.1527777777777778,
+          "max": 0.7777777777777778
+        }
+      }
+    },
+    "AXSUSDT": {
+      "rows": 80,
+      "labeled_rows": 80,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.45,
+      "action_macro_f1": 0.23168992248062015,
+      "target_exposure_mae": 0.06388074174989816,
+      "target_rows": 80,
+      "action_counts": {
+        "ADD_SHORT": 40,
+        "CLOSE_SHORT": 5,
+        "OPEN_SHORT": 4,
+        "REDUCE_SHORT": 31
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 33,
+        "ADD_SHORT": 35,
+        "REDUCE_SHORT": 12
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.95,
+        "reduce_recall": 0.3225806451612903,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 80,
+          "mean": 3.348529464285715,
+          "min": 0.9466428571428581,
+          "max": 6.085285714285722
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 80,
+          "mean": 0.7529326024512792,
+          "min": -0.2979557837821423,
+          "max": 1.5655820821721875
+        },
+        "feature_macd_histogram": {
+          "count": 80,
+          "mean": 0.4069959868799849,
+          "min": -2.369184085841765,
+          "max": 2.312762053318611
+        },
+        "feature_return_24bar": {
+          "count": 80,
+          "mean": 0.1689813777249995,
+          "min": -0.10284360189573472,
+          "max": 0.5346011621764395
+        },
+        "feature_rsi_14": {
+          "count": 80,
+          "mean": 67.18779174105114,
+          "min": 30.03818277003687,
+          "max": 87.72755869267888
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 80,
+          "mean": 0.6539930555555558,
+          "min": 0.041666666666666664,
+          "max": 1.0
+        }
+      }
+    },
+    "BCHH21": {
+      "rows": 13,
+      "labeled_rows": 13,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6153846153846154,
+      "action_macro_f1": 0.2892156862745098,
+      "target_exposure_mae": 0.2400470022054819,
+      "target_rows": 13,
+      "action_counts": {
+        "ADD_LONG": 7,
+        "REDUCE_LONG": 3,
+        "CLOSE_LONG": 2,
+        "OPEN_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 10,
+        "REDUCE_LONG": 3
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.3333333333333333,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 13,
+          "mean": 0.00015307692307692307,
+          "min": 0.00011071428571428553,
+          "max": 0.00022071428571428575
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 13,
+          "mean": 0.38555460648027917,
+          "min": -0.03443270380204841,
+          "max": 0.9590791287878998
+        },
+        "feature_macd_histogram": {
+          "count": 13,
+          "mean": -1.2419235873370094e-05,
+          "min": -4.2966893478715135e-05,
+          "max": 2.3687747101063396e-05
+        },
+        "feature_return_24bar": {
+          "count": 13,
+          "mean": -0.005324322208566353,
+          "min": -0.015151515151515138,
+          "max": 0.017667844522968323
+        },
+        "feature_rsi_14": {
+          "count": 13,
+          "mean": 50.09367082563586,
+          "min": 40.323682092088426,
+          "max": 60.70281808840709
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 13,
+          "mean": 0.6303418803418803,
+          "min": 0.2638888888888889,
+          "max": 0.9027777777777778
+        }
+      }
+    },
+    "BCHUSD": {
+      "rows": 42,
+      "labeled_rows": 42,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6904761904761905,
+      "action_macro_f1": 0.14427860696517414,
+      "target_exposure_mae": 0.1875145914737235,
+      "target_rows": 42,
+      "action_counts": {
+        "ADD_LONG": 29,
+        "CLOSE_LONG": 4,
+        "OPEN_LONG": 3,
+        "REDUCE_LONG": 4,
+        "FLIP_LONG_TO_SHORT": 1,
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 38,
+        "REDUCE_LONG": 4
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.0,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 42,
+          "mean": 4.16309523809524,
+          "min": 1.5535714285714286,
+          "max": 10.057142857142853
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 42,
+          "mean": 0.3842413829413662,
+          "min": -0.3085449366296937,
+          "max": 1.2371224422263714
+        },
+        "feature_macd_histogram": {
+          "count": 42,
+          "mean": 0.19110746359860162,
+          "min": -1.0450542212084724,
+          "max": 1.8924974196041888
+        },
+        "feature_return_24bar": {
+          "count": 42,
+          "mean": -0.0011246442388893872,
+          "min": -0.07169459962756053,
+          "max": 0.05040091638029809
+        },
+        "feature_rsi_14": {
+          "count": 42,
+          "mean": 45.696659273226565,
+          "min": 22.954917304880567,
+          "max": 67.61567321778125
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 42,
+          "mean": 0.8128306878306879,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "BNBUSD": {
+      "rows": 5,
+      "labeled_rows": 5,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8,
+      "action_macro_f1": 0.4444444444444445,
+      "target_exposure_mae": 0.4267351266976559,
+      "target_rows": 5,
+      "action_counts": {
+        "ADD_LONG": 4,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 5
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 1.0,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 5,
+          "mean": 3.6332857142857193,
+          "min": 3.390714285714292,
+          "max": 3.805000000000003
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 5,
+          "mean": 0.7512109872223599,
+          "min": 0.7342974655492428,
+          "max": 0.7634743236245229
+        },
+        "feature_macd_histogram": {
+          "count": 5,
+          "mean": 0.3344353436782721,
+          "min": 0.18649054718720492,
+          "max": 0.4712180842650415
+        },
+        "feature_return_24bar": {
+          "count": 5,
+          "mean": 0.03414854903688176,
+          "min": 0.025221810305327663,
+          "max": 0.045576122951515696
+        },
+        "feature_rsi_14": {
+          "count": 5,
+          "mean": 61.6330630219343,
+          "min": 61.28482079342007,
+          "max": 61.942934164930996
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 5,
+          "mean": 0.11944444444444444,
+          "min": 0.05555555555555555,
+          "max": 0.2361111111111111
+        }
+      }
+    },
+    "BNBUSDT": {
+      "rows": 24,
+      "labeled_rows": 24,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.4583333333333333,
+      "action_macro_f1": 0.2446236559139785,
+      "target_exposure_mae": 0.16123964424702625,
+      "target_rows": 24,
+      "action_counts": {
+        "ADD_LONG": 11,
+        "CLOSE_LONG": 6,
+        "OPEN_LONG": 5,
+        "REDUCE_LONG": 2
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 20,
+        "REDUCE_LONG": 4
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9090909090909091,
+        "reduce_recall": 0.5,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 24,
+          "mean": 6.701577380952383,
+          "min": 3.094999999999999,
+          "max": 13.980714285714283
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 24,
+          "mean": 0.3908316544692507,
+          "min": -0.3042679144065341,
+          "max": 0.9976518981121668
+        },
+        "feature_macd_histogram": {
+          "count": 24,
+          "mean": 0.44109021608688476,
+          "min": -3.564669066646484,
+          "max": 6.033080314893844
+        },
+        "feature_return_24bar": {
+          "count": 24,
+          "mean": 0.004250042255199593,
+          "min": -0.08858712133975799,
+          "max": 0.37711129923005604
+        },
+        "feature_rsi_14": {
+          "count": 24,
+          "mean": 47.10310919008723,
+          "min": 20.930670358690236,
+          "max": 75.12356428079619
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 24,
+          "mean": 0.5850694444444444,
+          "min": 0.1388888888888889,
+          "max": 1.0
+        }
+      }
+    },
+    "BTC": {
+      "rows": 320,
+      "labeled_rows": 320,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.60625,
+      "action_macro_f1": 0.3782345621055299,
+      "target_exposure_mae": 1.4415251250000007,
+      "target_rows": 320,
+      "action_counts": {
+        "ADD_LONG": 125,
+        "REDUCE_LONG": 160,
+        "REDUCE_SHORT": 15,
+        "FLIP_SHORT": 3,
+        "FLIP_LONG": 5,
+        "ADD_SHORT": 12
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 134,
+        "REDUCE_LONG": 150,
+        "REDUCE_SHORT": 9,
+        "ADD_SHORT": 27
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.7007299270072993,
+        "reduce_recall": 0.6742857142857143,
+        "close_recall": null,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 320,
+          "mean": 650.2578124999997,
+          "min": 181.5,
+          "max": 1570.4285714285713
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 320,
+          "mean": 0.5262299344703449,
+          "min": -0.5124978859185434,
+          "max": 1.4590622435090166
+        },
+        "feature_macd_histogram": {
+          "count": 320,
+          "mean": 24.69819116015163,
+          "min": -555.3866040675366,
+          "max": 562.6030290090179
+        },
+        "feature_return_24bar": {
+          "count": 320,
+          "mean": -0.0031063324450357516,
+          "min": -0.1046975777944551,
+          "max": 0.07653073244281106
+        },
+        "feature_rsi_14": {
+          "count": 320,
+          "mean": 50.03918741361248,
+          "min": 13.137816370248046,
+          "max": 88.62497248384928
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 320,
+          "mean": 0.7325520833333328,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "DOGEUSD": {
+      "rows": 1050,
+      "labeled_rows": 1050,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7,
+      "action_macro_f1": 0.2584134855450523,
+      "target_exposure_mae": 1.017332016507528,
+      "target_rows": 1050,
+      "action_counts": {
+        "REDUCE_LONG": 367,
+        "CLOSE_LONG": 42,
+        "OPEN_LONG": 42,
+        "ADD_LONG": 545,
+        "FLIP_LONG_TO_SHORT": 2,
+        "ADD_SHORT": 24,
+        "REDUCE_SHORT": 18,
+        "CLOSE_SHORT": 5,
+        "OPEN_SHORT": 4,
+        "FLIP_SHORT_TO_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 670,
+        "REDUCE_LONG": 350,
+        "ADD_SHORT": 21,
+        "REDUCE_SHORT": 9
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8629173989455184,
+        "reduce_recall": 0.6597402597402597,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 1050,
+          "mean": 0.0023626197278911573,
+          "min": 0.00016428571428571553,
+          "max": 0.02247928571428571
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 1050,
+          "mean": 0.48878222615204137,
+          "min": -0.4158339641103583,
+          "max": 1.4545822062847522
+        },
+        "feature_macd_histogram": {
+          "count": 1050,
+          "mean": -1.1729731754291637e-06,
+          "min": -0.003960453762551088,
+          "max": 0.00899558133604696
+        },
+        "feature_return_24bar": {
+          "count": 1050,
+          "mean": 0.013223065304222298,
+          "min": -0.2937191522307171,
+          "max": 0.5810023310023309
+        },
+        "feature_rsi_14": {
+          "count": 1050,
+          "mean": 50.455827585802794,
+          "min": 17.005917846766863,
+          "max": 89.4931400620833
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 1050,
+          "mean": 0.633478835978836,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "DOGEUSDT": {
+      "rows": 288,
+      "labeled_rows": 288,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.65625,
+      "action_macro_f1": 0.20802379312778158,
+      "target_exposure_mae": 0.04400368932401425,
+      "target_rows": 288,
+      "action_counts": {
+        "ADD_LONG": 158,
+        "REDUCE_LONG": 57,
+        "CLOSE_LONG": 20,
+        "OPEN_LONG": 18,
+        "OPEN_SHORT": 7,
+        "CLOSE_SHORT": 7,
+        "ADD_SHORT": 20,
+        "REDUCE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 225,
+        "REDUCE_LONG": 54,
+        "ADD_SHORT": 9
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9662921348314607,
+        "reduce_recall": 0.5689655172413793,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 288,
+          "mean": 0.011076093750000009,
+          "min": 0.0003742857142857144,
+          "max": 0.057627857142857154
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 288,
+          "mean": 0.4038632733968901,
+          "min": -0.3679270709382923,
+          "max": 1.323600719551492
+        },
+        "feature_macd_histogram": {
+          "count": 288,
+          "mean": -0.0002464797641524137,
+          "min": -0.01603092863029458,
+          "max": 0.014270414974933072
+        },
+        "feature_return_24bar": {
+          "count": 288,
+          "mean": 0.019903694069240217,
+          "min": -0.402089927709511,
+          "max": 0.7280491059514278
+        },
+        "feature_rsi_14": {
+          "count": 288,
+          "mean": 48.53333674936234,
+          "min": 12.827710707554132,
+          "max": 85.30226377510967
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 288,
+          "mean": 0.5615354938271604,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "DOTUSDT": {
+      "rows": 89,
+      "labeled_rows": 89,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6629213483146067,
+      "action_macro_f1": 0.23572170301142267,
+      "target_exposure_mae": 0.05993743406064206,
+      "target_rows": 89,
+      "action_counts": {
+        "ADD_LONG": 41,
+        "CLOSE_LONG": 6,
+        "OPEN_LONG": 6,
+        "REDUCE_LONG": 34,
+        "FLIP_LONG_TO_SHORT": 1,
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 66,
+        "REDUCE_LONG": 23
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.975609756097561,
+        "reduce_recall": 0.5588235294117647,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 89,
+          "mean": 0.6020565810593902,
+          "min": 0.1577500000000003,
+          "max": 1.5675357142857147
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 89,
+          "mean": 0.6412570917683471,
+          "min": -0.32848218968811865,
+          "max": 1.343453045984532
+        },
+        "feature_macd_histogram": {
+          "count": 89,
+          "mean": 0.028021671103208648,
+          "min": -0.5819772042094875,
+          "max": 0.43368671927692864
+        },
+        "feature_return_24bar": {
+          "count": 89,
+          "mean": 0.022965423331925194,
+          "min": -0.14576361221779544,
+          "max": 0.17398701105815317
+        },
+        "feature_rsi_14": {
+          "count": 89,
+          "mean": 54.7951919765444,
+          "min": 21.653586758430095,
+          "max": 79.19266626625489
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 89,
+          "mean": 0.6999063670411982,
+          "min": 0.05555555555555555,
+          "max": 1.0
+        }
+      }
+    },
+    "DOTUSDTH21": {
+      "rows": 15,
+      "labeled_rows": 15,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.26666666666666666,
+      "action_macro_f1": 0.11111111111111112,
+      "target_exposure_mae": 0.269274016202168,
+      "target_rows": 15,
+      "action_counts": {
+        "ADD_LONG": 4,
+        "CLOSE_LONG": 5,
+        "OPEN_LONG": 4,
+        "REDUCE_LONG": 2
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 14,
+        "REDUCE_LONG": 1
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.0,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 15,
+          "mean": 0.7498261904761904,
+          "min": 0.32921428571428607,
+          "max": 1.6945357142857138
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 15,
+          "mean": 0.7062251171128991,
+          "min": 0.02285904062632217,
+          "max": 1.1380829064100755
+        },
+        "feature_macd_histogram": {
+          "count": 15,
+          "mean": 0.06796699309252505,
+          "min": -0.23862309013085742,
+          "max": 0.5685353122330137
+        },
+        "feature_return_24bar": {
+          "count": 15,
+          "mean": 0.13297652298852985,
+          "min": -0.14477776662987873,
+          "max": 0.3646139913968758
+        },
+        "feature_rsi_14": {
+          "count": 15,
+          "mean": 58.74984110718052,
+          "min": 30.15772199281942,
+          "max": 79.24937819463922
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 15,
+          "mean": 0.6601851851851852,
+          "min": 0.041666666666666664,
+          "max": 0.9583333333333334
+        }
+      }
+    },
+    "EOSH21": {
+      "rows": 3,
+      "labeled_rows": 3,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 0.03554495175679525,
+      "target_rows": 3,
+      "action_counts": {
+        "CLOSE_LONG": 2,
+        "OPEN_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 2,
+        "REDUCE_LONG": 1
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 3,
+          "mean": 1.6857142857142866e-06,
+          "min": 1.4500000000000024e-06,
+          "max": 1.8714285714285705e-06
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 3,
+          "mean": 1.0253858084075222,
+          "min": 0.6969913183489714,
+          "max": 1.3957103914510431
+        },
+        "feature_macd_histogram": {
+          "count": 3,
+          "mean": 3.01704816114562e-07,
+          "min": 5.984444759897027e-08,
+          "max": 7.44875737918153e-07
+        },
+        "feature_return_24bar": {
+          "count": 3,
+          "mean": 0.09195929713301727,
+          "min": 0.06435643564356441,
+          "max": 0.12176165803108807
+        },
+        "feature_rsi_14": {
+          "count": 3,
+          "mean": 67.19056872802935,
+          "min": 58.80919953275452,
+          "max": 74.08247391095935
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 3,
+          "mean": 0.8842592592592592,
+          "min": 0.8194444444444444,
+          "max": 1.0
+        }
+      }
+    },
+    "EOSUSDTZ20": {
+      "rows": 2,
+      "labeled_rows": 2,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.5,
+      "action_macro_f1": 0.3333333333333333,
+      "target_exposure_mae": 0.7346897721290588,
+      "target_rows": 2,
+      "action_counts": {
+        "ADD_LONG": 1,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 1,
+        "REDUCE_LONG": 1
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 1.0,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 2,
+          "mean": 0.023446428571428504,
+          "min": 0.021892857142857065,
+          "max": 0.024999999999999942
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 2,
+          "mean": 0.8070423417651247,
+          "min": 0.7972442863272355,
+          "max": 0.8168403972030138
+        },
+        "feature_macd_histogram": {
+          "count": 2,
+          "mean": 0.0003615051327085292,
+          "min": -0.0018409243078165302,
+          "max": 0.0025639345732335886
+        },
+        "feature_return_24bar": {
+          "count": 2,
+          "mean": 0.01830102105123299,
+          "min": 0.016703222540914497,
+          "max": 0.019898819561551484
+        },
+        "feature_rsi_14": {
+          "count": 2,
+          "mean": 56.198066356327985,
+          "min": 55.98331211258332,
+          "max": 56.41282060007264
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 2,
+          "mean": 0.4513888888888889,
+          "min": 0.4027777777777778,
+          "max": 0.5
+        }
+      }
+    },
+    "ETHH21": {
+      "rows": 297,
+      "labeled_rows": 297,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7306397306397306,
+      "action_macro_f1": 0.2141634469604343,
+      "target_exposure_mae": 0.053527574886559036,
+      "target_rows": 297,
+      "action_counts": {
+        "ADD_LONG": 150,
+        "REDUCE_LONG": 129,
+        "CLOSE_LONG": 7,
+        "OPEN_SHORT": 1,
+        "ADD_SHORT": 1,
+        "CLOSE_SHORT": 2,
+        "OPEN_LONG": 7
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 172,
+        "REDUCE_LONG": 125
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8410596026490066,
+        "reduce_recall": 0.7054263565891473,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 297,
+          "mean": 0.000536661856661856,
+          "min": 9.64285714285722e-05,
+          "max": 0.0010142857142857137
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 297,
+          "mean": 0.35727104984573793,
+          "min": -0.2776285775955306,
+          "max": 1.326787008957025
+        },
+        "feature_macd_histogram": {
+          "count": 297,
+          "mean": -4.770417776655998e-05,
+          "min": -0.00036744802982102324,
+          "max": 0.0002978382878969045
+        },
+        "feature_return_24bar": {
+          "count": 297,
+          "mean": -0.027334214943011123,
+          "min": -0.11959586466165406,
+          "max": 0.14205219454329776
+        },
+        "feature_rsi_14": {
+          "count": 297,
+          "mean": 44.169428561512596,
+          "min": 20.551655563486577,
+          "max": 84.47112191862223
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 297,
+          "mean": 0.6745697717919935,
+          "min": 0.041666666666666664,
+          "max": 1.0
+        }
+      }
+    },
+    "ETHH22": {
+      "rows": 143,
+      "labeled_rows": 143,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8531468531468531,
+      "action_macro_f1": 0.4318710535061482,
+      "target_exposure_mae": 0.03533452160137645,
+      "target_rows": 143,
+      "action_counts": {
+        "ADD_LONG": 85,
+        "REDUCE_LONG": 51,
+        "CLOSE_LONG": 4,
+        "OPEN_LONG": 3
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 92,
+        "REDUCE_LONG": 51
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9411764705882353,
+        "reduce_recall": 0.8235294117647058,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 143,
+          "mean": 0.0002729970029970033,
+          "min": 8.714285714285805e-05,
+          "max": 0.0006228571428571422
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 143,
+          "mean": 0.5042047845434411,
+          "min": -0.17377637810545987,
+          "max": 1.221486182840669
+        },
+        "feature_macd_histogram": {
+          "count": 143,
+          "mean": -5.079360942843714e-06,
+          "min": -0.00021247766257704713,
+          "max": 0.00013124551817924744
+        },
+        "feature_return_24bar": {
+          "count": 143,
+          "mean": -0.0002726241055488349,
+          "min": -0.04320601127113344,
+          "max": 0.03440925700365405
+        },
+        "feature_rsi_14": {
+          "count": 143,
+          "mean": 51.410815894916546,
+          "min": 21.986270814168464,
+          "max": 74.79807681209044
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 143,
+          "mean": 0.6209207459207462,
+          "min": 0.027777777777777776,
+          "max": 1.0
+        }
+      }
+    },
+    "ETHM20": {
+      "rows": 10,
+      "labeled_rows": 10,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6,
+      "action_macro_f1": 0.34285714285714286,
+      "target_exposure_mae": 0.4292574656182442,
+      "target_rows": 10,
+      "action_counts": {
+        "ADD_LONG": 4,
+        "REDUCE_LONG": 3,
+        "CLOSE_LONG": 2,
+        "OPEN_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 6,
+        "REDUCE_LONG": 4
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.6666666666666666,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 10,
+          "mean": 0.00013050000000000014,
+          "min": 5.2857142857142686e-05,
+          "max": 0.00017714285714285735
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 10,
+          "mean": 0.9124305213673507,
+          "min": 0.26021299827378586,
+          "max": 1.0886190372539428
+        },
+        "feature_macd_histogram": {
+          "count": 10,
+          "mean": 5.643508789226861e-05,
+          "min": -2.161464467944122e-05,
+          "max": 0.0001039574845173774
+        },
+        "feature_return_24bar": {
+          "count": 10,
+          "mean": 0.033291113514964554,
+          "min": -0.0015723270440252124,
+          "max": 0.06589644843816878
+        },
+        "feature_rsi_14": {
+          "count": 10,
+          "mean": 75.64838656233447,
+          "min": 45.38027246691274,
+          "max": 90.5592697644951
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 10,
+          "mean": 0.713888888888889,
+          "min": 0.2638888888888889,
+          "max": 0.875
+        }
+      }
+    },
+    "ETHM21": {
+      "rows": 26,
+      "labeled_rows": 26,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.5,
+      "action_macro_f1": 0.17989417989417986,
+      "target_exposure_mae": 0.23936944896248497,
+      "target_rows": 26,
+      "action_counts": {
+        "ADD_LONG": 8,
+        "REDUCE_LONG": 8,
+        "CLOSE_LONG": 4,
+        "OPEN_LONG": 3,
+        "OPEN_SHORT": 1,
+        "ADD_SHORT": 1,
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 19,
+        "REDUCE_LONG": 7
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.625,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 26,
+          "mean": 0.00037340659340659335,
+          "min": 5.2857142857142686e-05,
+          "max": 0.0009371428571428557
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 26,
+          "mean": 0.5942708483490814,
+          "min": -0.0040085861396787,
+          "max": 1.3633538188639058
+        },
+        "feature_macd_histogram": {
+          "count": 26,
+          "mean": 4.99929208314504e-07,
+          "min": -0.00027896746045491083,
+          "max": 0.0001825949878421752
+        },
+        "feature_return_24bar": {
+          "count": 26,
+          "mean": 0.030623143198330052,
+          "min": -0.026521739130434763,
+          "max": 0.08288148721920985
+        },
+        "feature_rsi_14": {
+          "count": 26,
+          "mean": 59.482096200549634,
+          "min": 39.47571810647218,
+          "max": 80.23805417532732
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 26,
+          "mean": 0.533119658119658,
+          "min": 0.013888888888888888,
+          "max": 0.9444444444444444
+        }
+      }
+    },
+    "ETHM22": {
+      "rows": 126,
+      "labeled_rows": 126,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8809523809523809,
+      "action_macro_f1": 0.28903237377813645,
+      "target_exposure_mae": 0.029745045392087596,
+      "target_rows": 126,
+      "action_counts": {
+        "ADD_LONG": 29,
+        "REDUCE_LONG": 93,
+        "CLOSE_LONG": 1,
+        "OPEN_LONG": 1,
+        "FLIP_LONG_TO_SHORT": 1,
+        "FLIP_SHORT_TO_LONG": 1
+      },
+      "predicted_action_counts": {
+        "REDUCE_LONG": 96,
+        "ADD_LONG": 30
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8275862068965517,
+        "reduce_recall": 0.9354838709677419,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 126,
+          "mean": 0.00027772108843537435,
+          "min": 0.00012428571428571566,
+          "max": 0.0006342857142857138
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 126,
+          "mean": 0.6306467623887612,
+          "min": -0.16473219276184747,
+          "max": 1.1301366357190483
+        },
+        "feature_macd_histogram": {
+          "count": 126,
+          "mean": -3.5874564354346816e-06,
+          "min": -0.00014666017463283454,
+          "max": 0.00012097092220974835
+        },
+        "feature_return_24bar": {
+          "count": 126,
+          "mean": 0.006578505371932678,
+          "min": -0.0681093776212045,
+          "max": 0.020136931131695457
+        },
+        "feature_rsi_14": {
+          "count": 126,
+          "mean": 55.47082977927292,
+          "min": 15.955141353792882,
+          "max": 72.78589309845252
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 126,
+          "mean": 0.5485008818342141,
+          "min": 0.041666666666666664,
+          "max": 1.0
+        }
+      }
+    },
+    "ETHU20": {
+      "rows": 31,
+      "labeled_rows": 31,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.3548387096774194,
+      "action_macro_f1": 0.18997668997668998,
+      "target_exposure_mae": 0.283557920292848,
+      "target_rows": 31,
+      "action_counts": {
+        "CLOSE_LONG": 9,
+        "OPEN_LONG": 7,
+        "ADD_LONG": 10,
+        "REDUCE_LONG": 5
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 23,
+        "REDUCE_LONG": 8
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.2,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 31,
+          "mean": 0.00015172811059907873,
+          "min": 2.6428571428571343e-05,
+          "max": 0.00039142857142857235
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 31,
+          "mean": 0.7602275834552706,
+          "min": -0.07500102349860034,
+          "max": 1.2315129077411693
+        },
+        "feature_macd_histogram": {
+          "count": 31,
+          "mean": 1.4045005817776501e-05,
+          "min": -5.384926356659923e-05,
+          "max": 8.282429317251799e-05
+        },
+        "feature_return_24bar": {
+          "count": 31,
+          "mean": 0.015378782508701522,
+          "min": -0.016033254156769594,
+          "max": 0.03984620761971325
+        },
+        "feature_rsi_14": {
+          "count": 31,
+          "mean": 61.49126535846487,
+          "min": 34.9258466172638,
+          "max": 77.90602348220125
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 31,
+          "mean": 0.5685483870967742,
+          "min": 0.09722222222222222,
+          "max": 0.9166666666666666
+        }
+      }
+    },
+    "ETHU21": {
+      "rows": 53,
+      "labeled_rows": 53,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6792452830188679,
+      "action_macro_f1": 0.3694805194805194,
+      "target_exposure_mae": 0.1068250811457237,
+      "target_rows": 53,
+      "action_counts": {
+        "ADD_LONG": 23,
+        "REDUCE_LONG": 21,
+        "CLOSE_LONG": 5,
+        "OPEN_LONG": 4
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 32,
+        "REDUCE_LONG": 21
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9130434782608695,
+        "reduce_recall": 0.7142857142857143,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 53,
+          "mean": 0.0003294204851752021,
+          "min": 0.00011285714285714272,
+          "max": 0.0005114285714285724
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 53,
+          "mean": 0.41551413967215817,
+          "min": -0.19958004073196428,
+          "max": 1.0192909266074772
+        },
+        "feature_macd_histogram": {
+          "count": 53,
+          "mean": -2.8058207757642714e-06,
+          "min": -0.00027311417741884006,
+          "max": 0.0003022426535213063
+        },
+        "feature_return_24bar": {
+          "count": 53,
+          "mean": -0.009897754775108602,
+          "min": -0.04803921568627445,
+          "max": 0.06599590723055937
+        },
+        "feature_rsi_14": {
+          "count": 53,
+          "mean": 46.75722646202703,
+          "min": 21.85921711200544,
+          "max": 81.38791973850591
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 53,
+          "mean": 0.6645702306079663,
+          "min": 0.08333333333333333,
+          "max": 1.0
+        }
+      }
+    },
+    "ETHUSD": {
+      "rows": 3535,
+      "labeled_rows": 3535,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6413012729844413,
+      "action_macro_f1": 0.20665697685583892,
+      "target_exposure_mae": 0.03135752277155013,
+      "target_rows": 3535,
+      "action_counts": {
+        "ADD_LONG": 1558,
+        "REDUCE_LONG": 862,
+        "CLOSE_LONG": 140,
+        "OPEN_LONG": 144,
+        "OPEN_SHORT": 64,
+        "ADD_SHORT": 482,
+        "CLOSE_SHORT": 71,
+        "REDUCE_SHORT": 194,
+        "FLIP_SHORT_TO_LONG": 8,
+        "FLIP_LONG_TO_SHORT": 12
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 2256,
+        "REDUCE_LONG": 850,
+        "ADD_SHORT": 415,
+        "REDUCE_SHORT": 14
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9235294117647059,
+        "reduce_recall": 0.5501893939393939,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 3535,
+          "mean": 36.4583097595474,
+          "min": 1.1928571428571502,
+          "max": 327.43571428571425
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 3535,
+          "mean": 0.4082099254196693,
+          "min": -0.4822024477154204,
+          "max": 1.4141136456326044
+        },
+        "feature_macd_histogram": {
+          "count": 3535,
+          "mean": -1.8722036711112444,
+          "min": -68.34454843579041,
+          "max": 61.62716473339199
+        },
+        "feature_return_24bar": {
+          "count": 3535,
+          "mean": -0.010226245288550501,
+          "min": -0.3331436326226853,
+          "max": 0.3975077881619937
+        },
+        "feature_rsi_14": {
+          "count": 3535,
+          "mean": 47.108683928935626,
+          "min": 12.349980199455047,
+          "max": 91.53888053713104
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 3535,
+          "mean": 0.6275302530253027,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "ETHUSDZ20": {
+      "rows": 1,
+      "labeled_rows": 1,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 0.00012028217315673828,
+      "target_rows": 1,
+      "action_counts": {
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 1
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 1,
+          "mean": 2.289285714285711,
+          "min": 2.289285714285711,
+          "max": 2.289285714285711
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 1,
+          "mean": 0.12709993082877163,
+          "min": 0.12709993082877163,
+          "max": 0.12709993082877163
+        },
+        "feature_macd_histogram": {
+          "count": 1,
+          "mean": -0.9230496103864642,
+          "min": -0.9230496103864642,
+          "max": -0.9230496103864642
+        },
+        "feature_return_24bar": {
+          "count": 1,
+          "mean": -0.011558627264061094,
+          "min": -0.011558627264061094,
+          "max": -0.011558627264061094
+        },
+        "feature_rsi_14": {
+          "count": 1,
+          "mean": 40.36877917818244,
+          "min": 40.36877917818244,
+          "max": 40.36877917818244
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 1,
+          "mean": 0.2222222222222222,
+          "min": 0.2222222222222222,
+          "max": 0.2222222222222222
+        }
+      }
+    },
+    "ETHZ20": {
+      "rows": 206,
+      "labeled_rows": 206,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6747572815533981,
+      "action_macro_f1": 0.3275945757364317,
+      "target_exposure_mae": 0.11105364103775249,
+      "target_rows": 206,
+      "action_counts": {
+        "ADD_LONG": 128,
+        "REDUCE_LONG": 62,
+        "CLOSE_LONG": 8,
+        "OPEN_LONG": 8
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 149,
+        "REDUCE_LONG": 57
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8359375,
+        "reduce_recall": 0.5161290322580645,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 206,
+          "mean": 0.00019961165048543674,
+          "min": 5.642857142857136e-05,
+          "max": 0.000447142857142857
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 206,
+          "mean": 0.3713577317314437,
+          "min": -0.34264727833314196,
+          "max": 1.482600952516786
+        },
+        "feature_macd_histogram": {
+          "count": 206,
+          "mean": -4.866968883827857e-06,
+          "min": -0.00013554156268980066,
+          "max": 0.00015200515557405402
+        },
+        "feature_return_24bar": {
+          "count": 206,
+          "mean": -0.00946732585090442,
+          "min": -0.059277446509996556,
+          "max": 0.08689248895434476
+        },
+        "feature_rsi_14": {
+          "count": 206,
+          "mean": 44.59126021923432,
+          "min": 18.42407998038847,
+          "max": 82.13714383630202
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 206,
+          "mean": 0.6800836030204964,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "ETHZ21": {
+      "rows": 306,
+      "labeled_rows": 306,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8104575163398693,
+      "action_macro_f1": 0.40727699530516437,
+      "target_exposure_mae": 0.034365369498521654,
+      "target_rows": 306,
+      "action_counts": {
+        "ADD_LONG": 162,
+        "REDUCE_LONG": 140,
+        "CLOSE_LONG": 2,
+        "OPEN_LONG": 2
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 162,
+        "REDUCE_LONG": 144
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8333333333333334,
+        "reduce_recall": 0.8071428571428572,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 306,
+          "mean": 0.0003547572362278239,
+          "min": 9.857142857142703e-05,
+          "max": 0.0009428571428571392
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 306,
+          "mean": 0.45653398728250144,
+          "min": -0.3354184565080983,
+          "max": 1.2810566234668475
+        },
+        "feature_macd_histogram": {
+          "count": 306,
+          "mean": -5.344579472364067e-06,
+          "min": -0.00036350611662231726,
+          "max": 0.0004521752362707456
+        },
+        "feature_return_24bar": {
+          "count": 306,
+          "mean": 0.0005652797664408845,
+          "min": -0.055867618035524425,
+          "max": 0.07251724691159955
+        },
+        "feature_rsi_14": {
+          "count": 306,
+          "mean": 48.987162888670845,
+          "min": 13.543004229228117,
+          "max": 81.04801022027445
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 306,
+          "mean": 0.5703976034858383,
+          "min": 0.027777777777777776,
+          "max": 1.0
+        }
+      }
+    },
+    "LINKUSDT": {
+      "rows": 34,
+      "labeled_rows": 34,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6764705882352942,
+      "action_macro_f1": 0.3655523255813954,
+      "target_exposure_mae": 0.2181561141977007,
+      "target_rows": 34,
+      "action_counts": {
+        "ADD_LONG": 18,
+        "CLOSE_LONG": 5,
+        "OPEN_LONG": 4,
+        "REDUCE_LONG": 7
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 25,
+        "REDUCE_LONG": 9
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.7142857142857143,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 34,
+          "mean": 0.4625882352941175,
+          "min": 0.2909285714285712,
+          "max": 1.0870714285714282
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 34,
+          "mean": 0.6929577413609282,
+          "min": -0.18522473739002454,
+          "max": 1.0484400026890093
+        },
+        "feature_macd_histogram": {
+          "count": 34,
+          "mean": 0.043035122270082306,
+          "min": -0.1808749512578685,
+          "max": 0.2370581307737778
+        },
+        "feature_return_24bar": {
+          "count": 34,
+          "mean": 0.03565621394762604,
+          "min": -0.09393895014331433,
+          "max": 0.1337083934564438
+        },
+        "feature_rsi_14": {
+          "count": 34,
+          "mean": 58.6466462842141,
+          "min": 28.746601422344582,
+          "max": 68.83044964094498
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 34,
+          "mean": 0.7577614379084965,
+          "min": 0.16666666666666666,
+          "max": 1.0
+        }
+      }
+    },
+    "LINKUSDTZ20": {
+      "rows": 2,
+      "labeled_rows": 2,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 0.6674665808677673,
+      "target_rows": 2,
+      "action_counts": {
+        "ADD_SHORT": 1,
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 2
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 1.0,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 2,
+          "mean": 0.2895357142857143,
+          "min": 0.2895357142857143,
+          "max": 0.2895357142857143
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 2,
+          "mean": 0.8733952965278822,
+          "min": 0.8733952965278822,
+          "max": 0.8733952965278822
+        },
+        "feature_macd_histogram": {
+          "count": 2,
+          "mean": 0.10146294046379098,
+          "min": 0.10146294046379098,
+          "max": 0.10146294046379098
+        },
+        "feature_return_24bar": {
+          "count": 2,
+          "mean": 0.05272584797940216,
+          "min": 0.05272584797940216,
+          "max": 0.05272584797940216
+        },
+        "feature_rsi_14": {
+          "count": 2,
+          "mean": 61.88356851930103,
+          "min": 61.88356851930103,
+          "max": 61.88356851930103
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 2,
+          "mean": 0.9861111111111112,
+          "min": 0.9861111111111112,
+          "max": 0.9861111111111112
+        }
+      }
+    },
+    "LTCH21": {
+      "rows": 139,
+      "labeled_rows": 139,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7338129496402878,
+      "action_macro_f1": 0.37098741653826406,
+      "target_exposure_mae": 0.08036118549382501,
+      "target_rows": 139,
+      "action_counts": {
+        "ADD_LONG": 79,
+        "REDUCE_LONG": 47,
+        "CLOSE_LONG": 7,
+        "OPEN_LONG": 6
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 98,
+        "REDUCE_LONG": 41
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9240506329113924,
+        "reduce_recall": 0.6170212765957447,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 139,
+          "mean": 6.01130524152107e-05,
+          "min": 1.6071428571428504e-05,
+          "max": 0.0001332142857142857
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 139,
+          "mean": 0.3825957449492751,
+          "min": -0.5161125113122568,
+          "max": 1.1718620339578067
+        },
+        "feature_macd_histogram": {
+          "count": 139,
+          "mean": -3.665626657739706e-06,
+          "min": -4.048145960113915e-05,
+          "max": 4.667784429718136e-05
+        },
+        "feature_return_24bar": {
+          "count": 139,
+          "mean": -0.002962031529528404,
+          "min": -0.09494949494949512,
+          "max": 0.2027194066749074
+        },
+        "feature_rsi_14": {
+          "count": 139,
+          "mean": 47.23622170220519,
+          "min": 21.57592631633966,
+          "max": 80.00055415964177
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 139,
+          "mean": 0.5824340527577935,
+          "min": 0.041666666666666664,
+          "max": 1.0
+        }
+      }
+    },
+    "LTCM20": {
+      "rows": 17,
+      "labeled_rows": 17,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.23529411764705882,
+      "action_macro_f1": 0.07341269841269843,
+      "target_exposure_mae": 0.3166038000491069,
+      "target_rows": 17,
+      "action_counts": {
+        "ADD_SHORT": 3,
+        "FLIP_SHORT_TO_LONG": 1,
+        "ADD_LONG": 4,
+        "REDUCE_LONG": 4,
+        "FLIP_LONG_TO_SHORT": 1,
+        "REDUCE_SHORT": 1,
+        "CLOSE_SHORT": 1,
+        "OPEN_LONG": 1,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 12,
+        "ADD_SHORT": 2,
+        "REDUCE_LONG": 3
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8571428571428571,
+        "reduce_recall": 0.2,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 17,
+          "mean": 2.4663865546218477e-05,
+          "min": 1.2857142857142891e-05,
+          "max": 3.392857142857135e-05
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 17,
+          "mean": 0.4738374124728587,
+          "min": -0.031728451335623964,
+          "max": 1.071288106601221
+        },
+        "feature_macd_histogram": {
+          "count": 17,
+          "mean": 1.306469479109759e-06,
+          "min": -1.424745379719193e-05,
+          "max": 1.5577888619660626e-05
+        },
+        "feature_return_24bar": {
+          "count": 17,
+          "mean": 0.005217066543448223,
+          "min": -0.02112029384756664,
+          "max": 0.0453108535300315
+        },
+        "feature_rsi_14": {
+          "count": 17,
+          "mean": 52.02150887209396,
+          "min": 34.805185105835136,
+          "max": 78.53967985055026
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 17,
+          "mean": 0.5310457516339869,
+          "min": 0.09722222222222222,
+          "max": 0.8472222222222222
+        }
+      }
+    },
+    "LTCM21": {
+      "rows": 9,
+      "labeled_rows": 9,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6666666666666666,
+      "action_macro_f1": 0.26666666666666666,
+      "target_exposure_mae": 0.2224188296757047,
+      "target_rows": 9,
+      "action_counts": {
+        "CLOSE_LONG": 2,
+        "OPEN_LONG": 1,
+        "ADD_LONG": 6
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 9
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 9,
+          "mean": 6.761904761904756e-05,
+          "min": 7.857142857142908e-06,
+          "max": 8.535714285714278e-05
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 9,
+          "mean": 0.9785415917204775,
+          "min": 0.6076813898610167,
+          "max": 1.2942841117873936
+        },
+        "feature_macd_histogram": {
+          "count": 9,
+          "mean": 1.3237742658395273e-05,
+          "min": -1.6879739967926287e-06,
+          "max": 1.9487454593457134e-05
+        },
+        "feature_return_24bar": {
+          "count": 9,
+          "mean": 0.02513251164803128,
+          "min": 0.0029940119760478723,
+          "max": 0.04466858789625361
+        },
+        "feature_rsi_14": {
+          "count": 9,
+          "mean": 62.04514130928716,
+          "min": 53.09208726516111,
+          "max": 71.58136343084745
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 9,
+          "mean": 0.5833333333333334,
+          "min": 0.041666666666666664,
+          "max": 0.7916666666666666
+        }
+      }
+    },
+    "LTCU20": {
+      "rows": 85,
+      "labeled_rows": 85,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7058823529411765,
+      "action_macro_f1": 0.3799251379038613,
+      "target_exposure_mae": 0.1678816582054076,
+      "target_rows": 85,
+      "action_counts": {
+        "ADD_LONG": 47,
+        "REDUCE_LONG": 23,
+        "CLOSE_LONG": 8,
+        "OPEN_LONG": 7
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 61,
+        "REDUCE_LONG": 24
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9148936170212766,
+        "reduce_recall": 0.7391304347826086,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 85,
+          "mean": 3.121848739495798e-05,
+          "min": 7.857142857143156e-06,
+          "max": 7.21428571428573e-05
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 85,
+          "mean": 0.6027991875139111,
+          "min": -0.13223232959659803,
+          "max": 1.4947780321927757
+        },
+        "feature_macd_histogram": {
+          "count": 85,
+          "mean": 4.784278562104732e-06,
+          "min": -2.5191420503484318e-05,
+          "max": 3.329437892005992e-05
+        },
+        "feature_return_24bar": {
+          "count": 85,
+          "mean": 0.0094623551693606,
+          "min": -0.052532833020637826,
+          "max": 0.0639913232104119
+        },
+        "feature_rsi_14": {
+          "count": 85,
+          "mean": 54.60995732125615,
+          "min": 25.304398407497047,
+          "max": 85.00799363556331
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 85,
+          "mean": 0.6081699346405228,
+          "min": 0.05555555555555555,
+          "max": 1.0
+        }
+      }
+    },
+    "LTCU21": {
+      "rows": 17,
+      "labeled_rows": 17,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.5294117647058824,
+      "action_macro_f1": 0.18000000000000002,
+      "target_exposure_mae": 0.21087064036201028,
+      "target_rows": 17,
+      "action_counts": {
+        "ADD_LONG": 10,
+        "REDUCE_LONG": 2,
+        "CLOSE_LONG": 3,
+        "OPEN_LONG": 2
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 15,
+        "REDUCE_LONG": 2
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9,
+        "reduce_recall": 0.0,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 17,
+          "mean": 2.8063025210084056e-05,
+          "min": 9.999999999999964e-06,
+          "max": 5.692857142857143e-05
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 17,
+          "mean": 0.519203460438012,
+          "min": -0.4210706379260127,
+          "max": 1.0579640499732297
+        },
+        "feature_macd_histogram": {
+          "count": 17,
+          "mean": -2.0800081226526707e-06,
+          "min": -2.5604622969565427e-05,
+          "max": 9.335440642879137e-06
+        },
+        "feature_return_24bar": {
+          "count": 17,
+          "mean": 0.02457416655877372,
+          "min": -0.03793293018141841,
+          "max": 0.14103564923237055
+        },
+        "feature_rsi_14": {
+          "count": 17,
+          "mean": 52.05386474906884,
+          "min": 17.95671094549246,
+          "max": 68.42448718700209
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 17,
+          "mean": 0.7214052287581699,
+          "min": 0.2777777777777778,
+          "max": 1.0
+        }
+      }
+    },
+    "LTCUSD": {
+      "rows": 1336,
+      "labeled_rows": 1336,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7522455089820359,
+      "action_macro_f1": 0.1556001205111904,
+      "target_exposure_mae": 0.02993333385900714,
+      "target_rows": 1336,
+      "action_counts": {
+        "OPEN_LONG": 55,
+        "CLOSE_LONG": 54,
+        "ADD_LONG": 720,
+        "REDUCE_LONG": 486,
+        "FLIP_LONG_TO_SHORT": 3,
+        "CLOSE_SHORT": 5,
+        "ADD_SHORT": 1,
+        "REDUCE_SHORT": 9,
+        "FLIP_SHORT_TO_LONG": 1,
+        "OPEN_SHORT": 2
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 878,
+        "REDUCE_LONG": 457,
+        "ADD_SHORT": 1
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9181692094313454,
+        "reduce_recall": 0.692929292929293,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 1336,
+          "mean": 3.0482896706586833,
+          "min": 0.1907142857142848,
+          "max": 15.866428571428568
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 1336,
+          "mean": 0.5268564131616333,
+          "min": -0.42000164408574225,
+          "max": 1.5787613792179975
+        },
+        "feature_macd_histogram": {
+          "count": 1336,
+          "mean": -0.09846769575506885,
+          "min": -5.0286452152517755,
+          "max": 3.795360052673443
+        },
+        "feature_return_24bar": {
+          "count": 1336,
+          "mean": 0.009982182303932425,
+          "min": -0.16456074022485334,
+          "max": 0.30542188001283277
+        },
+        "feature_rsi_14": {
+          "count": 1336,
+          "mean": 51.8005576636647,
+          "min": 13.371492304074977,
+          "max": 88.96433177159511
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 1336,
+          "mean": 0.6128160345974711,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "LTCZ20": {
+      "rows": 99,
+      "labeled_rows": 99,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.5858585858585859,
+      "action_macro_f1": 0.30013440860215057,
+      "target_exposure_mae": 0.15803225808478963,
+      "target_rows": 99,
+      "action_counts": {
+        "ADD_LONG": 51,
+        "CLOSE_LONG": 8,
+        "OPEN_LONG": 8,
+        "REDUCE_LONG": 32
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 69,
+        "REDUCE_LONG": 30
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8431372549019608,
+        "reduce_recall": 0.46875,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 99,
+          "mean": 5.994949494949493e-05,
+          "min": 1.0714285714285587e-05,
+          "max": 0.00011107142857142869
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 99,
+          "mean": 0.521462601064668,
+          "min": -0.26242126202817845,
+          "max": 1.107901848727178
+        },
+        "feature_macd_histogram": {
+          "count": 99,
+          "mean": -1.220105562652177e-08,
+          "min": -3.126709274951142e-05,
+          "max": 3.4921314323586615e-05
+        },
+        "feature_return_24bar": {
+          "count": 99,
+          "mean": 0.019890313632542882,
+          "min": -0.06827309236947787,
+          "max": 0.10983397190293731
+        },
+        "feature_rsi_14": {
+          "count": 99,
+          "mean": 53.521364223855855,
+          "min": 28.209041022643746,
+          "max": 81.10941960141835
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 99,
+          "mean": 0.6856060606060609,
+          "min": 0.027777777777777776,
+          "max": 1.0
+        }
+      }
+    },
+    "LTCZ21": {
+      "rows": 14,
+      "labeled_rows": 14,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7142857142857143,
+      "action_macro_f1": 0.4888888888888889,
+      "target_exposure_mae": 0.34763563716927764,
+      "target_rows": 14,
+      "action_counts": {
+        "ADD_LONG": 5,
+        "REDUCE_LONG": 8,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 7,
+        "REDUCE_LONG": 7
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.8,
+        "reduce_recall": 0.75,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 14,
+          "mean": 1.8107142857142865e-05,
+          "min": 5.2142857142856625e-06,
+          "max": 3.228571428571426e-05
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 14,
+          "mean": 0.5831276877599193,
+          "min": 0.1293475223646632,
+          "max": 0.9218126804263241
+        },
+        "feature_macd_histogram": {
+          "count": 14,
+          "mean": 5.201497511279936e-06,
+          "min": -4.744252804346932e-06,
+          "max": 2.288727629589563e-05
+        },
+        "feature_return_24bar": {
+          "count": 14,
+          "mean": 0.012332190936924439,
+          "min": -0.021604938271604812,
+          "max": 0.04470198675496673
+        },
+        "feature_rsi_14": {
+          "count": 14,
+          "mean": 52.33738321458145,
+          "min": 36.73916330639237,
+          "max": 63.74424612367805
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 14,
+          "mean": 0.441468253968254,
+          "min": 0.2361111111111111,
+          "max": 0.8472222222222222
+        }
+      }
+    },
+    "LUNAUSD": {
+      "rows": 74,
+      "labeled_rows": 74,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.43243243243243246,
+      "action_macro_f1": 0.1608251504592968,
+      "target_exposure_mae": 0.13127594409976995,
+      "target_rows": 74,
+      "action_counts": {
+        "ADD_LONG": 3,
+        "REDUCE_LONG": 1,
+        "CLOSE_LONG": 3,
+        "OPEN_LONG": 2,
+        "OPEN_SHORT": 4,
+        "ADD_SHORT": 40,
+        "REDUCE_SHORT": 17,
+        "CLOSE_SHORT": 4
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 38,
+        "REDUCE_LONG": 1,
+        "ADD_SHORT": 30,
+        "REDUCE_SHORT": 5
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.2777777777777778,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 74,
+          "mean": 1.2909469111969103,
+          "min": 0.4627857142857132,
+          "max": 2.5899999999999994
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 74,
+          "mean": 0.505443784341625,
+          "min": -0.182437870713876,
+          "max": 1.131828956064337
+        },
+        "feature_macd_histogram": {
+          "count": 74,
+          "mean": -0.0912582768846862,
+          "min": -0.9865200333070372,
+          "max": 0.5380268204235148
+        },
+        "feature_return_24bar": {
+          "count": 74,
+          "mean": 0.002588918254260386,
+          "min": -0.22881894164570782,
+          "max": 0.16506980232755075
+        },
+        "feature_rsi_14": {
+          "count": 74,
+          "mean": 49.84831833496116,
+          "min": 21.488804017093912,
+          "max": 78.30712109875732
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 74,
+          "mean": 0.5930930930930933,
+          "min": 0.1388888888888889,
+          "max": 1.0
+        }
+      }
+    },
+    "TRXH21": {
+      "rows": 150,
+      "labeled_rows": 150,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.68,
+      "action_macro_f1": 0.23903187556671548,
+      "target_exposure_mae": 0.11258182845277209,
+      "target_rows": 150,
+      "action_counts": {
+        "ADD_LONG": 71,
+        "REDUCE_LONG": 59,
+        "CLOSE_LONG": 10,
+        "OPEN_LONG": 8,
+        "OPEN_SHORT": 1,
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 91,
+        "REDUCE_LONG": 59
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9014084507042254,
+        "reduce_recall": 0.6440677966101694,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 150,
+          "mean": 2.5647619047619064e-08,
+          "min": 6.428571428571435e-09,
+          "max": 7.714285714285712e-08
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 150,
+          "mean": 0.43489307736165056,
+          "min": -0.45021214934378206,
+          "max": 1.31240556733453
+        },
+        "feature_macd_histogram": {
+          "count": 150,
+          "mean": -8.206757618025216e-10,
+          "min": -2.3253107783701463e-08,
+          "max": 8.932457018664249e-09
+        },
+        "feature_return_24bar": {
+          "count": 150,
+          "mean": -0.012700863703319172,
+          "min": -0.24390243902439024,
+          "max": 0.15909090909090895
+        },
+        "feature_rsi_14": {
+          "count": 150,
+          "mean": 48.14728871740567,
+          "min": 21.0220937905881,
+          "max": 75.7520683209377
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 150,
+          "mean": 0.7087037037037037,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "TRXM20": {
+      "rows": 36,
+      "labeled_rows": 36,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6666666666666666,
+      "action_macro_f1": 0.36859582542694497,
+      "target_exposure_mae": 0.10186865859561499,
+      "target_rows": 36,
+      "action_counts": {
+        "ADD_LONG": 13,
+        "REDUCE_LONG": 16,
+        "CLOSE_LONG": 4,
+        "OPEN_LONG": 3
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 18,
+        "REDUCE_LONG": 18
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8461538461538461,
+        "reduce_recall": 0.8125,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 36,
+          "mean": 1.6686507936507927e-08,
+          "min": 8.57142857142858e-09,
+          "max": 2.7857142857142816e-08
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 36,
+          "mean": 0.4891989772529077,
+          "min": -0.2958931749587677,
+          "max": 1.2444330275088058
+        },
+        "feature_macd_histogram": {
+          "count": 36,
+          "mean": 4.0197811519505753e-10,
+          "min": -4.246842701157642e-09,
+          "max": 4.5284191355796046e-09
+        },
+        "feature_return_24bar": {
+          "count": 36,
+          "mean": 0.01760198863676106,
+          "min": -0.033333333333333215,
+          "max": 0.07272727272727275
+        },
+        "feature_rsi_14": {
+          "count": 36,
+          "mean": 52.544925177149224,
+          "min": 20.94978945975403,
+          "max": 80.54211828632633
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 36,
+          "mean": 0.5806327160493829,
+          "min": 0.027777777777777776,
+          "max": 0.9861111111111112
+        }
+      }
+    },
+    "TRXM21": {
+      "rows": 176,
+      "labeled_rows": 176,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8409090909090909,
+      "action_macro_f1": 0.3338830889222895,
+      "target_exposure_mae": 0.038298053910883575,
+      "target_rows": 176,
+      "action_counts": {
+        "REDUCE_LONG": 52,
+        "CLOSE_LONG": 5,
+        "OPEN_LONG": 4,
+        "ADD_LONG": 115
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 124,
+        "REDUCE_LONG": 51,
+        "ADD_SHORT": 1
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9565217391304348,
+        "reduce_recall": 0.75,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 176,
+          "mean": 5.422077922077913e-08,
+          "min": 7.857142857142872e-09,
+          "max": 1.0785714285714285e-07
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 176,
+          "mean": 0.5716438261313658,
+          "min": -0.42616083992109144,
+          "max": 1.3164530379268191
+        },
+        "feature_macd_histogram": {
+          "count": 176,
+          "mean": 1.0299486774047964e-09,
+          "min": -5.538568319987417e-08,
+          "max": 4.650293513226723e-08
+        },
+        "feature_return_24bar": {
+          "count": 176,
+          "mean": 0.11570151848139552,
+          "min": -0.250965250965251,
+          "max": 0.6476190476190478
+        },
+        "feature_rsi_14": {
+          "count": 176,
+          "mean": 55.788035628703504,
+          "min": 10.149892920293127,
+          "max": 95.86499228294944
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 176,
+          "mean": 0.655618686868687,
+          "min": 0.027777777777777776,
+          "max": 1.0
+        }
+      }
+    },
+    "TRXU20": {
+      "rows": 112,
+      "labeled_rows": 112,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.42857142857142855,
+      "action_macro_f1": 0.16232446415373245,
+      "target_exposure_mae": 0.1619642520303549,
+      "target_rows": 112,
+      "action_counts": {
+        "ADD_LONG": 41,
+        "REDUCE_LONG": 21,
+        "CLOSE_LONG": 12,
+        "OPEN_LONG": 10,
+        "OPEN_SHORT": 7,
+        "CLOSE_SHORT": 7,
+        "ADD_SHORT": 13,
+        "REDUCE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 82,
+        "REDUCE_LONG": 21,
+        "ADD_SHORT": 9
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9259259259259259,
+        "reduce_recall": 0.3181818181818182,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 112,
+          "mean": 5.412627551020407e-08,
+          "min": 7.142857142857165e-09,
+          "max": 2.628571428571429e-07
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 112,
+          "mean": 0.6263861163771898,
+          "min": -0.148870506443107,
+          "max": 1.454561715142215
+        },
+        "feature_macd_histogram": {
+          "count": 112,
+          "mean": 2.3478912565835804e-09,
+          "min": -2.6517952946919662e-08,
+          "max": 8.205999219167287e-08
+        },
+        "feature_return_24bar": {
+          "count": 112,
+          "mean": 0.0437119611422388,
+          "min": -0.09594095940959413,
+          "max": 0.3749999999999998
+        },
+        "feature_rsi_14": {
+          "count": 112,
+          "mean": 55.85463227626165,
+          "min": 27.52776329850151,
+          "max": 85.41467723877562
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 112,
+          "mean": 0.6274801587301587,
+          "min": 0.027777777777777776,
+          "max": 1.0
+        }
+      }
+    },
+    "TRXU21": {
+      "rows": 44,
+      "labeled_rows": 44,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6590909090909091,
+      "action_macro_f1": 0.33673469387755106,
+      "target_exposure_mae": 0.204642648091777,
+      "target_rows": 44,
+      "action_counts": {
+        "ADD_LONG": 23,
+        "REDUCE_LONG": 17,
+        "CLOSE_LONG": 2,
+        "OPEN_LONG": 2
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 26,
+        "REDUCE_LONG": 18
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8260869565217391,
+        "reduce_recall": 0.5882352941176471,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 44,
+          "mean": 1.0019155844155854e-08,
+          "min": 1.9071428571428793e-09,
+          "max": 5.445714285714286e-08
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 44,
+          "mean": 0.47154144759871847,
+          "min": -0.2204597069784755,
+          "max": 1.041364004094306
+        },
+        "feature_macd_histogram": {
+          "count": 44,
+          "mean": 1.3800723022141593e-09,
+          "min": -6.23341273533952e-09,
+          "max": 3.487234692910592e-08
+        },
+        "feature_return_24bar": {
+          "count": 44,
+          "mean": 0.005607862636406588,
+          "min": -0.054056489031037436,
+          "max": 0.18996916554249355
+        },
+        "feature_rsi_14": {
+          "count": 44,
+          "mean": 50.02312476762426,
+          "min": 24.612909614612718,
+          "max": 86.72148910501403
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 44,
+          "mean": 0.6562499999999999,
+          "min": 0.08333333333333333,
+          "max": 1.0
+        }
+      }
+    },
+    "TRXUSDT": {
+      "rows": 6,
+      "labeled_rows": 6,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8333333333333334,
+      "action_macro_f1": 0.45454545454545453,
+      "target_exposure_mae": 0.07562888135984815,
+      "target_rows": 6,
+      "action_counts": {
+        "ADD_LONG": 6
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 5,
+        "REDUCE_LONG": 1
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.8333333333333334,
+        "reduce_recall": null,
+        "close_recall": null,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 6,
+          "mean": 0.0008942857142857156,
+          "min": 0.000763571428571431,
+          "max": 0.0010878571428571424
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 6,
+          "mean": 0.7785860369311193,
+          "min": -0.24529267876757394,
+          "max": 1.0789390060863961
+        },
+        "feature_macd_histogram": {
+          "count": 6,
+          "mean": 0.00011560156591524719,
+          "min": -0.0002606362086232303,
+          "max": 0.0002432718076466415
+        },
+        "feature_return_24bar": {
+          "count": 6,
+          "mean": 0.023367219708027798,
+          "min": -0.04701102727800355,
+          "max": 0.04038179148311305
+        },
+        "feature_rsi_14": {
+          "count": 6,
+          "mean": 60.26560433335735,
+          "min": 38.13993291207702,
+          "max": 66.49866455933373
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 6,
+          "mean": 0.4791666666666667,
+          "min": 0.2916666666666667,
+          "max": 0.9305555555555556
+        }
+      }
+    },
+    "TRXZ20": {
+      "rows": 68,
+      "labeled_rows": 68,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6323529411764706,
+      "action_macro_f1": 0.264520202020202,
+      "target_exposure_mae": 0.13754803706868102,
+      "target_rows": 68,
+      "action_counts": {
+        "ADD_LONG": 42,
+        "REDUCE_LONG": 13,
+        "CLOSE_LONG": 7,
+        "OPEN_LONG": 6
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 57,
+        "REDUCE_LONG": 11
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9523809523809523,
+        "reduce_recall": 0.23076923076923078,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 68,
+          "mean": 1.5630252100840354e-08,
+          "min": 5.714285714285735e-09,
+          "max": 2.7857142857142952e-08
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 68,
+          "mean": 0.41205155600670357,
+          "min": -0.18879719856865773,
+          "max": 1.2791278649137432
+        },
+        "feature_macd_histogram": {
+          "count": 68,
+          "mean": 9.61835366898582e-10,
+          "min": -8.294192701383491e-09,
+          "max": 1.0548665659866012e-08
+        },
+        "feature_return_24bar": {
+          "count": 68,
+          "mean": -0.011780577356270258,
+          "min": -0.058139534883721034,
+          "max": 0.08260869565217388
+        },
+        "feature_rsi_14": {
+          "count": 68,
+          "mean": 46.483576259615965,
+          "min": 17.299338255580338,
+          "max": 76.52376004682705
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 68,
+          "mean": 0.590686274509804,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "TRXZ21": {
+      "rows": 22,
+      "labeled_rows": 22,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8636363636363636,
+      "action_macro_f1": 0.5696969696969697,
+      "target_exposure_mae": 0.14364556240973536,
+      "target_rows": 22,
+      "action_counts": {
+        "ADD_LONG": 6,
+        "REDUCE_LONG": 15,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 4,
+        "REDUCE_LONG": 18
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.6666666666666666,
+        "reduce_recall": 1.0,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 22,
+          "mean": 1.1589610389610396e-08,
+          "min": 4.3000000000000054e-09,
+          "max": 2.0464285714285754e-08
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 22,
+          "mean": 0.5676104230140401,
+          "min": -0.04220932323095265,
+          "max": 0.9479657993307771
+        },
+        "feature_macd_histogram": {
+          "count": 22,
+          "mean": -1.5355345364484127e-09,
+          "min": -1.2867491908626384e-08,
+          "max": 5.562605007903401e-09
+        },
+        "feature_return_24bar": {
+          "count": 22,
+          "mean": 0.011504195177100314,
+          "min": -0.04654027420736939,
+          "max": 0.06703816278284358
+        },
+        "feature_rsi_14": {
+          "count": 22,
+          "mean": 56.672016806696476,
+          "min": 28.3324023245291,
+          "max": 79.19065723708152
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 22,
+          "mean": 0.6616161616161617,
+          "min": 0.1111111111111111,
+          "max": 0.9861111111111112
+        }
+      }
+    },
+    "UNIUSDT": {
+      "rows": 73,
+      "labeled_rows": 73,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7534246575342466,
+      "action_macro_f1": 0.3543512245961438,
+      "target_exposure_mae": 0.10992218099244126,
+      "target_rows": 73,
+      "action_counts": {
+        "ADD_LONG": 46,
+        "REDUCE_LONG": 20,
+        "CLOSE_LONG": 4,
+        "OPEN_LONG": 3
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 55,
+        "REDUCE_LONG": 18
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9782608695652174,
+        "reduce_recall": 0.5,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 73,
+          "mean": 0.6305508806262227,
+          "min": 0.1909285714285713,
+          "max": 1.4923571428571418
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 73,
+          "mean": 0.6950319461978648,
+          "min": 0.01362722228237638,
+          "max": 1.2310655118950518
+        },
+        "feature_macd_histogram": {
+          "count": 73,
+          "mean": 0.08698164943960159,
+          "min": -0.5184555979060952,
+          "max": 0.3384017427409441
+        },
+        "feature_return_24bar": {
+          "count": 73,
+          "mean": 0.014385267127419884,
+          "min": -0.12108143970807761,
+          "max": 0.15323117921385743
+        },
+        "feature_rsi_14": {
+          "count": 73,
+          "mean": 55.80869947209802,
+          "min": 33.771376104160794,
+          "max": 77.83355410425611
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 73,
+          "mean": 0.720129375951294,
+          "min": 0.05555555555555555,
+          "max": 0.9861111111111112
+        }
+      }
+    },
+    "XBTM21": {
+      "rows": 1,
+      "labeled_rows": 1,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 4.112720489501953e-05,
+      "target_rows": 1,
+      "action_counts": {
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 1
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 1,
+          "mean": 626.5714285714286,
+          "min": 626.5714285714286,
+          "max": 626.5714285714286
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 1,
+          "mean": -0.01933605372469628,
+          "min": -0.01933605372469628,
+          "max": -0.01933605372469628
+        },
+        "feature_macd_histogram": {
+          "count": 1,
+          "mean": -181.30173115928494,
+          "min": -181.30173115928494,
+          "max": -181.30173115928494
+        },
+        "feature_return_24bar": {
+          "count": 1,
+          "mean": -0.028153704005652536,
+          "min": -0.028153704005652536,
+          "max": -0.028153704005652536
+        },
+        "feature_rsi_14": {
+          "count": 1,
+          "mean": 32.87114050599429,
+          "min": 32.87114050599429,
+          "max": 32.87114050599429
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 1,
+          "mean": 0.3194444444444444,
+          "min": 0.3194444444444444,
+          "max": 0.3194444444444444
+        }
+      }
+    },
+    "XBTUSD": {
+      "rows": 20798,
+      "labeled_rows": 20798,
+      "observed_action_rate": 0.9745648620059622,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6869410520242331,
+      "action_macro_f1": 0.21988661414889052,
+      "target_exposure_mae": 0.018402493326012077,
+      "target_rows": 20798,
+      "action_counts": {
+        "OPEN_LONG": 354,
+        "ADD_LONG": 5511,
+        "HOLD_LONG": 128,
+        "CLOSE_LONG": 364,
+        "NO_TRADE": 117,
+        "OPEN_SHORT": 199,
+        "CLOSE_SHORT": 194,
+        "REDUCE_LONG": 4096,
+        "ADD_SHORT": 5336,
+        "REDUCE_SHORT": 4089,
+        "FLIP_LONG_TO_SHORT": 59,
+        "HOLD_SHORT": 284,
+        "FLIP_SHORT_TO_LONG": 67
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 6530,
+        "REDUCE_LONG": 4071,
+        "ADD_SHORT": 6270,
+        "REDUCE_SHORT": 3927
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.8453950401032544,
+        "reduce_recall": 0.6961514966401955,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 20798,
+          "mean": 529.5133683870712,
+          "min": 11.857142857142858,
+          "max": 3108.5
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 20798,
+          "mean": 0.45753897608487337,
+          "min": -0.563321675692917,
+          "max": 1.5751154217138523
+        },
+        "feature_macd_histogram": {
+          "count": 20798,
+          "mean": -22.727782833390233,
+          "min": -899.4914074655304,
+          "max": 892.6413506298254
+        },
+        "feature_return_24bar": {
+          "count": 20798,
+          "mean": -0.005206771067605884,
+          "min": -0.23070367803292846,
+          "max": 0.2326416069714201
+        },
+        "feature_rsi_14": {
+          "count": 20798,
+          "mean": 48.896402461031954,
+          "min": 5.950890478395465,
+          "max": 91.28725973720424
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 20798,
+          "mean": 0.6102656772552968,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "XLMUSDT": {
+      "rows": 5,
+      "labeled_rows": 5,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6,
+      "action_macro_f1": 0.43333333333333335,
+      "target_exposure_mae": 0.4980983018875122,
+      "target_rows": 5,
+      "action_counts": {
+        "ADD_LONG": 2,
+        "REDUCE_LONG": 2,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 3,
+        "REDUCE_LONG": 2
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 1.0,
+        "reduce_recall": 0.5,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 5,
+          "mean": 0.020140571428571428,
+          "min": 0.01813714285714285,
+          "max": 0.023179285714285718
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 5,
+          "mean": 0.9346615938854475,
+          "min": 0.8552263885554255,
+          "max": 1.0700797855331683
+        },
+        "feature_macd_histogram": {
+          "count": 5,
+          "mean": 0.00353487947340995,
+          "min": 0.0015405202448673938,
+          "max": 0.006892906306894708
+        },
+        "feature_return_24bar": {
+          "count": 5,
+          "mean": 0.20297432669003687,
+          "min": 0.16266880434112352,
+          "max": 0.26460054820831913
+        },
+        "feature_rsi_14": {
+          "count": 5,
+          "mean": 70.72573169848364,
+          "min": 65.74638352692291,
+          "max": 78.79105910306812
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 5,
+          "mean": 0.675,
+          "min": 0.6111111111111112,
+          "max": 0.8888888888888888
+        }
+      }
+    },
+    "XRPUSD": {
+      "rows": 1205,
+      "labeled_rows": 1205,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6846473029045643,
+      "action_macro_f1": 0.2394128062315967,
+      "target_exposure_mae": 0.029868890440000656,
+      "target_rows": 1205,
+      "action_counts": {
+        "ADD_LONG": 493,
+        "REDUCE_LONG": 421,
+        "CLOSE_LONG": 60,
+        "OPEN_LONG": 59,
+        "OPEN_SHORT": 15,
+        "ADD_SHORT": 99,
+        "CLOSE_SHORT": 18,
+        "REDUCE_SHORT": 35,
+        "FLIP_LONG_TO_SHORT": 4,
+        "FLIP_SHORT_TO_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 690,
+        "REDUCE_LONG": 416,
+        "ADD_SHORT": 93,
+        "REDUCE_SHORT": 6
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9239864864864865,
+        "reduce_recall": 0.7017543859649122,
+        "close_recall": 0.0,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 1205,
+          "mean": 0.02445464137522225,
+          "min": 0.0011785714285714375,
+          "max": 0.14833571428571427
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 1205,
+          "mean": 0.6492473082941327,
+          "min": -0.4261864366918653,
+          "max": 1.455444263173303
+        },
+        "feature_macd_histogram": {
+          "count": 1205,
+          "mean": 0.0010155150904819319,
+          "min": -0.03101765596432772,
+          "max": 0.01834967131567628
+        },
+        "feature_return_24bar": {
+          "count": 1205,
+          "mean": 0.1340851877333544,
+          "min": -0.4699010445299615,
+          "max": 0.6096816397732228
+        },
+        "feature_rsi_14": {
+          "count": 1205,
+          "mean": 57.98086882440114,
+          "min": 13.279810004188889,
+          "max": 92.71906621643726
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 1205,
+          "mean": 0.712828492392805,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "XTZUSDTZ20": {
+      "rows": 8,
+      "labeled_rows": 8,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.875,
+      "action_macro_f1": 0.4666666666666667,
+      "target_exposure_mae": 0.23327259506498063,
+      "target_rows": 8,
+      "action_counts": {
+        "ADD_LONG": 7,
+        "CLOSE_LONG": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 8
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 1.0,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 8,
+          "mean": 0.026232142857142832,
+          "min": 0.023392857142857056,
+          "max": 0.02789285714285707
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 8,
+          "mean": 0.7646086440392349,
+          "min": 0.30271598294626184,
+          "max": 1.0636899168422087
+        },
+        "feature_macd_histogram": {
+          "count": 8,
+          "mean": 0.003673472717824951,
+          "min": -0.0032187171425163176,
+          "max": 0.010851663457021692
+        },
+        "feature_return_24bar": {
+          "count": 8,
+          "mean": 0.035893064806985314,
+          "min": 0.012048192771084265,
+          "max": 0.07112253641816624
+        },
+        "feature_rsi_14": {
+          "count": 8,
+          "mean": 59.852571458063686,
+          "min": 48.69324882235577,
+          "max": 65.40343536163064
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 8,
+          "mean": 0.48437499999999994,
+          "min": 0.18055555555555555,
+          "max": 0.7638888888888888
+        }
+      }
+    },
+    "YFIUSDTH21": {
+      "rows": 77,
+      "labeled_rows": 77,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7922077922077922,
+      "action_macro_f1": 0.2864612511671335,
+      "target_exposure_mae": 0.1388728099037284,
+      "target_rows": 77,
+      "action_counts": {
+        "ADD_LONG": 47,
+        "CLOSE_LONG": 7,
+        "OPEN_LONG": 6,
+        "REDUCE_LONG": 15,
+        "OPEN_SHORT": 1,
+        "CLOSE_SHORT": 1
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 58,
+        "REDUCE_LONG": 19
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 1.0,
+        "reduce_recall": 0.9333333333333333,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 77,
+          "mean": 756.8121521335809,
+          "min": 218.75,
+          "max": 2078.25
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 77,
+          "mean": 0.6144424602352797,
+          "min": -0.15971482803787274,
+          "max": 1.4045401878940276
+        },
+        "feature_macd_histogram": {
+          "count": 77,
+          "mean": 83.59845253883596,
+          "min": -285.8629518975454,
+          "max": 626.0344762139207
+        },
+        "feature_return_24bar": {
+          "count": 77,
+          "mean": 0.04889796131110014,
+          "min": -0.13382081686429514,
+          "max": 0.30226734218181117
+        },
+        "feature_rsi_14": {
+          "count": 77,
+          "mean": 54.00910142211244,
+          "min": 26.028496539609492,
+          "max": 79.17394593425101
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 77,
+          "mean": 0.6969696969696972,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "YFIUSDTZ20": {
+      "rows": 168,
+      "labeled_rows": 168,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.7202380952380952,
+      "action_macro_f1": 0.34125758411472695,
+      "target_exposure_mae": 0.025200858263742337,
+      "target_rows": 168,
+      "action_counts": {
+        "ADD_LONG": 112,
+        "CLOSE_LONG": 9,
+        "OPEN_LONG": 8,
+        "REDUCE_LONG": 39
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 133,
+        "REDUCE_LONG": 35
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": 0.9017857142857143,
+        "reduce_recall": 0.5128205128205128,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 168,
+          "mean": 629.7697704081629,
+          "min": 253.64285714285714,
+          "max": 1173.9642857142858
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 168,
+          "mean": 0.48184250456270483,
+          "min": -0.2838972198921324,
+          "max": 1.3671960432841377
+        },
+        "feature_macd_histogram": {
+          "count": 168,
+          "mean": 6.881998980844467,
+          "min": -274.91492294973216,
+          "max": 652.0032700593229
+        },
+        "feature_return_24bar": {
+          "count": 168,
+          "mean": 0.010239892720794744,
+          "min": -0.16507303576514631,
+          "max": 0.2746055597295267
+        },
+        "feature_rsi_14": {
+          "count": 168,
+          "mean": 50.42701340808857,
+          "min": 22.57837260320217,
+          "max": 79.53709460621613
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 168,
+          "mean": 0.5863095238095238,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    }
+  },
+  "by_venue_action_family": {
+    "BITMEX:ADD": {
+      "rows": 16601,
+      "labeled_rows": 16601,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.8158544665983977,
+      "action_macro_f1": 0.4329688458807456,
+      "target_exposure_mae": 0.06382143756130795,
+      "target_rows": 16601,
+      "action_counts": {
+        "ADD_SHORT": 6091,
+        "ADD_LONG": 10510
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 9529,
+        "ADD_SHORT": 4891,
+        "REDUCE_LONG": 1314,
+        "REDUCE_SHORT": 867
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.8686223721462563,
+        "reduce_recall": null,
+        "close_recall": null,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 16601,
+          "mean": 351.25900452950015,
+          "min": 1.9071428571428793e-09,
+          "max": 3108.5
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 16601,
+          "mean": 0.46579306145833654,
+          "min": -0.5244383020559023,
+          "max": 1.5787613792179975
+        },
+        "feature_macd_histogram": {
+          "count": 16601,
+          "mean": -10.89935572647852,
+          "min": -645.5753817921769,
+          "max": 892.6413506298254
+        },
+        "feature_return_24bar": {
+          "count": 16601,
+          "mean": 0.003315393687993862,
+          "min": -0.4068905364151766,
+          "max": 0.6476190476190478
+        },
+        "feature_rsi_14": {
+          "count": 16601,
+          "mean": 49.692742719275245,
+          "min": 12.349980199455047,
+          "max": 95.86499228294944
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 16601,
+          "mean": 0.6192690868689318,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "BITMEX:CLOSE": {
+      "rows": 1196,
+      "labeled_rows": 1196,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 0.1104596692782182,
+      "target_rows": 1196,
+      "action_counts": {
+        "CLOSE_LONG": 860,
+        "CLOSE_SHORT": 336
+      },
+      "predicted_action_counts": {
+        "REDUCE_LONG": 324,
+        "ADD_SHORT": 186,
+        "ADD_LONG": 618,
+        "REDUCE_SHORT": 68
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": 0.0,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 1196,
+          "mean": 179.32584242592662,
+          "min": 2.9071428571428337e-09,
+          "max": 2813.1428571428573
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 1196,
+          "mean": 0.5003688022842367,
+          "min": -0.4842407560290771,
+          "max": 1.5655820821721875
+        },
+        "feature_macd_histogram": {
+          "count": 1196,
+          "mean": -8.634741373379319,
+          "min": -485.7263763834444,
+          "max": 626.0344762139207
+        },
+        "feature_return_24bar": {
+          "count": 1196,
+          "mean": 0.007888284442922026,
+          "min": -0.4699010445299615,
+          "max": 0.5593378995433789
+        },
+        "feature_rsi_14": {
+          "count": 1196,
+          "mean": 50.70053348894401,
+          "min": 10.149892920293127,
+          "max": 92.71906621643726
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 1196,
+          "mean": 0.615616871051653,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "BITMEX:FLIP": {
+      "rows": 166,
+      "labeled_rows": 166,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 0.06049214430531352,
+      "target_rows": 166,
+      "action_counts": {
+        "FLIP_SHORT_TO_LONG": 80,
+        "FLIP_LONG_TO_SHORT": 86
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 36,
+        "REDUCE_LONG": 70,
+        "ADD_SHORT": 19,
+        "REDUCE_SHORT": 41
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": null,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 166,
+          "mean": 365.7989676831196,
+          "min": 4.0714285714286173e-08,
+          "max": 2562.6071428571427
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 166,
+          "mean": 0.43711479958665306,
+          "min": -0.4822024477154204,
+          "max": 1.3598023364995764
+        },
+        "feature_macd_histogram": {
+          "count": 166,
+          "mean": -16.410797300847147,
+          "min": -356.9260056431809,
+          "max": 452.4590678731905
+        },
+        "feature_return_24bar": {
+          "count": 166,
+          "mean": 0.001473753460637266,
+          "min": -0.14961806708734637,
+          "max": 0.41860962566844906
+        },
+        "feature_rsi_14": {
+          "count": 166,
+          "mean": 48.38765421339417,
+          "min": 15.39821412374188,
+          "max": 82.77252519746062
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 166,
+          "mean": 0.5937081659973227,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "BITMEX:HOLD": {
+      "rows": 529,
+      "labeled_rows": 529,
+      "observed_action_rate": 0.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 0.012056702651694907,
+      "target_rows": 529,
+      "action_counts": {
+        "HOLD_LONG": 128,
+        "NO_TRADE": 117,
+        "HOLD_SHORT": 284
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 74,
+        "REDUCE_LONG": 26,
+        "ADD_SHORT": 286,
+        "REDUCE_SHORT": 143
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": null,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 529,
+          "mean": 356.1146232784228,
+          "min": 11.857142857142858,
+          "max": 1696.5071428571432
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 529,
+          "mean": 0.5131149137138655,
+          "min": -0.4934717854052325,
+          "max": 1.4867303482762873
+        },
+        "feature_macd_histogram": {
+          "count": 529,
+          "mean": 4.785412829958334,
+          "min": -383.9055461243313,
+          "max": 766.0354004183611
+        },
+        "feature_return_24bar": {
+          "count": 529,
+          "mean": 0.0012865072462034687,
+          "min": -0.12038844427093498,
+          "max": 0.110456788158523
+        },
+        "feature_rsi_14": {
+          "count": 529,
+          "mean": 50.72635419928239,
+          "min": 12.340240518141442,
+          "max": 83.98011625716092
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 529,
+          "mean": 0.5188773366939716,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "BITMEX:OPEN": {
+      "rows": 1133,
+      "labeled_rows": 1133,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 0.09371989247807325,
+      "target_rows": 1133,
+      "action_counts": {
+        "OPEN_SHORT": 317,
+        "OPEN_LONG": 816
+      },
+      "predicted_action_counts": {
+        "REDUCE_LONG": 314,
+        "ADD_LONG": 563,
+        "ADD_SHORT": 192,
+        "REDUCE_SHORT": 64
+      },
+      "family_recall": {
+        "open_recall": 0.0,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": null,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 1133,
+          "mean": 187.96882432707304,
+          "min": 2.9071428571428337e-09,
+          "max": 2813.1428571428573
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 1133,
+          "mean": 0.5078514228480324,
+          "min": -0.5626411829195695,
+          "max": 1.455444263173303
+        },
+        "feature_macd_histogram": {
+          "count": 1133,
+          "mean": -5.8896326030251815,
+          "min": -452.07188500269785,
+          "max": 652.0032700593229
+        },
+        "feature_return_24bar": {
+          "count": 1133,
+          "mean": 0.011766821685616203,
+          "min": -0.42337895445366835,
+          "max": 0.7058504034761017
+        },
+        "feature_rsi_14": {
+          "count": 1133,
+          "mean": 51.14242200520936,
+          "min": 9.169426269204877,
+          "max": 92.71906621643726
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 1133,
+          "mean": 0.5961189565558488,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "BITMEX:REDUCE": {
+      "rows": 11686,
+      "labeled_rows": 11686,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6749957213760055,
+      "action_macro_f1": 0.39862422795078845,
+      "target_exposure_mae": 0.05600435567168494,
+      "target_rows": 11686,
+      "action_counts": {
+        "REDUCE_LONG": 7273,
+        "REDUCE_SHORT": 4413
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 2432,
+        "REDUCE_LONG": 5124,
+        "ADD_SHORT": 1336,
+        "REDUCE_SHORT": 2794
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": 0.6775628957727194,
+        "close_recall": null,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 11686,
+          "mean": 411.0842613368983,
+          "min": 2.192857142857126e-09,
+          "max": 2813.1428571428573
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 11686,
+          "mean": 0.4611740202602124,
+          "min": -0.563321675692917,
+          "max": 1.5787613792179975
+        },
+        "feature_macd_histogram": {
+          "count": 11686,
+          "mean": -23.4324048303106,
+          "min": -899.4914074655304,
+          "max": 876.3377333016791
+        },
+        "feature_return_24bar": {
+          "count": 11686,
+          "mean": 0.0015889660415365702,
+          "min": -0.4699010445299615,
+          "max": 0.7280491059514278
+        },
+        "feature_rsi_14": {
+          "count": 11686,
+          "mean": 48.73891322184945,
+          "min": 5.950890478395465,
+          "max": 92.71906621643726
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 11686,
+          "mean": 0.6252602829596691,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    },
+    "HYPERLIQUID:ADD": {
+      "rows": 137,
+      "labeled_rows": 137,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.5620437956204379,
+      "action_macro_f1": 0.3717607646073504,
+      "target_exposure_mae": 1.3368718978102192,
+      "target_rows": 137,
+      "action_counts": {
+        "ADD_LONG": 125,
+        "ADD_SHORT": 12
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 74,
+        "REDUCE_LONG": 41,
+        "ADD_SHORT": 22
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": 0.7007299270072993,
+        "reduce_recall": null,
+        "close_recall": null,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 137,
+          "mean": 619.8670490093851,
+          "min": 220.78571428571428,
+          "max": 1249.0714285714287
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 137,
+          "mean": 0.3414156932647264,
+          "min": -0.5124978859185434,
+          "max": 1.3720014694050904
+        },
+        "feature_macd_histogram": {
+          "count": 137,
+          "mean": -20.128702398054152,
+          "min": -555.3866040675366,
+          "max": 562.6030290090179
+        },
+        "feature_return_24bar": {
+          "count": 137,
+          "mean": -0.00789386701970258,
+          "min": -0.0752696658774007,
+          "max": 0.07653073244281106
+        },
+        "feature_rsi_14": {
+          "count": 137,
+          "mean": 42.48478418366234,
+          "min": 13.137816370248046,
+          "max": 79.31951775661231
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 137,
+          "mean": 0.7721005677210063,
+          "min": 0.041666666666666664,
+          "max": 1.0
+        }
+      }
+    },
+    "HYPERLIQUID:FLIP": {
+      "rows": 8,
+      "labeled_rows": 8,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.0,
+      "action_macro_f1": 0.0,
+      "target_exposure_mae": 1.003915,
+      "target_rows": 8,
+      "action_counts": {
+        "FLIP_SHORT": 3,
+        "FLIP_LONG": 5
+      },
+      "predicted_action_counts": {
+        "ADD_LONG": 8
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": null,
+        "close_recall": null,
+        "flip_recall": 0.0
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 8,
+          "mean": 434.4375,
+          "min": 326.64285714285717,
+          "max": 625.4285714285714
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 8,
+          "mean": 0.21140919177840037,
+          "min": -0.5124978859185434,
+          "max": 1.1655585979468785
+        },
+        "feature_macd_histogram": {
+          "count": 8,
+          "mean": -35.76351023361582,
+          "min": -202.81159117244303,
+          "max": 151.07885552609105
+        },
+        "feature_return_24bar": {
+          "count": 8,
+          "mean": -0.004750521919092476,
+          "min": -0.0238669856050574,
+          "max": 0.027084772651672084
+        },
+        "feature_rsi_14": {
+          "count": 8,
+          "mean": 44.463159058133485,
+          "min": 24.10634066842543,
+          "max": 75.02703346388782
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 8,
+          "mean": 0.8350694444444444,
+          "min": 0.3888888888888889,
+          "max": 1.0
+        }
+      }
+    },
+    "HYPERLIQUID:REDUCE": {
+      "rows": 175,
+      "labeled_rows": 175,
+      "observed_action_rate": 1.0,
+      "predicted_action_rate": 1.0,
+      "action_accuracy": 0.6685714285714286,
+      "action_macro_f1": 0.36926889714993805,
+      "target_exposure_mae": 1.5434586857142851,
+      "target_rows": 175,
+      "action_counts": {
+        "REDUCE_LONG": 160,
+        "REDUCE_SHORT": 15
+      },
+      "predicted_action_counts": {
+        "REDUCE_LONG": 109,
+        "ADD_LONG": 52,
+        "REDUCE_SHORT": 9,
+        "ADD_SHORT": 5
+      },
+      "family_recall": {
+        "open_recall": null,
+        "add_recall": null,
+        "reduce_recall": 0.6742857142857143,
+        "close_recall": null,
+        "flip_recall": null
+      },
+      "indicator_summary": {
+        "feature_atr_14bar": {
+          "count": 175,
+          "mean": 683.9155102040818,
+          "min": 181.5,
+          "max": 1570.4285714285713
+        },
+        "feature_bollinger_percent_b_20": {
+          "count": 175,
+          "mean": 0.6853048886800921,
+          "min": -0.17419860412553814,
+          "max": 1.4590622435090166
+        },
+        "feature_macd_histogram": {
+          "count": 175,
+          "mean": 62.55520846657644,
+          "min": -319.80727085240324,
+          "max": 509.2555633210335
+        },
+        "feature_return_24bar": {
+          "count": 175,
+          "mean": 0.0007167861408031603,
+          "min": -0.1046975777944551,
+          "max": 0.07449305983507948
+        },
+        "feature_rsi_14": {
+          "count": 175,
+          "mean": 56.20811009559531,
+          "min": 18.414709543881088,
+          "max": 88.62497248384928
+        },
+        "feature_volume_percentile_72bar": {
+          "count": 175,
+          "mean": 0.6969047619047622,
+          "min": 0.013888888888888888,
+          "max": 1.0
+        }
+      }
+    }
+  },
+  "model_prediction_errors": {},
+  "strict_autonomous_reference": {
+    "status": "DEMO_CONTINUE_LIVE_BLOCKED",
+    "report": "quant/reports/cross_venue_indicator_autonomous_audit.json",
+    "live_trading_allowed": false,
+    "demo_model_auto_switch": false,
+    "candidate_artifact_status": "NOT_PROMOTED_AUTONOMOUS_GATES_FAILED"
+  },
+  "strategy_reason_contract": {
+    "language": "zh-CN",
+    "label": "模型输入依据，不代表原交易员真实使用的指标或规则",
+    "fields": [
+      "feature_rsi_14",
+      "feature_macd_histogram",
+      "feature_bollinger_percent_b_20",
+      "feature_volume_percentile_72bar",
+      "feature_return_24bar",
+      "feature_atr_14bar"
+    ]
+  },
+  "next_step": "Use the detail CSV to render historical trade contexts and compare against K-lines. Keep the active model unchanged until strict autonomous time-out replay passes its promotion gates."
+}

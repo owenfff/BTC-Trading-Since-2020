@@ -22,6 +22,25 @@ python quant/scripts/audit_cross_venue_strategy.py
 
 `audit_cross_venue_strategy.py` 同时输出 `CONDITIONAL_BEHAVIOR` 与 `STRICT_AUTONOMOUS_REPLAY`，后者从零仓位开始，只用决策时已经关闭的 K 线，在下一根 K 线开盘模拟执行，并计入费用、资金费和滑点。当前候选若未通过自主收益门槛会保持 `DEMO_CONTINUE_LIVE_BLOCKED`，不会切换部署模型或提交订单。
 
+### M15.24 历史交易前指标上下文回放
+
+如果要像公开回放网站一样回看“每一笔交易发生前看到了什么”，运行：
+
+```bash
+python quant/scripts/build_trade_context_indicator_replay.py
+```
+
+脚本流式读取被忽略的 `quant/outputs/cross_venue_model_dataset_v3.csv`，用当前冻结 v3 模型做条件预测，并把每条模型可用记录的决策时间、最后已收盘 K 线、RSI14、MACD 柱、布林 `%B`、成交量分位数、24 小时动量、原动作、模型动作和中文解释写入被忽略的：
+
+- `quant/outputs/trade_context_indicator_replay.csv`
+
+汇总报告保存在 Git 中：
+
+- `quant/reports/trade_context_indicator_replay.md`
+- `quant/reports/trade_context_indicator_replay.json`
+
+历史标签只用于预测后的比较，不进入模型输入；条件回放仍使用历史持仓状态，不能代替从零仓位的 `STRICT_AUTONOMOUS_REPLAY`。指标解释统一标为“模型输入依据”，不声称原交易员真实使用过 RSI、MACD 或布林带。该步骤不训练、不接交易所、不改模型、不下单。
+
 官方公开 API 的有限近期刷新使用：
 
 ```bash
