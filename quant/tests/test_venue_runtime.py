@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 from quant_bot.domain.balance import Balance
 from quant_bot.domain.instrument import Instrument, InstrumentType
-from quant_bot.domain.market_data import MarketBar
+from quant_bot.domain.market_data import MarketBar, MarketContext, MarketQuote
 from quant_bot.domain.order import Order, OrderSide, OrderStatus, OrderType
 from quant_bot.domain.position import Position
 from quant_bot.venue_runtime import VenueRuntime
@@ -35,7 +35,9 @@ class SimulatedAdapter:
 
     def __init__(self) -> None:
         self.orders: dict[str, Order] = {}
-        now = datetime.now(timezone.utc) - timedelta(hours=110)
+        # Keep enough history for the feature engine while making the latest
+        # closed bar recent enough for the strict runtime freshness gate.
+        now = datetime.now(timezone.utc) - timedelta(hours=100)
         self.bars = [MarketBar("BTCUSDT", now + timedelta(hours=index), "100", "101", "99", "100", "10", source="fixture") for index in range(100)]
         self.place_calls = 0
 
@@ -58,6 +60,22 @@ class SimulatedAdapter:
     def fetch_quote(self, symbol: str) -> tuple[Decimal, Decimal]:
         assert symbol == "BTCUSDT"
         return Decimal("99.9"), Decimal("100.1")
+
+    def fetch_market_context(self, symbol: str, *, bars: list[MarketBar] | None = None) -> MarketContext:
+        assert symbol == "BTCUSDT"
+        now = datetime.now(timezone.utc)
+        latest = (bars or self.bars)[-1]
+        return MarketContext(
+            symbol,
+            MarketQuote(symbol, "99.9", "100.1", now, "fixture-quote"),
+            latest.timestamp + timedelta(hours=1),
+            None,
+            None,
+            None,
+            None,
+            now,
+            {"quote": "OK", "closed_bar": "OK", "funding": "MISSING", "mark_price": "MISSING", "index_price": "MISSING"},
+        )
 
     def place_order(self, order: Order) -> Order:
         self.place_calls += 1
@@ -113,6 +131,37 @@ def test_runtime_blocks_order_when_private_stream_is_unhealthy(tmp_path: Path) -
     result = runtime.process_once()
     assert result["submitted"] == []
     assert result["blocked"]["XBTUSD"] == ["WEBSOCKET_NOT_CONNECTED"]
+
+
+def test_runtime_rejects_unverified_or_future_market_context(tmp_path: Path) -> None:
+    adapter = SimulatedAdapter()
+    runtime = _runtime(tmp_path, adapter)
+    now = datetime.now(timezone.utc)
+    runtime.market_contexts["BTCUSDT"] = MarketContext(
+        "BTCUSDT",
+        MarketQuote("BTCUSDT", "99.9", "100.1", now, "fixture-quote"),
+        now + timedelta(hours=1),
+        None,
+        None,
+        None,
+        None,
+        now,
+        {"quote": "OK", "closed_bar": "UNVERIFIED_ADAPTER_FALLBACK"},
+    )
+    assert runtime._market_fresh("BTCUSDT") is False
+
+    runtime.market_contexts["BTCUSDT"] = MarketContext(
+        "BTCUSDT",
+        MarketQuote("BTCUSDT", "99.9", "100.1", now + timedelta(minutes=1), "fixture-quote"),
+        now + timedelta(hours=1),
+        None,
+        None,
+        None,
+        None,
+        now,
+        {"quote": "OK", "closed_bar": "OK"},
+    )
+    assert runtime._market_fresh("BTCUSDT") is False
 
 
 def test_runtime_persists_pre_action_context_before_order_submission(tmp_path: Path) -> None:

@@ -499,11 +499,14 @@ class VenueRuntime:
         if context is None:
             return False
         if context.coverage.get("closed_bar") == "UNVERIFIED_ADAPTER_FALLBACK":
-            return True
+            # A quote plus a guessed bar boundary is not sufficient evidence
+            # for an order. Adapters must provide a verified market context.
+            return False
         now = datetime.now(timezone.utc)
-        quote_ok = context.quote_age_seconds(now) <= 30
-        bar_age = context.closed_bar_age_seconds(now)
-        bar_ok = bar_age is not None and bar_age <= 7200
+        quote_age = (now - context.quote.observed_at).total_seconds()
+        bar_age = ((now - context.closed_bar_time).total_seconds() if context.closed_bar_time else None)
+        quote_ok = context.coverage.get("quote") == "OK" and 0 <= quote_age <= 30
+        bar_ok = context.coverage.get("closed_bar") == "OK" and bar_age is not None and 0 <= bar_age <= 7200
         return quote_ok and bar_ok
 
     def _record_decision_snapshot(
