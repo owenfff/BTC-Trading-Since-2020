@@ -350,3 +350,10 @@
 - The compact runtime state still retains the newest `5,000` rows for restart/dashboard use; the daily journal is append-only, flushed and synced, so long Demo observations are not silently evicted.
 - Sensitive key names, non-JSON values, invalid ISO timestamps, and records over `128 KiB` are rejected before append. No raw adapter payload is copied.
 - Verification: `414 passed`; the journal audit is `READY_NO_RUNTIME_RECORDS` until a new Demo cycle produces records. Active Demo/model are unchanged, no new orders were submitted, and exact strategy recovery remains unproven.
+
+## 2026-08-27 — Fail closed on unverified market freshness
+
+- M15.23 changes `VenueRuntime._market_fresh` so a quote-only adapter fallback is never treated as fresh enough to trade. A verified context must report `quote=OK` and `closed_bar=OK`.
+- Quote and closed-bar ages are now checked without clamping future timestamps: negative ages, stale quotes over `30` seconds, and closed bars older than `2` hours all fail the gate.
+- The change preserves the existing safety boundary: it blocks new orders and does not liquidate existing positions. The active model is unchanged.
+- Verification: full suite `415 passed` with 6 existing deprecation warnings; no credential, Demo order, mainnet connection, or raw historical input was used.

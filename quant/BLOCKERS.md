@@ -224,3 +224,9 @@ Phases 1 through 4 are complete. Public market data is `READY_WITH_WARNINGS`; no
 - M15.22 adds a flushed, append-only daily JSONL journal for credential-free pre-action decision context, while keeping the bounded `5,000`-row runtime ring for fast recovery.
 - The journal is empty until a new Demo run produces decisions, and it records the robot's observations rather than the original trader's missing private trigger. It cannot turn future robot decisions into historical teacher labels.
 - Keep the active Demo model unchanged; do not promote a candidate or add Demo orders based on this journal. The exact-recovery, pre-action-context, autonomous-timing and Demo-authorization blockers remain.
+
+## 2026-08-27 — Unverified or future market context is now a hard order block
+
+- M15.23 closes a runtime safety gap: adapters without a verified market context, stale quote/bar data, or future-dated quote/bar timestamps cannot pass the order freshness gate.
+- This makes the safety condition stricter; it does not improve historical strategy identifiability. Exact recovery, autonomous timing and candidate promotion remain blocked.
+- The active Demo model remains unchanged and no new Demo orders are authorized by this change.

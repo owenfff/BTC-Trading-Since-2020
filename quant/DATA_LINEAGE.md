@@ -408,3 +408,10 @@ Wallet ledger, public market data, behavioral episodes, features, labels, models
 - Each record is allowlisted pre-action context: venue mapping, reconciled quantity/equity, quote/bar/funding/mark/index timestamps and coverage, strategy features, and model output. Credential-shaped keys, invalid records, and oversized records are rejected; no raw adapter payload is copied.
 - Retention: state snapshot ring `5,000` newest rows; journal append-only by UTC date with `128 KiB` maximum record size. Audit report status at implementation time: `READY_NO_RUNTIME_RECORDS`.
 - Verification: full suite `414 passed`; raw root CSV/JSON inputs, active Demo model and Demo orders remained unchanged. This lineage is prospective evidence and does not establish exact strategy recovery.
+
+## M15.23 fail-closed market freshness gate
+
+- Code: `quant_bot/venue_runtime.py`; tests extended in `quant/tests/test_venue_runtime.py`.
+- Runtime source: adapter-provided `MarketContext` only. A quote-only fallback remains available for read-only diagnostics but is explicitly ineligible for order submission.
+- Freshness rules: quote coverage must be `OK` and its unclamped age must be `0–30` seconds; closed-bar coverage must be `OK` and its unclamped age must be `0–7200` seconds. Future timestamps are rejected.
+- Verification: full suite `415 passed` with only the existing 6 `read_csv_batched` deprecation warnings. No historical CSV/JSON input, active model, credential, private endpoint, mainnet connection, or Demo order was changed.

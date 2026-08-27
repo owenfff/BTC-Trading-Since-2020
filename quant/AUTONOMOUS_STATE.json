@@ -2,12 +2,12 @@
   "program_version": "4.0",
   "program_status": "RUNNING",
   "current_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "current_work_package": "M15.22-append-only-prospective-decision-audit-journal",
+  "current_work_package": "M15.23-fail-closed-market-freshness-gate",
   "last_completed_phase": "PHASE_15_CROSS_VENUE_PUBLIC_REPLAY",
-  "last_code_commit": "808e837868f2ecca6cec7d09b28f82695a266ebf",
+  "last_code_commit": "5c5ef8fddc7e06eb06f1b82c30337235d2ab5d92",
   "last_report_commit": "294f2b80801aa7348e03614395d93d45a5e42913",
-  "test_count": 414,
-  "last_test_status": "FULL_SUITE_414_PASSED;APPEND_ONLY_PROSPECTIVE_DECISION_AUDIT_JOURNAL;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
+  "test_count": 415,
+  "last_test_status": "FULL_SUITE_415_PASSED;MARKET_FRESHNESS_FAIL_CLOSED;APPEND_ONLY_PROSPECTIVE_DECISION_AUDIT_JOURNAL;STRATEGY_COMPLETION_AUDIT_NOT_COMPLETE;ACTIVE_DEMO_UNCHANGED;NO_CREDENTIALS_USED",
   "accounting_status": "HIGH_CONFIDENCE_WITH_RESIDUALS",
   "wallet_status": "READY_WITH_WARNINGS",
   "behavior_dataset_status": "READY_WITH_WARNINGS",
@@ -73,7 +73,8 @@
     "M15.19 four no-download probes of representative Hyperliquid historical L2 archive keys returned 403; access/cost/coverage are unverified, so no L2 data was downloaded or integrated.",
     "M15.20 finds shared OPEN/ADD/REDUCE/FLIP action families across the separate BitMEX and Hyperliquid sources, but denominators and execution semantics are not interchangeable; exact private trigger recovery remains blocked and the active Demo model is unchanged.",
     "M15.21 adds bounded credential-free prospective decision snapshots before order side effects; this improves future Demo evidence but cannot reconstruct historical private triggers or prove exact strategy learning.",
-    "M15.22 adds an append-only UTC-partitioned credential-free JSONL journal for prospective decision context; it preserves future observations beyond the 5000-row state ring but cannot recover missing historical triggers or authorize model promotion."
+    "M15.22 adds an append-only UTC-partitioned credential-free JSONL journal for prospective decision context; it preserves future observations beyond the 5000-row state ring but cannot recover missing historical triggers or authorize model promotion.",
+    "M15.23 makes unverified, stale, or future-dated market context fail closed before order submission; this improves runtime safety but does not identify the original trader's private triggers or authorize candidate promotion."
   ],
   "warnings": [
     "Teacher data is TRADE_RECORDS_ONLY.",
@@ -87,6 +88,6 @@
     "Dependency audit and personal-data scan passed; license audit retains the historical teacher/source review warning.",
     "Docker runtime dependency pins are audited separately from full research/test dependencies; build and PAPER_SMOKE_PASS run succeeded without credentials."
   ],
-  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Run the prospective decision journal during an explicitly authorized Demo observation, then audit its daily files; do not claim exact learning without verified historical pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
+  "next_action": "Keep the current Demo model unchanged; do not promote v4.5 or add Demo orders. Run the stricter runtime only with verified fresh market context during an explicitly authorized Demo observation, then audit its daily files; do not claim exact learning without verified historical pre-action context. Do not incur requester-pays transfer costs without explicit authorization.",
   "updated_at_utc": "2026-08-26T16:29:54Z"
 }
