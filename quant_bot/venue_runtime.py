@@ -1090,7 +1090,14 @@ class VenueRuntime:
     def shutdown(self) -> None:
         self.stop_event.set()
         if self._async_stop is not None and self._async_loop is not None:
-            self._async_loop.call_soon_threadsafe(self._async_stop.set)
+            # The websocket thread may have already exited and closed its
+            # event loop (for example after a transient connection error).
+            # Shutdown is a best-effort cleanup path; a closed loop must not
+            # turn a safe, already-stopped runtime into RUNNER_EXCEPTION.
+            try:
+                self._async_loop.call_soon_threadsafe(self._async_stop.set)
+            except RuntimeError:
+                pass
         if self.ws_thread is not None and self.ws_thread.is_alive():
             self.ws_thread.join(timeout=2)
         self.cancel_created_orders()
