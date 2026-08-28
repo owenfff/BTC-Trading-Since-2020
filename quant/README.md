@@ -246,4 +246,14 @@ python quant/scripts/build_okx_public_market.py \
   --end now
 ```
 
+### M18.2 OKX 严格自主回放
+
+使用冻结的 v3 模型和 OKX 已收盘公共行情，从零仓位开始回放；信号在收盘后生成，下一根 K 线开盘执行，并计入手续费、滑点和可观测资金费。执行动作严格由 `当前暴露 → 目标暴露` 推导，防止动作分类与目标仓位不一致时产生隐藏调仓：
+
+```bash
+python quant/scripts/run_okx_strict_autonomous_replay.py
+```
+
+报告写入 `quant/reports/okx_strict_autonomous_replay.md` / `.json`，逐决策明细写入被 Git 忽略的 `quant/outputs/okx_strict_autonomous_replay.csv`。该回放只验证当前 v3 在 OKX 市场上下文中的可执行性，不训练、不切换 Demo 模型、不下单；`NOT_READY_FOR_DEMO` 时必须保留当前模型。
+
 小型审计摘要写入 `quant/reports/okx_public_market_audit.md` / `.json`；逐页缓存、K 线、上下文和指标 CSV 写入被 Git 忽略的 `quant/outputs/okx_public_market/`。这些 OKX 行情是市场环境输入，不是原交易者 BitMEX 私有成交标签；使用前仍须经过严格自主回放，不能据此宣称精确恢复策略或保证盈利。
