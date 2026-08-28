@@ -22,6 +22,27 @@ python quant/scripts/audit_cross_venue_strategy.py
 
 `audit_cross_venue_strategy.py` 同时输出 `CONDITIONAL_BEHAVIOR` 与 `STRICT_AUTONOMOUS_REPLAY`，后者从零仓位开始，只用决策时已经关闭的 K 线，在下一根 K 线开盘模拟执行，并计入费用、资金费和滑点。当前候选若未通过自主收益门槛会保持 `DEMO_CONTINUE_LIVE_BLOCKED`，不会切换部署模型或提交订单。
 
+## M17 可观测教师—学生蒸馏 v5
+
+本阶段新增真正的软标签蒸馏候选：`behavioral-distillation-v5.0-observable-teacher-student`。教师只使用决策前可观测的市场、仓位和订单事件，学生同时学习硬动作、教师动作概率、目标暴露和不确定性；教师不是原交易者的私有策略，结果仍标记为 `BEHAVIORAL_APPROXIMATION`。
+
+从仓库根目录运行：
+
+```bash
+python quant/scripts/build_observable_teacher_model.py
+python quant/scripts/audit_observable_distillation.py
+pytest quant/tests -v
+```
+
+候选模型和部署清单为：
+
+- `quant/outputs/cross_asset_deployment_model_v50.json`
+- `quant/reports/observable_distillation_manifest.md`
+- `quant/reports/observable_distillation_audit.md`
+- `quant/reports/observable_distillation_audit.json`
+
+审计同时比较 v3、v4.6 和 v5，输出条件行为、严格自主回放、逐交易所、逐品种和成本敏感性结果。v5 未通过门槛时，当前 v3 Demo 保持不变，不提交 Demo 订单，不进行在线训练；Hyperliquid 缺失窗口明确记录为 `INSUFFICIENT_COVERAGE`，不使用合成或 BitMEX 替代行情。
+
 ### M15.24 历史交易前指标上下文回放
 
 如果要像公开回放网站一样回看“每一笔交易发生前看到了什么”，运行：
@@ -197,3 +218,32 @@ pytest quant/tests -v
 每条 action、decision 和 cycle 都保留 `ordering_confidence`、`action_confidence`、`accounting_confidence`、`price_confidence`、`wallet_confidence` 和 `overall_confidence`。XBTUSD 是 BTC-first 教师范围，策略保真度固定为 `BEHAVIORAL_APPROXIMATION`；钱包只做 aggregate-only evidence，不伪造逐笔 join。
 
 Parquet 大文件只写入 `quant/outputs/` 并被 `.gitignore` 保护；若运行时没有 `quant/requirements.txt` 中的 Parquet engine，脚本会生成明确标记的 ignored CSV fallback，并在 `quant/reports/trader_behavior_profile.md` 中记录。
+
+## M18 市场驱动交易时机候选
+
+M18 新增 `MarketDrivenDistilledStrategy`，先从真实已关闭 K 线构造密集的背景决策点，再用冻结数据中的行情和指标学习“未来固定窗口内是否出现动作”，从市场特征预测动作时机和标准化目标暴露。当前持仓、最近动作、累计费用和执行字段不进入学习编码器；持仓只在预测完成后用于把目标暴露翻译为开仓、加仓、减仓、平仓或反手。动作族最终由 `current_exposure → target_exposure` 推导，避免平仓、减仓等动作在零仓位上产生不可能的订单语义。
+
+构建并审计候选：
+
+```bash
+python quant/scripts/build_market_driven_timing_model.py
+python quant/scripts/audit_market_driven_timing.py
+```
+
+产物为 `quant/outputs/cross_asset_deployment_model_v60.json`、`quant/reports/market_driven_event_dataset_manifest.md` 和 `quant/reports/market_driven_timing_audit.md` / `.json`。当前冻结背景集包含 `92,406` 个真实闭合 K 线决策点，其中 `42,961` 个处于六小时目标窗口；时机头单独使用一小时窗口；没有合成行情。审计脚本在候选未通过升级门槛时返回非零状态，这是 fail-closed 设计；不会切换当前 v3 Demo，也不会提交订单。最新保守门槛实验的 WF1/WF2/WF3 成本后净结果为 `-0.007463 / +0.066291 / +0.002982`，PF 为 `0.984599 / 1.040878 / 1.004122`，但严格自主 OPEN/CLOSE/FLIP 召回仍未达标，因此 v6 继续是候选。历史 L2/订单簿缺失和 Hyperliquid 不足窗口继续明确标记，不填充、不合成。
+
+## OKX 公开历史市场数据回溯
+
+`python quant/scripts/build_okx_public_market.py` 只调用 OKX 公开市场接口，不读取 API Key，不访问账户接口，也不下单。它支持按 `after` 时间游标分页回溯已收盘 K 线，并尽力附加标记价、指数价和资金费；无法取得的上下文保持缺失，不用 `0` 伪造。指标使用仓库现有的因果计算逻辑，输出 RSI14、MACD、布林带、ATR、收益率、波动率和成交量分位数。
+
+示例：
+
+```bash
+python quant/scripts/build_okx_public_market.py \
+  --inst-id BTC-USDT-SWAP \
+  --bar 1H \
+  --start 2020-01-01T00:00:00Z \
+  --end now
+```
+
+小型审计摘要写入 `quant/reports/okx_public_market_audit.md` / `.json`；逐页缓存、K 线、上下文和指标 CSV 写入被 Git 忽略的 `quant/outputs/okx_public_market/`。这些 OKX 行情是市场环境输入，不是原交易者 BitMEX 私有成交标签；使用前仍须经过严格自主回放，不能据此宣称精确恢复策略或保证盈利。

@@ -46,6 +46,7 @@ data/external/
 reports/cross_venue_rowwise_coverage.csv
 data/market/raw/
 data/market/cache/
+outputs/okx_public_market/
 outputs/instrument_terms_temporal_audit.csv
 outputs/execution_tie_order_audit.csv
 **/__pycache__/
