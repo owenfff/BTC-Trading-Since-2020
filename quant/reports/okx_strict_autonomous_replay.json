@@ -1,0 +1,139 @@
+{
+  "report_version": "M18.2-OKX-STRICT-AUTONOMOUS-REPLAY-1.0",
+  "status": "PASS_WITH_WARNINGS",
+  "strategy_fidelity": "BEHAVIORAL_APPROXIMATION",
+  "strategy_version": "behavioral-distillation-v3-cross-asset-indicators",
+  "analysis_commit": "b11bc1259cc904378f2c6958e89a537fc631c19d",
+  "market_rows": 8999,
+  "period": {
+    "start": "2025-08-18T05:00:00.001000Z",
+    "end": "2026-08-28T03:00:00.001000Z"
+  },
+  "source": {
+    "features": "quant/outputs/okx_public_market/BTC-USDT-SWAP_1H/features.csv",
+    "features_sha256": "ad29f27e9aaecc6ec18b8554c3906a5f710a6b6e10934b74f4a9cbbd9b527a9e",
+    "model": "quant/outputs/cross_asset_deployment_model_v3.json",
+    "model_sha256": "d2b224f5c35f34162c92a3e7b1895226ff9b9ce656b0a42701a37840c19555ab",
+    "market_source": "OKX_PUBLIC_API_CLOSED_CANDLES",
+    "credentials": "none"
+  },
+  "strict_autonomous_replay": {
+    "metrics": {
+      "final_equity": 1.26833633840395,
+      "net_return": 0.2683363384039501,
+      "gross_pnl": 0.2577711917671188,
+      "fees": 0.0005,
+      "funding_payment_net": -0.01116514663682829,
+      "slippage_cost": 0.0001,
+      "max_drawdown": 0.20665695220917737,
+      "sharpe_annualized": 0.5994891739312156,
+      "sortino_annualized": 0.8655990951812526,
+      "profit_factor": 1.0201536516118839,
+      "trade_count": 1,
+      "turnover_exposure": 1.0,
+      "positive_pnl_steps": 6707,
+      "negative_pnl_steps": 6807
+    },
+    "action_counts": {
+      "HOLD_SHORT": 8926,
+      "OPEN_SHORT": 1
+    },
+    "raw_action_mismatch_count": 8927,
+    "target_saturated_rows": 8927,
+    "windows": [
+      {
+        "window": "WF1",
+        "start": "2025-08-18T05:00:00.001000Z",
+        "end": "2025-12-21T03:00:00.001000Z",
+        "rows": 2999,
+        "net_return": 0.2267595065452359,
+        "max_drawdown": 0.1553405664524715,
+        "action_counts": {
+          "HOLD_SHORT": 2926,
+          "OPEN_SHORT": 1
+        }
+      },
+      {
+        "window": "WF2",
+        "start": "2025-12-21T04:00:00.001000Z",
+        "end": "2026-04-25T02:00:00.001000Z",
+        "rows": 2999,
+        "net_return": 0.07267289951130373,
+        "max_drawdown": 0.16599783806981494,
+        "action_counts": {
+          "HOLD_SHORT": 2999
+        }
+      },
+      {
+        "window": "WF3",
+        "start": "2026-04-25T03:00:00.001000Z",
+        "end": "2026-08-28T03:00:00.001000Z",
+        "rows": 3001,
+        "net_return": -0.03431990479412883,
+        "max_drawdown": 0.2066553123110975,
+        "action_counts": {
+          "HOLD_SHORT": 3001
+        }
+      }
+    ],
+    "warmup_bars": 72,
+    "warmup_rows": 72,
+    "signal_rows": 8927,
+    "causal_timestamp_violation_count": 0,
+    "indicator_missing_counts": {
+      "feature_rsi_14": 14,
+      "feature_macd_histogram": 33,
+      "feature_bollinger_percent_b_20": 19,
+      "feature_volume_percentile_72bar": 71,
+      "feature_atr_14bar": 14
+    },
+    "state_source": "SIMULATED_ZERO_START",
+    "teacher_dynamic_state_consumed": false,
+    "execution_rule": "NEXT_CLOSED_BAR_OPEN; FILL_RATIO_CONFIGURED; COSTS_INCLUDED"
+  },
+  "baselines": {
+    "no_trade": {
+      "net_return": 0.0,
+      "final_equity": 1.0,
+      "trade_count": 0
+    },
+    "buy_and_hold": {
+      "final_equity": 0.7290924192370996,
+      "net_return": -0.27090758076290045,
+      "gross_pnl": -0.2591424341260731,
+      "fees": 0.0005,
+      "funding_payment_net": 0.01116514663682829,
+      "slippage_cost": 0.0001,
+      "max_drawdown": 0.6280009975708424,
+      "sharpe_annualized": -0.06254879125491519,
+      "sortino_annualized": -0.08886817018152143,
+      "profit_factor": 0.980058088911467,
+      "trade_count": 1,
+      "turnover_exposure": 1.0,
+      "positive_pnl_steps": 6806,
+      "negative_pnl_steps": 6710
+    }
+  },
+  "context_status_counts": {
+    "COMPLETE": 1899,
+    "MARK_INDEX_MISSING": 7100
+  },
+  "conditional_behavior": {
+    "status": "NOT_RUN",
+    "reason": "This run is intentionally strict autonomous and has no teacher labels in the OKX market-context file."
+  },
+  "model_upgrade_decision": "NOT_PROMOTED_CURRENT_V3_MARKET_CONTEXT_ONLY",
+  "model_readiness": "NOT_READY_FOR_DEMO",
+  "readiness_reasons": [
+    "动作分类头与目标暴露推导不一致",
+    "目标暴露长期饱和在边界",
+    "有效仓位调整次数过少，无法证明稳定捕捉信号"
+  ],
+  "live_trading_allowed": false,
+  "demo_model_switched": false,
+  "private_api_used": false,
+  "orders_submitted": false,
+  "real_funds_used": false,
+  "raw_account_inputs_unchanged": true,
+  "detail_output": "quant/outputs/okx_strict_autonomous_replay.csv"
+}
